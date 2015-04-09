@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		id="com.onesignal.plugins.OneSignal"
+		version="1.5.0">
+
+	<name>OneSignal Push Notifications</name>
+	<author>Josh Kasten</author>
+
+	<description>
+		OneSignal is a high volume Push Notification service for mobile apps. In addition to basic notification delivery, OneSignal also provides tools to localize, target, schedule, and automate notifications that you send.
+	</description>
+
+	<keywords>push,notification,push notification,push notifications,apns,gcm,adm,retention,messaging</keywords>
+
+	<license>MIT</license>
+
+	<js-module src="www/OneSignal.js" name="OneSignal">
+		<clobbers target="OneSignal" />
+	</js-module>
+
+	<engines>
+		<engine name="cordova" version=">=3.3.0" />
+	</engines>
+	
+	<platform name="android">
+		<dependency id="android.support.v4" />
+		<dependency id="com.google.playservices" />
+
+		<config-file target="res/xml/config.xml" parent="/*">
+			<feature name="OneSignalPush" >
+				<param name="android-package" value="com.plugin.gcm.OneSignalPush" />
+			</feature>
+		</config-file>
+
+		<config-file target="AndroidManifest.xml" parent="/manifest">
+			<uses-permission android:name="android.permission.INTERNET" />
+			<uses-permission android:name="android.permission.WAKE_LOCK" />
+			<uses-permission android:name="android.permission.VIBRATE"/>
+			
+			<uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+			<permission android:name="$PACKAGE_NAME.permission.C2D_MESSAGE" android:protectionLevel="signature" />
+			<uses-permission android:name="$PACKAGE_NAME.permission.C2D_MESSAGE" />
+			
+			<uses-permission android:name="com.amazon.device.messaging.permission.RECEIVE" />
+			<permission android:name="$PACKAGE_NAME.permission.RECEIVE_ADM_MESSAGE" android:protectionLevel="signature" />
+			<uses-permission android:name="$PACKAGE_NAME.permission.RECEIVE_ADM_MESSAGE" />
+		</config-file>
+
+		<config-file target="AndroidManifest.xml" parent="/manifest/application">
+			<activity android:name="com.onesignal.NotificationOpenedActivity"/>
+			
+			<receiver
+				android:name="com.onesignal.GcmBroadcastReceiver"
+				android:permission="com.google.android.c2dm.permission.SEND" >
+				<intent-filter>
+					<action android:name="com.google.android.c2dm.intent.RECEIVE" />
+					<category android:name="$PACKAGE_NAME" />
+				</intent-filter>
+			</receiver>
+			<service android:name="com.onesignal.GcmIntentService" />
+			
+			
+			<amazon:enable-feature android:name="com.amazon.device.messaging" android:required="false" xmlns:amazon="http://schemas.amazon.com/apk/res/android" />
+			<service android:name="com.onesignal.ADMMessageHandler" android:exported="false" />
+			<receiver
+				android:name="com.onesignal.ADMMessageHandler$Receiver"
+				android:permission="com.amazon.device.messaging.permission.SEND" >
+				<intent-filter>
+				  <action android:name="com.amazon.device.messaging.intent.REGISTRATION" />
+				  <action android:name="com.amazon.device.messaging.intent.RECEIVE" />
+				  <category android:name="$PACKAGE_NAME" />
+				</intent-filter>
+			</receiver>
+		</config-file>
+		
+		<source-file src="src/android/libs/OneSignalSDK.jar" target-dir="libs" />
+		<source-file src="src/android/com/plugin/gcm/OneSignalPush.java" target-dir="src/com/plugin/gcm/" />
+	</platform>
+	
+	<!-- ios -->
+	<platform name="ios">
+
+		<config-file target="config.xml" parent="/*">
+			<feature name="OneSignalPush">
+				<param name="ios-package" value="OneSignalPush"/>
+			</feature>
+		</config-file>
+
+		<framework src="SystemConfiguration.framework" />
+
+		<config-file target="*-Info.plist" parent="UIBackgroundModes">
+            <array>
+                <string>remote-notification</string>
+            </array>
+        </config-file>
+
+		<source-file src="src/ios/OneSignal.m" />
+		<source-file src="src/ios/OneSignalHTTPClient.m" />
+		<source-file src="src/ios/OneSignalTrackIAP.m" />
+		<source-file src="src/ios/OneSignalJailbreakDetection.m" />
+		<source-file src="src/ios/OneSignalPush.m" />
+		<source-file src="src/ios/OneSignalReachability.m" />
+
+		<header-file src="src/ios/OneSignal.h" />
+		<header-file src="src/ios/OneSignalHTTPClient.h" />
+		<header-file src="src/ios/OneSignalTrackIAP.h" />
+		<header-file src="src/ios/OneSignalJailbreakDetection.h" />
+		<header-file src="src/ios/OneSignalPush.h" />
+		<header-file src="src/ios/OneSignalReachability.h" />
+
+	</platform>
+
+</plugin>
+
