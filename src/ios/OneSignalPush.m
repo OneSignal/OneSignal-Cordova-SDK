@@ -36,6 +36,7 @@ OneSignal* oneSignal;
 NSString* notficationOpenedCallbackId;
 NSString* getTagsCallbackId;
 NSString* getIdsCallbackId;
+NSString* postNotificationCallbackId;
 
 NSMutableDictionary* launchDict;
 
@@ -47,12 +48,20 @@ void successCallback(NSString* callbackId, NSDictionary* data) {
     [pluginCommandDelegate sendPluginResult:commandResult callbackId:callbackId];
 }
 
+void failureCallback(NSString* callbackId, NSDictionary* data) {
+    CDVPluginResult* commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:data];
+    commandResult.keepCallback = @1;
+    [pluginCommandDelegate sendPluginResult:commandResult callbackId:callbackId];
+}
+
 void processNotificationOpened(NSDictionary* launchOptions) {
     successCallback(notficationOpenedCallbackId, launchOptions);
 }
 
 void initOneSignalObject(NSDictionary* launchOptions, const char* appId, BOOL autoRegister) {
     if (oneSignal == nil) {
+        [OneSignal setValue:@"cordova" forKey:@"mSDKType"];
+
         NSString* appIdStr = (appId ? [NSString stringWithUTF8String: appId] : nil);
         
         oneSignal = [[OneSignal alloc] initWithLaunchOptions:launchOptions appId:appIdStr handleNotification:^(NSString* message, NSDictionary* additionalData, BOOL isActive) {
@@ -151,7 +160,7 @@ static Class delegateClass = nil;
 - (void)getIds_GameThrive:(CDVInvokedUrlCommand*)command {
     getIdsCallbackId = command.callbackId;
     [oneSignal IdsAvailable:^(NSString* playerId, NSString* pushToken) {
-        if(pushToken == nil)
+        if (pushToken == nil)
             pushToken = @"";
         
         successCallback(getIdsCallbackId, @{@"playerId" : playerId, @"pushToken" : pushToken});
@@ -164,10 +173,35 @@ static Class delegateClass = nil;
 
 - (void)deleteTags:(CDVInvokedUrlCommand*)command {
     [oneSignal deleteTags:command.arguments];
-}
+}   
 
 - (void)registerForPushNotifications:(CDVInvokedUrlCommand*)command {
     [oneSignal registerForPushNotifications];
+}
+
+- (void)enableInAppAlertNotification:(CDVInvokedUrlCommand*)command {
+    [oneSignal enableInAppAlertNotification:[command.arguments[0] boolValue]];
+}
+
+- (void)setSubscription:(CDVInvokedUrlCommand*)command {
+    [oneSignal setSubscription:[command.arguments[0] boolValue]];
+}
+
+- (void)postNotification:(CDVInvokedUrlCommand*)command {
+    postNotificationCallbackId = command.callbackId;
+
+    [oneSignal postNotification:command.arguments[0]
+        onSuccess:^(NSDictionary* results) {
+            successCallback(postNotificationCallbackId, results);
+        }
+        onFailure:^(NSError* error) {
+            if (error.userInfo && error.userInfo[@"returned"])
+                failureCallback(postNotificationCallbackId, error.userInfo[@"returned"]);
+            else
+                failureCallback(postNotificationCallbackId, @{@"error": @"HTTP no response error"});
+
+    }];
+
 }
 
 - (void)setLogLevel:(CDVInvokedUrlCommand*)command {
@@ -178,5 +212,6 @@ static Class delegateClass = nil;
 // Android only
 - (void)enableVibrate:(CDVInvokedUrlCommand*)command {}
 - (void)enableSound:(CDVInvokedUrlCommand*)command {}
+- (void)enableNotificationsWhenActive:(CDVInvokedUrlCommand*)command {}
 
 @end

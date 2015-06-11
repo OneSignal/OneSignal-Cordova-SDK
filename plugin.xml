@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
 		xmlns:android="http://schemas.android.com/apk/res/android"
 		id="com.onesignal.plugins.OneSignal"
-		version="1.5.0">
+		version="1.6.0">
 
 	<name>OneSignal Push Notifications</name>
 	<author>Josh Kasten</author>
@@ -101,13 +101,15 @@
 		<source-file src="src/ios/OneSignalJailbreakDetection.m" />
 		<source-file src="src/ios/OneSignalPush.m" />
 		<source-file src="src/ios/OneSignalReachability.m" />
-
+		<source-file src="src/ios/OneSignalMobileProvision.m" />
+		
 		<header-file src="src/ios/OneSignal.h" />
 		<header-file src="src/ios/OneSignalHTTPClient.h" />
 		<header-file src="src/ios/OneSignalTrackIAP.h" />
 		<header-file src="src/ios/OneSignalJailbreakDetection.h" />
 		<header-file src="src/ios/OneSignalPush.h" />
 		<header-file src="src/ios/OneSignalReachability.h" />
+		<header-file src="src/ios/OneSignalMobileProvision.h" />
 
 	</platform>
 
