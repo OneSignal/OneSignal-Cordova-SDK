@@ -5,7 +5,7 @@
         OneSignal Example App.
     </description>
     <author email="support@onesignal.com" href="https://onesignal.com">
-        Apache Cordova Team
+        OneSignal Team
     </author>
     <content src="index.html" />
     <access origin="*" />

@@ -84,15 +84,40 @@ OneSignal.prototype.enableSound = function(enable) {
     cordova.exec(function(){}, function(){}, "OneSignalPush", "enableSound", [enable]);
 };
 
+OneSignal.prototype.enableNotificationsWhenActive = function(enable) {
+    cordova.exec(function(){}, function(){}, "OneSignalPush", "enableNotificationsWhenActive", [enable]);
+};
+
+OneSignal.prototype.enableInAppAlertNotification = function(enable) {
+    cordova.exec(function(){}, function(){}, "OneSignalPush", "enableInAppAlertNotification", [enable]);
+};
+
+OneSignal.prototype.setSubscription = function(enable) {
+    cordova.exec(function(){}, function(){}, "OneSignalPush", "setSubscription", [enable]);
+};
+
+OneSignal.prototype.postNotification = function(jsonData, onSuccess, onFailure) {
+    if (onSuccess == null)
+        onSuccess = function() {};
+
+    if (onFailure == null)
+        onFailure = function() {};
+
+    cordova.exec(onSuccess, onFailure, "OneSignalPush", "postNotification", [jsonData]);
+};
+
+OneSignal.prototype.setLogLevel = function(logLevel) {
+    cordova.exec(function(){}, function(){}, "OneSignalPush", "setLogLevel", [logLevel]);
+};
+
+
 //-------------------------------------------------------------------
 
-if(!window.plugins) {
+if(!window.plugins)
     window.plugins = {};
-}
-if (!window.plugins.OneSignal) {
-    window.plugins.OneSignal = new OneSignal();
-}
 
-if (typeof module != 'undefined' && module.exports) {
-  module.exports = OneSignal;
-}
+if (!window.plugins.OneSignal)
+    window.plugins.OneSignal = new OneSignal();
+
+if (typeof module != 'undefined' && module.exports)
+    module.exports = OneSignal;
