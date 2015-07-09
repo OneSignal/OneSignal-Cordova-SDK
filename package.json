@@ -1,0 +1,50 @@
+{
+  "version": "1.7.1",
+  "name": "onesignal-cordova-plugin",
+  "cordova_name": "OneSignal Push Notifications",
+  "description": "OneSignal is a high volume Push Notification service for mobile apps. In addition to basic notification delivery, OneSignal also provides tools to localize, target, schedule, and automate notifications that you send.",
+  "license": "MIT",
+  "keywords": [
+    "push",
+    "notification",
+    "push notification",
+    "push notifications",
+    "apns",
+    "gcm",
+    "adm",
+    "retention",
+    "messaging",
+    "ecosystem:cordova",
+    "cordova-android",
+    "cordova-ios",
+    "cordova-amazon-fireos"
+  ],
+  "platforms": [
+    "android",
+    "ios",
+    "amazon-fireos"
+  ],
+  "engines": [
+    {
+      "name": "cordova",
+      "version": ">=3.3.0"
+    }
+  ],
+  "cordova": {
+    "id": "onesignal-cordova-plugin",
+    "platforms": [
+      "android",
+      "ios",
+      "amazon-fireos"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/one-signal/OneSignal-Cordova-SDK.git"
+  },
+  "author": "Josh Kasten",
+  "bugs": {
+    "url": "https://github.com/one-signal/OneSignal-Cordova-SDK/issues"
+  },
+  "homepage": "https://github.com/one-signal/OneSignal-Cordova-SDK#readme"
+}
