@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="com.onesignal.plugins.onesignal"
-    version="1.7.1">
+    version="1.7.2">
 
   <name>OneSignal Push Notifications</name>
   <author>Josh Kasten</author>
@@ -22,8 +22,8 @@
   </engines>
   
   <platform name="android">
-    <framework src="com.google.android.gms:play-services-gcm:7.3.0" />
-    <framework src="com.google.android.gms:play-services-ads:7.3.0" />
+    <dependency id="android.support.v4" />
+    <dependency id="com.google.playservices" />
 
     <config-file target="res/xml/config.xml" parent="/*">
       <feature name="OneSignalPush" >
