@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    id="com.onesignal.plugins.onesignal"
+    id="com.onesignal.plugins.onesignalpgbcompat"
     version="1.7.6">
 
-  <name>OneSignal Push Notifications</name>
+  <name>OneSignal Push Notifications PGB Compat</name>
   <author>Josh Kasten</author>
 
   <description>OneSignal is a high volume Push Notification service for mobile apps. In addition to basic notification delivery, OneSignal also provides tools to localize, target, schedule, A/B test, and automate notifications that you send.</description>
@@ -22,9 +22,6 @@
   </engines>
   
   <platform name="android">
-    <dependency id="android.support.v4" />
-    <dependency id="com.google.playservices" />
-
     <config-file target="res/xml/config.xml" parent="/*">
       <feature name="OneSignalPush" >
         <param name="android-package" value="com.plugin.gcm.OneSignalPush" />
