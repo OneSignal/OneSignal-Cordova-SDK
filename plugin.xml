@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="com.onesignal.plugins.onesignalpgbcompat"
-    version="1.7.6">
+    version="1.7.6-pgb-compat">
 
   <name>OneSignal Push Notifications PGB Compat</name>
   <author>Josh Kasten</author>
