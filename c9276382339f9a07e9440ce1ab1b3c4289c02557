@@ -1,0 +1,4 @@
+* Fixed plugin conflict with cordova-plugin-google-analytics
+
+* Fixed gradle conflict with cordova-plugin-google-analytics
+* Fixed issue where UTF-8 messages sent with postNotification were not encoding correctly.
