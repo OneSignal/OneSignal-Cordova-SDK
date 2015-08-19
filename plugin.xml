@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="com.onesignal.plugins.onesignal"
-    version="1.8.0-pgb">
+    version="1.9.0-pgb">
 
   <name>OneSignal Push Notifications</name>
   <author>Josh Kasten</author>
@@ -109,6 +109,23 @@
     <header-file src="src/ios/OneSignalReachability.h" />
     <header-file src="src/ios/OneSignalMobileProvision.h" />
 
+  </platform>
+  
+  <!-- Windows Phone 8.1 -->
+  <platform name="windows">
+    <config-file target="config.xml" parent="/*">
+      <feature name="OneSignalPush">
+        <param name="ios-package" value="OneSignalPush"/>
+      </feature>
+    </config-file>
+    
+    <js-module src="src/windows/OneSignalPushProxy.js" name="OneSignalPushProxy">
+      <merges target="" />
+    </js-module>
+    
+    <framework src="src/windows/OneSignalSDK_WP_WNS_WRTC.winmd" custom="true" />
+    <framework src="src/windows/OneSignalSDK_WP_WNS.dll" custom="true" />
+    <framework src="src/windows/Newtonsoft.Json.dll" custom="true" />
   </platform>
 
 </plugin>
