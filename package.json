@@ -1,5 +1,5 @@
 {
-  "version": "1.8.0-pgb-compat",
+  "version": "1.9.0-pgb-compat",
   "name": "onesignal-cordova-plugin-pgb-compat",
   "cordova_name": "OneSignal Push Notifications PGB Compat",
   "description": "NOTE: Use onesignal-cordova-plugin instead. This version is only for PhoneGap Build where other plugins are already depending on either 'com.google.play.services' or 'android.support.v4'. If your other plugins do not include both make sure you include the missing one in your project for OneSignal to work. Contact support@onesignal.com if you need help on setting up the OneSignal plugin. OneSignal is a high volume Push Notification service for mobile apps. In addition to basic notification delivery, OneSignal also provides tools to localize, target, schedule, and automate notifications that you send.",
