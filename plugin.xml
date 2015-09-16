@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    id="com.onesignal.plugins.onesignalpgbcompat"
-    version="1.9.0-pgb-compat">
+    id="onesignal-cordova-plugin"
+    version="1.9.1-pgb-compat">
 
   <name>OneSignal Push Notifications PGB Compat</name>
   <author>Josh Kasten</author>
