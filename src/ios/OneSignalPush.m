@@ -56,6 +56,7 @@ void failureCallback(NSString* callbackId, NSDictionary* data) {
 
 void processNotificationOpened(NSDictionary* launchOptions) {
     successCallback(notficationOpenedCallbackId, launchOptions);
+    launchDict = nil;
 }
 
 void initOneSignalObject(NSDictionary* launchOptions, const char* appId, BOOL autoRegister) {
