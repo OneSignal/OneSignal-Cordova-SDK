@@ -1,6 +1,10 @@
-OneSignal Cordova Push Notification Plugin
-====================================
+# Depercated Branch
 
-OneSignal is a free push notification service for mobile apps. This plugin makes it easy to integrate your PhoneGap CLI, PhoneGap Build, Cordova, or Sencha Touch app or game with OneSignal. Supports Android, iOS, and Amazon's Fire OS platforms.
+#### PhoneGap Build (PGB) users
+* Please use the npm plugin `onesignal-cordova-plugin-pgb-compat` instead of `com.onesignal.plugins.onesignal`
 
-- See http://documentation.onesignal.com/v2.0/docs/phonegap-sdk-overview for setup documentation.
+#### All others (Cordova, PhoneGap CLI, Ionic, others)
+* Please use `onesignal-cordova-plugin`.
+
+
+Follow our [setup guide](http://documentation.onesignal.com/docs/phonegap-sdk-overview) to get started with OneSignal Push Notificaitons.
