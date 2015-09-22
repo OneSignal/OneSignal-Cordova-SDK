@@ -1,8 +1,8 @@
 {
-  "version": "1.9.1-pgb-compat",
+  "version": "1.9.2-pgb-compat",
   "name": "onesignal-cordova-plugin-pgb-compat",
   "cordova_name": "OneSignal Push Notifications PGB Compat",
-  "description": "NOTE: Only use for PhoneGap Build, otherwise use onesignal-cordova-plugin instead. Follow our [setup guide](http://documentation.onesignal.com/docs/phonegap-sdk-overview) to get started.
+  "description": "NOTE: Only use for PhoneGap Build, otherwise use onesignal-cordova-plugin instead. Follow our [setup guide](http://documentation.onesignal.com/docs/phonegap-sdk-overview) to get started.",
   "license": "MIT",
   "keywords": [
     "push",
@@ -40,7 +40,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/one-signal/OneSignal-Cordova-SDK.git#1.9.1-pgb-compat"
+    "url": "git+https://github.com/one-signal/OneSignal-Cordova-SDK.git#1.9.2-pgb-compat"
   },
   "author": "Josh Kasten",
   "bugs": {
