@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="onesignal-cordova-plugin"
-    version="1.9.2">
+    version="1.9.3">
 
   <name>OneSignal Push Notifications</name>
   <author>Josh Kasten</author>
@@ -24,6 +24,7 @@
   <platform name="android">
     <framework src="com.google.android.gms:play-services-gcm:+" />
     <framework src="com.google.android.gms:play-services-analytics:+" />
+    <framework src="build-extras-onesignal.gradle" custom="true" type="gradleReference" />
 
     <config-file target="res/xml/config.xml" parent="/*">
       <feature name="OneSignalPush" >
