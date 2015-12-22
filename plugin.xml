@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="onesignal-cordova-plugin-pgb-compat"
-    version="1.10.0">
+    version="1.10.1">
 
   <name>OneSignal Push Notifications PGB Compat</name>
   <author>Josh Kasten</author>
@@ -30,6 +30,7 @@
 
     <config-file target="AndroidManifest.xml" parent="/manifest">
       <uses-permission android:name="android.permission.INTERNET" />
+      <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
       <uses-permission android:name="android.permission.WAKE_LOCK" />
       <uses-permission android:name="android.permission.VIBRATE"/>
       
@@ -43,8 +44,7 @@
     </config-file>
 
     <config-file target="AndroidManifest.xml" parent="/manifest/application">
-      <activity android:name="com.onesignal.NotificationOpenedActivity" android:theme="@android:style/Theme.NoDisplay" />
-      
+      <receiver android:name="com.onesignal.NotificationOpenedReceiver" />
       <receiver
         android:name="com.onesignal.GcmBroadcastReceiver"
         android:permission="com.google.android.c2dm.permission.SEND" >
@@ -54,7 +54,8 @@
         </intent-filter>
       </receiver>
       <service android:name="com.onesignal.GcmIntentService" />
-      
+      <service android:name="com.onesignal.SyncService" android:stopWithTask="false" />
+      <activity android:name="com.onesignal.PermissionsActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar" />
       
       <amazon:enable-feature android:name="com.amazon.device.messaging" android:required="false" xmlns:amazon="http://schemas.amazon.com/apk/res/android" />
       <service android:name="com.onesignal.ADMMessageHandler" android:exported="false" />
