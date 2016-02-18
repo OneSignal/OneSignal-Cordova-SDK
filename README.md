@@ -6,8 +6,7 @@ This PGB-Compat branch is being phased out now that PhoneGap (PBG) now supports 
 <gap:plugin name="onesignal-cordova-plugin" source="npm" />
 
 <!-- Recommend the newest cli but requires cli-5.1.1+, and gradle for Android. -->
-<!-- If the below setting are not compatible with your project set the ANT version above. -->
-<preference name="phonegap-version" value="cli-5.2.0" />
+<preference name="phonegap-version" value="cli-5.4.1" />
 <preference name="android-build-tool" value="gradle" />
 ```
 
