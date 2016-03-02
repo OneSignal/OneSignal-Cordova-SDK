@@ -60,7 +60,7 @@ static ONE_S_LOG_LEVEL _visualLogLevel = ONE_S_LL_NONE;
 
 @implementation OneSignal
 
-NSString* const ONESIGNAL_VERSION = @"011100";
+NSString* const ONESIGNAL_VERSION = @"011103";
 
 @synthesize app_id = _GT_publicKey;
 @synthesize httpClient = _GT_httpRequest;
@@ -112,6 +112,10 @@ static NSString* mSDKType = @"native";
 
 - (id)initWithLaunchOptions:(NSDictionary*)launchOptions appId:(NSString*)appId handleNotification:(OneSignalHandleNotificationBlock)callback {
     return [self initWithLaunchOptions:launchOptions appId:appId handleNotification:callback autoRegister:true];
+}
+
+- (id)initWithLaunchOptions:(NSDictionary*)launchOptions handleNotification:(OneSignalHandleNotificationBlock)callback autoRegister:(BOOL)autoRegister {
+    return [self initWithLaunchOptions:launchOptions appId:nil handleNotification:callback autoRegister:autoRegister];
 }
 
 - (id)initWithLaunchOptions:(NSDictionary*)launchOptions appId:(NSString*)appId handleNotification:(OneSignalHandleNotificationBlock)callback autoRegister:(BOOL)autoRegister {
@@ -1080,7 +1084,7 @@ int getNotificationTypes() {
         notification.category = [category identifier];
         if ([data[@"m"] isKindOfClass:[NSDictionary class]]) {
             if ([notification respondsToSelector:NSSelectorFromString(@"alertTitle")])
-                notification.alertTitle = data[@"m"][@"title"];
+                [notification setValue:data[@"m"][@"title"] forKey:@"alertTitle"]; // Using reflection for pre-Xcode 6.2 support.
             notification.alertBody = data[@"m"][@"body"];
         }
         else
