@@ -6,8 +6,9 @@ var OneSignal_app_id = null;
 
 // Process launch args from cold start
 launchArgs = require('cordova/platform').activationContext;
-if (launchArgs.type === "activated" && launchArgs.args != "")
-    OneSingal_launchString = launchArgs.args;
+if(launchArgs)
+	if (launchArgs.type === "activated" && launchArgs.args != "")
+		OneSingal_launchString = launchArgs.args;
 
 // Process launch args from warn start
 function onActivatedHandler(args) {
