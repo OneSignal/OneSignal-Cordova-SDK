@@ -106,6 +106,14 @@ OneSignal.prototype.postNotification = function(jsonData, onSuccess, onFailure) 
     cordova.exec(onSuccess, onFailure, "OneSignalPush", "postNotification", [jsonData]);
 };
 
+OneSignal.prototype.promptLocation = function() {
+  cordova.exec(function(){}, function(){}, "OneSignalPush", "promptLocation", []);
+};
+
+OneSignal.prototype.setEmail = function(email) {
+    cordova.exec(function(){}, function(){}, "OneSignalPush", "setEmail", [email]);
+};
+
 OneSignal.prototype.setLogLevel = function(logLevel) {
     cordova.exec(function(){}, function(){}, "OneSignalPush", "setLogLevel", [logLevel]);
 };

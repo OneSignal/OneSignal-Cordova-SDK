@@ -65,6 +65,8 @@ public class OneSignalPush extends CordovaPlugin {
   public static final String ENABLE_INAPP_ALERT_NOTIFICATION = "enableInAppAlertNotification";
   public static final String SET_SUBSCRIPTION = "setSubscription";
   public static final String POST_NOTIFICATION = "postNotification";
+  public static final String PROMPT_LOCATION = "promptLocation";
+  public static final String SET_EMAIL = "setEmail";
   public static final String SET_LOG_LEVEL = "setLogLevel";
   
   // This is to prevent an issue where if two Javascript calls are made to OneSignal expecting a callback then only one would fire.
@@ -243,6 +245,9 @@ public class OneSignalPush extends CordovaPlugin {
         t.printStackTrace();
       }
     }
+    else if (PROMPT_LOCATION.equals(action)
+      OneSignal.promptLocation();
+    else if (SET_EMAIL.equals(action) {}
     else if (SET_LOG_LEVEL.equals(action)) {
       try {
         JSONObject jo = data.getJSONObject(0);

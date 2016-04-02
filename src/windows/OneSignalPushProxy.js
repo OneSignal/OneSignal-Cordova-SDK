@@ -6,9 +6,10 @@ var OneSignal_app_id = null;
 
 // Process launch args from cold start
 launchArgs = require('cordova/platform').activationContext;
-if(launchArgs)
+if(launchArgs) {
 	if (launchArgs.type === "activated" && launchArgs.args != "")
 		OneSingal_launchString = launchArgs.args;
+}
 
 // Process launch args from warn start
 function onActivatedHandler(args) {
@@ -70,6 +71,8 @@ module.exports = {
   enableInAppAlertNotification: function (successCallback, errorCallback, params) { },
   setSubscription: function (successCallback, errorCallback, params) { },
   postNotification: function (successCallback, errorCallback, params) { },
+  promptLocation: function (successCallback, errorCallback, params) { },
+  setEmail: function (successCallback, errorCallback, params) { },
   setLogLevel: function (successCallback, errorCallback, params) { }
 };
 

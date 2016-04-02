@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="onesignal-cordova-plugin"
-    version="1.11.2">
+    version="1.12.0">
 
   <name>OneSignal Push Notifications</name>
   <author>Josh Kasten</author>
@@ -31,7 +31,6 @@
     <framework src="com.google.android.gms:play-services-analytics:+" />
     <framework src="com.google.android.gms:play-services-location:+" />
     
-    <!-- Work around for android:authorities duplication when using GMS 8.1.0+. See bug Cordova CB-10014 -->
     <framework src="build-extras-onesignal.gradle" custom="true" type="gradleReference" />
 
     <config-file target="res/xml/config.xml" parent="/*">
@@ -82,6 +81,7 @@
     <source-file src="src/ios/OneSignalPush.m" />
     <source-file src="src/ios/OneSignalReachability.m" />
     <source-file src="src/ios/OneSignalMobileProvision.m" />
+    <header-file src="src/ios/OneSignalLocation.m" />
     
     <header-file src="src/ios/OneSignal.h" />
     <header-file src="src/ios/OneSignalHTTPClient.h" />
@@ -90,6 +90,7 @@
     <header-file src="src/ios/OneSignalPush.h" />
     <header-file src="src/ios/OneSignalReachability.h" />
     <header-file src="src/ios/OneSignalMobileProvision.h" />
+    <header-file src="src/ios/OneSignalLocation.h" />
 
   </platform>
   
