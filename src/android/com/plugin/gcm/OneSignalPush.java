@@ -1,7 +1,7 @@
 /**
   * Modified MIT License
   * 
-  * Copyright 2015 OneSignal
+  * Copyright 2016 OneSignal
   *
   * Permission is hereby granted, free of charge, to any person obtaining a copy
   * of this software and associated documentation files (the "Software"), to deal
@@ -245,9 +245,9 @@ public class OneSignalPush extends CordovaPlugin {
         t.printStackTrace();
       }
     }
-    else if (PROMPT_LOCATION.equals(action)
+    else if (PROMPT_LOCATION.equals(action))
       OneSignal.promptLocation();
-    else if (SET_EMAIL.equals(action) {}
+    else if (SET_EMAIL.equals(action)) {}
     else if (SET_LOG_LEVEL.equals(action)) {
       try {
         JSONObject jo = data.getJSONObject(0);
