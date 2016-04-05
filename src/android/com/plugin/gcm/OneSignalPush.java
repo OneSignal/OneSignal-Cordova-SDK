@@ -247,7 +247,9 @@ public class OneSignalPush extends CordovaPlugin {
     }
     else if (PROMPT_LOCATION.equals(action))
       OneSignal.promptLocation();
-    else if (SET_EMAIL.equals(action)) {}
+    else if (SET_EMAIL.equals(action)) {
+      OneSignal.setEmail(data.getString(0));
+    }
     else if (SET_LOG_LEVEL.equals(action)) {
       try {
         JSONObject jo = data.getJSONObject(0);
