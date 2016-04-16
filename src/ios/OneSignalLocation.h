@@ -1,7 +1,7 @@
 /**
  * Modified MIT License
- * 
- * Copyright 2015 OneSignal
+ *
+ * Copyright 2016 OneSignal
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -9,13 +9,13 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * 1. The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * 2. All copies of substantial portions of the Software may only be used in connection
  * with services provided by OneSignal.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,29 +25,11 @@
  * THE SOFTWARE.
  */
 
-#import <Foundation/Foundation.h>
-#import <Cordova/CDV.h>
-#import <Cordova/CDVPlugin.h>
+#ifndef OneSignalLocation_h
+#define OneSignalLocation_h
 
-@interface OneSignalPush : CDVPlugin {}
-
-- (void)init:(CDVInvokedUrlCommand*)command;
-- (void)getTags:(CDVInvokedUrlCommand*)command;
-- (void)getIds:(CDVInvokedUrlCommand*)command;
-- (void)getIds_GameThrive:(CDVInvokedUrlCommand*)command;
-- (void)sendTags:(CDVInvokedUrlCommand*)command;
-- (void)deleteTags:(CDVInvokedUrlCommand*)command;
-- (void)registerForPushNotifications:(CDVInvokedUrlCommand*)command;
-- (void)enableInAppAlertNotification:(CDVInvokedUrlCommand*)command;
-- (void)setSubscription:(CDVInvokedUrlCommand*)command;
-- (void)postNotification:(CDVInvokedUrlCommand*)command;
-- (void)setLogLevel:(CDVInvokedUrlCommand*)command;
-- (void)promptLocation:(CDVInvokedUrlCommand*)command;
-- (void)setEmail:(CDVInvokedUrlCommand*)command;
-
-// Android Only
-- (void)enableVibrate:(CDVInvokedUrlCommand*)command;
-- (void)enableSound:(CDVInvokedUrlCommand*)command;
-- (void)enableNotificationsWhenActive:(CDVInvokedUrlCommand*)command;
-
+@interface OneSignalLocation : NSObject
++ (void) getLocation:(id)delegate prompt:(bool)prompt;
 @end
+
+#endif /* OneSignalLocation_h */

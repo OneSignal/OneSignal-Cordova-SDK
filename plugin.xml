@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="onesignal-cordova-plugin-pgb-compat"
-    version="1.11.2">
+    version="1.12.3">
 
   <name>OneSignal Push Notifications PGB Compat</name>
   <author>Josh Kasten</author>
@@ -37,6 +37,25 @@
       <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
       <permission android:name="$PACKAGE_NAME.permission.C2D_MESSAGE" android:protectionLevel="signature" />
       <uses-permission android:name="$PACKAGE_NAME.permission.C2D_MESSAGE" />
+      
+      <!-- START: ShortcutBadger -->
+      <!--for Samsung-->
+      <uses-permission android:name="com.sec.android.provider.badge.permission.READ"/>
+      <uses-permission android:name="com.sec.android.provider.badge.permission.WRITE"/>
+
+      <!--for htc-->
+      <uses-permission android:name="com.htc.launcher.permission.READ_SETTINGS"/>
+      <uses-permission android:name="com.htc.launcher.permission.UPDATE_SHORTCUT"/>
+
+      <!--for sony-->
+      <uses-permission android:name="com.sonyericsson.home.permission.BROADCAST_BADGE"/>
+
+      <!--for apex-->
+      <uses-permission android:name="com.anddoes.launcher.permission.UPDATE_COUNT"/>
+
+      <!--for solid-->
+      <uses-permission android:name="com.majeur.launcher.permission.UPDATE_BADGE"/>
+      <!-- End: ShortcutBadger -->
       
       <uses-permission android:name="com.amazon.device.messaging.permission.RECEIVE" />
       <permission android:name="$PACKAGE_NAME.permission.RECEIVE_ADM_MESSAGE" android:protectionLevel="signature" />
@@ -98,6 +117,7 @@
     <source-file src="src/ios/OneSignalPush.m" />
     <source-file src="src/ios/OneSignalReachability.m" />
     <source-file src="src/ios/OneSignalMobileProvision.m" />
+    <source-file src="src/ios/OneSignalLocation.m" />
     
     <header-file src="src/ios/OneSignal.h" />
     <header-file src="src/ios/OneSignalHTTPClient.h" />
@@ -106,6 +126,7 @@
     <header-file src="src/ios/OneSignalPush.h" />
     <header-file src="src/ios/OneSignalReachability.h" />
     <header-file src="src/ios/OneSignalMobileProvision.h" />
+    <header-file src="src/ios/OneSignalLocation.h" />
 
   </platform>
   

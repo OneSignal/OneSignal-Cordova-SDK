@@ -1,16 +1,21 @@
+
 var OneSingal_launchString = "";
 var OneSignal_JSBridge = new OneSignalSDK_WP_WNS_WRTC.WinJSBridge();
 var OneSignal_app_id = null;
 
-function onActivatedHandler(args) {
-    if (args.detail.kind === Windows.ApplicationModel.Activation.ActivationKind.launch) {
-        if (OneSignal_app_id === null)
-            OneSingal_launchString = args.detail.arguments;
-        else
-            OneSignal_JSBridge.init(OneSignal_app_id, args.detail.arguments);
-    }
+
+// Process launch args from cold start
+launchArgs = require('cordova/platform').activationContext;
+if(launchArgs) {
+	if (launchArgs.type === "activated" && launchArgs.args != "")
+		OneSingal_launchString = launchArgs.args;
 }
 
+// Process launch args from warn start
+function onActivatedHandler(args) {
+  if (args.detail.kind === Windows.ApplicationModel.Activation.ActivationKind.launch)
+        OneSignal_JSBridge.init(OneSignal_app_id, args.detail.arguments);
+}
 WinJS.Application.addEventListener("activated", onActivatedHandler, false);
 
 
@@ -66,6 +71,8 @@ module.exports = {
   enableInAppAlertNotification: function (successCallback, errorCallback, params) { },
   setSubscription: function (successCallback, errorCallback, params) { },
   postNotification: function (successCallback, errorCallback, params) { },
+  promptLocation: function (successCallback, errorCallback, params) { },
+  setEmail: function (successCallback, errorCallback, params) { },
   setLogLevel: function (successCallback, errorCallback, params) { }
 };
 

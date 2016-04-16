@@ -205,6 +205,14 @@ static Class delegateClass = nil;
 
 }
 
+- (void)promptLocation:(CDVInvokedUrlCommand*)command {
+   [oneSignal promptLocation];
+}
+
+- (void)setEmail:(CDVInvokedUrlCommand*)command {
+   [oneSignal setEmail:command.arguments[0]];
+}
+
 - (void)setLogLevel:(CDVInvokedUrlCommand*)command {
     NSDictionary* options = command.arguments[0];
     [OneSignal setLogLevel:options[@"logLevel"] visualLevel:options[@"visualLevel"]];
