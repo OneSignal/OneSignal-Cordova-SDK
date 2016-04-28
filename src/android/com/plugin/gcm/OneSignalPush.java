@@ -71,12 +71,18 @@ public class OneSignalPush extends CordovaPlugin {
   
   // This is to prevent an issue where if two Javascript calls are made to OneSignal expecting a callback then only one would fire.
   private static void callbackSuccess(CallbackContext callbackContext, JSONObject jsonObject) {
+    if(jsonObject == null){ // in case there are no data
+      jsonObject = new JSONObject();
+    }
     PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jsonObject);
     pluginResult.setKeepCallback(true);
     callbackContext.sendPluginResult(pluginResult);
   }
   
   private static void callbackError(CallbackContext callbackContext, JSONObject jsonObject) {
+    if(jsonObject == null){ // in case there are no data
+      jsonObject = new JSONObject();
+    }
     PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, jsonObject);
     pluginResult.setKeepCallback(true);
     callbackContext.sendPluginResult(pluginResult);
