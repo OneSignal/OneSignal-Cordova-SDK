@@ -2,10 +2,10 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="onesignal-cordova-plugin"
-    version="1.13.0">
+    version="2.0.0">
 
   <name>OneSignal Push Notifications</name>
-  <author>Josh Kasten</author>
+  <author>Joseph Kalash</author>
 
   <description>OneSignal is a high volume Push Notification service for mobile apps. In addition to basic notification delivery, OneSignal also provides tools to localize, target, schedule, A/B test, and automate notifications that you send.</description>
 
@@ -19,44 +19,44 @@
 
   <engines>
     <engine name="cordova-android" version=">=4.0.0" /> <!-- This main branch of OneSignal depends on gradle and maven. -->
-    <engine name="apple-xcode" version=">=6.2.0" />
-    <engine name="apple-ios" version=">=6.0.0" />
+    <engine name="apple-xcode" version=">=8.0.0" />
+    <engine name="apple-ios" version=">=8.0.0" />
   </engines>
   
-  <platform name="android">
-    <framework src="com.onesignal:OneSignal:2.6.0@aar" />
-    
-    <framework src="com.google.android.gms:play-services-gcm:+" />
-    <!-- play-services-analytics is only required when gms version 8.1.0 or older is used. -->
-    <framework src="com.google.android.gms:play-services-analytics:+" />
-    <framework src="com.google.android.gms:play-services-location:+" />
-    
-    <framework src="build-extras-onesignal.gradle" custom="true" type="gradleReference" />
+        <platform name="android">
+        <framework src="com.onesignal:OneSignal:2.6.0@aar" />
 
-    <config-file target="res/xml/config.xml" parent="/*">
-      <feature name="OneSignalPush" >
-        <param name="android-package" value="com.plugin.gcm.OneSignalPush" />
-      </feature>
-    </config-file>
+        <framework src="com.google.android.gms:play-services-gcm:+" />
+        <!-- play-services-analytics is only required when gms version 8.1.0 or older is used. -->
+        <framework src="com.google.android.gms:play-services-analytics:+" />
+        <framework src="com.google.android.gms:play-services-location:+" />
 
-    <!-- PhoneGap Build (PGB) does not have a amazon build target so it include the required manifest entries in all Android builds. -->
-    <config-file target="AndroidManifest.xml" parent="/manifest/application">
-      <amazon:enable-feature android:name="com.amazon.device.messaging" android:required="false" xmlns:amazon="http://schemas.amazon.com/apk/res/android" />
-      <service android:name="com.onesignal.ADMMessageHandler" android:exported="false" />
-      <receiver
-        android:name="com.onesignal.ADMMessageHandler$Receiver"
-        android:permission="com.amazon.device.messaging.permission.SEND" >
-        <intent-filter>
-          <action android:name="com.amazon.device.messaging.intent.REGISTRATION" />
-          <action android:name="com.amazon.device.messaging.intent.RECEIVE" />
-          <category android:name="$PACKAGE_NAME" />
-        </intent-filter>
-      </receiver>
-    </config-file>
-    
-    <source-file src="src/android/com/plugin/gcm/OneSignalPush.java" target-dir="src/com/plugin/gcm/" />
-  </platform>
-  
+        <framework src="build-extras-onesignal.gradle" custom="true" type="gradleReference" />
+
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="OneSignalPush" >
+                <param name="android-package" value="com.plugin.gcm.OneSignalPush" />
+            </feature>
+        </config-file>
+
+        <!-- PhoneGap Build (PGB) does not have a amazon build target so it include the required manifest entries in all Android builds. -->
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">
+            <amazon:enable-feature android:name="com.amazon.device.messaging" android:required="false" xmlns:amazon="http://schemas.amazon.com/apk/res/android" />
+            <service android:name="com.onesignal.ADMMessageHandler" android:exported="false" />
+            <receiver
+                android:name="com.onesignal.ADMMessageHandler$Receiver"
+                android:permission="com.amazon.device.messaging.permission.SEND" >
+                <intent-filter>
+                    <action android:name="com.amazon.device.messaging.intent.REGISTRATION" />
+                    <action android:name="com.amazon.device.messaging.intent.RECEIVE" />
+                    <category android:name="$PACKAGE_NAME" />
+                </intent-filter>
+            </receiver>
+        </config-file>
+
+        <source-file src="src/android/com/plugin/gcm/OneSignalPush.java" target-dir="src/com/plugin/gcm/" />
+        </platform>
+
   <!-- ios -->
   <platform name="ios">
 
@@ -74,42 +74,54 @@
       </array>
     </config-file>
 
-    <source-file src="src/ios/OneSignal.m" />
-    <source-file src="src/ios/OneSignalHTTPClient.m" />
-    <source-file src="src/ios/OneSignalTrackIAP.m" />
-    <source-file src="src/ios/OneSignalJailbreakDetection.m" />
     <source-file src="src/ios/OneSignalPush.m" />
-    <source-file src="src/ios/OneSignalReachability.m" />
-    <source-file src="src/ios/OneSignalMobileProvision.m" />
-    <source-file src="src/ios/OneSignalLocation.m" />
+    <source-file src="src/ios/OneSignalLocation-Helper.m" />
     
-    <header-file src="src/ios/OneSignal.h" />
-    <header-file src="src/ios/OneSignalHTTPClient.h" />
-    <header-file src="src/ios/OneSignalTrackIAP.h" />
-    <header-file src="src/ios/OneSignalJailbreakDetection.h" />
+    <header-file src="src/ios/OneSignalXC8.h" />
+    <header-file src="src/ios/OneSignalXC8-Swift.h" />
     <header-file src="src/ios/OneSignalPush.h" />
-    <header-file src="src/ios/OneSignalReachability.h" />
-    <header-file src="src/ios/OneSignalMobileProvision.h" />
-    <header-file src="src/ios/OneSignalLocation.h" />
+    <header-file src="src/ios/Constants.h" />
+    <header-file src="src/ios/OneSignalLocation-Helper.h" />
+    
+    <source-file src="src/ios/OneSignal-Alert.swift" />
+    <source-file src="src/ios/OneSignal-FocusTasks.swift" />
+    <source-file src="src/ios/OneSignal-Helpers.swift" />
+    <source-file src="src/ios/OneSignal-Location.swift" />
+    <source-file src="src/ios/OneSignal-Logging.swift" />
+    <source-file src="src/ios/OneSignal-Networking.swift" />
+    <source-file src="src/ios/OneSignal-Notifications.swift" />
+    <source-file src="src/ios/OneSignal-Purchases.swift" />
+    <source-file src="src/ios/OneSignal-Swizzling.swift" />
+    <source-file src="src/ios/OneSignal-Tags.swift" />
+    <source-file src="src/ios/OneSignal-UIApplication.swift" />
+    <source-file src="src/ios/OneSignal-UNUserNotificationCenterDelegate.swift" />
+    <source-file src="src/ios/OneSignal.swift" />
+    <source-file src="src/ios/OneSignalHTTPClient.swift" />
+    <source-file src="src/ios/OneSignalJailbreakDetection.swift" />
+    <source-file src="src/ios/OneSignalLocation.swift" />
+    <source-file src="src/ios/OneSignalMobileProvision.swift" />
+    <source-file src="src/ios/OneSignalReachability.swift" />
+    <source-file src="src/ios/OneSignalTrackIAP.swift" />
+    <source-file src="src/ios/OneSignalWebView.swift" />
 
   </platform>
   
   <!-- Windows Phone 8.1 -->
-  <platform name="windows">
-    <config-file target="config.xml" parent="/*">
-      <feature name="OneSignalPush">
-        <param name="ios-package" value="OneSignalPush"/>
-      </feature>
-    </config-file>
-    
-    <js-module src="src/windows/OneSignalPushProxy.js" name="OneSignalPushProxy">
-      <merges target="" />
-    </js-module>
-    
-    <framework src="src/windows/OneSignalSDK_WP_WNS_WRTC.winmd" custom="true" />
-    <framework src="src/windows/OneSignalSDK_WP_WNS.dll" custom="true" />
-    <framework src="src/windows/Newtonsoft.Json.dll" custom="true" />
-  </platform>
+    <platform name="windows">     
+        <config-file target="config.xml" parent="/*">
+            <feature name="OneSignalPush">
+                <param name="ios-package" value="OneSignalPush"/>
+            </feature>
+        </config-file>
+
+        <js-module src="src/windows/OneSignalPushProxy.js" name="OneSignalPushProxy">
+            <merges target="" />
+        </js-module>
+
+        <framework src="src/windows/OneSignalSDK_WP_WNS_WRTC.winmd" custom="true" />
+        <framework src="src/windows/OneSignalSDK_WP_WNS.dll" custom="true" />
+        <framework src="src/windows/Newtonsoft.Json.dll" custom="true" />
+        </platform>
 
 </plugin>
 
