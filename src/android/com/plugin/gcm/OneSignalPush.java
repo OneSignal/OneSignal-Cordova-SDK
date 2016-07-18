@@ -68,6 +68,7 @@ public class OneSignalPush extends CordovaPlugin {
   public static final String PROMPT_LOCATION = "promptLocation";
   public static final String SET_EMAIL = "setEmail";
   public static final String SET_LOG_LEVEL = "setLogLevel";
+  public static final String CLEAR_ONE_SIGNAL_NOTIFICATIONS = "clearOneSignalNotifications";
   
   // This is to prevent an issue where if two Javascript calls are made to OneSignal expecting a callback then only one would fire.
   private static void callbackSuccess(CallbackContext callbackContext, JSONObject jsonObject) {
@@ -268,6 +269,8 @@ public class OneSignalPush extends CordovaPlugin {
         t.printStackTrace();
       }
     }
+    else if (CLEAR_ONE_SIGNAL_NOTIFICATIONS.equals(action))
+      OneSignal.clearOneSignalNotifications();
     else {
       result = false;
       Log.e(TAG, "Invalid action : " + action);

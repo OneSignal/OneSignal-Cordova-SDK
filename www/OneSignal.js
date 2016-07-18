@@ -118,6 +118,9 @@ OneSignal.prototype.setLogLevel = function(logLevel) {
     cordova.exec(function(){}, function(){}, "OneSignalPush", "setLogLevel", [logLevel]);
 };
 
+OneSignal.prototype.clearOneSignalNotifications = function() {
+    cordova.exec(function(){}, function(){}, "OneSignalPush", "clearOneSignalNotifications", []);
+};
 
 //-------------------------------------------------------------------
 

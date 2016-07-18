@@ -222,5 +222,6 @@ static Class delegateClass = nil;
 - (void)enableVibrate:(CDVInvokedUrlCommand*)command {}
 - (void)enableSound:(CDVInvokedUrlCommand*)command {}
 - (void)enableNotificationsWhenActive:(CDVInvokedUrlCommand*)command {}
+- (void)clearOneSignalNotifications:(CDVInvokedUrlCommand*)command {}
 
 @end
