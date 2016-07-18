@@ -1,7 +1,7 @@
 /**
  * Modified MIT License
  * 
- * Copyright 2015 OneSignal
+ * Copyright 2016 OneSignal
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -104,6 +104,14 @@ OneSignal.prototype.postNotification = function(jsonData, onSuccess, onFailure) 
         onFailure = function() {};
 
     cordova.exec(onSuccess, onFailure, "OneSignalPush", "postNotification", [jsonData]);
+};
+
+OneSignal.prototype.promptLocation = function() {
+  cordova.exec(function(){}, function(){}, "OneSignalPush", "promptLocation", []);
+};
+
+OneSignal.prototype.setEmail = function(email) {
+    cordova.exec(function(){}, function(){}, "OneSignalPush", "setEmail", [email]);
 };
 
 OneSignal.prototype.setLogLevel = function(logLevel) {
