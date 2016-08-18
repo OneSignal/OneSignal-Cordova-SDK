@@ -52,6 +52,7 @@
           <category android:name="$PACKAGE_NAME" />
         </intent-filter>
       </receiver>
+      <uses-permission android:name="com.amazon.device.messaging.permission.RECEIVE" />
     </config-file>
     
     <source-file src="src/android/com/plugin/gcm/OneSignalPush.java" target-dir="src/com/plugin/gcm/" />
@@ -63,7 +64,7 @@
     <config-file target="config.xml" parent="/*">
       <feature name="OneSignalPush">
         <param name="ios-package" value="OneSignalPush"/>
-      </feature>
+        </feature>
     </config-file>
 
     <framework src="SystemConfiguration.framework" />
