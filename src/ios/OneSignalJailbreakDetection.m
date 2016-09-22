@@ -22,13 +22,14 @@
 
 // Renamed DTTJailbreakDetection.m to OneSignalJailbreakDetection.m to avoid conflicts with other libraries.
 
-#import "OneSignalJailbreakDetection.h"
-
 #import <UIKit/UIKit.h>
+
+#import "OneSignalJailbreakDetection.h"
 
 @implementation OneSignalJailbreakDetection
 
 + (BOOL)isJailbroken {
+    
 #if !(TARGET_IPHONE_SIMULATOR)
     
     FILE *file = fopen("/Applications/Cydia.app", "r");
@@ -41,6 +42,7 @@
         fclose(file);
         return YES;
     }
+
     file = fopen("/bin/bash", "r");
     if (file) {
         fclose(file);

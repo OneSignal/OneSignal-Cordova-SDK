@@ -73,7 +73,8 @@ module.exports = {
   postNotification: function (successCallback, errorCallback, params) { },
   promptLocation: function (successCallback, errorCallback, params) { },
   setEmail: function (successCallback, errorCallback, params) { },
-  setLogLevel: function (successCallback, errorCallback, params) { }
+  setLogLevel: function (successCallback, errorCallback, params) { },
+  setInFocusDisplay: function(display) {}
 };
 
 require("cordova/exec/proxy").add("OneSignalPush", module.exports);

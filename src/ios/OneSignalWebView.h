@@ -25,36 +25,13 @@
  * THE SOFTWARE.
  */
 
-#import <Foundation/Foundation.h>
-#import "OneSignalHTTPClient.h"
+@interface OneSignalWebView : UIViewController <UIWebViewDelegate>
 
-#define DEFAULT_PUSH_HOST @"https://onesignal.com/api/v1/"
+@property(nonatomic, copy)NSURL *url;
+@property(nonatomic)UIWebView *webView;
+@property(nonatomic)UIActivityIndicatorView *uiBusy;
 
-@interface OneSignalHTTPClient()
-@property (readwrite, nonatomic) NSURL *baseURL;
-@end
-
-@implementation OneSignalHTTPClient
-
-@synthesize baseURL = _baseURL;
-
-- (id)init {
-    self = [super init];
-    if (self)
-        self.baseURL = [NSURL URLWithString:DEFAULT_PUSH_HOST];
-    return self;
-}
-
-- (NSMutableURLRequest*) requestWithMethod:(NSString*)method
-                                       path:(NSString*)path {
-    
-    NSURL* url = [NSURL URLWithString:path relativeToURL:self.baseURL];
-    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url];
-    [request setHTTPMethod:method];
-    [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
-    [request setValue:@"application/json" forHTTPHeaderField:@"Accept"];
-    
-    return request;
-}
+-(void)dismiss:(id)sender;
+-(void)showInApp;
 
 @end

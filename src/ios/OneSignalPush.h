@@ -34,20 +34,18 @@
 - (void)init:(CDVInvokedUrlCommand*)command;
 - (void)getTags:(CDVInvokedUrlCommand*)command;
 - (void)getIds:(CDVInvokedUrlCommand*)command;
-- (void)getIds_GameThrive:(CDVInvokedUrlCommand*)command;
 - (void)sendTags:(CDVInvokedUrlCommand*)command;
 - (void)deleteTags:(CDVInvokedUrlCommand*)command;
 - (void)registerForPushNotifications:(CDVInvokedUrlCommand*)command;
-- (void)enableInAppAlertNotification:(CDVInvokedUrlCommand*)command;
 - (void)setSubscription:(CDVInvokedUrlCommand*)command;
 - (void)postNotification:(CDVInvokedUrlCommand*)command;
 - (void)setLogLevel:(CDVInvokedUrlCommand*)command;
 - (void)promptLocation:(CDVInvokedUrlCommand*)command;
-- (void)setEmail:(CDVInvokedUrlCommand*)command;
+- (void)syncHashedEmail:(CDVInvokedUrlCommand*)command;
 
 // Android Only
 - (void)enableVibrate:(CDVInvokedUrlCommand*)command;
 - (void)enableSound:(CDVInvokedUrlCommand*)command;
-- (void)enableNotificationsWhenActive:(CDVInvokedUrlCommand*)command;
+- (void)setInFocusDisplaying:(CDVInvokedUrlCommand*)command;
 
 @end

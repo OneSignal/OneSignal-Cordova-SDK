@@ -5,6 +5,8 @@
 //  Created by kaolin fire on 2013-06-24.
 //  Copyright (c) 2013 The Blindsight Corporation. All rights reserved.
 //  Released under the BSD 2-Clause License (see LICENSE)
+#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
 #import "OneSignalMobileProvision.h"
 #import "TargetConditionals.h"
@@ -12,8 +14,8 @@
 
 @implementation OneSignalMobileProvision
 
-/** embedded.mobileprovision plist format:
- 
+/** 
+ embedded.mobileprovision plist format:
  AppIDName, // string - TextDetective
  ApplicationIdentifierPrefix[],  // [ string - 66PK3K3KEV ]
  CreationData, // date - 2013-01-17T14:18:05Z
