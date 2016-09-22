@@ -42,40 +42,42 @@ OSNotification *notification;
 
 id <CDVCommandDelegate> pluginCommandDelegate;
 
-void successCallback(NSString* callbackId, NSString* data) {
+void successCallback(NSString* callbackId, NSDictionary* data) {
+    CDVPluginResult* commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
+    commandResult.keepCallback = @1;
+    [pluginCommandDelegate sendPluginResult:commandResult callbackId:callbackId];
+}
+
+void failureCallback(NSString* callbackId, NSDictionary* data) {
+    CDVPluginResult* commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:data];
+    commandResult.keepCallback = @1;
+    [pluginCommandDelegate sendPluginResult:commandResult callbackId:callbackId];
+}
+
+void processNotificationReceived(OSNotification* _notif) {
+    NSString * data = [_notif stringify];
     NSError *jsonError;
     NSData *objectData = [data dataUsingEncoding:NSUTF8StringEncoding];
     NSDictionary *json = [NSJSONSerialization JSONObjectWithData:objectData
-                                      options:NSJSONReadingMutableContainers 
-                                        error:&jsonError];
+                                                         options:NSJSONReadingMutableContainers
+                                                           error:&jsonError];
     if(!jsonError) {
-        CDVPluginResult* commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:json];
-        commandResult.keepCallback = @1;
-        [pluginCommandDelegate sendPluginResult:commandResult callbackId:callbackId];
+        successCallback(notficationReceivedCallbackId, json);
+        notification = nil;
     }
-}
-
-void failureCallback(NSString* callbackId, NSString* data) {
-    NSError *jsonError;
-    NSData *objectData = [data dataUsingEncoding:NSUTF8StringEncoding];
-    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:objectData
-                                      options:NSJSONReadingMutableContainers 
-                                        error:&jsonError];
-    if(!jsonError) {
-        CDVPluginResult* commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:json];
-        commandResult.keepCallback = @1;
-        [pluginCommandDelegate sendPluginResult:commandResult callbackId:callbackId];
-    }
-}
-
-void processNotificationReceived(OSNotification* notification) {
-    successCallback(notficationReceivedCallbackId, [notification stringify]);
-    notification = nil;
 }
 
 void processNotificationOpened(OSNotificationOpenedResult* result) {
-    successCallback(notficationOpenedCallbackId, [result stringify]);
-    actionNotification = nil;
+    NSString * data = [result stringify];
+    NSError *jsonError;
+    NSData *objectData = [data dataUsingEncoding:NSUTF8StringEncoding];
+    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:objectData
+                                                         options:NSJSONReadingMutableContainers
+                                                           error:&jsonError];
+    if(!jsonError) {
+        successCallback(notficationOpenedCallbackId, json);
+        actionNotification = nil;
+    }
 }
 
 void initOneSignalObject(NSDictionary* launchOptions, const char* appId, BOOL inAppAlerts, int displayOption, BOOL inAppLaunchURL, BOOL autoPrompt) {
@@ -132,7 +134,7 @@ static Class delegateClass = nil;
 
 - (BOOL)oneSignalApplication:(UIApplication*)application didFinishLaunchingWithOptions:(NSDictionary*)launchOptions {
     if ([launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey] != nil)
-        initOneSignalObject(launchOptions, nil, true, 1, true, true);
+        initOneSignalObject(launchOptions, nil, YES, 1, YES, YES);
     
     if ([self respondsToSelector:@selector(oneSignalApplication:didFinishLaunchingWithOptions:)])
         return [self oneSignalApplication:application didFinishLaunchingWithOptions:launchOptions];
@@ -156,16 +158,15 @@ static Class delegateClass = nil;
 
     NSString* appId = (NSString*)command.arguments[0];
     NSDictionary* settings = (NSDictionary*)command.arguments[2];
-    BOOL inAppAlerts = options["kOSSettingsKeyInAppAlerts"] ? [(NSNumber*)options["kOSSettingsKeyInAppAlerts"] boolValue] : YES;
-    BOOL inAppLaunchURL = options["kOSSettingsKeyInAppLaunchURL"] ? [(NSNumber*)options["kOSSettingsKeyInAppLaunchURL"] boolValue] : YES;
-    BOOL autoPrompt = options["kOSSettingsKeyAutoPrompt"] ? [(NSNumber*)options["kOSSettingsKeyAutoPrompt"] boolValue] : YES;
+    BOOL inAppLaunchURL = settings[@"kOSSettingsKeyInAppLaunchURL"] ? [(NSNumber*)settings[@"kOSSettingsKeyInAppLaunchURL"] boolValue] : YES;
+    BOOL autoPrompt = settings[@"kOSSettingsKeyAutoPrompt"] ? [(NSNumber*)settings[@"kOSSettingsKeyAutoPrompt"] boolValue] : YES;
 
     int displayOption = [(NSNumber*)command.arguments[3] intValue];
 
-    initOneSignalObject(nil, [options[@"appId"], inAppAlerts, displayOption, inAppLaunchURL, autoPrompt);
+    initOneSignalObject(nil, [appId UTF8String], YES, displayOption, inAppLaunchURL, autoPrompt);
     
     if (notification)
-        processNotificatioReceived(notification);
+        processNotificationReceived(notification);
     if (actionNotification)
         processNotificationOpened(actionNotification);
 }
@@ -230,7 +231,7 @@ static Class delegateClass = nil;
 
 - (void)setLogLevel:(CDVInvokedUrlCommand*)command {
     NSDictionary* options = command.arguments[0];
-    [OneSignal setLogLevel:options[@"logLevel"] visualLevel:options[@"visualLevel"]];
+    [OneSignal setLogLevel:(NSInteger)options[@"logLevel"] visualLevel:(NSInteger)options[@"visualLevel"]];
 }
 
 // Android only
