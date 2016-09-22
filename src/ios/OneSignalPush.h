@@ -31,6 +31,8 @@
 
 @interface OneSignalPush : CDVPlugin {}
 
+- (void)setNotificationReceivedHandler:(CDVInvokedUrlCommand*)command;
+- (void)setNotificationOpenedHandler:(CDVInvokedUrlCommand*)command;
 - (void)init:(CDVInvokedUrlCommand*)command;
 - (void)getTags:(CDVInvokedUrlCommand*)command;
 - (void)getIds:(CDVInvokedUrlCommand*)command;

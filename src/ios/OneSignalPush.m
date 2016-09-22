@@ -143,10 +143,10 @@ static Class delegateClass = nil;
 
 @implementation OneSignalPush
 
-- (void)setNotificationReceivedHandler:(CDVInvokedUrlCommand*)command{
+- (void)setNotificationReceivedHandler:(CDVInvokedUrlCommand*)command {
     notficationReceivedCallbackId = command.callbackId;
 }
-- (void)setNotificationOpenedHandler:(CDVInvokedUrlCommand*)command{
+- (void)setNotificationOpenedHandler:(CDVInvokedUrlCommand*)command {
     notficationOpenedCallbackId = command.callbackId;
 }
 
@@ -187,16 +187,6 @@ static Class delegateClass = nil;
     }];
 }
 
-- (void)getIds_GameThrive:(CDVInvokedUrlCommand*)command {
-    getIdsCallbackId = command.callbackId;
-    [OneSignal IdsAvailable:^(NSString* playerId, NSString* pushToken) {
-        if (pushToken == nil)
-            pushToken = @"";
-        
-        successCallback(getIdsCallbackId, @{@"playerId" : playerId, @"pushToken" : pushToken});
-    }];
-}
-
 - (void)sendTags:(CDVInvokedUrlCommand*)command {
     [OneSignal sendTags:command.arguments[0]];
 }
@@ -207,10 +197,6 @@ static Class delegateClass = nil;
 
 - (void)registerForPushNotifications:(CDVInvokedUrlCommand*)command {
     [OneSignal registerForPushNotifications];
-}
-
-- (void)enableInAppAlertNotification:(CDVInvokedUrlCommand*)command {
-    [OneSignal enableInAppAlertNotification:[command.arguments[0] boolValue]];
 }
 
 - (void)setSubscription:(CDVInvokedUrlCommand*)command {
@@ -250,6 +236,6 @@ static Class delegateClass = nil;
 // Android only
 - (void)enableVibrate:(CDVInvokedUrlCommand*)command {}
 - (void)enableSound:(CDVInvokedUrlCommand*)command {}
-- (void)enableNotificationsWhenActive:(CDVInvokedUrlCommand*)command {}
+- (void)setInFocusDisplaying:(CDVInvokedUrlCommand*)command {}
 
 @end
