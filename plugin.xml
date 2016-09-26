@@ -105,7 +105,6 @@
     <source-file src="src/ios/OneSignalTracker.m" />
     <source-file src="src/ios/OneSignalHelper.m" />
     <source-file src="src/ios/OneSignalWebView.m" />
-    <source-file src="src/ios/UIApplication+Swizzling.m" />
     <source-file src="src/ios/OneSignalPush.m" />
 
     <header-file src="src/ios/OneSignal-Prefix.pch" />
