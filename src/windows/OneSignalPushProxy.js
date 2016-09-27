@@ -64,6 +64,8 @@ module.exports = {
   },
 
   // Native SDK does not support these functions.
+  setNotificationReceivedHandler: function (successCallback, errorCallback, params) { },
+  setNotificationReceivedHandler:function (successCallback, errorCallback, params) { },
   registerForPushNotifications: function (successCallback, errorCallback, params) { },
   enableVibrate: function (successCallback, errorCallback, params) { },
   enableSound: function (successCallback, errorCallback, params) { },
@@ -72,9 +74,9 @@ module.exports = {
   setSubscription: function (successCallback, errorCallback, params) { },
   postNotification: function (successCallback, errorCallback, params) { },
   promptLocation: function (successCallback, errorCallback, params) { },
-  setEmail: function (successCallback, errorCallback, params) { },
-  setLogLevel: function (successCallback, errorCallback, params) { },
-  setInFocusDisplay: function(display) {}
+  syncHashedEmail: function (successCallback, errorCallback, params) { },
+  setLogLevel: function (successCallback, errorCallback, params) { }
+
 };
 
 require("cordova/exec/proxy").add("OneSignalPush", module.exports);

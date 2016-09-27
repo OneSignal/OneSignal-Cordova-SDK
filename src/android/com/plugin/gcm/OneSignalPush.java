@@ -66,7 +66,6 @@ public class OneSignalPush extends CordovaPlugin {
   public static final String ENABLE_VIBRATE = "enableVibrate";
   public static final String ENABLE_SOUND = "enableSound";
   public static final String ENABLE_NOTIFICATIONS_WHEN_ACTIVE = "enableNotificationsWhenActive";
-  public static final String SET_IN_FOCUS_DISPLAYING = "setInFocusDisplaying";
   public static final String SET_SUBSCRIPTION = "setSubscription";
   public static final String POST_NOTIFICATION = "postNotification";
   public static final String PROMPT_LOCATION = "promptLocation";
@@ -115,8 +114,8 @@ public class OneSignalPush extends CordovaPlugin {
     }
     else if (INIT.equals(action)) {
       try {
-        int appId = data.getJSONObject(0);
-        int googleProjectNumber = data.getJSONObject(1);
+        int appId = data.getString(0);
+        int googleProjectNumber = data.getString(1);
         OneSignal.sdkType = "cordova";
         OneSignal.init(
         (Activity)this.cordova.getActivity(),
@@ -209,14 +208,6 @@ public class OneSignalPush extends CordovaPlugin {
     else if (ENABLE_NOTIFICATIONS_WHEN_ACTIVE.equals(action)) {
       try {
         OneSignal.enableNotificationsWhenActive(data.getBoolean(0));
-        result = true;
-        } catch (Throwable t) {
-        t.printStackTrace();
-      }
-    }
-    else if (SET_IN_FOCUS_DISPLAYING.equals(action)) {
-      try {
-        OneSignal.setInFocusDisplaying(data.getInt(0));
         result = true;
         } catch (Throwable t) {
         t.printStackTrace();

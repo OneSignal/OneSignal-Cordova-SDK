@@ -48,6 +48,5 @@
 // Android Only
 - (void)enableVibrate:(CDVInvokedUrlCommand*)command;
 - (void)enableSound:(CDVInvokedUrlCommand*)command;
-- (void)setInFocusDisplaying:(CDVInvokedUrlCommand*)command;
 
 @end
