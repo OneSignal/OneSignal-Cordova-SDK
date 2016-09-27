@@ -74,7 +74,7 @@ NSString * const kOSSettingsKeyInAppLaunchURL = @"kOSSettingsKeyInAppLaunchURL";
 NSString * const kOSSettingsKeyInFocusDisplayOption = @"kOSSettingsKeyInFocusDisplayOption";
 
 @implementation OneSignal
-    
+
 NSString* const ONESIGNAL_VERSION = @"020114";
 static NSString* mSDKType = @"native";
 static BOOL coldStartFromTapOnNotification = NO;
@@ -92,7 +92,7 @@ int mNotificationTypes = -1;
 OSIdsAvailableBlock idsAvailableBlockWhenReady;
 BOOL disableBadgeClearing = NO;
 BOOL mSubscriptionSet;
-    
+
 + (NSString*)app_id {
     return app_id;
 }
@@ -111,7 +111,7 @@ BOOL mSubscriptionSet;
     coldStartFromTapOnNotification = NO;
     return val;
 }
-    
+
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions appId:(NSString*)appId {
     return [self initWithLaunchOptions: launchOptions appId: appId handleNotificationReceived: NULL handleNotificationAction : NULL settings: @{kOSSettingsKeyAutoPrompt : @YES, kOSSettingsKeyInAppAlerts : @YES, kOSSettingsKeyInAppLaunchURL : @YES}];
 }
@@ -186,9 +186,9 @@ BOOL mSubscriptionSet;
         
         
         /*Check if in-app setting passed assigned
-            LOGIC: Default - InAppAlerts enabled / InFocusDisplayOption InAppAlert.
-            Priority for kOSSettingsKeyInFocusDisplayOption.
-        */
+         LOGIC: Default - InAppAlerts enabled / InFocusDisplayOption InAppAlert.
+         Priority for kOSSettingsKeyInFocusDisplayOption.
+         */
         
         NSNumber * IAASetting = settings[kOSSettingsKeyInAppAlerts];
         BOOL inAppAlertsPassed = IAASetting && (IAASetting.integerValue == 0 || IAASetting.integerValue == 1);
@@ -204,7 +204,7 @@ BOOL mSubscriptionSet;
         
         else [self setNotificationDisplayOptions:IAASetting];
         
-
+        
         if (mUserId != nil)
             [self registerUser];
         else // Fall back incase Apple does not responsed in time.
@@ -212,7 +212,7 @@ BOOL mSubscriptionSet;
         
         [OneSignalTracker onFocus:NO];
     }
- 
+    
     /*
      * No need to call the handleNotificationOpened:userInfo as it will be called from the
      * application:didReceiveRemoteNotification:fetchCompletionHandler / userNotificationCenter:didReceiveNotificationResponse:withCompletionHandler (i10)
@@ -222,17 +222,17 @@ BOOL mSubscriptionSet;
     NSDictionary* userInfo = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
     if(userInfo)
         coldStartFromTapOnNotification = YES;
-
+    
     [self clearBadgeCount:false];
     
     if ([OneSignalTrackIAP canTrack])
         trackIAPPurchase = [[OneSignalTrackIAP alloc] init];
     
     if (NSClassFromString(@"UNUserNotificationCenter")) {
-        #if XC8_AVAILABLE
+#if XC8_AVAILABLE
         [OneSignalHelper registerAsUNNotificationCenterDelegate];
         [OneSignalHelper clearCachedMedia];
-        #endif
+#endif
     }
     
     return self;
@@ -271,7 +271,7 @@ void onesignal_Log(ONE_S_LOG_LEVEL logLevel, NSString* message) {
         default:
             break;
     }
-
+    
     if (logLevel <= _nsLogLevel)
         NSLog(@"%@", [levelString stringByAppendingString:message]);
     
@@ -290,9 +290,9 @@ void onesignal_Log(ONE_S_LOG_LEVEL logLevel, NSString* message) {
 // in the implementation UIApplication(OneSignalPush) below after contacting Apple's server.
 + (void)registerForPushNotifications {
     
-    #if XC8_AVAILABLE
+#if XC8_AVAILABLE
     [OneSignalHelper requestAuthorization];
-    #endif
+#endif
     
     // For iOS 8 devices
     if ([[UIApplication sharedApplication] respondsToSelector:@selector(registerUserNotificationSettings:)]) {
@@ -343,7 +343,7 @@ void onesignal_Log(ONE_S_LOG_LEVEL logLevel, NSString* message) {
 }
 
 + (void)sendTags:(NSDictionary*)keyValuePair onSuccess:(OSResultSuccessBlock)successBlock onFailure:(OSFailureBlock)failureBlock {
-   
+    
     if (mUserId == nil) {
         if (tagsToSend == nil)
             tagsToSend = [keyValuePair mutableCopy];
@@ -364,8 +364,8 @@ void onesignal_Log(ONE_S_LOG_LEVEL logLevel, NSString* message) {
     [request setHTTPBody:postData];
     
     [OneSignalHelper enqueueRequest:request
-               onSuccess:successBlock
-               onFailure:failureBlock];
+                          onSuccess:successBlock
+                          onFailure:failureBlock];
 }
 
 + (void)sendTag:(NSString*)key value:(NSString*)value {
@@ -457,20 +457,20 @@ void onesignal_Log(ONE_S_LOG_LEVEL logLevel, NSString* message) {
     [request setHTTPBody:postData];
     
     [OneSignalHelper enqueueRequest:request
-               onSuccess:^(NSDictionary* results) {
-                   NSData* jsonData = [NSJSONSerialization dataWithJSONObject:results options:0 error:nil];
-                   NSString* jsonResultsString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-                   
-                   onesignal_Log(ONE_S_LL_DEBUG, [NSString stringWithFormat: @"HTTP create notification success %@", jsonResultsString]);
-                   if (successBlock)
-                       successBlock(results);
-               }
-               onFailure:^(NSError* error) {
-                   onesignal_Log(ONE_S_LL_ERROR, @"Create notification failed");
-                   onesignal_Log(ONE_S_LL_INFO, [NSString stringWithFormat: @"%@", error]);
-                   if (failureBlock)
-                       failureBlock(error);
-               }];
+                          onSuccess:^(NSDictionary* results) {
+                              NSData* jsonData = [NSJSONSerialization dataWithJSONObject:results options:0 error:nil];
+                              NSString* jsonResultsString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+                              
+                              onesignal_Log(ONE_S_LL_DEBUG, [NSString stringWithFormat: @"HTTP create notification success %@", jsonResultsString]);
+                              if (successBlock)
+                                  successBlock(results);
+                          }
+                          onFailure:^(NSError* error) {
+                              onesignal_Log(ONE_S_LL_ERROR, @"Create notification failed");
+                              onesignal_Log(ONE_S_LL_INFO, [NSString stringWithFormat: @"%@", error]);
+                              if (failureBlock)
+                                  failureBlock(error);
+                          }];
 }
 
 + (void)postNotificationWithJsonString:(NSString*)jsonString onSuccess:(OSResultSuccessBlock)successBlock onFailure:(OSFailureBlock)failureBlock {
@@ -488,7 +488,7 @@ void onesignal_Log(ONE_S_LOG_LEVEL logLevel, NSString* message) {
 
 /* Option:0, 1 or 2 */
 + (void)setNotificationDisplayOptions:(NSNumber*)option {
-   
+    
     // Special Case: If iOS version < 10 && Option passed is 2, default to inAppAlerts.
     NSInteger op = option.integerValue;
     if(![OneSignalHelper isiOS10Plus] && OSNotificationDisplayTypeNotification == op)
@@ -507,7 +507,7 @@ void onesignal_Log(ONE_S_LOG_LEVEL logLevel, NSString* message) {
     NSString* value = nil;
     if (!enable)
         value = @"no";
-
+    
     [[NSUserDefaults standardUserDefaults] setObject:value forKey:@"ONESIGNAL_SUBSCRIPTION"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
@@ -519,14 +519,14 @@ void onesignal_Log(ONE_S_LOG_LEVEL logLevel, NSString* message) {
 + (void) promptLocation {
     [OneSignalLocation getLocation:true];
 }
-    
+
 + (void)registerDeviceToken:(id)inDeviceToken onSuccess:(OSResultSuccessBlock)successBlock onFailure:(OSFailureBlock)failureBlock {
     [self updateDeviceToken:inDeviceToken onSuccess:successBlock onFailure:failureBlock];
     
     [[NSUserDefaults standardUserDefaults] setObject:mDeviceToken forKey:@"GT_DEVICE_TOKEN"];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
-    
+
 + (void)updateDeviceToken:(NSString*)deviceToken onSuccess:(OSResultSuccessBlock)successBlock onFailure:(OSFailureBlock)failureBlock {
     
     // Do not block next registration as there's a new token in hand
@@ -551,7 +551,7 @@ void onesignal_Log(ONE_S_LOG_LEVEL logLevel, NSString* message) {
     
     if ([deviceToken isEqualToString:mDeviceToken]) {
         if (successBlock)
-        successBlock(nil);
+            successBlock(nil);
         return;
     }
     
@@ -603,7 +603,7 @@ bool nextRegistrationIsHighPriority = NO;
     NSTimeInterval delta = now - lastTimeClosed;
     return delta > minTimeThreshold;
 }
-    
+
 + (void)registerUser {
     
     static BOOL waitingForOneSReg = NO;
@@ -662,9 +662,9 @@ bool nextRegistrationIsHighPriority = NO;
     if (ASIdentifierManagerClass) {
         id asIdManager = [ASIdentifierManagerClass valueForKey:@"sharedManager"];
         if ([[asIdManager valueForKey:@"advertisingTrackingEnabled"] isEqual:[NSNumber numberWithInt:1]])
-        dataDic[@"as_id"] = [[asIdManager valueForKey:@"advertisingIdentifier"] UUIDString];
+            dataDic[@"as_id"] = [[asIdManager valueForKey:@"advertisingIdentifier"] UUIDString];
         else
-        dataDic[@"as_id"] = @"OptedOut";
+            dataDic[@"as_id"] = @"OptedOut";
     }
     
     UIApplicationReleaseMode releaseMode = [OneSignalMobileProvision releaseMode];
@@ -698,7 +698,7 @@ bool nextRegistrationIsHighPriority = NO;
             [[NSUserDefaults standardUserDefaults] synchronize];
             
             if (mDeviceToken)
-            [self updateDeviceToken:mDeviceToken onSuccess:tokenUpdateSuccessBlock onFailure:tokenUpdateFailureBlock];
+                [self updateDeviceToken:mDeviceToken onSuccess:tokenUpdateSuccessBlock onFailure:tokenUpdateFailureBlock];
             
             
             if (tagsToSend) {
@@ -760,10 +760,10 @@ bool nextRegistrationIsHighPriority = NO;
     }
     
 }
-    
+
 + (void)sendPurchases:(NSArray*)purchases {
     if (mUserId == nil)
-    return;
+        return;
     
     NSMutableURLRequest* request = [httpClient requestWithMethod:@"POST" path:[NSString stringWithFormat:@"players/%@/on_purchase", mUserId]];
     
@@ -776,10 +776,10 @@ bool nextRegistrationIsHighPriority = NO;
     [request setHTTPBody:postData];
     
     [OneSignalHelper enqueueRequest:request
-               onSuccess:nil
-               onFailure:nil];
+                          onSuccess:nil
+                          onFailure:nil];
 }
-    
+
 + (void)notificationOpened:(NSDictionary*)messageDict isActive:(BOOL)isActive {
     
     NSDictionary* customDict = [messageDict objectForKey:@"os_data"];
@@ -813,7 +813,7 @@ bool nextRegistrationIsHighPriority = NO;
             NSArray *additionalData = [OneSignalHelper getActionButtons];
             if (additionalData) {
                 for(id button in additionalData)
-                [alertView addButtonWithTitle:button[@"n"]];
+                    [alertView addButtonWithTitle:button[@"n"]];
             }
             
             [alertView show];
@@ -853,7 +853,7 @@ bool nextRegistrationIsHighPriority = NO;
     }
     
 }
-    
+
 + (void) handleNotificationOpened:(NSDictionary*)messageDict isActive:(BOOL)isActive actionType : (OSNotificationActionType)actionType displayType:(OSNotificationDisplayType)displayType{
     
     
@@ -883,7 +883,7 @@ bool nextRegistrationIsHighPriority = NO;
 }
 
 + (void)launchWebURL:(NSString*)openUrl {
-
+    
     if (openUrl) {
         if ([OneSignalHelper verifyURL:openUrl]) {
             //Create a dleay to allow alertview to dismiss before showing anything or going to safari
@@ -914,7 +914,7 @@ bool nextRegistrationIsHighPriority = NO;
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
 }
-    
+
 + (BOOL) clearBadgeCount:(BOOL)fromNotifOpened {
     
     NSNumber *disableBadgeNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"OneSignal_disable_badge_clearing"];
@@ -924,7 +924,7 @@ bool nextRegistrationIsHighPriority = NO;
     else disableBadgeClearing = NO;
     
     if (disableBadgeClearing || mNotificationTypes == -1 || (mNotificationTypes & NOTIFICATION_TYPE_BADGE) == 0)
-    return false;
+        return false;
     
     bool wasBadgeSet = [UIApplication sharedApplication].applicationIconBadgeNumber > 0;
     
@@ -938,7 +938,7 @@ bool nextRegistrationIsHighPriority = NO;
     
     return wasBadgeSet;
 }
-    
+
 + (int) getNotificationTypes {
     
     if(mNotificationTypes == ERROR_PUSH_CAPABLILITY_DISABLED)
@@ -949,9 +949,9 @@ bool nextRegistrationIsHighPriority = NO;
     
     if (mDeviceToken) {
         if ([OneSignalHelper isCapableOfGettingNotificationTypes])
-        return [[UIApplication sharedApplication] currentUserNotificationSettings].types;
+            return [[UIApplication sharedApplication] currentUserNotificationSettings].types;
         else
-        return NOTIFICATION_TYPE_ALL;
+            return NOTIFICATION_TYPE_ALL;
     }
     
     return -1;
@@ -963,12 +963,12 @@ bool nextRegistrationIsHighPriority = NO;
     if([self mUserId]) {
         NSMutableURLRequest* request = [httpClient requestWithMethod:@"PUT" path:[NSString stringWithFormat:@"players/%@", mUserId]];
         NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                             app_id, @"app_id",
-                             @(mNotificationTypes), @"notification_types",
-                             nil];
+                                 app_id, @"app_id",
+                                 @(mNotificationTypes), @"notification_types",
+                                 nil];
         NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
         [request setHTTPBody:postData];
-    
+        
         [OneSignalHelper enqueueRequest:request onSuccess:nil onFailure:nil];
     }
 }
@@ -1003,7 +1003,7 @@ bool nextRegistrationIsHighPriority = NO;
     }];
     
 }
-    
+
 + (void) remoteSilentNotification:(UIApplication*)application UserInfo:(NSDictionary*)userInfo {
     // If 'm' present then the notification has action buttons attached to it.
     NSDictionary* data = nil;
@@ -1045,7 +1045,7 @@ bool nextRegistrationIsHighPriority = NO;
         [OneSignalHelper handleNotificationReceived:OSNotificationDisplayTypeNone];
     else [OneSignalHelper handleNotificationReceived:OSNotificationDisplayTypeNotification];
 }
-    
+
 + (void)processLocalActionBasedNotification:(UILocalNotification*) notification identifier:(NSString*)identifier {
     if (notification.userInfo) {
         NSMutableDictionary* userInfo, *customDict, *additionalData, *optionsDict;
@@ -1172,7 +1172,7 @@ static id<OSUserNotificationCenterDelegate> notificationCenterDelegate;
         if(userInfo[@"m"])
             userInfo[@"aps"] = @{ @"alert" : userInfo[@"m"] };
     }
-
+    
     BOOL isActive = [UIApplication sharedApplication].applicationState == UIApplicationStateActive;
     
     [OneSignal notificationOpened:userInfo isActive:isActive];
@@ -1181,7 +1181,7 @@ static id<OSUserNotificationCenterDelegate> notificationCenterDelegate;
 }
 
 + (void)tunnelToDelegate:(id)center :(id)response :(void (^)())handler {
-
+    
     if ([[OneSignal notificationCenterDelegate] respondsToSelector:@selector(userNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:)])
         [[OneSignal notificationCenterDelegate] userNotificationCenter:center didReceiveNotificationResponse:response withCompletionHandler:handler];
     else
@@ -1210,7 +1210,7 @@ static id<OSUserNotificationCenterDelegate> notificationCenterDelegate;
         }
         
         completionHandler(completionHandlerOptions);
-     
+        
         //Call notificationOpened if no alert (MSB not set)
         NSDictionary* usrInfo = [[[notification valueForKey:@"request"] valueForKey:@"content"] valueForKey:@"userInfo"];
         [OneSignal notificationOpened:usrInfo isActive:YES];
@@ -1234,17 +1234,17 @@ static id<OSUserNotificationCenterDelegate> notificationCenterDelegate;
     
     NSMutableURLRequest* request = [httpClient requestWithMethod:@"PUT" path:[NSString stringWithFormat:@"players/%@", mUserId]];
     NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                            app_id, @"app_id",
-                            md5, @"em_m",
-                            sha1, @"em_s",
-                            [OneSignalHelper getNetType], @"net_type",
-                            nil];
+                             app_id, @"app_id",
+                             md5, @"em_m",
+                             sha1, @"em_s",
+                             [OneSignalHelper getNetType], @"net_type",
+                             nil];
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
     [request setHTTPBody:postData];
     
     [OneSignalHelper enqueueRequest:request
-                onSuccess:nil
-               onFailure:nil];
+                          onSuccess:nil
+                          onFailure:nil];
     
 }
 

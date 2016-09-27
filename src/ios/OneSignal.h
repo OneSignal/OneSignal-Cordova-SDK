@@ -163,6 +163,8 @@ typedef OSNotificationDisplayType OSInFocusDisplayOption;
 /* Convert object into an NSString that can be convertible into a custom Dictionary / JSON Object */
 - (NSString*)stringify;
 
++ (void) onesignal_Log:(ONE_S_LOG_LEVEL)logLevel message:(NSString*)message;
+
 @end
 
 

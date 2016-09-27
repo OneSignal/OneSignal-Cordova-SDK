@@ -4,6 +4,7 @@
     id="onesignal-cordova-plugin"
     version="2.0.0">
 
+
   <name>OneSignal Push Notifications</name>
   <author>Josh Kasten</author>
 
@@ -25,7 +26,7 @@
   
   <platform name="android">
     <framework src="com.onesignal:OneSignal:3.3.0@aar" />
-    
+
     <framework src="com.google.android.gms:play-services-gcm:+" />
     <!-- play-services-analytics is only required when gms version 8.1.0 or older is used. -->
     <framework src="com.google.android.gms:play-services-analytics:+" />
