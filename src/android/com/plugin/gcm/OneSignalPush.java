@@ -73,6 +73,7 @@ public class OneSignalPush extends CordovaPlugin {
   public static final String SYNC_HASHED_EMAIL = "syncHashedEmail";
   public static final String SET_LOG_LEVEL = "setLogLevel";
   public static final String CLEAR_ONESIGNAL_NOTIFICATIONS = "clearOneSignalNotifications";
+
   
   private static CallbackContext notifReceivedCallbackContext;
   private static CallbackContext notifOpenedCallbackContext;
@@ -109,7 +110,7 @@ public class OneSignalPush extends CordovaPlugin {
     if(SET_NOTIFICATION_RECEIVED_HANDLER.equals(action)) {
       notifReceivedCallbackContext = callbackContext;
     }
-    else if(SET_NOTIFICATION_RECEIVED_HANDLER.equals(action)) {
+    else if(SET_NOTIFICATION_OPENED_HANDLER.equals(action)) {
       notifOpenedCallbackContext = callbackContext;
     }
     else if (INIT.equals(action)) {
@@ -122,7 +123,9 @@ public class OneSignalPush extends CordovaPlugin {
         appId,
         googleProjectNumber,
         new CordovaNotificationReceivedHandler(notifReceivedCallbackContext),
-        new CordovaNotificationOpenedHandler(notifReceivedCallbackContext));
+        new CordovaNotificationOpenedHandler(notifOpenedCallbackContext));
+
+        // data.getJSONObject(2) is for iOS settings.
 
         int displayOption = data.getJSONObject(3);
         OneSignal.setInFocusDisplaying(displayOption);
@@ -273,6 +276,7 @@ public class OneSignalPush extends CordovaPlugin {
         t.printStackTrace();
       }
     }
+    else if(iOS)
     else {
       result = false;
       Log.e(TAG, "Invalid action : " + action);

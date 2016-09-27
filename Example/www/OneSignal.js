@@ -1,3 +1,4 @@
+cordova.define("onesignal-cordova-plugin.OneSignal", function(require, exports, module) {
 /**
  * Modified MIT License
  * 
@@ -34,28 +35,34 @@ var OneSignal = function() {
     var _notificationOpenedDelegate = function() {};
 };
 
+OneSignal.OSInFocusDisplayOption = {
+    None: 0,
+    InAppAlert : 1,
+    Notification : 2
+}
+
 
 // You must call init before any other OneSignal function.
 // options is a JSON object that includes:
 //  Android - googleProjectNumber: is required.
 OneSignal.prototype.startInit = function(appId, googleProjectNumber) {
-    _appID = appId;
-    _googleProjectNumber = googleProjectNumber;
+    OneSignal._appID = appId;
+    OneSignal._googleProjectNumber = googleProjectNumber;
     return this;
 };
 
 OneSignal.prototype.handleNotificationReceived = function(handleNotificationReceivedCallback) {
-    _notificationReceivedDelegate = handleNotificationReceivedCallback;
+    OneSignal._notificationReceivedDelegate = handleNotificationReceivedCallback;
     return this;
 }
 
 OneSignal.prototype.handleNotificationOpened = function(handleNotificationOpenedCallback) {
-    _notificationOpenedDelegate = handleNotificationOpenedCallback;
+    OneSignal._notificationOpenedDelegate = handleNotificationOpenedCallback;
     return this;
 }
 
 OneSignal.prototype.inFocusDisplaying = function(display) {
-    _displayOption = display;
+    OneSignal._displayOption = display;
     return this;
 }
 
@@ -63,18 +70,18 @@ OneSignal.prototype.inFocusDisplaying = function(display) {
 // kOSSettingsKeyInAppLaunchURL: Bool. Enable in-app webviews for urls. Default: Enabled
 // kOSSettingsKeyAutoPrompt: Bool. Enable automatic prompting for notifications. Default: Enabled
 OneSignal.prototype.iOSSettings = function(settings) {
-    _iOSSettings = settings;
+    OneSignal._iOSSettings = settings;
     return this;
 }
 
 OneSignal.prototype.endInit = function() {
 
     //Pass notification received handler
-    cordova.exec(_notificationReceivedDelegate, function(){}, "OneSignalPush", "setNotificationReceivedHandler", []);
-    cordova.exec(_notificationOpenedDelegate, function(){}, "OneSignalPush", "setNotificationOpenedHandler", []);
+    cordova.exec(OneSignal._notificationReceivedDelegate, function(){}, "OneSignalPush", "setNotificationReceivedHandler", []);
+    cordova.exec(OneSignal._notificationOpenedDelegate, function(){}, "OneSignalPush", "setNotificationOpenedHandler", []);
 
     //Call Init
-    cordova.exec(function() {}, function(){}, "OneSignalPush", "init", [appId, googleProjectNumber, _iOSSettings, _displayOption]);
+    cordova.exec(function() {}, function(){}, "OneSignalPush", "init", [OneSignal._appID, OneSignal._googleProjectNumber, OneSignal._iOSSettings, OneSignal._displayOption]);
 }
 
 OneSignal.prototype.getTags = function(tagsReceivedCallBack) {
@@ -160,3 +167,4 @@ if (!window.plugins.OneSignal)
 
 if (typeof module != 'undefined' && module.exports)
     module.exports = OneSignal;
+});
