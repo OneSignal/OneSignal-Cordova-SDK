@@ -1,5 +1,5 @@
 {
-  "version": "1.12.4",
+  "version": "2.0.0",
   "name": "onesignal-cordova-plugin",
   "cordova_name": "OneSignal Push Notifications",
   "description": "OneSignal is a high volume Push Notification service for mobile apps. In addition to basic notification delivery, OneSignal also provides tools to localize, target, schedule, and automate notifications that you send.",
@@ -36,7 +36,7 @@
     },
     {
       "name": "apple-ios",
-      "version": ">=6.0.0"
+      "version": ">=7.0.0"
     }
   ],
   "cordova": {
@@ -50,11 +50,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/one-signal/OneSignal-Cordova-SDK.git"
+    "url": "git+https://github.com/onesignal/OneSignal-Cordova-SDK.git"
   },
   "author": "Josh Kasten",
   "bugs": {
-    "url": "https://github.com/one-signal/OneSignal-Cordova-SDK/issues"
+    "url": "https://github.com/onesignal/OneSignal-Cordova-SDK/issues"
   },
-  "homepage": "https://github.com/one-signal/OneSignal-Cordova-SDK#readme"
+  "homepage": "https://github.com/onesignal/OneSignal-Cordova-SDK#readme"
 }

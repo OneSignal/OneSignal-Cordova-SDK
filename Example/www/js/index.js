@@ -50,15 +50,27 @@ var app = {
         // Enable to debug issues.
         // window.plugins.OneSignal.setLogLevel({logLevel: 4, visualLevel: 4});
 
-        window.plugins.OneSignal.init( "5eb5a37e-b458-11e3-ac11-000c2940e62c",
-                                        {googleProjectNumber: "703322744261"},
-                                        app.didReceiveRemoteNotificationCallBack);
-    },
-    didReceiveRemoteNotificationCallBack : function(jsonData) {
+        var iosSettings = {};
+        iosSettings["kOSSettingsKeyAutoPrompt"] = true;
+        iosSettings["kOSSettingsKeyInAppLaunchURL"] = false;
+
+        window.plugins.OneSignal.startInit( "5eb5a37e-b458-11e3-ac11-000c2940e62c", "703322744261")
+                                .handleNotificationReceived(didReceiveRemoteNotificationCallBack)
+                                .handleNotificationOpened(didOpenRemoteNotificationCallBack)
+                                .inFocusDisplaying(OneSignal.OSNotificationDislayOption.Notification)
+                                .iOSSettings(iosSettings)
+                                .endInit();
+    }
+};
+
+function didReceiveRemoteNotificationCallBack(jsonData) {
         alert("Notification received:\n" + JSON.stringify(jsonData));
         console.log('didReceiveRemoteNotificationCallBack: ' + JSON.stringify(jsonData));
     }
-};
+function didOpenRemoteNotificationCallBack (jsonData) {
+        alert("Notification opened:\n" + JSON.stringify(jsonData));
+        console.log('didOpenRemoteNotificationCallBack: ' + JSON.stringify(jsonData));   
+    }
 
 function sendTag() {
     window.plugins.OneSignal.sendTag("PhoneGapKey", "PhoneGapValue");

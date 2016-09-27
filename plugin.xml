@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="onesignal-cordova-plugin"
-    version="1.12.4">
+    version="2.0.0">
 
   <name>OneSignal Push Notifications</name>
   <author>Josh Kasten</author>
@@ -20,11 +20,11 @@
   <engines>
     <engine name="cordova-android" version=">=4.0.0" /> <!-- This main branch of OneSignal depends on gradle and maven. -->
     <engine name="apple-xcode" version=">=6.2.0" />
-    <engine name="apple-ios" version=">=6.0.0" />
+    <engine name="apple-ios" version=">=7.0.0" />
   </engines>
   
   <platform name="android">
-    <framework src="com.onesignal:OneSignal:2.3.0@aar" />
+    <framework src="com.onesignal:OneSignal:3.3.0@aar" />
     
     <framework src="com.google.android.gms:play-services-gcm:+" />
     <!-- play-services-analytics is only required when gms version 8.1.0 or older is used. -->
@@ -52,6 +52,7 @@
           <category android:name="$PACKAGE_NAME" />
         </intent-filter>
       </receiver>
+      <uses-permission android:name="com.amazon.device.messaging.permission.RECEIVE" />
     </config-file>
     
     <source-file src="src/android/com/plugin/gcm/OneSignalPush.java" target-dir="src/com/plugin/gcm/" />
@@ -63,7 +64,7 @@
     <config-file target="config.xml" parent="/*">
       <feature name="OneSignalPush">
         <param name="ios-package" value="OneSignalPush"/>
-      </feature>
+        </feature>
     </config-file>
 
     <framework src="SystemConfiguration.framework" />
@@ -74,23 +75,39 @@
       </array>
     </config-file>
 
-    <source-file src="src/ios/OneSignal.m" />
-    <source-file src="src/ios/OneSignalHTTPClient.m" />
-    <source-file src="src/ios/OneSignalTrackIAP.m" />
-    <source-file src="src/ios/OneSignalJailbreakDetection.m" />
-    <source-file src="src/ios/OneSignalPush.m" />
-    <source-file src="src/ios/OneSignalReachability.m" />
-    <source-file src="src/ios/OneSignalMobileProvision.m" />
-    <source-file src="src/ios/OneSignalLocation.m" />
-    
+    <!-- Headers -->
     <header-file src="src/ios/OneSignal.h" />
     <header-file src="src/ios/OneSignalHTTPClient.h" />
     <header-file src="src/ios/OneSignalTrackIAP.h" />
     <header-file src="src/ios/OneSignalJailbreakDetection.h" />
-    <header-file src="src/ios/OneSignalPush.h" />
     <header-file src="src/ios/OneSignalReachability.h" />
     <header-file src="src/ios/OneSignalMobileProvision.h" />
     <header-file src="src/ios/OneSignalLocation.h" />
+    <header-file src="src/ios/OneSignalAlertViewDelegate.h" />
+    <header-file src="src/ios/NSString+Hash.h" />
+    <header-file src="src/ios/NSObject+Extras.h" />
+    <header-file src="src/ios/OneSignalHelper.h" />
+    <header-file src="src/ios/OneSignalTracker.h" />
+    <header-file src="src/ios/OneSignalWebView.h" />
+    <source-file src="src/ios/OneSignalPush.h" />
+
+    <!-- Implementation -->
+    <source-file src="src/ios/OneSignal.m" />
+    <source-file src="src/ios/OneSignalHTTPClient.m" />
+    <source-file src="src/ios/OneSignalTrackIAP.m" />
+    <source-file src="src/ios/OneSignalJailbreakDetection.m" />
+    <source-file src="src/ios/OneSignalReachability.m" />
+    <source-file src="src/ios/OneSignalMobileProvision.m" />
+    <source-file src="src/ios/OneSignalLocation.m" />
+    <source-file src="src/ios/NSObject+Extras.m" />
+    <source-file src="src/ios/NSString+Hash.m" />
+    <source-file src="src/ios/OneSignalAlertViewDelegate.m" />
+    <source-file src="src/ios/OneSignalTracker.m" />
+    <source-file src="src/ios/OneSignalHelper.m" />
+    <source-file src="src/ios/OneSignalWebView.m" />
+    <source-file src="src/ios/OneSignalPush.m" />
+
+    <header-file src="src/ios/OneSignal-Prefix.pch" />
 
   </platform>
   
