@@ -267,7 +267,6 @@ public class OneSignalPush extends CordovaPlugin {
         t.printStackTrace();
       }
     }
-    else if(iOS)
     else {
       result = false;
       Log.e(TAG, "Invalid action : " + action);
