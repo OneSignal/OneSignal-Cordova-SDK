@@ -44,8 +44,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import com.onesignal.OneSignal;
-import con.onesignal.OneSignal.OSNotification;
-import con.onesignal.OneSignal.OSNotificationOpenResult;
+import com.onesignal.OSNotification;
+import com.onesignal.OSNotificationOpenResult;
 import com.onesignal.OneSignal.NotificationOpenedHandler;
 import com.onesignal.OneSignal.NotificationReceivedHandler;
 import com.onesignal.OneSignal.GetTagsHandler;
@@ -65,7 +65,6 @@ public class OneSignalPush extends CordovaPlugin {
   public static final String REGISTER_FOR_PUSH_NOTIFICATIONS = "registerForPushNotifications";
   public static final String ENABLE_VIBRATE = "enableVibrate";
   public static final String ENABLE_SOUND = "enableSound";
-  public static final String ENABLE_NOTIFICATIONS_WHEN_ACTIVE = "enableNotificationsWhenActive";
   public static final String SET_SUBSCRIPTION = "setSubscription";
   public static final String POST_NOTIFICATION = "postNotification";
   public static final String PROMPT_LOCATION = "promptLocation";
@@ -114,25 +113,26 @@ public class OneSignalPush extends CordovaPlugin {
     }
     else if (INIT.equals(action)) {
       try {
-        int appId = data.getString(0);
-        int googleProjectNumber = data.getString(1);
+        String appId = data.getString(0);
+        String googleProjectNumber = data.getString(1);
         OneSignal.sdkType = "cordova";
-        OneSignal.init(
-        (Activity)this.cordova.getActivity(),
-        appId,
-        googleProjectNumber,
-        new CordovaNotificationReceivedHandler(notifReceivedCallbackContext),
-        new CordovaNotificationOpenedHandler(notifOpenedCallbackContext));
-
-        // data.getJSONObject(2) is for iOS settings.
-
-        int displayOption = data.getJSONObject(3);
-        OneSignal.setInFocusDisplaying(displayOption);
         
-        result = true;
-        } catch (JSONException e) {
-        Log.e(TAG, "execute: Got JSON Exception " + e.getMessage());
-        result = false;
+        OneSignal.init(this.cordova.getActivity(),
+           googleProjectNumber,
+           appId,
+           new CordovaNotificationOpenedHandler(notifOpenedCallbackContext),
+           new CordovaNotificationReceivedHandler(notifReceivedCallbackContext));
+
+         // data.getJSONObject(2) is for iOS settings.
+
+         int displayOption = data.getInt(3);
+         OneSignal.setInFocusDisplaying(displayOption);
+        
+         result = true;
+      }
+      catch (JSONException e) {
+         Log.e(TAG, "execute: Got JSON Exception " + e.getMessage());
+         result = false;
       }
     }
     else if (GET_TAGS.equals(action)) {
@@ -200,14 +200,6 @@ public class OneSignalPush extends CordovaPlugin {
     else if (ENABLE_SOUND.equals(action)) {
       try {
         OneSignal.enableSound(data.getBoolean(0));
-        result = true;
-        } catch (Throwable t) {
-        t.printStackTrace();
-      }
-    }
-    else if (ENABLE_NOTIFICATIONS_WHEN_ACTIVE.equals(action)) {
-      try {
-        OneSignal.enableNotificationsWhenActive(data.getBoolean(0));
         result = true;
         } catch (Throwable t) {
         t.printStackTrace();

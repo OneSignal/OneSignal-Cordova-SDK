@@ -1,4 +1,3 @@
-cordova.define("onesignal-cordova-plugin.OneSignal", function(require, exports, module) {
 /**
  * Modified MIT License
  * 
@@ -35,7 +34,7 @@ var OneSignal = function() {
     var _notificationOpenedDelegate = function() {};
 };
 
-OneSignal.OSInFocusDisplayOption = {
+OneSignal.prototype.OSInFocusDisplayOption = {
     None: 0,
     InAppAlert : 1,
     Notification : 2
@@ -167,4 +166,3 @@ if (!window.plugins.OneSignal)
 
 if (typeof module != 'undefined' && module.exports)
     module.exports = OneSignal;
-});
