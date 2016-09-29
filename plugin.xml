@@ -41,6 +41,11 @@
     </config-file>
 
     <!-- PhoneGap Build (PGB) does not have a amazon build target so it include the required manifest entries in all Android builds. -->
+    <config-file target="AndroidManifest.xml" parent="/manifest">
+      <uses-permission android:name="com.amazon.device.messaging.permission.RECEIVE" />
+      <permission android:name="$PACKAGE_NAME.permission.RECEIVE_ADM_MESSAGE" android:protectionLevel="signature" />
+      <uses-permission android:name="$PACKAGE_NAME.permission.RECEIVE_ADM_MESSAGE" />
+    </config-file>
     <config-file target="AndroidManifest.xml" parent="/manifest/application">
       <amazon:enable-feature android:name="com.amazon.device.messaging" android:required="false" xmlns:amazon="http://schemas.amazon.com/apk/res/android" />
       <service android:name="com.onesignal.ADMMessageHandler" android:exported="false" />
@@ -53,7 +58,6 @@
           <category android:name="$PACKAGE_NAME" />
         </intent-filter>
       </receiver>
-      <uses-permission android:name="com.amazon.device.messaging.permission.RECEIVE" />
     </config-file>
     
     <source-file src="src/android/com/plugin/gcm/OneSignalPush.java" target-dir="src/com/plugin/gcm/" />
