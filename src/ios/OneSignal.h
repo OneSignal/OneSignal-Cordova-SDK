@@ -44,7 +44,7 @@
  REST API: https://documentation.onesignal.com/docs/server-api-overview
  Create Notification API: https://documentation.onesignal.com/docs/notifications-create-notification
  
-***/
+ ***/
 
 #import <Foundation/Foundation.h>
 
@@ -155,15 +155,13 @@ typedef OSNotificationDisplayType OSInFocusDisplayOption;
 
 /* iOS 10+: Indicates wether or not the received notification has mutableContent : 1 assigned to its payload
  Used for UNNotificationServiceExtension to launch extension.
-*/
+ */
 #if XC8_AVAILABLE
 @property(readonly, getter=hasMutableContent)BOOL mutableContent;
 #endif
 
 /* Convert object into an NSString that can be convertible into a custom Dictionary / JSON Object */
 - (NSString*)stringify;
-
-+ (void) onesignal_Log:(ONE_S_LOG_LEVEL)logLevel message:(NSString*)message;
 
 @end
 
@@ -192,27 +190,27 @@ typedef void (^OSHandleNotificationReceivedBlock)(OSNotification* notification);
 typedef void (^OSHandleNotificationActionBlock)(OSNotificationOpenedResult * result);
 
 /*Dictionary of keys to pass alongside the init serttings*/
-    
+
 /*Let OneSignal directly promt for push notifications on init*/
 extern NSString * const kOSSettingsKeyAutoPrompt;
-    
+
 /*Enable the default in-app alerts*/
 extern NSString * const kOSSettingsKeyInAppAlerts;
 
 /*Enable In-App display of Launch URLs*/
 extern NSString * const kOSSettingsKeyInAppLaunchURL;
 
-/* iOS10+ - 
+/* iOS10+ -
  Set notificaion's in-focus display option.
  Value must be an OSNotificationDisplayType enum
-*/
+ */
 extern NSString * const kOSSettingsKeyInFocusDisplayOption;
 
 /**
-    OneSignal provides a high level interface to interact with OneSignal's push service.
-    OneSignal is a singleton for applications which use a globally available client to share configuration settings.
-    You should avoid creating instances of this class at all costs. Instead, access its instance methods.
-    Include `#import <OneSignal/OneSignal.h>` in your application files to access OneSignal's methods.
+ OneSignal provides a high level interface to interact with OneSignal's push service.
+ OneSignal is a singleton for applications which use a globally available client to share configuration settings.
+ You should avoid creating instances of this class at all costs. Instead, access its instance methods.
+ Include `#import <OneSignal/OneSignal.h>` in your application files to access OneSignal's methods.
  **/
 @interface OneSignal : NSObject
 
@@ -229,7 +227,7 @@ typedef NS_ENUM(NSUInteger, ONE_S_LOG_LEVEL) {
 /**
  Initialize OneSignal. Sends push token to OneSignal so you can later send notifications.
  
-*/
+ */
 
 // - Initialization
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions appId:(NSString*)appId;
@@ -238,7 +236,7 @@ typedef NS_ENUM(NSUInteger, ONE_S_LOG_LEVEL) {
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions appId:(NSString*)appId handleNotificationReceived:(OSHandleNotificationReceivedBlock)receivedCallback handleNotificationAction:(OSHandleNotificationActionBlock)actionCallback settings:(NSDictionary*)settings;
 
 + (NSString*)app_id;
-    
+
 // Only use if you passed FALSE to autoRegister
 + (void)registerForPushNotifications;
 

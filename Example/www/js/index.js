@@ -57,7 +57,7 @@ var app = {
         window.plugins.OneSignal.startInit( "5eb5a37e-b458-11e3-ac11-000c2940e62c", "703322744261")
                                 .handleNotificationReceived(didReceiveRemoteNotificationCallBack)
                                 .handleNotificationOpened(didOpenRemoteNotificationCallBack)
-                                .inFocusDisplaying(OneSignal.OSNotificationDislayOption.Notification)
+                                .inFocusDisplaying(window.plugins.OneSignal.OSInFocusDisplayOption.Notification)
                                 .iOSSettings(iosSettings)
                                 .endInit();
     }
