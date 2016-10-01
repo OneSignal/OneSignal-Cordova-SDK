@@ -82,3 +82,5 @@ function getIds() {
         console.log('getIds: ' + JSON.stringify(ids));
     });
 }
+
+app.initialize();

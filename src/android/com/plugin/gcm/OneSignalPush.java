@@ -81,7 +81,10 @@ public class OneSignalPush extends CordovaPlugin {
     if(jsonObject == null){ // in case there are no data
       jsonObject = new JSONObject();
     }
-    PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jsonObject);
+    else {
+      Log.e(TAG, "SUCCESS!! - Calling " + callbackContext + " back to javascript with: " + jsonObject);
+    }
+    PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jsonObject.toString());
     pluginResult.setKeepCallback(true);
     callbackContext.sendPluginResult(pluginResult);
   }
@@ -90,7 +93,8 @@ public class OneSignalPush extends CordovaPlugin {
     if(jsonObject == null){ // in case there are no data
       jsonObject = new JSONObject();
     }
-    PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, jsonObject);
+    else Log.e(TAG, "FAILURE!! - Calling " + callbackContext + " back to javascript with: " + jsonObject);
+    PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, jsonObject.toString());
     pluginResult.setKeepCallback(true);
     callbackContext.sendPluginResult(pluginResult);
   }
@@ -107,21 +111,25 @@ public class OneSignalPush extends CordovaPlugin {
     
     if(SET_NOTIFICATION_RECEIVED_HANDLER.equals(action)) {
       notifReceivedCallbackContext = callbackContext;
+      Log.e(TAG, "Successfuly set the notification received handler");
     }
     else if(SET_NOTIFICATION_OPENED_HANDLER.equals(action)) {
       notifOpenedCallbackContext = callbackContext;
+      Log.e(TAG, "Successfuly set the notification opened handler");
     }
     else if (INIT.equals(action)) {
       try {
         String appId = data.getString(0);
         String googleProjectNumber = data.getString(1);
+
         OneSignal.sdkType = "cordova";
-        
+        Log.e(TAG, "App ID: " + appId + " - GPN: " + googleProjectNumber);
         OneSignal.init(this.cordova.getActivity(),
-           googleProjectNumber,
-           appId,
-           new CordovaNotificationOpenedHandler(notifOpenedCallbackContext),
-           new CordovaNotificationReceivedHandler(notifReceivedCallbackContext));
+                  googleProjectNumber,
+                  appId,
+                  new CordovaNotificationOpenedHandler(notifOpenedCallbackContext),
+                  new CordovaNotificationReceivedHandler(notifReceivedCallbackContext)
+                  );
 
          // data.getJSONObject(2) is for iOS settings.
 
@@ -274,11 +282,13 @@ public class OneSignalPush extends CordovaPlugin {
     
     public CordovaNotificationReceivedHandler(CallbackContext inCallbackContext) {
       jsNotificationReceivedCallBack = inCallbackContext;
+      Log.e(TAG, "Created NotificationReceivedHandler");
     }
     
     @Override
     public void notificationReceived(OSNotification notification) {      
       try {
+        Log.e(TAG, "NOTIFICATION RECEIVED!!");
         callbackSuccess(jsNotificationReceivedCallBack, new JSONObject(notification.stringify()));
         } catch (Throwable t) {
         t.printStackTrace();
@@ -291,6 +301,7 @@ public class OneSignalPush extends CordovaPlugin {
     private CallbackContext jsNotificationOpenedCallBack;
     
     public CordovaNotificationOpenedHandler(CallbackContext inCallbackContext) {
+      Log.e(TAG, "Created NotificationOpenedHandler");
       jsNotificationOpenedCallBack = inCallbackContext;
     }
     
@@ -298,6 +309,7 @@ public class OneSignalPush extends CordovaPlugin {
     public void notificationOpened(OSNotificationOpenResult result) {      
       try {
         callbackSuccess(jsNotificationOpenedCallBack, new JSONObject(result.stringify()));
+        Log.e(TAG, "NOTIFICATION OPENED!!");
         } catch (Throwable t) {
         t.printStackTrace();
       }

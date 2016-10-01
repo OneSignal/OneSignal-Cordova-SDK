@@ -1,4 +1,3 @@
-cordova.define("onesignal-cordova-plugin.OneSignal", function(require, exports, module) {
 /**
  * Modified MIT License
  * 
@@ -167,4 +166,3 @@ if (!window.plugins.OneSignal)
 
 if (typeof module != 'undefined' && module.exports)
     module.exports = OneSignal;
-});
