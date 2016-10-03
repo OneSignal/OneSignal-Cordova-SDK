@@ -85,14 +85,14 @@ public class OneSignalPush extends CordovaPlugin {
     if(jsonObject.has("payload")) {
       try {
         JSONObject payload = jsonObject.getJSONObject("payload");
-        if(payload.has("additionalData")) {
+        if (payload.has("additionalData")) {
           payload.put("additionalData", new JSONObject(payload.getString("additionalData")));
           jsonObject.put("payload", payload);
         }
       } catch (Throwable t) {t.printStackTrace();}
     }
 
-    PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jsonObject.toString());
+    PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jsonObject);
     pluginResult.setKeepCallback(true);
     callbackContext.sendPluginResult(pluginResult);
   }
@@ -102,7 +102,7 @@ public class OneSignalPush extends CordovaPlugin {
       jsonObject = new JSONObject();
     }
     
-    PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, jsonObject.toString());
+    PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, jsonObject);
     pluginResult.setKeepCallback(true);
     callbackContext.sendPluginResult(pluginResult);
   }
