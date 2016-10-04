@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="onesignal-cordova-plugin-pgb-compat"
-    version="1.13.1">
+    version="2.0.2">
 
   <name>OneSignal Push Notifications PGB Compat</name>
   <author>Josh Kasten</author>
@@ -59,6 +59,11 @@
 
       <!-- Solid -->
       <uses-permission android:name="com.majeur.launcher.permission.UPDATE_BADGE"/>
+
+      <!-- Huawei -->
+      <uses-permission android:name="com.huawei.android.launcher.permission.CHANGE_BADGE" />
+      <uses-permission android:name="com.huawei.android.launcher.permission.READ_SETTINGS" />
+      <uses-permission android:name="com.huawei.android.launcher.permission.WRITE_SETTINGS" />
       <!-- End: ShortcutBadger -->
       
       <uses-permission android:name="com.amazon.device.messaging.permission.RECEIVE" />
@@ -127,23 +132,39 @@
       </array>
     </config-file>
 
-    <source-file src="src/ios/OneSignal.m" />
-    <source-file src="src/ios/OneSignalHTTPClient.m" />
-    <source-file src="src/ios/OneSignalTrackIAP.m" />
-    <source-file src="src/ios/OneSignalJailbreakDetection.m" />
-    <source-file src="src/ios/OneSignalPush.m" />
-    <source-file src="src/ios/OneSignalReachability.m" />
-    <source-file src="src/ios/OneSignalMobileProvision.m" />
-    <source-file src="src/ios/OneSignalLocation.m" />
-    
+      <!-- Headers -->
     <header-file src="src/ios/OneSignal.h" />
     <header-file src="src/ios/OneSignalHTTPClient.h" />
     <header-file src="src/ios/OneSignalTrackIAP.h" />
     <header-file src="src/ios/OneSignalJailbreakDetection.h" />
-    <header-file src="src/ios/OneSignalPush.h" />
     <header-file src="src/ios/OneSignalReachability.h" />
     <header-file src="src/ios/OneSignalMobileProvision.h" />
     <header-file src="src/ios/OneSignalLocation.h" />
+    <header-file src="src/ios/OneSignalAlertViewDelegate.h" />
+    <header-file src="src/ios/NSString+Hash.h" />
+    <header-file src="src/ios/NSObject+Extras.h" />
+    <header-file src="src/ios/OneSignalHelper.h" />
+    <header-file src="src/ios/OneSignalTracker.h" />
+    <header-file src="src/ios/OneSignalWebView.h" />
+    <source-file src="src/ios/OneSignalPush.h" />
+
+    <!-- Implementation -->
+    <source-file src="src/ios/OneSignal.m" />
+    <source-file src="src/ios/OneSignalHTTPClient.m" />
+    <source-file src="src/ios/OneSignalTrackIAP.m" />
+    <source-file src="src/ios/OneSignalJailbreakDetection.m" />
+    <source-file src="src/ios/OneSignalReachability.m" />
+    <source-file src="src/ios/OneSignalMobileProvision.m" />
+    <source-file src="src/ios/OneSignalLocation.m" />
+    <source-file src="src/ios/NSObject+Extras.m" />
+    <source-file src="src/ios/NSString+Hash.m" />
+    <source-file src="src/ios/OneSignalAlertViewDelegate.m" />
+    <source-file src="src/ios/OneSignalTracker.m" />
+    <source-file src="src/ios/OneSignalHelper.m" />
+    <source-file src="src/ios/OneSignalWebView.m" />
+    <source-file src="src/ios/OneSignalPush.m" />
+
+    <header-file src="src/ios/OneSignal-Prefix.pch" />
 
   </platform>
   
