@@ -25,11 +25,11 @@
  * THE SOFTWARE.
  */
 
+
 var OneSignal = function() {
     var _appID = "";
     var _googleProjectNumber = "";
     var _iOSSettings = {};
-    var _displayOption = 1;
     var _notificationReceivedDelegate = function() {};
     var _notificationOpenedDelegate = function() {};
 };
@@ -40,6 +40,7 @@ OneSignal.prototype.OSInFocusDisplayOption = {
     Notification : 2
 }
 
+OneSignal._displayOption = OneSignal.prototype.OSInFocusDisplayOption.InAppAlert;
 
 // You must call init before any other OneSignal function.
 // options is a JSON object that includes:
