@@ -662,9 +662,9 @@ bool nextRegistrationIsHighPriority = NO;
     if (ASIdentifierManagerClass) {
         id asIdManager = [ASIdentifierManagerClass valueForKey:@"sharedManager"];
         if ([[asIdManager valueForKey:@"advertisingTrackingEnabled"] isEqual:[NSNumber numberWithInt:1]])
-        dataDic[@"as_id"] = [[asIdManager valueForKey:@"advertisingIdentifier"] UUIDString];
+            dataDic[@"as_id"] = [[asIdManager valueForKey:@"advertisingIdentifier"] UUIDString];
         else
-        dataDic[@"as_id"] = @"OptedOut";
+            dataDic[@"as_id"] = @"OptedOut";
     }
     
     UIApplicationReleaseMode releaseMode = [OneSignalMobileProvision releaseMode];
@@ -950,9 +950,9 @@ bool nextRegistrationIsHighPriority = NO;
     
     if (mDeviceToken) {
         if ([OneSignalHelper isCapableOfGettingNotificationTypes])
-        return [[UIApplication sharedApplication] currentUserNotificationSettings].types;
+            return [[UIApplication sharedApplication] currentUserNotificationSettings].types;
         else
-        return NOTIFICATION_TYPE_ALL;
+            return NOTIFICATION_TYPE_ALL;
     }
     
     return -1;
