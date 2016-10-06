@@ -80,7 +80,7 @@ void processNotificationOpened(OSNotificationOpenedResult* result) {
     }
 }
 
-void initOneSignalObject(NSDictionary* launchOptions, const char* appId, BOOL inAppAlerts, int displayOption, BOOL inAppLaunchURL, BOOL autoPrompt) {
+void initOneSignalObject(NSDictionary* launchOptions, const char* appId, int displayOption, BOOL inAppLaunchURL, BOOL autoPrompt) {
     
         [OneSignal setValue:@"cordova" forKey:@"mSDKType"];
 
@@ -95,7 +95,7 @@ void initOneSignalObject(NSDictionary* launchOptions, const char* appId, BOOL in
                 actionNotification = openResult;
                 if (pluginCommandDelegate)
                     processNotificationOpened(openResult);
-            } settings:@{kOSSettingsKeyAutoPrompt : @(autoPrompt), kOSSettingsKeyInAppAlerts : @(inAppAlerts), kOSSettingsKeyInFocusDisplayOption : @(displayOption), kOSSettingsKeyInAppLaunchURL : @(inAppLaunchURL)}];
+            } settings:@{kOSSettingsKeyAutoPrompt : @(autoPrompt), kOSSettingsKeyInFocusDisplayOption : @(displayOption), kOSSettingsKeyInAppLaunchURL : @(inAppLaunchURL)}];
 }
 
 @implementation UIApplication(OneSignalCordovaPush)
@@ -134,7 +134,7 @@ static Class delegateClass = nil;
 
 - (BOOL)oneSignalApplication:(UIApplication*)application didFinishLaunchingWithOptions:(NSDictionary*)launchOptions {
     if ([launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey] != nil)
-        initOneSignalObject(launchOptions, nil, YES, 1, YES, YES);
+        initOneSignalObject(launchOptions, nil, 1, YES, YES);
     
     if ([self respondsToSelector:@selector(oneSignalApplication:didFinishLaunchingWithOptions:)])
         return [self oneSignalApplication:application didFinishLaunchingWithOptions:launchOptions];
@@ -158,12 +158,13 @@ static Class delegateClass = nil;
 
     NSString* appId = (NSString*)command.arguments[0];
     NSDictionary* settings = command.arguments[2] == [NSNull null] ? @{} : (NSDictionary*)command.arguments[2];
+    
     BOOL inAppLaunchURL = settings[@"kOSSettingsKeyInAppLaunchURL"] ? [(NSNumber*)settings[@"kOSSettingsKeyInAppLaunchURL"] boolValue] : YES;
     BOOL autoPrompt = settings[@"kOSSettingsKeyAutoPrompt"] ? [(NSNumber*)settings[@"kOSSettingsKeyAutoPrompt"] boolValue] : YES;
 
     int displayOption = [(NSNumber*)command.arguments[3] intValue];
 
-    initOneSignalObject(nil, [appId UTF8String], YES, displayOption, inAppLaunchURL, autoPrompt);
+    initOneSignalObject(nil, [appId UTF8String], displayOption, inAppLaunchURL, autoPrompt);
     
     if (notification)
         processNotificationReceived(notification);
