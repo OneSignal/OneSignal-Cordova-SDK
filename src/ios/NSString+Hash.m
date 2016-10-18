@@ -25,36 +25,30 @@
  * THE SOFTWARE.
  */
 
-#import <Foundation/Foundation.h>
-#import "OneSignalHTTPClient.h"
+#import <CommonCrypto/CommonDigest.h>
 
-#define DEFAULT_PUSH_HOST @"https://onesignal.com/api/v1/"
+#import "NSString+Hash.h"
 
-@interface OneSignalHTTPClient()
-@property (readwrite, nonatomic) NSURL *baseURL;
-@end
+@implementation NSString (Hash)
 
-@implementation OneSignalHTTPClient
-
-@synthesize baseURL = _baseURL;
-
-- (id)init {
-    self = [super init];
-    if (self)
-        self.baseURL = [NSURL URLWithString:DEFAULT_PUSH_HOST];
-    return self;
+- (NSString*)hashUsingSha1 {
+    const char *cstr = [self UTF8String];
+    uint8_t digest[CC_SHA1_DIGEST_LENGTH];
+    CC_SHA1(cstr, (CC_LONG)strlen(cstr), digest);
+    NSMutableString *output = [NSMutableString stringWithCapacity:CC_SHA1_DIGEST_LENGTH * 2];
+    for (int i = 0; i < CC_SHA1_DIGEST_LENGTH; i++)
+        [output appendFormat:@"%02x", digest[i]];
+    return output;
 }
 
-- (NSMutableURLRequest*) requestWithMethod:(NSString*)method
-                                       path:(NSString*)path {
-    
-    NSURL* url = [NSURL URLWithString:path relativeToURL:self.baseURL];
-    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url];
-    [request setHTTPMethod:method];
-    [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
-    [request setValue:@"application/json" forHTTPHeaderField:@"Accept"];
-    
-    return request;
+- (NSString*)hashUsingMD5 {
+    const char *cstr = [self UTF8String];
+    uint8_t digest[CC_MD5_DIGEST_LENGTH];
+    CC_MD5(cstr, (CC_LONG)strlen(cstr), digest);
+    NSMutableString *output = [NSMutableString stringWithCapacity:CC_MD5_DIGEST_LENGTH * 2];
+    for (int i = 0; i < CC_MD5_DIGEST_LENGTH; i++)
+        [output appendFormat:@"%02x", digest[i]];
+    return output;
 }
 
 @end
