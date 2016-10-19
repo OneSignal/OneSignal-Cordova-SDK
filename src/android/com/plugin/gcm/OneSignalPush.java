@@ -1,6 +1,6 @@
 /**
   * Modified MIT License
-  * 
+  *
   * Copyright 2016 OneSignal
   *
   * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -9,13 +9,13 @@
   * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   * copies of the Software, and to permit persons to whom the Software is
   * furnished to do so, subject to the following conditions:
-  * 
+  *
   * 1. The above copyright notice and this permission notice shall be included in
   * all copies or substantial portions of the Software.
-  * 
+  *
   * 2. All copies of substantial portions of the Software may only be used in connection
   * with services provided by OneSignal.
-  * 
+  *
   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -54,7 +54,7 @@ import com.onesignal.OneSignal.PostNotificationResponseHandler;
 
 public class OneSignalPush extends CordovaPlugin {
   public static final String TAG = "OneSignalPush";
-  
+
   public static final String SET_NOTIFICATION_RECEIVED_HANDLER = "setNotificationReceivedHandler";
   public static final String SET_NOTIFICATION_OPENED_HANDLER = "setNotificationOpenedHandler";
   public static final String INIT = "init";
@@ -71,8 +71,9 @@ public class OneSignalPush extends CordovaPlugin {
   public static final String SYNC_HASHED_EMAIL = "syncHashedEmail";
   public static final String SET_LOG_LEVEL = "setLogLevel";
   public static final String CLEAR_ONESIGNAL_NOTIFICATIONS = "clearOneSignalNotifications";
+  public static final String ENABLE_LOCATION_SHARING = "enableLocationSharing";
 
-  
+
   private static CallbackContext notifReceivedCallbackContext;
   private static CallbackContext notifOpenedCallbackContext;
 
@@ -96,27 +97,27 @@ public class OneSignalPush extends CordovaPlugin {
     pluginResult.setKeepCallback(true);
     callbackContext.sendPluginResult(pluginResult);
   }
-  
+
   private static void callbackError(CallbackContext callbackContext, JSONObject jsonObject) {
     if(jsonObject == null) { // in case there are no data
       jsonObject = new JSONObject();
     }
-    
+
     PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, jsonObject);
     pluginResult.setKeepCallback(true);
     callbackContext.sendPluginResult(pluginResult);
   }
-  
+
   private static void callbackError(CallbackContext callbackContext, String str) {
     PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, str);
     pluginResult.setKeepCallback(true);
     callbackContext.sendPluginResult(pluginResult);
   }
-  
+
   @Override
   public boolean execute(String action, JSONArray data, CallbackContext callbackContext) {
     boolean result = false;
-    
+
     if(SET_NOTIFICATION_RECEIVED_HANDLER.equals(action)) {
       notifReceivedCallbackContext = callbackContext;
       result = true;
@@ -142,7 +143,7 @@ public class OneSignalPush extends CordovaPlugin {
 
          int displayOption = data.getInt(3);
          OneSignal.setInFocusDisplaying(displayOption);
-        
+
          result = true;
       }
       catch (JSONException e) {
@@ -172,7 +173,7 @@ public class OneSignalPush extends CordovaPlugin {
             jsonIds.put("pushToken", registrationId);
             else
             jsonIds.put("pushToken", "");
-            
+
             callbackSuccess(jsIdsAvailableCallBack, jsonIds);
             } catch (Throwable t) {
             t.printStackTrace();
@@ -238,13 +239,13 @@ public class OneSignalPush extends CordovaPlugin {
           public void onSuccess(JSONObject response) {
             callbackSuccess(jsPostNotificationCallBack, response);
           }
-          
+
           @Override
           public void onFailure(JSONObject response) {
             callbackError(jsPostNotificationCallBack, response);
           }
         });
-        
+
         result = true;
         } catch (Throwable t) {
         t.printStackTrace();
@@ -274,25 +275,33 @@ public class OneSignalPush extends CordovaPlugin {
         t.printStackTrace();
       }
     }
+    else if (ENABLE_LOCATION_SHARING.equals(action)) {
+       try {
+         OneSignal.setLocationShared(data.getBoolean(0));
+         result = true;
+       } catch (Throwable t) {
+       t.printStackTrace();
+     }
+    }
     else {
       result = false;
       Log.e(TAG, "Invalid action : " + action);
       callbackError(callbackContext, "Invalid action : " + action);
     }
-    
+
     return result;
   }
 
   private class CordovaNotificationReceivedHandler implements NotificationReceivedHandler {
-    
+
     private CallbackContext jsNotificationReceivedCallBack;
-    
+
     public CordovaNotificationReceivedHandler(CallbackContext inCallbackContext) {
       jsNotificationReceivedCallBack = inCallbackContext;
     }
-    
+
     @Override
-    public void notificationReceived(OSNotification notification) {      
+    public void notificationReceived(OSNotification notification) {
       try {
         callbackSuccess(jsNotificationReceivedCallBack, new JSONObject(notification.stringify()));
         } catch (Throwable t) {
@@ -300,17 +309,17 @@ public class OneSignalPush extends CordovaPlugin {
       }
     }
   }
-  
+
   private class CordovaNotificationOpenedHandler implements NotificationOpenedHandler {
-    
+
     private CallbackContext jsNotificationOpenedCallBack;
-    
+
     public CordovaNotificationOpenedHandler(CallbackContext inCallbackContext) {
       jsNotificationOpenedCallBack = inCallbackContext;
     }
-    
+
     @Override
-    public void notificationOpened(OSNotificationOpenResult result) {      
+    public void notificationOpened(OSNotificationOpenResult result) {
       try {
         callbackSuccess(jsNotificationOpenedCallBack, new JSONObject(result.stringify()));
         } catch (Throwable t) {
@@ -318,7 +327,7 @@ public class OneSignalPush extends CordovaPlugin {
       }
     }
   }
-  
+
   @Override
   public void onDestroy() {
     OneSignal.removeNotificationOpenedHandler();
