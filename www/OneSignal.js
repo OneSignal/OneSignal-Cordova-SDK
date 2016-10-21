@@ -86,8 +86,10 @@ OneSignal.prototype.endInit = function() {
     cordova.exec(OneSignal._notificationReceivedDelegate, function(){}, "OneSignalPush", "setNotificationReceivedHandler", []);
     cordova.exec(OneSignal._notificationOpenedDelegate, function(){}, "OneSignalPush", "setNotificationOpenedHandler", []);
 
-    // Set location sharing option
-    cordova.exec(function(){}, function(){}, "OneSignalPush", "enableLocationSharing", [OneSignal._enableLocationSharing]);
+    if (!OneSignal._enableLocationSharing) {
+      // Disable location sharing
+      cordova.exec(function(){}, function(){}, "OneSignalPush", "enableLocationSharing", [OneSignal._enableLocationSharing]);
+    }
 
     //Call Init
     cordova.exec(function() {}, function(){}, "OneSignalPush", "init", [OneSignal._appID, OneSignal._googleProjectNumber, OneSignal._iOSSettings, OneSignal._displayOption]);
