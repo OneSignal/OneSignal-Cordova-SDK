@@ -1,6 +1,6 @@
 /**
  * Modified MIT License
- * 
+ *
  * Copyright 2016 OneSignal
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -9,13 +9,13 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * 1. The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * 2. All copies of substantial portions of the Software may only be used in connection
  * with services provided by OneSignal.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -30,6 +30,7 @@ var OneSignal = function() {
     var _appID = "";
     var _googleProjectNumber = "";
     var _iOSSettings = {};
+    var _enableLocationSharing = true;
     var _notificationReceivedDelegate = function() {};
     var _notificationOpenedDelegate = function() {};
 };
@@ -74,11 +75,21 @@ OneSignal.prototype.iOSSettings = function(settings) {
     return this;
 }
 
+OneSignal.prototype.enableLocationSharing = function(enable) {
+  OneSignal._enableLocationSharing = enable;
+  return this;
+}
+
 OneSignal.prototype.endInit = function() {
 
     //Pass notification received handler
     cordova.exec(OneSignal._notificationReceivedDelegate, function(){}, "OneSignalPush", "setNotificationReceivedHandler", []);
     cordova.exec(OneSignal._notificationOpenedDelegate, function(){}, "OneSignalPush", "setNotificationOpenedHandler", []);
+
+    if (!OneSignal._enableLocationSharing) {
+      // Disable location sharing
+      cordova.exec(function(){}, function(){}, "OneSignalPush", "enableLocationSharing", [OneSignal._enableLocationSharing]);
+    }
 
     //Call Init
     cordova.exec(function() {}, function(){}, "OneSignalPush", "init", [OneSignal._appID, OneSignal._googleProjectNumber, OneSignal._iOSSettings, OneSignal._displayOption]);
