@@ -1,6 +1,6 @@
 /**
  * Modified MIT License
- * 
+ *
  * Copyright 2015 OneSignal
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -9,13 +9,13 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * 1. The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * 2. All copies of substantial portions of the Software may only be used in connection
  * with services provided by OneSignal.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -81,7 +81,7 @@ void processNotificationOpened(OSNotificationOpenedResult* result) {
 }
 
 void initOneSignalObject(NSDictionary* launchOptions, const char* appId, int displayOption, BOOL inAppLaunchURL, BOOL autoPrompt) {
-    
+
         [OneSignal setValue:@"cordova" forKey:@"mSDKType"];
 
         NSString* appIdStr = (appId ? [NSString stringWithUTF8String: appId] : nil);
@@ -104,14 +104,14 @@ static void injectSelector(Class newClass, SEL newSel, Class addToClass, SEL mak
     Method newMeth = class_getInstanceMethod(newClass, newSel);
     IMP imp = method_getImplementation(newMeth);
     const char* methodTypeEncoding = method_getTypeEncoding(newMeth);
-    
+
     BOOL successful = class_addMethod(addToClass, makeLikeSel, imp, methodTypeEncoding);
     if (!successful) {
         class_addMethod(addToClass, newSel, imp, methodTypeEncoding);
         newMeth = class_getInstanceMethod(addToClass, newSel);
-        
+
         Method orgMeth = class_getInstanceMethod(addToClass, makeLikeSel);
-        
+
         method_exchangeImplementations(orgMeth, newMeth);
     }
 }
@@ -126,7 +126,7 @@ static Class delegateClass = nil;
     if(delegateClass != nil)
         return;
     delegateClass = [delegate class];
-    
+
     injectSelector(self.class, @selector(oneSignalApplication:didFinishLaunchingWithOptions:),
                    delegateClass, @selector(application:didFinishLaunchingWithOptions:));
     [self setOneSignalCordovaDelegate:delegate];
@@ -135,7 +135,7 @@ static Class delegateClass = nil;
 - (BOOL)oneSignalApplication:(UIApplication*)application didFinishLaunchingWithOptions:(NSDictionary*)launchOptions {
     if ([launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey] != nil)
         initOneSignalObject(launchOptions, nil, 1, YES, YES);
-    
+
     if ([self respondsToSelector:@selector(oneSignalApplication:didFinishLaunchingWithOptions:)])
         return [self oneSignalApplication:application didFinishLaunchingWithOptions:launchOptions];
     return YES;
@@ -153,19 +153,19 @@ static Class delegateClass = nil;
 }
 
 - (void)init:(CDVInvokedUrlCommand*)command {
-    
+
     pluginCommandDelegate = self.commandDelegate;
 
     NSString* appId = (NSString*)command.arguments[0];
     NSDictionary* settings = command.arguments[2] == [NSNull null] ? @{} : (NSDictionary*)command.arguments[2];
-    
+
     BOOL inAppLaunchURL = settings[@"kOSSettingsKeyInAppLaunchURL"] ? [(NSNumber*)settings[@"kOSSettingsKeyInAppLaunchURL"] boolValue] : YES;
     BOOL autoPrompt = settings[@"kOSSettingsKeyAutoPrompt"] ? [(NSNumber*)settings[@"kOSSettingsKeyAutoPrompt"] boolValue] : YES;
 
     int displayOption = [(NSNumber*)command.arguments[3] intValue];
 
     initOneSignalObject(nil, [appId UTF8String], displayOption, inAppLaunchURL, autoPrompt);
-    
+
     if (notification)
         processNotificationReceived(notification);
     if (actionNotification)
@@ -184,7 +184,7 @@ static Class delegateClass = nil;
     [OneSignal IdsAvailable:^(NSString* userId, NSString* pushToken) {
         if (pushToken == nil)
             pushToken = @"";
-        
+
         successCallback(getIdsCallbackId, @{@"userId" : userId, @"pushToken" : pushToken});
     }];
 }
@@ -195,7 +195,7 @@ static Class delegateClass = nil;
 
 - (void)deleteTags:(CDVInvokedUrlCommand*)command {
     [OneSignal deleteTags:command.arguments];
-}   
+}
 
 - (void)registerForPushNotifications:(CDVInvokedUrlCommand*)command {
     [OneSignal registerForPushNotifications];
@@ -203,6 +203,11 @@ static Class delegateClass = nil;
 
 - (void)setSubscription:(CDVInvokedUrlCommand*)command {
     [OneSignal setSubscription:[command.arguments[0] boolValue]];
+}
+
+- (void)enableLocationSharing:(CDVInvokedUrlCommand*)command {
+  // TODO : Enable once PULL request accepted withing OneSignal-iOS-SDK and merged back to this code base.
+  //  [OneSignal enableLocationSharing:[command.arguments[0] boolValue]];
 }
 
 - (void)postNotification:(CDVInvokedUrlCommand*)command {
