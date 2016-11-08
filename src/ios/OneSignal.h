@@ -44,7 +44,7 @@
  REST API: https://documentation.onesignal.com/docs/server-api-overview
  Create Notification API: https://documentation.onesignal.com/docs/notifications-create-notification
  
- ***/
+***/
 
 #import <Foundation/Foundation.h>
 
@@ -54,8 +54,8 @@
 
 @protocol OSUserNotificationCenterDelegate <NSObject>
 @optional
-- (void)userNotificationCenter:(id)center willPresentNotification:(id)notification withCompletionHandler:(void (^)(NSUInteger options))completionHandler;
-- (void)userNotificationCenter:(id)center didReceiveNotificationResponse:(id)response withCompletionHandler:(void (^)())completionHandler;
+- (void)userNotificationCenter:(id)center willPresentNotification:(id)notification withCompletionHandler:(void (^)(NSUInteger options))completionHandler __deprecated_msg("Can use your own delegate as normal.");
+- (void)userNotificationCenter:(id)center didReceiveNotificationResponse:(id)response withCompletionHandler:(void (^)())completionHandler __deprecated_msg("Can use your own delegate as normal.");
 @end
 
 #endif
@@ -148,6 +148,9 @@ typedef OSNotificationDisplayType OSInFocusDisplayOption;
  Set to false when app is in focus and in-app alerts are disabled, or the remote notification is silent. */
 @property(readonly, getter=wasShown)BOOL shown;
 
+/* Set to true if the app was in focus when the notification  */
+@property(readonly, getter=wasAppInFocus)BOOL isAppInFocus;
+
 /* Set to true when the received notification is silent
  Silent means there is no alert, sound, or badge payload in the aps dictionary
  requires remote-notification within UIBackgroundModes array of the Info.plist */
@@ -155,7 +158,7 @@ typedef OSNotificationDisplayType OSInFocusDisplayOption;
 
 /* iOS 10+: Indicates wether or not the received notification has mutableContent : 1 assigned to its payload
  Used for UNNotificationServiceExtension to launch extension.
- */
+*/
 #if XC8_AVAILABLE
 @property(readonly, getter=hasMutableContent)BOOL mutableContent;
 #endif
@@ -190,27 +193,27 @@ typedef void (^OSHandleNotificationReceivedBlock)(OSNotification* notification);
 typedef void (^OSHandleNotificationActionBlock)(OSNotificationOpenedResult * result);
 
 /*Dictionary of keys to pass alongside the init serttings*/
-
+    
 /*Let OneSignal directly promt for push notifications on init*/
 extern NSString * const kOSSettingsKeyAutoPrompt;
-
+    
 /*Enable the default in-app alerts*/
 extern NSString * const kOSSettingsKeyInAppAlerts;
 
 /*Enable In-App display of Launch URLs*/
 extern NSString * const kOSSettingsKeyInAppLaunchURL;
 
-/* iOS10+ -
+/* iOS10+ - 
  Set notificaion's in-focus display option.
  Value must be an OSNotificationDisplayType enum
- */
+*/
 extern NSString * const kOSSettingsKeyInFocusDisplayOption;
 
 /**
- OneSignal provides a high level interface to interact with OneSignal's push service.
- OneSignal is a singleton for applications which use a globally available client to share configuration settings.
- You should avoid creating instances of this class at all costs. Instead, access its instance methods.
- Include `#import <OneSignal/OneSignal.h>` in your application files to access OneSignal's methods.
+    OneSignal provides a high level interface to interact with OneSignal's push service.
+    OneSignal is a singleton for applications which use a globally available client to share configuration settings.
+    You should avoid creating instances of this class at all costs. Instead, access its instance methods.
+    Include `#import <OneSignal/OneSignal.h>` in your application files to access OneSignal's methods.
  **/
 @interface OneSignal : NSObject
 
@@ -227,16 +230,16 @@ typedef NS_ENUM(NSUInteger, ONE_S_LOG_LEVEL) {
 /**
  Initialize OneSignal. Sends push token to OneSignal so you can later send notifications.
  
- */
+*/
 
 // - Initialization
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions appId:(NSString*)appId;
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions appId:(NSString*)appId handleNotificationAction:(OSHandleNotificationActionBlock)actionCallback;
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions appId:(NSString*)appId handleNotificationAction:(OSHandleNotificationActionBlock)actionCallback settings:(NSDictionary*)settings;
-+ (id)initWithLaunchOptions:(NSDictionary*)launchOptions appId:(NSString*)appId handleNotificationReceived:(OSHandleNotificationReceivedBlock)receivedCallback handleNotificationAction:(OSHandleNotificationActionBlock)actionCallback settings:(NSDictionary*)settings;
++ (id)initWithLaunchOptions:(NSDictionary*)launchOptions appId:(NSString*)appId handleNotificationReceived:(OSHandleNotificationReceivedBlock)erceivedCallback handleNotificationAction:(OSHandleNotificationActionBlock)actionCallback settings:(NSDictionary*)settings;
 
 + (NSString*)app_id;
-
+    
 // Only use if you passed FALSE to autoRegister
 + (void)registerForPushNotifications;
 
@@ -276,10 +279,10 @@ typedef NS_ENUM(NSUInteger, ONE_S_LOG_LEVEL) {
 // Optional method that sends us the user's email as an anonymized hash so that we can better target and personalize notifications sent to that user across their devices.
 + (void)syncHashedEmail:(NSString*)email;
 
-// - iOS 10 BETA features currently only available on XCode 8 & iOS 10.0+
+// - iOS 10 features currently only available on XCode 8 & iOS 10.0+
 #if XC8_AVAILABLE
-+ (void)setNotificationCenterDelegate:(id<OSUserNotificationCenterDelegate>)delegate;
-+ (id<OSUserNotificationCenterDelegate>)notificationCenterDelegate;
++ (void)setNotificationCenterDelegate:(id<OSUserNotificationCenterDelegate>)delegate __deprecated_msg("Can use your own delegate as normal.");
++ (id<OSUserNotificationCenterDelegate>)notificationCenterDelegate __deprecated_msg("Can use your own delegate as normal.");
 #endif
 
 @end

@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="onesignal-cordova-plugin-pgb-compat"
-    version="2.0.6">
+    version="2.0.7">
 
   <name>OneSignal Push Notifications PGB Compat</name>
   <author>Josh Kasten</author>
@@ -147,6 +147,9 @@
     <header-file src="src/ios/OneSignalTracker.h" />
     <header-file src="src/ios/OneSignalWebView.h" />
     <source-file src="src/ios/OneSignalPush.h" />
+    <source-file src="src/ios/OneSignalSelectorHelpers.h" />
+    <source-file src="src/ios/UNUserNotificationCenter+OneSignal.h" />
+    
 
     <!-- Implementation -->
     <source-file src="src/ios/OneSignal.m" />
@@ -163,6 +166,8 @@
     <source-file src="src/ios/OneSignalHelper.m" />
     <source-file src="src/ios/OneSignalWebView.m" />
     <source-file src="src/ios/OneSignalPush.m" />
+    <source-file src="src/ios/OneSignalSelectorHelpers.m" />
+    <source-file src="src/ios/UNUserNotificationCenter+OneSignal.m" />
 
     <header-file src="src/ios/OneSignal-Prefix.pch" />
 
