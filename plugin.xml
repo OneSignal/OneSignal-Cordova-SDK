@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="onesignal-cordova-plugin"
-    version="2.0.6">
+    version="2.0.7">
 
 
   <name>OneSignal Push Notifications</name>
@@ -25,7 +25,7 @@
   </engines>
   
   <platform name="android">
-    <framework src="com.onesignal:OneSignal:3.3.0@aar" />
+    <framework src="com.onesignal:OneSignal:3.4.1@aar" />
 
     <framework src="com.google.android.gms:play-services-gcm:+" />
     <!-- play-services-analytics is only required when gms version 8.1.0 or older is used. -->
@@ -95,6 +95,9 @@
     <header-file src="src/ios/OneSignalTracker.h" />
     <header-file src="src/ios/OneSignalWebView.h" />
     <source-file src="src/ios/OneSignalPush.h" />
+    <source-file src="src/ios/OneSignalSelectorHelpers.h" />
+    <source-file src="src/ios/UNUserNotificationCenter+OneSignal.h" />
+    
 
     <!-- Implementation -->
     <source-file src="src/ios/OneSignal.m" />
@@ -111,6 +114,8 @@
     <source-file src="src/ios/OneSignalHelper.m" />
     <source-file src="src/ios/OneSignalWebView.m" />
     <source-file src="src/ios/OneSignalPush.m" />
+    <source-file src="src/ios/OneSignalSelectorHelpers.m" />
+    <source-file src="src/ios/UNUserNotificationCenter+OneSignal.m" />
 
     <header-file src="src/ios/OneSignal-Prefix.pch" />
 

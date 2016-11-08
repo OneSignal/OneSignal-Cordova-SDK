@@ -1,7 +1,6 @@
 def manifest = new XmlSlurper().parse(file("AndroidManifest.xml"))
 android.defaultConfig {
    applicationId manifest.@package.text()
-   manifestPlaceholders = [manifestApplicationId: "${android.defaultConfig.applicationId}",
-                          onesignal_app_id: "", // Use from code for now.
-                          onesignal_google_project_number: ""]
+   manifestPlaceholders = [onesignal_app_id: "", // Use from code for now.
+                          onesignal_google_project_number: "REMOTE"]
 }
