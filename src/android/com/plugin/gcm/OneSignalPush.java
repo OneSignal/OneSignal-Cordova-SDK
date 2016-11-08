@@ -78,19 +78,8 @@ public class OneSignalPush extends CordovaPlugin {
 
   // This is to prevent an issue where if two Javascript calls are made to OneSignal expecting a callback then only one would fire.
   private static void callbackSuccess(CallbackContext callbackContext, JSONObject jsonObject) {
-    if(jsonObject == null){ // in case there are no data
+    if (jsonObject == null) // in case there are no data
       jsonObject = new JSONObject();
-    }
-
-    if(jsonObject.has("payload")) {
-      try {
-        JSONObject payload = jsonObject.getJSONObject("payload");
-        if (payload.has("additionalData")) {
-          payload.put("additionalData", new JSONObject(payload.getString("additionalData")));
-          jsonObject.put("payload", payload);
-        }
-      } catch (Throwable t) {t.printStackTrace();}
-    }
 
     PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jsonObject);
     pluginResult.setKeepCallback(true);
@@ -98,9 +87,8 @@ public class OneSignalPush extends CordovaPlugin {
   }
   
   private static void callbackError(CallbackContext callbackContext, JSONObject jsonObject) {
-    if(jsonObject == null) { // in case there are no data
+    if (jsonObject == null) // in case there are no data
       jsonObject = new JSONObject();
-    }
     
     PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, jsonObject);
     pluginResult.setKeepCallback(true);
@@ -169,12 +157,13 @@ public class OneSignalPush extends CordovaPlugin {
           try {
             jsonIds.put("userId", userId);
             if (registrationId != null)
-            jsonIds.put("pushToken", registrationId);
+              jsonIds.put("pushToken", registrationId);
             else
-            jsonIds.put("pushToken", "");
+              jsonIds.put("pushToken", "");
             
             callbackSuccess(jsIdsAvailableCallBack, jsonIds);
-            } catch (Throwable t) {
+          }
+          catch (Throwable t) {
             t.printStackTrace();
           }
         }
@@ -184,7 +173,8 @@ public class OneSignalPush extends CordovaPlugin {
     else if (SEND_TAGS.equals(action)) {
       try {
         OneSignal.sendTags(data.getJSONObject(0));
-        } catch (Throwable t) {
+      }
+      catch (Throwable t) {
         t.printStackTrace();
       }
       result = true;
@@ -193,10 +183,10 @@ public class OneSignalPush extends CordovaPlugin {
       try {
         Collection<String> list = new ArrayList<String>();
         for (int i = 0; i < data.length(); i++)
-        list.add(data.get(i).toString());
+          list.add(data.get(i).toString());
         OneSignal.deleteTags(list);
         result = true;
-        } catch (Throwable t) {
+      } catch (Throwable t) {
         t.printStackTrace();
       }
     }
@@ -208,7 +198,8 @@ public class OneSignalPush extends CordovaPlugin {
       try {
         OneSignal.enableVibrate(data.getBoolean(0));
         result = true;
-        } catch (Throwable t) {
+      }
+      catch (Throwable t) {
         t.printStackTrace();
       }
     }
@@ -216,7 +207,8 @@ public class OneSignalPush extends CordovaPlugin {
       try {
         OneSignal.enableSound(data.getBoolean(0));
         result = true;
-        } catch (Throwable t) {
+      }
+      catch (Throwable t) {
         t.printStackTrace();
       }
     }
@@ -224,7 +216,8 @@ public class OneSignalPush extends CordovaPlugin {
       try {
         OneSignal.setSubscription(data.getBoolean(0));
         result = true;
-        } catch (Throwable t) {
+      }
+      catch (Throwable t) {
         t.printStackTrace();
       }
     }
@@ -233,20 +226,21 @@ public class OneSignalPush extends CordovaPlugin {
         JSONObject jo = data.getJSONObject(0);
         final CallbackContext jsPostNotificationCallBack = callbackContext;
         OneSignal.postNotification(jo,
-        new PostNotificationResponseHandler() {
-          @Override
-          public void onSuccess(JSONObject response) {
-            callbackSuccess(jsPostNotificationCallBack, response);
-          }
-          
-          @Override
-          public void onFailure(JSONObject response) {
-            callbackError(jsPostNotificationCallBack, response);
-          }
-        });
+          new PostNotificationResponseHandler() {
+            @Override
+            public void onSuccess(JSONObject response) {
+              callbackSuccess(jsPostNotificationCallBack, response);
+            }
+            
+            @Override
+            public void onFailure(JSONObject response) {
+              callbackError(jsPostNotificationCallBack, response);
+            }
+          });
         
         result = true;
-        } catch (Throwable t) {
+      }
+      catch (Throwable t) {
         t.printStackTrace();
       }
     }
@@ -263,14 +257,16 @@ public class OneSignalPush extends CordovaPlugin {
       try {
         JSONObject jo = data.getJSONObject(0);
         OneSignal.setLogLevel(jo.getInt("logLevel"), jo.getInt("visualLevel"));
-        } catch(Throwable t) {
+      }
+      catch(Throwable t) {
         t.printStackTrace();
       }
     }
     else if (CLEAR_ONESIGNAL_NOTIFICATIONS.equals(action)) {
       try {
         OneSignal.clearOneSignalNotifications();
-        } catch(Throwable t) {
+      }
+      catch(Throwable t) {
         t.printStackTrace();
       }
     }
@@ -295,7 +291,8 @@ public class OneSignalPush extends CordovaPlugin {
     public void notificationReceived(OSNotification notification) {      
       try {
         callbackSuccess(jsNotificationReceivedCallBack, new JSONObject(notification.stringify()));
-        } catch (Throwable t) {
+      }
+      catch (Throwable t) {
         t.printStackTrace();
       }
     }
@@ -313,7 +310,8 @@ public class OneSignalPush extends CordovaPlugin {
     public void notificationOpened(OSNotificationOpenResult result) {      
       try {
         callbackSuccess(jsNotificationOpenedCallBack, new JSONObject(result.stringify()));
-        } catch (Throwable t) {
+      }
+      catch (Throwable t) {
         t.printStackTrace();
       }
     }

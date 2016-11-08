@@ -1,7 +1,7 @@
 /**
  * Modified MIT License
  * 
- * Copyright 2015 OneSignal
+ * Copyright 2016 OneSignal
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -232,7 +232,7 @@ static Class delegateClass = nil;
 
 - (void)setLogLevel:(CDVInvokedUrlCommand*)command {
     NSDictionary* options = command.arguments[0];
-    [OneSignal setLogLevel:(NSInteger)options[@"logLevel"] visualLevel:(NSInteger)options[@"visualLevel"]];
+    [OneSignal setLogLevel:[options[@"logLevel"] intValue] visualLevel:[options[@"visualLevel"] intValue]];
 }
 
 // Android only
