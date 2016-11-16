@@ -1,5 +1,5 @@
 {
-  "version": "2.0.7",
+  "version": "2.0.8",
   "name": "onesignal-cordova-plugin-pgb-compat",
   "cordova_name": "OneSignal Push Notifications Compat",
   "description": "NOTE: Only use for PhoneGap Build, otherwise use onesignal-cordova-plugin instead. Follow our [setup guide](http://documentation.onesignal.com/docs/phonegap-sdk-overview) to get started.",
