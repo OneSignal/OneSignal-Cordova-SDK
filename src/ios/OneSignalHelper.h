@@ -40,6 +40,7 @@
 // - Notification Opened
 + (NSDictionary*)getPushTitleBody:(NSDictionary*)messageDict;
 + (NSArray*)getActionButtons:(NSDictionary*)messageDict;
++ (NSMutableDictionary*) formatApsPayloadIntoStandard:(NSDictionary*)remoteUserInfo identifier:(NSString*)identifier;
 + (void)lastMessageReceived:(NSDictionary*)message;
 + (void)notificationBlocks:(OSHandleNotificationReceivedBlock)receivedBlock :(OSHandleNotificationActionBlock)actionBlock;
 + (void)handleNotificationReceived:(OSNotificationDisplayType)displayType;
@@ -49,22 +50,30 @@
 + (BOOL)isiOS10Plus;
 #if XC8_AVAILABLE
 + (void)registerAsUNNotificationCenterDelegate;
-+ (void) requestAuthorization;
 + (void)clearCachedMedia;
 + (id)prepareUNNotificationRequest:(NSDictionary *)data :(NSDictionary *)userInfo;
++ (void)addnotificationRequest:(NSDictionary *)data userInfo:(NSDictionary *)userInfo completionHandler:(void (^)(UIBackgroundFetchResult))completionHandler;
 #endif
 
 // - Notifications
-+ (BOOL) isCapableOfGettingNotificationTypes;
++ (BOOL)isCapableOfGettingNotificationTypes;
 + (UILocalNotification*)prepareUILocalNotification:(NSDictionary*)data :(NSDictionary*)userInfo;
 + (BOOL)verifyURL:(NSString *)urlString;
-+ (BOOL) isRemoteSilentNotification:(NSDictionary*)msg;
++ (BOOL)isRemoteSilentNotification:(NSDictionary*)msg;
 
 // - Networking
 + (NSNumber*)getNetType;
 + (void)enqueueRequest:(NSURLRequest*)request onSuccess:(OSResultSuccessBlock)successBlock onFailure:(OSFailureBlock)failureBlock;
 + (void)enqueueRequest:(NSURLRequest*)request onSuccess:(OSResultSuccessBlock)successBlock onFailure:(OSFailureBlock)failureBlock isSynchronous:(BOOL)isSynchronous;
 + (void)handleJSONNSURLResponse:(NSURLResponse*) response data:(NSData*) data error:(NSError*) error onSuccess:(OSResultSuccessBlock)successBlock onFailure:(OSFailureBlock)failureBlock;
+
+// Threading
++ (void) runOnMainThread:(void(^)())block;
+
+// Other
++ (BOOL) isValidEmail:(NSString*)email;
++ (NSString*)hashUsingSha1:(NSString*)string;
++ (NSString*)hashUsingMD5:(NSString*)string;
 
 #pragma clang diagnostic pop
 @end

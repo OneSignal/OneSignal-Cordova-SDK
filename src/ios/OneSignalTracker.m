@@ -35,7 +35,7 @@
 @interface OneSignal ()
 
 + (void)registerUser;
-+ (void) sendNotificationTypesUpdate:(BOOL)isNewType;
++ (void) sendNotificationTypesUpdate;
 + (BOOL) clearBadgeCount:(BOOL)fromNotifOpened;
 + (NSString*)mUserId;
 
@@ -60,12 +60,14 @@ BOOL lastOnFocusWasToBackground = YES;
 }
 
 + (void)onFocus:(BOOL)toBackground {
-    bool wasBadgeSet = false;
     
     //Prevent the onFocus to be called twice when app being terminated
     // (Both WillResignActive and willTerminate
-    if(lastOnFocusWasToBackground == toBackground) return;
+    if (lastOnFocusWasToBackground == toBackground)
+        return;
     lastOnFocusWasToBackground = toBackground;
+    
+    bool wasBadgeSet = false;
     
     NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
     NSTimeInterval timeToPingWith = 0.0;
@@ -73,13 +75,8 @@ BOOL lastOnFocusWasToBackground = YES;
     
     if (!toBackground) {
         lastOpenedTime = now;
-        [OneSignal sendNotificationTypesUpdate:false];
+        [OneSignal sendNotificationTypesUpdate];
         wasBadgeSet = [OneSignal clearBadgeCount:false];
-        
-        //Make sure webview dismissed if came back from deep link
-        OneSignalWebView *webVC = [OneSignalHelper webVC];
-        if(webVC)
-            [webVC dismiss:self];
     }
     else {
 
