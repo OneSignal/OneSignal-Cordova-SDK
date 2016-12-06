@@ -133,8 +133,7 @@ static Class delegateClass = nil;
 }
 
 - (BOOL)oneSignalApplication:(UIApplication*)application didFinishLaunchingWithOptions:(NSDictionary*)launchOptions {
-    if ([launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey] != nil)
-        initOneSignalObject(launchOptions, nil, 1, YES, YES);
+    initOneSignalObject(launchOptions, nil, 1, YES, YES);
     
     if ([self respondsToSelector:@selector(oneSignalApplication:didFinishLaunchingWithOptions:)])
         return [self oneSignalApplication:application didFinishLaunchingWithOptions:launchOptions];

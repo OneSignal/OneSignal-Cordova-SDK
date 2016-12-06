@@ -30,7 +30,9 @@
 
 #import "UNUserNotificationCenter+OneSignal.h"
 #import "OneSignal.h"
+#import "OneSignalHelper.h"
 #import "OneSignalSelectorHelpers.h"
+#import "UIApplicationDelegate+OneSignal.h"
 
 
 #if XC8_AVAILABLE
@@ -49,9 +51,12 @@
 // - userNotificationCenter:willPresentNotification:withCompletionHandler:
 //   - Reads kOSSettingsKeyInFocusDisplayOption to respect it's setting.
 // - userNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:
-//   - Used to process opening a notifications.
-//   - The presents of this selector tells iOS to no longer fire `application:didReceiveRemoteNotification:fetchCompletionHandler:`.
-//       We call this to maintain existing behavior.
+//   - Used to process opening notifications.
+//
+// NOTE: On iOS 10, when a UNUserNotificationCenterDelegate is set, UIApplicationDelegate notification selectors no longer fire.
+//       However, this class maintains firing of UIApplicationDelegate selectors if the app did not setup it's own UNUserNotificationCenterDelegate.
+//       This ensures we don't produce any side effects to standard iOS API selectors.
+//       The `callLegacyAppDeletegateSelector` selector below takes care of this backwards compatibility handling.
 
 @implementation swizzleUNUserNotif
 
@@ -80,17 +85,12 @@ static NSArray* delegateUNSubclasses = nil;
 }
 
 // Apple's docs - Called when a notification is delivered to a foreground app.
+// NOTE: iOS behavior - Calling completionHandler with 0 means userNotificationCenter:didReceiveNotificationResponse:withCompletionHandler: does not trigger.
+//  - callLegacyAppDeletegateSelector is called from here due to this case.
 - (void)onesignalUserNotificationCenter:(UNUserNotificationCenter *)center
                 willPresentNotification:(UNNotification *)notification
                   withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler {
     [OneSignal onesignal_Log:ONE_S_LL_VERBOSE message:@"onesignalUserNotificationCenter:willPresentNotification:withCompletionHandler: Fired!"];
-    
-    // Depercated - [OneSignal notificationCenterDelegate] - Now handled by swizzling.
-    //    Proxy to user if listening to delegate and overrides the method.
-    if ([[OneSignal notificationCenterDelegate] respondsToSelector:@selector(userNotificationCenter:willPresentNotification:withCompletionHandler:)]) {
-        [[OneSignal notificationCenterDelegate] userNotificationCenter:center willPresentNotification:notification withCompletionHandler:completionHandler];
-        return;
-    }
     
     // Set the completionHandler options based on the ONESIGNAL_ALERT_OPTION value.
     if (![[NSUserDefaults standardUserDefaults] objectForKey:@"ONESIGNAL_ALERT_OPTION"]) {
@@ -107,11 +107,20 @@ static NSArray* delegateUNSubclasses = nil;
         default: break;
     }
     
-    // Call notificationOpened if no alert (MSB not set)
     [OneSignal notificationOpened:notification.request.content.userInfo isActive:YES];
     
+    // Call orginal selector if one was set.
     if ([self respondsToSelector:@selector(onesignalUserNotificationCenter:willPresentNotification:withCompletionHandler:)])
         [self onesignalUserNotificationCenter:center willPresentNotification:notification withCompletionHandler:completionHandler];
+    // Or call a legacy AppDelegate selector
+    else {
+        [swizzleUNUserNotif callLegacyAppDeletegateSelector:notification
+                                                isTextReply:false
+                                           actionIdentifier:nil
+                                                   userText:nil
+                                    fromPresentNotification:true
+                                      withCompletionHandler:^() {}];
+    }
     
     // Calling completionHandler for the following reasons:
     //   App dev may have not implented userNotificationCenter:willPresentNotification.
@@ -126,128 +135,103 @@ static NSArray* delegateUNSubclasses = nil;
                   withCompletionHandler:(void(^)())completionHandler {
     [OneSignal onesignal_Log:ONE_S_LL_VERBOSE message:@"onesignalUserNotificationCenter:didReceiveNotificationResponse:withCompletionHandler: Fired!"];
     
-    BOOL isActive = [UIApplication sharedApplication].applicationState == UIApplicationStateActive &&
-        [[[NSUserDefaults standardUserDefaults] objectForKey:@"ONESIGNAL_ALERT_OPTION"] intValue] != OSNotificationDisplayTypeNotification;
-    
-    NSDictionary* remoteUserInfo = response.notification.request.content.userInfo;
-    NSMutableDictionary *userInfo = [[NSMutableDictionary alloc] init],
-    *customDict = [[NSMutableDictionary alloc] init],
-    *additionalData = [[NSMutableDictionary alloc] init];
-    NSMutableArray *optionsDict = [[NSMutableArray alloc] init];
-    
-    NSMutableDictionary* buttonsDict = remoteUserInfo[@"os_data"][@"buttons"];
-    NSMutableDictionary* custom = remoteUserInfo[@"custom"];
-    if (buttonsDict) {
-        [userInfo addEntriesFromDictionary:remoteUserInfo];
-        NSArray* o = buttonsDict[@"o"];
-        if (o)
-            [optionsDict addObjectsFromArray:o];
-    }
-    else if (custom) {
-        [userInfo addEntriesFromDictionary:remoteUserInfo];
-        [customDict addEntriesFromDictionary:custom];
-        NSDictionary *a = customDict[@"a"];
-        NSArray *o = userInfo[@"o"];
-        if (a)
-            [additionalData addEntriesFromDictionary:a];
-        if (o)
-            [optionsDict addObjectsFromArray:o];
-    }
-    
-    NSMutableArray* buttonArray = [[NSMutableArray alloc] init];
-    for (NSDictionary* button in optionsDict) {
-        NSString * text = button[@"n"] != nil ? button[@"n"] : @"";
-        NSString * buttonID = button[@"i"] != nil ? button[@"i"] : text;
-        NSDictionary * buttonToAppend = [[NSDictionary alloc] initWithObjects:@[text, buttonID] forKeys:@[@"text", @"id"]];
-        [buttonArray addObject:buttonToAppend];
-    }
-    
-    additionalData[@"actionSelected"] = [response valueForKey:@"actionIdentifier"];
-    additionalData[@"actionButtons"] = buttonArray;
-    
-    NSDictionary* os_data = remoteUserInfo[@"os_data"];
-    if (os_data) {
-        [userInfo addEntriesFromDictionary:os_data];
-        if (userInfo[@"os_data"][@"buttons"][@"m"])
-            userInfo[@"aps"] = @{@"alert" : userInfo[@"os_data"][@"buttons"][@"m"]};
-        [userInfo addEntriesFromDictionary:additionalData];
-    }
-    else {
-        customDict[@"a"] = additionalData;
-        userInfo[@"custom"] = customDict;
-        if (userInfo[@"m"])
-            userInfo[@"aps"] = @{ @"alert": userInfo[@"m"] };
-    }
-    
-    if ([OneSignal app_id])
-       [OneSignal notificationOpened:userInfo isActive:isActive];
-    
-    // For depercated OSUserNotificationCenterDelegate
-    [swizzleUNUserNotif tunnelToDelegate:center response:response handler:completionHandler];
+    [swizzleUNUserNotif processiOS10Open:response];
     
     // Call orginal selector if one was set.
     if ([self respondsToSelector:@selector(onesignalUserNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:)])
         [self onesignalUserNotificationCenter:center didReceiveNotificationResponse:response withCompletionHandler:completionHandler];
+    // Or call a legacy AppDelegate selector
+    //  - If not a dismiss event as their isn't a iOS 9 selector for it.
+    else if (![swizzleUNUserNotif isDismissEvent:response]) {
+        BOOL isTextReply = [response isKindOfClass:NSClassFromString(@"UNTextInputNotificationResponse")];
+        NSString* userText = isTextReply ? [response valueForKey:@"userText"] : nil;
+        [swizzleUNUserNotif callLegacyAppDeletegateSelector:response.notification
+                                                isTextReply:isTextReply
+                                           actionIdentifier:response.actionIdentifier
+                                                   userText:userText
+                                    fromPresentNotification:false
+                                      withCompletionHandler:completionHandler];
+    }
     else
-        [swizzleUNUserNotif callLegacyAppDeletegateSelector:response withCompletionHandler:completionHandler];
+        completionHandler();
 }
 
-// Depercated - [OneSignal notificationCenterDelegate] - Now handled by swizzling.
-+ (BOOL)tunnelToDelegate:(id)center response:(id)response handler:(void (^)())handler {
-    if ([[OneSignal notificationCenterDelegate] respondsToSelector:@selector(userNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:)]) {
-        [[OneSignal notificationCenterDelegate] userNotificationCenter:center didReceiveNotificationResponse:response withCompletionHandler:handler];
-        return true;
-    }
++ (BOOL) isDismissEvent:(UNNotificationResponse *)response {
+    return [@"com.apple.UNNotificationDismissActionIdentifier" isEqual:response.actionIdentifier];
+}
+
++ (void) processiOS10Open:(UNNotificationResponse *)response {
+    if (![OneSignal app_id])
+        return;
     
-    return false;
+    if ([swizzleUNUserNotif isDismissEvent:response])
+        return;
+    
+    BOOL isActive = [UIApplication sharedApplication].applicationState == UIApplicationStateActive &&
+                    [[[NSUserDefaults standardUserDefaults] objectForKey:@"ONESIGNAL_ALERT_OPTION"] intValue] != OSNotificationDisplayTypeNotification;
+    
+    
+    NSMutableDictionary *userInfo;
+    userInfo = [OneSignalHelper formatApsPayloadIntoStandard:response.notification.request.content.userInfo identifier:[response valueForKey:@"actionIdentifier"]];
+    
+    [OneSignal notificationOpened:userInfo isActive:isActive];
 }
 
 // Calls depercated pre-iOS 10 selector if one is set on the AppDelegate.
+//   Even though they are deperated in iOS 10 they should still be called in iOS 10
+//     As long as they didn't setup their own UNUserNotificationCenterDelegate
 // - application:didReceiveLocalNotification:
 // - application:didReceiveRemoteNotification:fetchCompletionHandler:
 // - application:handleActionWithIdentifier:forLocalNotification:withResponseInfo:completionHandler:
 // - application:handleActionWithIdentifier:forRemoteNotification:withResponseInfo:completionHandler:
 // - application:handleActionWithIdentifier:forLocalNotification:completionHandler:
 // - application:handleActionWithIdentifier:forRemoteNotification:completionHandler:
-+ (void)callLegacyAppDeletegateSelector:(UNNotificationResponse *)response
++ (void)callLegacyAppDeletegateSelector:(UNNotification *)notification
+                            isTextReply:(BOOL)isTextReply
+                       actionIdentifier:(NSString*)actionIdentifier
+                               userText:(NSString*)userText
+                fromPresentNotification:(BOOL)fromPresentNotification
                   withCompletionHandler:(void(^)())completionHandler {
+    [OneSignal onesignal_Log:ONE_S_LL_VERBOSE message:@"callLegacyAppDeletegateSelector:withCompletionHandler: Fired!"];
+    
     UIApplication *sharedApp = [UIApplication sharedApplication];
     
-    BOOL isTextReply = [response isKindOfClass:NSClassFromString(@"UNTextInputNotificationResponse")];
-    BOOL isLegacyLocalNotif = [response.notification.request.trigger isKindOfClass:NSClassFromString(@"UNLegacyNotificationTrigger")];
-    BOOL isCustomAction = ![@"com.apple.UNNotificationDefaultActionIdentifier" isEqualToString:response.actionIdentifier];
-   // BOOL isRemote = [response.notification.request.trigger isKindOfClass:NSClassFromString(@"UNPushNotificationTrigger")];
+    // trigger is nil when UIApplication.presentLocalNotificationNow: is used.
+    //  However it will be UNLegacyNotificationTrigger when UIApplication.scheduleLocalNotification: is used
+    BOOL isLegacyLocalNotif = !notification.request.trigger || [notification.request.trigger isKindOfClass:NSClassFromString(@"UNLegacyNotificationTrigger")];
+    BOOL isCustomAction = actionIdentifier && ![@"com.apple.UNNotificationDefaultActionIdentifier" isEqualToString:actionIdentifier];
+    BOOL isRemote = [notification.request.trigger isKindOfClass:NSClassFromString(@"UNPushNotificationTrigger")];
     
     if (isLegacyLocalNotif) {
         UILocalNotification *localNotif = [NSClassFromString(@"UIConcreteLocalNotification") alloc];
-        localNotif.alertBody = response.notification.request.content.body;
-        localNotif.alertTitle = response.notification.request.content.title;
-        localNotif.applicationIconBadgeNumber = [response.notification.request.content.badge integerValue];
-        NSString* soundName = [response.notification.request.content.sound valueForKey:@"_toneFileName"];
+        localNotif.alertBody = notification.request.content.body;
+        localNotif.alertTitle = notification.request.content.title;
+        localNotif.applicationIconBadgeNumber = [notification.request.content.badge integerValue];
+        NSString* soundName = [notification.request.content.sound valueForKey:@"_toneFileName"];
         if (!soundName)
             soundName = @"UILocalNotificationDefaultSoundName";
         localNotif.soundName = soundName;
-        localNotif.alertLaunchImage = response.notification.request.content.launchImageName;
-        localNotif.userInfo = response.notification.request.content.userInfo;
-        localNotif.category = response.notification.request.content.categoryIdentifier;
+        localNotif.alertLaunchImage = notification.request.content.launchImageName;
+        localNotif.userInfo = notification.request.content.userInfo;
+        localNotif.category = notification.request.content.categoryIdentifier;
         localNotif.hasAction = true; // Defaults to true, UNLocalNotification doesn't seem to have a flag for this.
-        localNotif.fireDate = response.notification.date;
-        localNotif.timeZone = [response.notification.request.trigger valueForKey:@"_timeZone"];
-        localNotif.repeatInterval = (NSCalendarUnit)[response.notification.request.trigger valueForKey:@"_repeatInterval"];
-        localNotif.repeatCalendar = [response.notification.request.trigger valueForKey:@"_repeatCalendar"];
+        localNotif.fireDate = notification.date;
+        localNotif.timeZone = [notification.request.trigger valueForKey:@"_timeZone"];
+        localNotif.repeatInterval = (NSCalendarUnit)[notification.request.trigger valueForKey:@"_repeatInterval"];
+        localNotif.repeatCalendar = [notification.request.trigger valueForKey:@"_repeatCalendar"];
         // localNotif.region =
         // localNotif.regionTriggersOnce =
         
         if (isTextReply &&
             [sharedApp.delegate respondsToSelector:@selector(application:handleActionWithIdentifier:forLocalNotification:withResponseInfo:completionHandler:)]) {
-            NSDictionary* dict = @{UIUserNotificationActionResponseTypedTextKey: [response valueForKey:@"userText"]};
-            [sharedApp.delegate application:sharedApp handleActionWithIdentifier:response.actionIdentifier forLocalNotification:localNotif withResponseInfo:dict completionHandler:^() {
+            NSDictionary* dict = @{UIUserNotificationActionResponseTypedTextKey: userText};
+            [sharedApp.delegate application:sharedApp handleActionWithIdentifier:actionIdentifier forLocalNotification:localNotif withResponseInfo:dict completionHandler:^() {
                 completionHandler();
             }];
         }
         else if (isCustomAction &&
                  [sharedApp.delegate respondsToSelector:@selector(application:handleActionWithIdentifier:forLocalNotification:completionHandler:)])
-            [sharedApp.delegate application:sharedApp handleActionWithIdentifier:response.actionIdentifier forLocalNotification:localNotif completionHandler:^() {
+            [sharedApp.delegate application:sharedApp handleActionWithIdentifier:actionIdentifier forLocalNotification:localNotif completionHandler:^() {
                 completionHandler();
             }];
         else if ([sharedApp.delegate respondsToSelector:@selector(application:didReceiveLocalNotification:)]) {
@@ -257,23 +241,27 @@ static NSArray* delegateUNSubclasses = nil;
         else
             completionHandler();
     }
-    else {
-        NSDictionary* remoteUserInfo = response.notification.request.content.userInfo;
+    else if (isRemote) {
+        NSDictionary* remoteUserInfo = notification.request.content.userInfo;
         
         if (isTextReply &&
             [sharedApp.delegate respondsToSelector:@selector(application:handleActionWithIdentifier:forRemoteNotification:withResponseInfo:completionHandler:)]) {
-            NSDictionary* responseInfo = @{UIUserNotificationActionResponseTypedTextKey: [response valueForKey:@"userText"]};
-            [sharedApp.delegate application:sharedApp handleActionWithIdentifier:response.actionIdentifier forRemoteNotification:remoteUserInfo withResponseInfo:responseInfo completionHandler:^() {
+            NSDictionary* responseInfo = @{UIUserNotificationActionResponseTypedTextKey: userText};
+            [sharedApp.delegate application:sharedApp handleActionWithIdentifier:actionIdentifier forRemoteNotification:remoteUserInfo withResponseInfo:responseInfo completionHandler:^() {
                 completionHandler();
             }];
         }
         else if (isCustomAction &&
                  [sharedApp.delegate respondsToSelector:@selector(application:handleActionWithIdentifier:forRemoteNotification:completionHandler:)])
-            [sharedApp.delegate application:sharedApp handleActionWithIdentifier:response.actionIdentifier forRemoteNotification:remoteUserInfo completionHandler:^() {
+            [sharedApp.delegate application:sharedApp handleActionWithIdentifier:actionIdentifier forRemoteNotification:remoteUserInfo completionHandler:^() {
                 completionHandler();
             }];
-        else if ([sharedApp.delegate respondsToSelector:@selector(application:didReceiveRemoteNotification:fetchCompletionHandler:)]) {
-            //   NOTE: Should always be true as our AppDelegate swizzling should be there unless something else unswizzled it.
+        // Always trigger selector for open events and for non-content-available receive events.
+        //  content-available seems to be an odd expection to iOS 10's fallback rules for legacy selectors.
+        else if ([sharedApp.delegate respondsToSelector:@selector(application:didReceiveRemoteNotification:fetchCompletionHandler:)] &&
+                 (!fromPresentNotification ||
+                 ![[notification.request.trigger valueForKey:@"_isContentAvailable"] boolValue])) {
+            // NOTE: Should always be true as our AppDelegate swizzling should be there unless something else unswizzled it.
             [sharedApp.delegate application:sharedApp didReceiveRemoteNotification:remoteUserInfo fetchCompletionHandler:^(UIBackgroundFetchResult result) {
                 // Call iOS 10's compleationHandler from iOS 9's completion handler.
                 completionHandler();
@@ -282,6 +270,8 @@ static NSArray* delegateUNSubclasses = nil;
         else
             completionHandler();
     }
+    else
+        completionHandler();
 }
 
 @end
