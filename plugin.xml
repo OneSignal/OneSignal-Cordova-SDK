@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="onesignal-cordova-plugin"
-    version="2.0.8">
+    version="2.0.9">
 
 
   <name>OneSignal Push Notifications</name>
@@ -25,7 +25,7 @@
   </engines>
   
   <platform name="android">
-    <framework src="com.onesignal:OneSignal:3.4.1@aar" />
+    <framework src="com.onesignal:OneSignal:3.4.2@aar" />
 
     <framework src="com.google.android.gms:play-services-gcm:+" />
     <!-- play-services-analytics is only required when gms version 8.1.0 or older is used. -->
@@ -96,14 +96,14 @@
     <header-file src="src/ios/OneSignalMobileProvision.h" />
     <header-file src="src/ios/OneSignalLocation.h" />
     <header-file src="src/ios/OneSignalAlertViewDelegate.h" />
-    <header-file src="src/ios/NSString+Hash.h" />
-    <header-file src="src/ios/NSObject+Extras.h" />
     <header-file src="src/ios/OneSignalHelper.h" />
     <header-file src="src/ios/OneSignalTracker.h" />
     <header-file src="src/ios/OneSignalWebView.h" />
     <source-file src="src/ios/OneSignalPush.h" />
     <source-file src="src/ios/OneSignalSelectorHelpers.h" />
     <source-file src="src/ios/UNUserNotificationCenter+OneSignal.h" />
+    <source-file src="src/ios/UIApplicationDelegate+OneSignal.h" />
+    
     
 
     <!-- Implementation -->
@@ -114,8 +114,6 @@
     <source-file src="src/ios/OneSignalReachability.m" />
     <source-file src="src/ios/OneSignalMobileProvision.m" />
     <source-file src="src/ios/OneSignalLocation.m" />
-    <source-file src="src/ios/NSObject+Extras.m" />
-    <source-file src="src/ios/NSString+Hash.m" />
     <source-file src="src/ios/OneSignalAlertViewDelegate.m" />
     <source-file src="src/ios/OneSignalTracker.m" />
     <source-file src="src/ios/OneSignalHelper.m" />
@@ -123,6 +121,7 @@
     <source-file src="src/ios/OneSignalPush.m" />
     <source-file src="src/ios/OneSignalSelectorHelpers.m" />
     <source-file src="src/ios/UNUserNotificationCenter+OneSignal.m" />
+    <source-file src="src/ios/UIApplicationDelegate+OneSignal.m" />
 
     <header-file src="src/ios/OneSignal-Prefix.pch" />
 

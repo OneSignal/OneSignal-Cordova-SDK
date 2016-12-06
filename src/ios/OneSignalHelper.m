@@ -28,9 +28,10 @@
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
 
+#import <CommonCrypto/CommonDigest.h>
+
 #import "OneSignalReachability.h"
 #import "OneSignalHelper.h"
-#import "NSObject+Extras.h"
 
 #import <objc/runtime.h>
 
@@ -275,6 +276,22 @@
 
 @implementation OneSignalHelper
 
+UIBackgroundTaskIdentifier mediaBackgroundTask;
+
++ (void) beginBackgroundMediaTask {
+    mediaBackgroundTask = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+        [OneSignalHelper endBackgroundMediaTask];
+    }];
+}
+
++ (void) endBackgroundMediaTask {
+    [[UIApplication sharedApplication] endBackgroundTask: mediaBackgroundTask];
+    mediaBackgroundTask = UIBackgroundTaskInvalid;
+}
+
+
+
+
 OneSignalWebView *webVC;
 NSDictionary* lastMessageReceived;
 OSHandleNotificationReceivedBlock handleNotificationReceived;
@@ -384,6 +401,48 @@ OSHandleNotificationActionBlock handleNotificationAction;
     return @{@"title" : title, @"subtitle": subtitle, @"body": body};
 }
 
+
++ (NSMutableDictionary*) formatApsPayloadIntoStandard:(NSDictionary*)remoteUserInfo identifier:(NSString*)identifier {
+    NSMutableDictionary* userInfo, *customDict, *additionalData, *optionsDict;
+    
+    if (remoteUserInfo[@"os_data"][@"buttons"]) {
+        userInfo = [remoteUserInfo mutableCopy];
+        additionalData = [NSMutableDictionary dictionary];
+        optionsDict = userInfo[@"os_data"][@"buttons"][@"o"];
+    }
+    else if (remoteUserInfo[@"custom"]) {
+        userInfo = [remoteUserInfo mutableCopy];
+        customDict = [userInfo[@"custom"] mutableCopy];
+        additionalData = [[NSMutableDictionary alloc] initWithDictionary:customDict[@"a"]];
+        optionsDict = userInfo[@"o"];
+    }
+    else
+        return nil;
+    
+    NSMutableArray* buttonArray = [[NSMutableArray alloc] init];
+    for (NSDictionary* button in optionsDict) {
+        [buttonArray addObject: @{@"text" : button[@"n"],
+                                  @"id" : (button[@"i"] ? button[@"i"] : button[@"n"])}];
+    }
+    additionalData[@"actionSelected"] = identifier;
+    additionalData[@"actionButtons"] = buttonArray;
+    
+    if (remoteUserInfo[@"os_data"]) {
+        [userInfo addEntriesFromDictionary:additionalData];
+        userInfo[@"aps"] = @{@"alert" : userInfo[@"os_data"][@"buttons"][@"m"]};
+    }
+    else {
+        customDict[@"a"] = additionalData;
+        userInfo[@"custom"] = customDict;
+        
+        if(userInfo[@"m"])
+            userInfo[@"aps"] = @{@"alert" : userInfo[@"m"]};
+    }
+    
+    return userInfo;
+}
+
+
 // Prevent the OSNotification blocks from firing if we receive a Non-OneSignal remote push
 + (BOOL)isOneSignalPayload {
     if (!lastMessageReceived)
@@ -398,7 +457,7 @@ OSHandleNotificationActionBlock handleNotificationAction;
     OSNotificationPayload *payload = [[OSNotificationPayload alloc] initWithRawMessage:lastMessageReceived];
     OSNotification *notification = [[OSNotification alloc] initWithPayload:payload displayType:displayType];
     
-    //Prevent duplicate calls to same action
+    // Prevent duplicate calls to same receive event
     static NSString* lastMessageID = @"";
     if ([payload.notificationID isEqualToString:lastMessageID])
         return;
@@ -416,7 +475,7 @@ OSHandleNotificationActionBlock handleNotificationAction;
     OSNotification *notification = [[OSNotification alloc] initWithPayload:payload displayType:displayType];
     OSNotificationOpenedResult * result = [[OSNotificationOpenedResult alloc] initWithNotification:notification action:action];
     
-    //Prevent duplicate calls to same action
+    // Prevent duplicate calls to same action
     static NSString* lastMessageID = @"";
     if ([payload.notificationID isEqualToString:lastMessageID])
         return;
@@ -528,15 +587,8 @@ static OneSignal* singleInstance = nil;
 
 #if XC8_AVAILABLE
 
-+ (void)requestAuthorization {
-    [[NSClassFromString(@"UNUserNotificationCenter") currentNotificationCenter] requestAuthorizationWithOptions:7 completionHandler:^(BOOL granted, NSError * _Nullable error) {}];
-}
-
 + (void)registerAsUNNotificationCenterDelegate {
     Class UNNofiCenterClass = NSClassFromString(@"UNUserNotificationCenter");
-    if (!UNNofiCenterClass)
-        return;
-    
     UNUserNotificationCenter *curNotifCenter = [UNNofiCenterClass currentNotificationCenter];
     if (!curNotifCenter.delegate)
         curNotifCenter.delegate = (id)[self sharedInstance];
@@ -596,11 +648,12 @@ static OneSignal* singleInstance = nil;
         if ([self verifyURL:URI]) {
             /* Synchroneously download file and chache it */
             NSString* name = [OneSignalHelper downloadMediaAndSaveInBundle:URI];
-            if (!name) continue;
+            if (!name)
+                continue;
             NSArray* paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-            NSString*filePath = [paths[0] stringByAppendingPathComponent:name];
-            NSURL * url = [NSURL fileURLWithPath:filePath];
-            NSError * error;
+            NSString* filePath = [paths[0] stringByAppendingPathComponent:name];
+            NSURL* url = [NSURL fileURLWithPath:filePath];
+            NSError* error;
             id attachment = [NSClassFromString(@"UNNotificationAttachment") attachmentWithIdentifier:key URL:url options:0 error:&error];
             if (attachment)
                 [attachments addObject:attachment];
@@ -630,26 +683,33 @@ static OneSignal* singleInstance = nil;
     return [NSClassFromString(@"UNNotificationRequest") requestWithIdentifier:[self randomStringWithLength:16] content:content trigger:trigger];
 }
 
-+ (void)addnotificationRequest:(NSDictionary *)data :(NSDictionary *)userInfo {
-    if(!NSClassFromString(@"UNUserNotificationCenter")) return;
-    
-    id notificationRequest = [OneSignalHelper prepareUNNotificationRequest:data :userInfo];
-    [[NSClassFromString(@"UNUserNotificationCenter") currentNotificationCenter] addNotificationRequest:notificationRequest withCompletionHandler:^(NSError * _Nullable error) {}];
++ (void)addnotificationRequest:(NSDictionary *)data userInfo:(NSDictionary *)userInfo completionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [OneSignalHelper beginBackgroundMediaTask];
+        id notificationRequest = [OneSignalHelper prepareUNNotificationRequest:data :userInfo];
+        [[NSClassFromString(@"UNUserNotificationCenter") currentNotificationCenter] addNotificationRequest:notificationRequest withCompletionHandler:^(NSError * _Nullable error) {}];
+        if (completionHandler)
+            completionHandler(UIBackgroundFetchResultNewData);
+        [OneSignalHelper endBackgroundMediaTask];
+    });
+
 }
 
-//Synchroneously downloads a media
-//On success returns bundle resource name, otherwise returns nil
+// Synchroneously downloads a media
+// On success returns bundle resource name, otherwise returns nil
 +(NSString*) downloadMediaAndSaveInBundle:(NSString*) url {
     
     NSArray<NSString*>* supportedExtensions = @[@"aiff", @"wav", @"mp3", @"mp4", @"jpg", @"jpeg", @"png", @"gif", @"mpeg", @"mpg", @"avi", @"m4a", @"m4v"];
     NSArray* components = [url componentsSeparatedByString:@"."];
     
-    //URL is not to a file
-    if ([components count] < 2) return NULL;
-    NSString * extension = [components lastObject];
+    // URL is not to a file
+    if ([components count] < 2)
+        return NULL;
+    NSString* extension = [components lastObject];
     
-    //Unrecognized extention
-    if(![supportedExtensions containsObject:extension]) return NULL;
+    // Unrecognized extention
+    if (![supportedExtensions containsObject:extension])
+        return NULL;
     
     NSURL * URL = [NSURL URLWithString:url];
     NSData * data = [NSData dataWithContentsOfURL:URL];
@@ -664,7 +724,8 @@ static OneSignal* singleInstance = nil;
         appendedCache = [[NSMutableArray alloc] initWithArray:cachedFiles];
         [appendedCache addObject:name];
     }
-    else appendedCache = [[NSMutableArray alloc] initWithObjects:name, nil];
+    else
+        appendedCache = [[NSMutableArray alloc] initWithObjects:name, nil];
     
     [[NSUserDefaults standardUserDefaults] setObject:appendedCache forKey:@"CACHED_MEDIA"];
     [[NSUserDefaults standardUserDefaults] synchronize];
@@ -672,10 +733,8 @@ static OneSignal* singleInstance = nil;
 }
 
 +(void)clearCachedMedia {
-    
-    NSArray * cachedFiles = [[NSUserDefaults standardUserDefaults] objectForKey:@"CACHED_MEDIA"];
-    if(cachedFiles) {
-        
+    NSArray* cachedFiles = [[NSUserDefaults standardUserDefaults] objectForKey:@"CACHED_MEDIA"];
+    if (cachedFiles) {
         NSArray * paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
         for (NSString* file in cachedFiles) {
             NSString* filePath = [paths[0] stringByAppendingPathComponent:file];
@@ -703,7 +762,8 @@ static OneSignal* singleInstance = nil;
 }
 
 + (void)enqueueRequest:(NSURLRequest*)request onSuccess:(OSResultSuccessBlock)successBlock onFailure:(OSFailureBlock)failureBlock isSynchronous:(BOOL)isSynchronous {
-    [OneSignal onesignal_Log:ONE_S_LL_VERBOSE message: [NSString stringWithFormat:@"request.body: %@", [[NSString alloc]initWithData:request.HTTPBody encoding:NSUTF8StringEncoding]]];
+    [OneSignal onesignal_Log:ONE_S_LL_VERBOSE message:[NSString stringWithFormat:@"network request to: %@", request.URL]];
+    [OneSignal onesignal_Log:ONE_S_LL_VERBOSE message:[NSString stringWithFormat:@"request.body: %@", [[NSString alloc] initWithData:request.HTTPBody encoding:NSUTF8StringEncoding]]];
     
     if (isSynchronous) {
         NSURLResponse* response = nil;
@@ -736,6 +796,7 @@ static OneSignal* singleInstance = nil;
     
     if (data != nil && [data length] > 0) {
         innerJson = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&jsonError];
+        [OneSignal onesignal_Log:ONE_S_LL_VERBOSE message:[NSString stringWithFormat:@"network response: %@", innerJson]];
         if (jsonError) {
             if (failureBlock != nil)
                 failureBlock([NSError errorWithDomain:@"OneSignal Error" code:statusCode userInfo:@{@"returned" : jsonError}]);
@@ -763,23 +824,68 @@ static OneSignal* singleInstance = nil;
 
 + (void) displayWebView:(NSURL*)url {
     
-    //Check if in-app or safari
+    // Check if in-app or safari
     BOOL inAppLaunch = YES;
-    if(![[NSUserDefaults standardUserDefaults] objectForKey:@"ONESIGNAL_INAPP_LAUNCH_URL"]) {
+    if( ![[NSUserDefaults standardUserDefaults] objectForKey:@"ONESIGNAL_INAPP_LAUNCH_URL"]) {
         [[NSUserDefaults standardUserDefaults] setObject:@YES forKey:@"ONESIGNAL_INAPP_LAUNCH_URL"];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
     
     inAppLaunch = [[[NSUserDefaults standardUserDefaults] objectForKey:@"ONESIGNAL_INAPP_LAUNCH_URL"] boolValue];
+    NSString* urlScheme = [url.scheme lowercaseString];
+    BOOL isWWWScheme = [urlScheme isEqualToString:@"http"] || [urlScheme isEqualToString:@"https"];
     
-    if(inAppLaunch) {
-        if(!webVC)
+    if (inAppLaunch && isWWWScheme) {
+        if (!webVC)
             webVC = [[OneSignalWebView alloc] init];
         webVC.url = url;
         [webVC showInApp];
     }
-    else [[UIApplication sharedApplication] openURL:url];
+    else {
+        // Keep dispatch_async. Without this the url can take an extra 2 to 10 secounds to open.
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[UIApplication sharedApplication] openURL:url];
+        });
+    }
     
+}
+
++ (void) runOnMainThread:(void(^)())block {
+    if ([NSThread isMainThread])
+        block();
+    else
+        dispatch_sync(dispatch_get_main_queue(), block);
+}
+
++ (BOOL) isValidEmail:(NSString*)email {
+    NSError *error = NULL;
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$"
+                                                                           options:NSRegularExpressionCaseInsensitive
+                                                                             error:&error];
+    NSUInteger numberOfMatches = [regex numberOfMatchesInString:email
+                                                        options:0
+                                                          range:NSMakeRange(0, [email length])];
+    return numberOfMatches != 0;
+}
+
++ (NSString*)hashUsingSha1:(NSString*)string {
+    const char *cstr = [string UTF8String];
+    uint8_t digest[CC_SHA1_DIGEST_LENGTH];
+    CC_SHA1(cstr, (CC_LONG)strlen(cstr), digest);
+    NSMutableString *output = [NSMutableString stringWithCapacity:CC_SHA1_DIGEST_LENGTH * 2];
+    for (int i = 0; i < CC_SHA1_DIGEST_LENGTH; i++)
+        [output appendFormat:@"%02x", digest[i]];
+    return output;
+}
+
++ (NSString*)hashUsingMD5:(NSString*)string {
+    const char *cstr = [string UTF8String];
+    uint8_t digest[CC_MD5_DIGEST_LENGTH];
+    CC_MD5(cstr, (CC_LONG)strlen(cstr), digest);
+    NSMutableString *output = [NSMutableString stringWithCapacity:CC_MD5_DIGEST_LENGTH * 2];
+    for (int i = 0; i < CC_MD5_DIGEST_LENGTH; i++)
+        [output appendFormat:@"%02x", digest[i]];
+    return output;
 }
 
 #pragma clang diagnostic pop
