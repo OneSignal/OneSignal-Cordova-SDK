@@ -80,22 +80,24 @@ void processNotificationOpened(OSNotificationOpenedResult* result) {
     }
 }
 
-void initOneSignalObject(NSDictionary* launchOptions, const char* appId, int displayOption, BOOL inAppLaunchURL, BOOL autoPrompt) {
-    
-        [OneSignal setValue:@"cordova" forKey:@"mSDKType"];
+void initOneSignalObject(NSDictionary* launchOptions, const char* appId, int displayOption, BOOL inAppLaunchURL, BOOL autoPrompt, BOOL fromColdStart) {
+    [OneSignal setValue:@"cordova" forKey:@"mSDKType"];
 
-        NSString* appIdStr = (appId ? [NSString stringWithUTF8String: appId] : nil);
+    NSString* appIdStr = (appId ? [NSString stringWithUTF8String: appId] : nil);
 
-        [OneSignal initWithLaunchOptions:launchOptions appId:appIdStr handleNotificationReceived:^(OSNotification* _notif) {
+    [OneSignal initWithLaunchOptions:launchOptions appId:appIdStr handleNotificationReceived:^(OSNotification* _notif) {
             notification = _notif;
             if (pluginCommandDelegate)
                processNotificationReceived(_notif);
-    }
-            handleNotificationAction:^(OSNotificationOpenedResult* openResult) {
-                actionNotification = openResult;
-                if (pluginCommandDelegate)
-                    processNotificationOpened(openResult);
-            } settings:@{kOSSettingsKeyAutoPrompt : @(autoPrompt), kOSSettingsKeyInFocusDisplayOption : @(displayOption), kOSSettingsKeyInAppLaunchURL : @(inAppLaunchURL)}];
+        }
+        handleNotificationAction:^(OSNotificationOpenedResult* openResult) {
+            actionNotification = openResult;
+            if (pluginCommandDelegate)
+                processNotificationOpened(openResult);
+        } settings:@{kOSSettingsKeyAutoPrompt : @(autoPrompt),
+                     kOSSettingsKeyInFocusDisplayOption : @(displayOption),
+                     kOSSettingsKeyInAppLaunchURL : @(inAppLaunchURL),
+                     @"kOSSettingsKeyInOmitNoAppIdLogging": @(fromColdStart)}];
 }
 
 @implementation UIApplication(OneSignalCordovaPush)
@@ -133,7 +135,7 @@ static Class delegateClass = nil;
 }
 
 - (BOOL)oneSignalApplication:(UIApplication*)application didFinishLaunchingWithOptions:(NSDictionary*)launchOptions {
-    initOneSignalObject(launchOptions, nil, 1, YES, YES);
+    initOneSignalObject(launchOptions, nil, 1, YES, NO, YES);
     
     if ([self respondsToSelector:@selector(oneSignalApplication:didFinishLaunchingWithOptions:)])
         return [self oneSignalApplication:application didFinishLaunchingWithOptions:launchOptions];
@@ -163,7 +165,7 @@ static Class delegateClass = nil;
 
     int displayOption = [(NSNumber*)command.arguments[3] intValue];
 
-    initOneSignalObject(nil, [appId UTF8String], displayOption, inAppLaunchURL, autoPrompt);
+    initOneSignalObject(nil, [appId UTF8String], displayOption, inAppLaunchURL, autoPrompt, NO);
     
     if (notification)
         processNotificationReceived(notification);
