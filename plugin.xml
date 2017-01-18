@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="onesignal-cordova-plugin"
-    version="2.0.10">
+    version="2.0.11">
 
 
   <name>OneSignal Push Notifications</name>
@@ -25,7 +25,7 @@
   </engines>
   
   <platform name="android">
-    <framework src="com.onesignal:OneSignal:3.4.2@aar" />
+    <framework src="com.onesignal:OneSignal:3.4.3@aar" />
 
     <framework src="com.google.android.gms:play-services-gcm:+" />
     <!-- play-services-analytics is only required when gms version 8.1.0 or older is used. -->
