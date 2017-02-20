@@ -116,6 +116,10 @@ OneSignal.prototype.registerForPushNotifications = function() {
     cordova.exec(function(){}, function(){}, "OneSignalPush", "registerForPushNotifications", []);
 };
 
+OneSignal.prototype.clearOneSignalNotifications = function() {
+    cordova.exec(function(){}, function(){}, "OneSignalPush", "clearOneSignalNotifications", []);
+};
+
 // Only applies to Android, vibrate is on by default but can be disabled by passing in false.
 OneSignal.prototype.enableVibrate = function(enable) {
     cordova.exec(function(){}, function(){}, "OneSignalPush", "enableVibrate", [enable]);

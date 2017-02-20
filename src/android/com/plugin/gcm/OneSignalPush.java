@@ -265,6 +265,7 @@ public class OneSignalPush extends CordovaPlugin {
     else if (CLEAR_ONESIGNAL_NOTIFICATIONS.equals(action)) {
       try {
         OneSignal.clearOneSignalNotifications();
+        result = true;
       }
       catch(Throwable t) {
         t.printStackTrace();

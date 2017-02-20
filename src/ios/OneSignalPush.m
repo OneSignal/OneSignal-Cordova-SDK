@@ -239,5 +239,6 @@ static Class delegateClass = nil;
 // Android only
 - (void)enableVibrate:(CDVInvokedUrlCommand*)command {}
 - (void)enableSound:(CDVInvokedUrlCommand*)command {}
+- (void)clearOneSignalNotifications:(CDVInvokedUrlCommand*)command {}
 
 @end
