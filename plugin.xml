@@ -124,7 +124,9 @@
     <source-file src="src/ios/UIApplicationDelegate+OneSignal.m" />
 
     <header-file src="src/ios/OneSignal-Prefix.pch" />
-
+    
+    <hook type="after_plugin_install" src="src/ios/hooks/install_prerequisites.js"/>
+    <hook type="after_plugin_install" src="src/ios/hooks/install_entitlements.js"/>
   </platform>
   
   <!-- Windows Phone 8.1 -->
