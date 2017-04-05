@@ -1,15 +1,14 @@
 
-var OneSingal_launchString = "";
+var OneSignal_launchString = "";
 var OneSignal_JSBridge = new OneSignalSDK_WP_WNS_WRTC.WinJSBridge();
 var OneSignal_app_id = null;
 var OneSignal_opened_callback = null;
 
-
 // Process launch args from cold start
 launchArgs = require('cordova/platform').activationContext;
-if(launchArgs) {
-	if (launchArgs.type === "activated" && launchArgs.args != "")
-		OneSingal_launchString = launchArgs.args;
+if (launchArgs) {
+   if (launchArgs.type === "activated" && launchArgs.args != "")
+      OneSignal_launchString = launchArgs.args;
 }
 
 // Process launch args from warn start
@@ -37,7 +36,7 @@ module.exports = {
         OneSignal_opened_callback(newData, { keepCallback: true });
     });
     
-    OneSignal_JSBridge.init(OneSignal_app_id, OneSingal_launchString);
+    OneSignal_JSBridge.init(OneSignal_app_id, OneSignal_launchString);
   },
 
   sendTags: function (successCallback, errorCallback, params) {
