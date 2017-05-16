@@ -99,9 +99,20 @@ OneSignal._processFunctionList = function(array, param) {
       array[i](param);
 };
 
+OneSignal._formatPermissionObj = function(state) {
+    // If Android format, match it to the iOS format
+    if ("undefined" !== typeof state.enabled) {
+      state.hasPrompted = true;
+      state.state = state.enabled ? OneSignal.prototype.OSNotificationPermission.Authorized : OneSignal.prototype.OSNotificationPermission.Denied;
+      delete state.enabled
+    }
+};
+
 OneSignal.prototype.addPermissionObserver = function(callback) {
   OneSignal._permissionObserverList.push(callback);
   var permissionCallBackProcessor = function(state) {
+    OneSignal._formatPermissionObj(state.to);
+    OneSignal._formatPermissionObj(state.from);
     OneSignal._processFunctionList(OneSignal._permissionObserverList, state);
   };
   cordova.exec(permissionCallBackProcessor, function(){}, "OneSignalPush", "addPermissionObserver", []);
@@ -121,7 +132,11 @@ OneSignal.prototype.setInFocusDisplaying = function(displayType) {
 };
 
 OneSignal.prototype.getPermissionSubscriptionState = function(callback) {
-  cordova.exec(callback, function(){}, "OneSignalPush", "getPermissionSubscriptionState", []);
+  var internalCallBackProcessor = function(state) {
+    OneSignal._formatPermissionObj(state.permissionStatus);
+    callback(state);
+  };
+  cordova.exec(internalCallBackProcessor, function(){}, "OneSignalPush", "getPermissionSubscriptionState", []);
 };
 
 OneSignal.prototype.getIds = function(IdsReceivedCallBack) {
