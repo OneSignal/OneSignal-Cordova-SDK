@@ -38,7 +38,13 @@ OneSignal.prototype.OSInFocusDisplayOption = {
     None: 0,
     InAppAlert : 1,
     Notification : 2
-}
+};
+
+OneSignal.prototype.OSNotificationPermission = {
+    NotDetermined: 0,
+    Authorized: 1,
+    Denied: 2
+};
 
 OneSignal._displayOption = OneSignal.prototype.OSInFocusDisplayOption.InAppAlert;
 
@@ -58,17 +64,17 @@ OneSignal.prototype.startInit = function(appId, googleProjectNumber) {
 OneSignal.prototype.handleNotificationReceived = function(handleNotificationReceivedCallback) {
     OneSignal._notificationReceivedDelegate = handleNotificationReceivedCallback;
     return this;
-}
+};
 
 OneSignal.prototype.handleNotificationOpened = function(handleNotificationOpenedCallback) {
     OneSignal._notificationOpenedDelegate = handleNotificationOpenedCallback;
     return this;
-}
+};
 
 OneSignal.prototype.inFocusDisplaying = function(display) {
     OneSignal._displayOption = display;
     return this;
-}
+};
 
 //Possible settings keys:
 // kOSSettingsKeyInAppLaunchURL: Bool. Enable in-app webviews for urls. Default: Enabled
@@ -76,7 +82,7 @@ OneSignal.prototype.inFocusDisplaying = function(display) {
 OneSignal.prototype.iOSSettings = function(settings) {
     OneSignal._iOSSettings = settings;
     return this;
-}
+};
 
 OneSignal.prototype.endInit = function() {
 
@@ -86,9 +92,9 @@ OneSignal.prototype.endInit = function() {
 
     //Call Init
     cordova.exec(function() {}, function(){}, "OneSignalPush", "init", [OneSignal._appID, OneSignal._googleProjectNumber, OneSignal._iOSSettings, OneSignal._displayOption]);
-}
+};
 
-OneSignal._processFunctionList = function (array, param) {
+OneSignal._processFunctionList = function(array, param) {
     for (var i = 0; i < array.length; i++)
       array[i](param);
 };
@@ -151,7 +157,10 @@ OneSignal.prototype.registerForPushNotifications = function() {
 };
 
 OneSignal.prototype.promptForPushNotificationsWithUserResponse = function(callback) {
-    cordova.exec(callback, function(){}, "OneSignalPush", "promptForPushNotificationsWithUserResponse", []);
+    var internalCallback = function(data) {
+        callback(data.accepted === "true");
+    };
+    cordova.exec(internalCallback, function(){}, "OneSignalPush", "promptForPushNotificationsWithUserResponse", []);
 };
 
 OneSignal.prototype.clearOneSignalNotifications = function() {

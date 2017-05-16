@@ -82,6 +82,15 @@
     </config-file>
 
     <!-- Headers -->
+    <header-file src="src/ios/OSObservable.h" />
+    <header-file src="src/ios/OSPermission.h" />
+    <header-file src="src/ios/OSSubscription.h" />
+    <header-file src="src/ios/OneSignalNotificationSettings.h" />
+    <header-file src="src/ios/OneSignalNotificationSettingsIOS7.h" />
+    <header-file src="src/ios/OneSignalNotificationSettingsIOS8.h" />
+    <header-file src="src/ios/OneSignalNotificationSettingsIOS10.h" />
+    <header-file src="src/ios/OneSignalInternal.h" />
+    <header-file src="src/ios/NSString+OneSignal.h" />
     <header-file src="src/ios/OneSignal.h" />
     <header-file src="src/ios/OneSignalHTTPClient.h" />
     <header-file src="src/ios/OneSignalTrackIAP.h" />
@@ -93,14 +102,16 @@
     <header-file src="src/ios/OneSignalHelper.h" />
     <header-file src="src/ios/OneSignalTracker.h" />
     <header-file src="src/ios/OneSignalWebView.h" />
-    <source-file src="src/ios/OneSignalPush.h" />
-    <source-file src="src/ios/OneSignalSelectorHelpers.h" />
-    <source-file src="src/ios/UNUserNotificationCenter+OneSignal.h" />
-    <source-file src="src/ios/UIApplicationDelegate+OneSignal.h" />
-    
-    
+    <header-file src="src/ios/OneSignalPush.h" />
+    <header-file src="src/ios/OneSignalSelectorHelpers.h" />
+    <header-file src="src/ios/UNUserNotificationCenter+OneSignal.h" />
+    <header-file src="src/ios/UIApplicationDelegate+OneSignal.h" />
+
 
     <!-- Implementation -->
+    <source-file src="src/ios/OSObservable.m" />
+    <source-file src="src/ios/OSPermission.m" />
+    <source-file src="src/ios/OSSubscription.m" />
     <source-file src="src/ios/OneSignal.m" />
     <source-file src="src/ios/OneSignalHTTPClient.m" />
     <source-file src="src/ios/OneSignalTrackIAP.m" />
@@ -116,8 +127,9 @@
     <source-file src="src/ios/OneSignalSelectorHelpers.m" />
     <source-file src="src/ios/UNUserNotificationCenter+OneSignal.m" />
     <source-file src="src/ios/UIApplicationDelegate+OneSignal.m" />
-
-    <header-file src="src/ios/OneSignal-Prefix.pch" />
+    <source-file src="src/ios/OneSignalNotificationSettingsIOS7.m" />
+    <source-file src="src/ios/OneSignalNotificationSettingsIOS8.m" />
+    <source-file src="src/ios/OneSignalNotificationSettingsIOS10.m" />
 
   </platform>
   
