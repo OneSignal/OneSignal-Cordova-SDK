@@ -1,0 +1,4 @@
+cordova plugin rm onesignal-cordova-plugin
+cordova plugin add C:\OneSignalRepos\OneSignal-Cordova-SDK --save
+cordova build android
+adb -s ZX1G22WFGX install -r platforms/android/build/outputs/apk/android-debug.apk

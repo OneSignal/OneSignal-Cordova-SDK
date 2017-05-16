@@ -1,7 +1,7 @@
 /**
  * Modified MIT License
  * 
- * Copyright 2016 OneSignal
+ * Copyright 2017 OneSignal
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,6 +41,10 @@ OneSignal.prototype.OSInFocusDisplayOption = {
 }
 
 OneSignal._displayOption = OneSignal.prototype.OSInFocusDisplayOption.InAppAlert;
+
+OneSignal._permissionObserverList = [];
+OneSignal._subscriptionObserverList = [];
+
 
 // You must call init before any other OneSignal function.
 // options is a JSON object that includes:
@@ -84,12 +88,42 @@ OneSignal.prototype.endInit = function() {
     cordova.exec(function() {}, function(){}, "OneSignalPush", "init", [OneSignal._appID, OneSignal._googleProjectNumber, OneSignal._iOSSettings, OneSignal._displayOption]);
 }
 
-OneSignal.prototype.getTags = function(tagsReceivedCallBack) {
-    cordova.exec(tagsReceivedCallBack, function(){}, "OneSignalPush", "getTags", []);
+OneSignal._processFunctionList = function (array, param) {
+    for (var i = 0; i < array.length; i++)
+      array[i](param);
+};
+
+OneSignal.prototype.addPermissionObserver = function(callback) {
+  OneSignal._permissionObserverList.push(callback);
+  var permissionCallBackProcessor = function(state) {
+    OneSignal._processFunctionList(OneSignal._permissionObserverList, state);
+  };
+  cordova.exec(permissionCallBackProcessor, function(){}, "OneSignalPush", "addPermissionObserver", []);
+};
+
+OneSignal.prototype.addSubscriptionObserver = function(callback) {
+  OneSignal._subscriptionObserverList.push(callback);
+  var subscriptionCallBackProcessor = function(state) {
+    OneSignal._processFunctionList(OneSignal._subscriptionObserverList, state);
+  };
+  cordova.exec(subscriptionCallBackProcessor, function(){}, "OneSignalPush", "addSubscriptionObserver", []);
+};
+
+OneSignal.prototype.setInFocusDisplaying = function(displayType) {
+  OneSignal._displayOption = displayType;
+  cordova.exec(function(){}, function(){}, "OneSignalPush", "setInFocusDisplaying", [displayType]);
+};
+
+OneSignal.prototype.getPermissionSubscriptionState = function(callback) {
+  cordova.exec(callback, function(){}, "OneSignalPush", "getPermissionSubscriptionState", []);
 };
 
 OneSignal.prototype.getIds = function(IdsReceivedCallBack) {
-    cordova.exec(IdsReceivedCallBack, function(){}, "OneSignalPush", "getIds", []);
+  cordova.exec(IdsReceivedCallBack, function(){}, "OneSignalPush", "getIds", []);
+};
+
+OneSignal.prototype.getTags = function(tagsReceivedCallBack) {
+    cordova.exec(tagsReceivedCallBack, function(){}, "OneSignalPush", "getTags", []);
 };
 
 OneSignal.prototype.sendTag = function(key, value) {
@@ -114,6 +148,10 @@ OneSignal.prototype.deleteTags = function(keys) {
 // Call only if you passed false to autoRegister
 OneSignal.prototype.registerForPushNotifications = function() {
     cordova.exec(function(){}, function(){}, "OneSignalPush", "registerForPushNotifications", []);
+};
+
+OneSignal.prototype.promptForPushNotificationsWithUserResponse = function(callback) {
+    cordova.exec(callback, function(){}, "OneSignalPush", "promptForPushNotificationsWithUserResponse", []);
 };
 
 OneSignal.prototype.clearOneSignalNotifications = function() {

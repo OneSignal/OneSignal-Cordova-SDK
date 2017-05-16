@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="onesignal-cordova-plugin"
-    version="2.0.11">
+    version="2.1.0">
 
 
   <name>OneSignal Push Notifications</name>
@@ -20,20 +20,14 @@
 
   <engines>
     <engine name="cordova-android" version=">=4.0.0" /> <!-- This main branch of OneSignal depends on gradle and maven. -->
-    <engine name="apple-xcode" version=">=6.2.0" />
+    <engine name="apple-xcode" version=">=8.0.0" />
     <engine name="apple-ios" version=">=7.0.0" />
   </engines>
   
   <platform name="android">
-    <framework src="com.onesignal:OneSignal:3.4.3@aar" />
-
-    <framework src="com.google.android.gms:play-services-gcm:+" />
-    <!-- play-services-analytics is only required when gms version 8.1.0 or older is used. -->
-    <framework src="com.google.android.gms:play-services-analytics:+" />
-    <framework src="com.google.android.gms:play-services-location:+" />
-    
+    <framework src="com.onesignal:OneSignal:3.5.6" />
     <framework src="build-extras-onesignal.gradle" custom="true" type="gradleReference" />
-
+    
     <config-file target="res/xml/config.xml" parent="/*">
       <feature name="OneSignalPush" >
         <param name="android-package" value="com.plugin.gcm.OneSignalPush" />

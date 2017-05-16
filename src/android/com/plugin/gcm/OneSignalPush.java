@@ -1,7 +1,7 @@
 /**
   * Modified MIT License
   * 
-  * Copyright 2016 OneSignal
+  * Copyright 2017 OneSignal
   *
   * Permission is hereby granted, free of charge, to any person obtaining a copy
   * of this software and associated documentation files (the "Software"), to deal
@@ -52,29 +52,51 @@ import com.onesignal.OneSignal.GetTagsHandler;
 import com.onesignal.OneSignal.IdsAvailableHandler;
 import com.onesignal.OneSignal.PostNotificationResponseHandler;
 
+import com.onesignal.OSPermissionObserver;
+import com.onesignal.OSSubscriptionObserver;
+import com.onesignal.OSPermissionStateChanges;
+import com.onesignal.OSSubscriptionStateChanges;
+
 public class OneSignalPush extends CordovaPlugin {
-  public static final String TAG = "OneSignalPush";
+  private static final String TAG = "OneSignalPush";
   
-  public static final String SET_NOTIFICATION_RECEIVED_HANDLER = "setNotificationReceivedHandler";
-  public static final String SET_NOTIFICATION_OPENED_HANDLER = "setNotificationOpenedHandler";
-  public static final String INIT = "init";
-  public static final String GET_TAGS = "getTags";
-  public static final String GET_IDS = "getIds";
-  public static final String DELETE_TAGS = "deleteTags";
-  public static final String SEND_TAGS = "sendTags";
-  public static final String REGISTER_FOR_PUSH_NOTIFICATIONS = "registerForPushNotifications";
-  public static final String ENABLE_VIBRATE = "enableVibrate";
-  public static final String ENABLE_SOUND = "enableSound";
-  public static final String SET_SUBSCRIPTION = "setSubscription";
-  public static final String POST_NOTIFICATION = "postNotification";
-  public static final String PROMPT_LOCATION = "promptLocation";
-  public static final String SYNC_HASHED_EMAIL = "syncHashedEmail";
-  public static final String SET_LOG_LEVEL = "setLogLevel";
-  public static final String CLEAR_ONESIGNAL_NOTIFICATIONS = "clearOneSignalNotifications";
+  private static final String SET_NOTIFICATION_RECEIVED_HANDLER = "setNotificationReceivedHandler";
+  private static final String SET_NOTIFICATION_OPENED_HANDLER = "setNotificationOpenedHandler";
+  private static final String INIT = "init";
+  
+  private static final String SET_IN_FOCUS_DISPLAYING = "setInFocusDisplaying";
+  
+  private static final String GET_PERMISSION_SUBCRIPTION_STATE = "getPermissionSubscriptionState";
+  private static final String GET_IDS = "getIds";
+  
+  private static final String ADD_PERMISSION_OBSERVER = "addPermissionObserver";
+  private static final String ADD_SUBSCRIPTION_OBSERVER = "addSubscriptionObserver";
+  
+  private static final String GET_TAGS = "getTags";
+  private static final String DELETE_TAGS = "deleteTags";
+  private static final String SEND_TAGS = "sendTags";
+  private static final String SYNC_HASHED_EMAIL = "syncHashedEmail";
+  
+  private static final String REGISTER_FOR_PUSH_NOTIFICATIONS = "registerForPushNotifications";
+  private static final String ENABLE_VIBRATE = "enableVibrate";
+  private static final String ENABLE_SOUND = "enableSound";
+
+  private static final String SET_SUBSCRIPTION = "setSubscription";
+  private static final String POST_NOTIFICATION = "postNotification";
+  private static final String PROMPT_LOCATION = "promptLocation";
+  private static final String CLEAR_ONESIGNAL_NOTIFICATIONS = "clearOneSignalNotifications";
+  
+  private static final String SET_LOG_LEVEL = "setLogLevel";
 
   
   private static CallbackContext notifReceivedCallbackContext;
   private static CallbackContext notifOpenedCallbackContext;
+  
+  private static CallbackContext jsPermissionObserverCallBack;
+  private static CallbackContext jsSubscriptionObserverCallBack;
+  
+  private static OSPermissionObserver permissionObserver;
+  private static OSSubscriptionObserver subscriptionObserver;
 
   // This is to prevent an issue where if two Javascript calls are made to OneSignal expecting a callback then only one would fire.
   private static void callbackSuccess(CallbackContext callbackContext, JSONObject jsonObject) {
@@ -119,6 +141,10 @@ public class OneSignalPush extends CordovaPlugin {
         String googleProjectNumber = data.getString(1);
 
         OneSignal.sdkType = "cordova";
+        OneSignal.Builder builder = OneSignal.getCurrentOrNewInitBuilder();
+        builder.unsubscribeWhenNotificationsAreDisabled(true);
+        builder.filterOtherGCMReceivers(true);
+        
         OneSignal.init(this.cordova.getActivity(),
                   googleProjectNumber,
                   appId,
@@ -130,13 +156,49 @@ public class OneSignalPush extends CordovaPlugin {
 
          int displayOption = data.getInt(3);
          OneSignal.setInFocusDisplaying(displayOption);
-        
+         
          result = true;
       }
       catch (JSONException e) {
          Log.e(TAG, "execute: Got JSON Exception " + e.getMessage());
          result = false;
       }
+    }
+    else if (SET_IN_FOCUS_DISPLAYING.equals(action)) {
+      try {
+        OneSignal.setInFocusDisplaying(data.getInt(0));
+        result = true;
+      }
+      catch (JSONException e) {
+         Log.e(TAG, "execute: Got JSON Exception " + e.getMessage());
+         result = false;
+      }
+    }
+    else if (ADD_PERMISSION_OBSERVER.equals(action)) {
+      jsPermissionObserverCallBack = callbackContext;
+      if (permissionObserver == null) {
+        permissionObserver = new OSPermissionObserver() {
+          @Override
+          public void onOSPermissionChanged(OSPermissionStateChanges stateChanges) {
+            callbackSuccess(jsPermissionObserverCallBack, stateChanges.toJSONObject());
+          }
+        };
+        OneSignal.addPermissionObserver(permissionObserver);
+      }
+      result = true;
+    }
+    else if (ADD_SUBSCRIPTION_OBSERVER.equals(action)) {
+      jsSubscriptionObserverCallBack = callbackContext;
+      if (subscriptionObserver == null) {
+        subscriptionObserver = new OSSubscriptionObserver() {
+          @Override
+          public void onOSSubscriptionChanged(OSSubscriptionStateChanges stateChanges) {
+            callbackSuccess(jsSubscriptionObserverCallBack, stateChanges.toJSONObject());
+          }
+        };
+        OneSignal.addSubscriptionObserver(subscriptionObserver);
+      }
+      result = true;
     }
     else if (GET_TAGS.equals(action)) {
       final CallbackContext jsTagsAvailableCallBack = callbackContext;
@@ -146,6 +208,10 @@ public class OneSignalPush extends CordovaPlugin {
           callbackSuccess(jsTagsAvailableCallBack, tags);
         }
       });
+      result = true;
+    }
+    else if (GET_PERMISSION_SUBCRIPTION_STATE.equals(action)) {
+      callbackSuccess(callbackContext, OneSignal.getPermissionSubscriptionState().toJSONObject());
       result = true;
     }
     else if (GET_IDS.equals(action)) {
@@ -256,7 +322,7 @@ public class OneSignalPush extends CordovaPlugin {
     else if (SET_LOG_LEVEL.equals(action)) {
       try {
         JSONObject jo = data.getJSONObject(0);
-        OneSignal.setLogLevel(jo.getInt("logLevel"), jo.getInt("visualLevel"));
+        OneSignal.setLogLevel(jo.optInt("logLevel", 0), jo.optInt("visualLevel", 0));
       }
       catch(Throwable t) {
         t.printStackTrace();
