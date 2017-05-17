@@ -1,7 +1,7 @@
 /**
  * Modified MIT License
  * 
- * Copyright 2016 OneSignal
+ * Copyright 2017 OneSignal
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,6 +36,9 @@ NSString* notficationOpenedCallbackId;
 NSString* getTagsCallbackId;
 NSString* getIdsCallbackId;
 NSString* postNotificationCallbackId;
+NSString* permissionObserverCallbackId;
+NSString* subscriptionObserverCallbackId;
+NSString* promptForPushNotificationsWithUserResponseCallbackId;
 
 OSNotificationOpenedResult* actionNotification;
 OSNotification *notification;
@@ -146,6 +149,14 @@ static Class delegateClass = nil;
 
 @implementation OneSignalPush
 
+- (void)onOSPermissionChanged:(OSPermissionStateChanges*)stateChanges {
+    successCallback(permissionObserverCallbackId, [stateChanges toDictionary]);
+}
+
+- (void)onOSSubscriptionChanged:(OSSubscriptionStateChanges*)stateChanges {
+    successCallback(subscriptionObserverCallbackId, [stateChanges toDictionary]);
+}
+
 - (void)setNotificationReceivedHandler:(CDVInvokedUrlCommand*)command {
     notficationReceivedCallbackId = command.callbackId;
 }
@@ -202,6 +213,14 @@ static Class delegateClass = nil;
     [OneSignal registerForPushNotifications];
 }
 
+- (void)promptForPushNotificationsWithUserResponse:(CDVInvokedUrlCommand*)command {
+   promptForPushNotificationsWithUserResponseCallbackId = command.callbackId;
+    [OneSignal promptForPushNotificationsWithUserResponse:^(BOOL accepted) {
+        successCallback(promptForPushNotificationsWithUserResponseCallbackId, @{@"accepted": (accepted ? @"true" : @"false")});
+    }];
+}
+
+
 - (void)setSubscription:(CDVInvokedUrlCommand*)command {
     [OneSignal setSubscription:[command.arguments[0] boolValue]];
 }
@@ -220,7 +239,6 @@ static Class delegateClass = nil;
                 failureCallback(postNotificationCallbackId, @{@"error": @"HTTP no response error"});
 
     }];
-
 }
 
 - (void)promptLocation:(CDVInvokedUrlCommand*)command {
@@ -240,5 +258,28 @@ static Class delegateClass = nil;
 - (void)enableVibrate:(CDVInvokedUrlCommand*)command {}
 - (void)enableSound:(CDVInvokedUrlCommand*)command {}
 - (void)clearOneSignalNotifications:(CDVInvokedUrlCommand*)command {}
+
+
+- (void)setInFocusDisplaying:(CDVInvokedUrlCommand*)command {
+    OneSignal.inFocusDisplayType = [(NSNumber*)command.arguments[0] intValue];
+}
+
+- (void)getPermissionSubscriptionState:(CDVInvokedUrlCommand*)command {
+    successCallback(command.callbackId, [[OneSignal getPermissionSubscriptionState] toDictionary]);
+}
+
+- (void)addPermissionObserver:(CDVInvokedUrlCommand*)command {
+   bool first = permissionObserverCallbackId  == nil;
+   permissionObserverCallbackId = command.callbackId;
+   if (first)
+      [OneSignal addPermissionObserver:self];
+}
+
+- (void)addSubscriptionObserver:(CDVInvokedUrlCommand*)command {
+    bool first = subscriptionObserverCallbackId  == nil;
+    subscriptionObserverCallbackId = command.callbackId;
+    if (first)
+       [OneSignal addSubscriptionObserver:self];
+}
 
 @end

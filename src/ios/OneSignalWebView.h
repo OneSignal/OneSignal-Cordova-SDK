@@ -25,6 +25,8 @@
  * THE SOFTWARE.
  */
 
+#import <UIKit/UIKit.h>
+
 @interface OneSignalWebView : UIViewController <UIWebViewDelegate>
 
 @property(nonatomic, copy)NSURL *url;

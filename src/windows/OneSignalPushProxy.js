@@ -77,8 +77,12 @@ module.exports = {
   postNotification: function (successCallback, errorCallback, params) { },
   promptLocation: function (successCallback, errorCallback, params) { },
   syncHashedEmail: function (successCallback, errorCallback, params) { },
-  setLogLevel: function (successCallback, errorCallback, params) { }
-
+  setLogLevel: function (successCallback, errorCallback, params) { },
+  promptForPushNotificationsWithUserResponse: function (successCallback, errorCallback, params) { },
+  addPermissionObserver: function (successCallback, errorCallback, params) { },
+  addSubscriptionObserver: function (successCallback, errorCallback, params) { },
+  setInFocusDisplaying: function (successCallback, errorCallback, params) { },
+  getPermissionSubscriptionState: function (successCallback, errorCallback, params) { }
 };
 
 require("cordova/exec/proxy").add("OneSignalPush", module.exports);

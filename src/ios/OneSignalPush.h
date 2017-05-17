@@ -1,7 +1,7 @@
 /**
  * Modified MIT License
  * 
- * Copyright 2016 OneSignal
+ * Copyright 2017 OneSignal
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,15 +29,27 @@
 #import <Cordova/CDV.h>
 #import <Cordova/CDVPlugin.h>
 
-@interface OneSignalPush : CDVPlugin {}
+#import "OneSignal.h"
+
+@interface OneSignalPush : CDVPlugin <OSPermissionObserver, OSSubscriptionObserver>
 
 - (void)setNotificationReceivedHandler:(CDVInvokedUrlCommand*)command;
 - (void)setNotificationOpenedHandler:(CDVInvokedUrlCommand*)command;
 - (void)init:(CDVInvokedUrlCommand*)command;
+
+- (void)setInFocusDisplaying:(CDVInvokedUrlCommand*)command;
+- (void)getPermissionSubscriptionState:(CDVInvokedUrlCommand*)command;
+
+
+- (void)addPermissionObserver:(CDVInvokedUrlCommand*)command;
+- (void)addSubscriptionObserver:(CDVInvokedUrlCommand*)command;
+
+
 - (void)getTags:(CDVInvokedUrlCommand*)command;
 - (void)getIds:(CDVInvokedUrlCommand*)command;
 - (void)sendTags:(CDVInvokedUrlCommand*)command;
 - (void)deleteTags:(CDVInvokedUrlCommand*)command;
+- (void)promptForPushNotificationsWithUserResponse:(CDVInvokedUrlCommand*)command;
 - (void)registerForPushNotifications:(CDVInvokedUrlCommand*)command;
 - (void)setSubscription:(CDVInvokedUrlCommand*)command;
 - (void)postNotification:(CDVInvokedUrlCommand*)command;
