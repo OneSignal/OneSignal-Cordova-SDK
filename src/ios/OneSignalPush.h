@@ -29,7 +29,7 @@
 #import <Cordova/CDV.h>
 #import <Cordova/CDVPlugin.h>
 
-#import "OneSignal.h"
+#import <OneSignal/OneSignal.h>
 
 @interface OneSignalPush : CDVPlugin <OSPermissionObserver, OSSubscriptionObserver>
 

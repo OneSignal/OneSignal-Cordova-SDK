@@ -11,4 +11,4 @@ adb -s ZX1G22WFGX install -r platforms/android/build/outputs/apk/android-debug.a
 cordova plugin rm onesignal-cordova-plugin
 cordova plugin add /Users/josh/Documents/OneSignalRepos/OneSignal-Cordova-SDK --save
 cordova build ios
-open platforms/ios/HelloCordova.xcodeproj/
+open platforms/ios/HelloCordova.xcworkspace

@@ -29,7 +29,7 @@
 #import <objc/runtime.h>
 
 #import "OneSignalPush.h"
-#import "OneSignal.h"
+#import <OneSignal/OneSignal.h>
 
 NSString* notficationReceivedCallbackId;
 NSString* notficationOpenedCallbackId;

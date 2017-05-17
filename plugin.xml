@@ -19,6 +19,8 @@
   </js-module>
 
   <engines>
+    <engine name="cordova" version=">=6.4.0" />
+    <engine name="cordova-ios" version=">=4.3.0" />
     <engine name="cordova-android" version=">=4.0.0" /> <!-- This main branch of OneSignal depends on gradle and maven. -->
     <engine name="apple-xcode" version=">=8.0.0" />
     <engine name="apple-ios" version=">=7.0.0" />
@@ -81,55 +83,9 @@
       <string>production</string>
     </config-file>
 
-    <!-- Headers -->
-    <header-file src="src/ios/OSObservable.h" />
-    <header-file src="src/ios/OSPermission.h" />
-    <header-file src="src/ios/OSSubscription.h" />
-    <header-file src="src/ios/OneSignalNotificationSettings.h" />
-    <header-file src="src/ios/OneSignalNotificationSettingsIOS7.h" />
-    <header-file src="src/ios/OneSignalNotificationSettingsIOS8.h" />
-    <header-file src="src/ios/OneSignalNotificationSettingsIOS10.h" />
-    <header-file src="src/ios/OneSignalInternal.h" />
-    <header-file src="src/ios/NSString+OneSignal.h" />
-    <header-file src="src/ios/OneSignal.h" />
-    <header-file src="src/ios/OneSignalHTTPClient.h" />
-    <header-file src="src/ios/OneSignalTrackIAP.h" />
-    <header-file src="src/ios/OneSignalJailbreakDetection.h" />
-    <header-file src="src/ios/OneSignalReachability.h" />
-    <header-file src="src/ios/OneSignalMobileProvision.h" />
-    <header-file src="src/ios/OneSignalLocation.h" />
-    <header-file src="src/ios/OneSignalAlertViewDelegate.h" />
-    <header-file src="src/ios/OneSignalHelper.h" />
-    <header-file src="src/ios/OneSignalTracker.h" />
-    <header-file src="src/ios/OneSignalWebView.h" />
+    <framework src="OneSignal" type="podspec" spec="2.5.4" />
     <header-file src="src/ios/OneSignalPush.h" />
-    <header-file src="src/ios/OneSignalSelectorHelpers.h" />
-    <header-file src="src/ios/UNUserNotificationCenter+OneSignal.h" />
-    <header-file src="src/ios/UIApplicationDelegate+OneSignal.h" />
-
-
-    <!-- Implementation -->
-    <source-file src="src/ios/OSObservable.m" />
-    <source-file src="src/ios/OSPermission.m" />
-    <source-file src="src/ios/OSSubscription.m" />
-    <source-file src="src/ios/OneSignal.m" />
-    <source-file src="src/ios/OneSignalHTTPClient.m" />
-    <source-file src="src/ios/OneSignalTrackIAP.m" />
-    <source-file src="src/ios/OneSignalJailbreakDetection.m" />
-    <source-file src="src/ios/OneSignalReachability.m" />
-    <source-file src="src/ios/OneSignalMobileProvision.m" />
-    <source-file src="src/ios/OneSignalLocation.m" />
-    <source-file src="src/ios/OneSignalAlertViewDelegate.m" />
-    <source-file src="src/ios/OneSignalTracker.m" />
-    <source-file src="src/ios/OneSignalHelper.m" />
-    <source-file src="src/ios/OneSignalWebView.m" />
     <source-file src="src/ios/OneSignalPush.m" />
-    <source-file src="src/ios/OneSignalSelectorHelpers.m" />
-    <source-file src="src/ios/UNUserNotificationCenter+OneSignal.m" />
-    <source-file src="src/ios/UIApplicationDelegate+OneSignal.m" />
-    <source-file src="src/ios/OneSignalNotificationSettingsIOS7.m" />
-    <source-file src="src/ios/OneSignalNotificationSettingsIOS8.m" />
-    <source-file src="src/ios/OneSignalNotificationSettingsIOS10.m" />
 
   </platform>
   
