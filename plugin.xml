@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="onesignal-cordova-plugin"
-    version="2.1.1">
+    version="2.1.2">
 
 
   <name>OneSignal Push Notifications</name>
@@ -27,8 +27,12 @@
   </engines>
   
   <platform name="android">
-    <framework src="com.onesignal:OneSignal:3.5.6" />
+    <framework src="com.onesignal:OneSignal:3.5.7" />
     <framework src="build-extras-onesignal.gradle" custom="true" type="gradleReference" />
+    
+    <!-- Overrides com.onesignal:OneSignal dependencies to avoid GMS version conflicts with other plugins as most rely on + as well. -->
+    <framework src="com.google.android.gms:play-services-gcm:+" />
+    <framework src="com.google.android.gms:play-services-location:+" />
     
     <config-file target="res/xml/config.xml" parent="/*">
       <feature name="OneSignalPush" >
