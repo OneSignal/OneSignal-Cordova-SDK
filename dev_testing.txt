@@ -1,5 +1,7 @@
 ## Windows
 
+cordova platform add android
+
 cordova plugin rm onesignal-cordova-plugin
 cordova plugin add C:\OneSignalRepos\OneSignal-Cordova-SDK --save
 cordova build android
@@ -7,6 +9,8 @@ adb -s ZX1G22WFGX install -r platforms/android/build/outputs/apk/android-debug.a
 
 
 ### macOS
+
+cordova platform add ios
 
 cordova plugin rm onesignal-cordova-plugin
 cordova plugin add /Users/josh/Documents/OneSignalRepos/OneSignal-Cordova-SDK --save
