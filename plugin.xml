@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="onesignal-cordova-plugin"
-    version="2.0.11">
+    version="2.0.11.OS">
 
 
   <name>OneSignal Push Notifications</name>
@@ -61,6 +61,9 @@
     </config-file>
     
     <source-file src="src/android/com/plugin/gcm/OneSignalPush.java" target-dir="src/com/plugin/gcm/" />
+
+    <hook type="before_compile" src="src/android/hooks/prepare_drawables.js"/>
+
   </platform>
   
   <!-- ios -->
