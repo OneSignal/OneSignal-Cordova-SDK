@@ -11,7 +11,7 @@
   <description>OneSignal is a high volume Push Notification service for mobile apps. In addition to basic notification delivery, OneSignal also provides tools to localize, target, schedule, A/B test, and automate notifications that you send.</description>
 
   <keywords>push,notification,push notification,push notifications,apns,gcm,adm,retention,messaging,ios,android,windows phone</keywords>
-
+  
   <license>MIT</license>
 
   <js-module src="www/OneSignal.js" name="OneSignal">
@@ -27,14 +27,8 @@
   </engines>
   
   <platform name="android">
-    <framework src="com.onesignal:OneSignal:3.6.1" />
+    <framework src="com.onesignal:OneSignal:3.6.2" />
     <framework src="build-extras-onesignal.gradle" custom="true" type="gradleReference" />
-    
-    <!-- Overrides com.onesignal:OneSignal dependencies to avoid GMS version conflicts with other plugins as most rely on + as well. -->
-    <framework src="com.google.android.gms:play-services-gcm:+" />
-    <framework src="com.google.android.gms:play-services-location:+" />
-    <framework src="com.android.support:support-v4:+" />
-    <framework src="com.android.support:customtabs:+" />
     
     <config-file target="res/xml/config.xml" parent="/*">
       <feature name="OneSignalPush" >

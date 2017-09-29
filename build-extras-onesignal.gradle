@@ -8,3 +8,50 @@ android.defaultConfig {
 repositories {
    maven { url 'https://maven.google.com' }
 }
+
+// ## Align gms and support group versions on all dependencies 
+
+def versionGroupAligns = [
+    // ### Google Play Services library
+    'com.google.android.gms': [
+        'version': '11.2.+'
+    ],
+    
+    // ### Google Firebase library
+    // Although not used by OneSignal Firebase has some dependencies on gms
+    // If present, ensuring they are aligned
+    'com.google.firebase': [
+        'version': '11.2.+'
+    ],
+
+    // ### Android Support Library
+    'com.android.support': [
+        'version': '26.1.+',
+        'requiredCompileSdkVersion': 26,
+        
+        // Can't use 26 of com.android.support when compileSdkVersion 25 is set
+        // The following error will be thrown if there is a mismatch here.
+        // "No resource found that matches the given name: attr 'android:keyboardNavigationCluster'"
+        'versionFallback': '25.+'
+    ]
+]
+
+configurations.all { resolutionStrategy {
+
+    // Enable to find root causes of any remaining version mismatches
+    // failOnVersionConflict()
+
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        def curCompileSdkVersion = android.compileSdkVersion.split('-')[1].toInteger()
+        def versionOverride = versionGroupAligns[details.requested.group]
+
+        if (versionOverride) {
+            def requiredCompileSdk = versionOverride['requiredCompileSdkVersion']
+            def useVersion = versionOverride['version']
+
+            if (curCompileSdkVersion < requiredCompileSdk)
+                useVersion = versionOverride['versionFallback']
+            details.useVersion(useVersion)
+        }
+    }
+}}
