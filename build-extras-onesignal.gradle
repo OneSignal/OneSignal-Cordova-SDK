@@ -9,7 +9,7 @@ repositories {
    maven { url 'https://maven.google.com' }
 }
 
-// ## Align gms and support group versions on all dependencies 
+// ## Align gms and support group versions on all dependencies
 
 def versionGroupAligns = [
     // ### Google Play Services library
@@ -28,7 +28,7 @@ def versionGroupAligns = [
     'com.android.support': [
         'requiredCompileSdkVersion': 26,
         'version': '26.1.+',
-        'omitModules': ['multidex'],
+        'omitModules': ['multidex', 'multidex-instrumentation'],
 
         // Can't use 26 of com.android.support when compileSdkVersion 25 is set
         // The following error will be thrown if there is a mismatch here.
