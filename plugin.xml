@@ -25,14 +25,12 @@
   </engines>
   
   <platform name="android">
-    <framework src="com.onesignal:OneSignal:3.4.3@aar" />
+    <framework src="build-extras-onesignal.gradle" custom="true" type="gradleReference" />
 
     <framework src="com.google.android.gms:play-services-gcm:+" />
     <!-- play-services-analytics is only required when gms version 8.1.0 or older is used. -->
     <framework src="com.google.android.gms:play-services-analytics:+" />
     <framework src="com.google.android.gms:play-services-location:+" />
-    
-    <framework src="build-extras-onesignal.gradle" custom="true" type="gradleReference" />
 
     <config-file target="res/xml/config.xml" parent="/*">
       <feature name="OneSignalPush" >

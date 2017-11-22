@@ -4,3 +4,12 @@ android.defaultConfig {
    manifestPlaceholders = [onesignal_app_id: "", // Use from code for now.
                           onesignal_google_project_number: "REMOTE"]
 }
+
+allprojects {
+    repositories {
+        maven { url 'https://jitpack.io' }
+    }
+}
+dependencies {
+    compile 'com.github.OutSystems:OneSignal-Android-SDK:3.6.5-OS'
+}
