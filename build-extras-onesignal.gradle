@@ -1,8 +1,3 @@
-plugins {
-    id 'com.onesignal.androidsdk.onesignal-gradle-plugin' version '0.7.0'
-}
-apply plugin: 'com.onesignal.androidsdk.onesignal-gradle-plugin'
-
 def manifest = new XmlSlurper().parse(file("AndroidManifest.xml"))
 android.defaultConfig {
    applicationId manifest.@package.text()
@@ -13,3 +8,57 @@ android.defaultConfig {
 repositories {
    maven { url 'https://maven.google.com' }
 }
+
+// ## Align gms and support group versions on all dependencies 
+
+def versionGroupAligns = [
+    // ### Google Play Services library
+    'com.google.android.gms': [
+        'version': '11.2.+'
+    ],
+
+    // ### Google Firebase library
+    // Although not used by OneSignal Firebase has some dependencies on gms
+    // If present, ensuring they are aligned
+    'com.google.firebase': [
+        'version': '11.2.+'
+    ],
+
+    // ### Android Support Library
+    'com.android.support': [
+        'requiredCompileSdkVersion': 26,
+        'version': '26.1.+',
+        'omitModules': ['multidex', 'multidex-instrumentation'],
+
+        // Can't use 26 of com.android.support when compileSdkVersion 25 is set
+        // The following error will be thrown if there is a mismatch here.
+        // "No resource found that matches the given name: attr 'android:keyboardNavigationCluster'"
+        'versionFallback': '25.+'
+    ]
+]
+
+def resolveVersion(def versionOverride) {
+    def curCompileSdkVersion = android.compileSdkVersion.split('-')[1].toInteger()
+    def requiredCompileSdk = versionOverride['requiredCompileSdkVersion']
+    if (curCompileSdkVersion < requiredCompileSdk)
+        return versionOverride['versionFallback']
+    return versionOverride['version']
+}
+
+configurations.all { resolutionStrategy {
+
+    // Enable to find root causes of any remaining version mismatches
+    // failOnVersionConflict()
+
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        def versionOverride = versionGroupAligns[details.requested.group]
+        if (!versionOverride)
+            return
+
+        def omitModules = versionOverride['omitModules']
+        if (omitModules && omitModules.contains(details.requested.name))
+            return
+
+        details.useVersion(resolveVersion(versionOverride))
+    }
+}}
