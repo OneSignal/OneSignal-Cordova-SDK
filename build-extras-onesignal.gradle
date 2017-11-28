@@ -1,7 +1,15 @@
-plugins {
-    id 'com.onesignal.androidsdk.onesignal-gradle-plugin' version '0.7.0'
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "gradle.plugin.com.onesignal:onesignal-gradle-plugin:0.7.0"
+  }
 }
-apply plugin: 'com.onesignal.androidsdk.onesignal-gradle-plugin'
+
+apply plugin: com.onesignal.androidsdk.GradleProjectPlugin
 
 def manifest = new XmlSlurper().parse(file("AndroidManifest.xml"))
 android.defaultConfig {
