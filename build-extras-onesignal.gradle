@@ -1,8 +1,6 @@
-def manifest = new XmlSlurper().parse(file("AndroidManifest.xml"))
 android.defaultConfig {
-   applicationId manifest.@package.text()
-   manifestPlaceholders = [onesignal_app_id: "", // Use from code for now.
-                          onesignal_google_project_number: "REMOTE"]
+   manifestPlaceholders = [onesignal_app_id: '', // Use from js code
+                          onesignal_google_project_number: 'REMOTE']
 }
 
 repositories {
