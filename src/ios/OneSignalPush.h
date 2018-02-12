@@ -57,6 +57,11 @@
 - (void)promptLocation:(CDVInvokedUrlCommand*)command;
 - (void)syncHashedEmail:(CDVInvokedUrlCommand*)command;
 
+//email
+- (void)setEmail:(CDVInvokedUrlCommand *)command;
+- (void)setUnauthenticatedEmail:(CDVInvokedUrlCommand *)command;
+- (void)logoutEmail:(CDVInvokedUrlCommand *)command;
+
 // Android Only
 - (void)enableVibrate:(CDVInvokedUrlCommand*)command;
 - (void)enableSound:(CDVInvokedUrlCommand*)command;

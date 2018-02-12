@@ -222,6 +222,41 @@ OneSignal.prototype.setLogLevel = function(logLevel) {
     cordova.exec(function(){}, function(){}, "OneSignalPush", "setLogLevel", [logLevel]);
 };
 
+//email
+
+OneSignal.prototype.setEmail = function(email, emailAuthToken, onSuccess, onFailure) {
+    if (onSuccess == null)
+        onSuccess = function() {};
+
+
+    if (onFailure == null)
+        onFailure = function() {};
+    
+    cordova.exec(onSuccess, onFailure, "OneSignalPush", "setEmail", [email, emailAuthToken]);
+}
+
+OneSignal.prototype.setUnauthenticatedEmail = function(email, onSuccess, onFailure) {
+    if (onSuccess == null)
+        onSuccess = function() {};
+
+
+    if (onFailure == null)
+        onFailure = function() {};
+    
+    cordova.exec(onSuccess, onFailure, "OneSignalPush", "setUnauthenticatedEmail", [email]);
+}
+
+OneSignal.prototype.logoutEmail = function(onSuccess, onFailure) {
+    if (onSuccess == null)
+        onSuccess = function() {};
+
+
+    if (onFailure == null)
+        onFailure = function() {};
+    
+    cordova.exec(onSuccess, onFailure, "OneSignalPush", "logoutEmail", []);
+}
+
 
 //-------------------------------------------------------------------
 
