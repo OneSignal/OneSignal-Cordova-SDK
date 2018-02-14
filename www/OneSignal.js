@@ -228,22 +228,22 @@ OneSignal.prototype.setEmail = function(email, emailAuthToken, onSuccess, onFail
     if (onSuccess == null)
         onSuccess = function() {};
 
-
     if (onFailure == null)
         onFailure = function() {};
     
-    cordova.exec(onSuccess, onFailure, "OneSignalPush", "setEmail", [email, emailAuthToken]);
-}
+    if (typeof emailAuthToken == 'function') {
+        onFailure = onSuccess;
+        onSuccess = emailAuthToken;
+        
+        cordova.exec(onSuccess, onFailure, "OneSignalPush", "setUnauthenticatedEmail", [email]);
+    } else if (emailAuthToken == undefined) {
+        cordova.exec(onSuccess, onFailure, "OneSignalPush", "setUnauthenticatedEmail", [email]);
+    } else {
+        onFailure = onSuccess;
+        onSuccess = emailAuthToken;
 
-OneSignal.prototype.setUnauthenticatedEmail = function(email, onSuccess, onFailure) {
-    if (onSuccess == null)
-        onSuccess = function() {};
-
-
-    if (onFailure == null)
-        onFailure = function() {};
-    
-    cordova.exec(onSuccess, onFailure, "OneSignalPush", "setUnauthenticatedEmail", [email]);
+        cordova.exec(onSuccess, onFailure, "OneSignalPush", "setEmail", [email, emailAuthToken]);
+    }
 }
 
 OneSignal.prototype.logoutEmail = function(onSuccess, onFailure) {

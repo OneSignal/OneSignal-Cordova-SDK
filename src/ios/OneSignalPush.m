@@ -261,41 +261,39 @@ static Class delegateClass = nil;
 //email
 
 - (void)setEmail:(CDVInvokedUrlCommand *)command {
-    NSString *email = command.arguments[0];
-    NSString *emailAuthToken;
     setEmailCallbackId = command.callbackId;
     
-    if (command.arguments.count > 1)
-        emailAuthToken = command.arguments[1];
+    NSString *email = command.arguments[0];
+    NSString *emailAuthToken = command.arguments[1];
     
-    [OneSignal setEmail:email withEmailAuthHashToken:emailAuthToken withSuccess: ^() {
+    [OneSignal setEmail:email withEmailAuthHashToken:emailAuthToken withSuccess:^{
         successCallback(setEmailCallbackId, nil);
-    } withFailure: ^(NSError *error) {
-        failureCallback(setEmailCallbackId, error);
+    } withFailure:^(NSError *error) {
+        failureCallback(setEmailCallbackId, error.userInfo);
     }];
 }
 
 - (void)setUnauthenticatedEmail:(CDVInvokedUrlCommand *)command {
-    NSString *email = command.arguments[0];
     setUnauthenticatedEmailCallbackId = command.callbackId;
     
-    [OneSignal setUnauthenticatedEmail:email withSuccess: ^() {
+    NSString *email = command.arguments[0];
+    
+    [OneSignal setEmail:email withSuccess:^{
         successCallback(setUnauthenticatedEmailCallbackId, nil);
-    } withFailure: ^(NSError *error) {
-        failureCallback(setUnauthenticatedEmailCallbackId, error);
+    } withFailure:^(NSError *error) {
+        failureCallback(setUnauthenticatedEmailCallbackId, error.userInfo);
     }];
 }
 
 - (void)logoutEmail:(CDVInvokedUrlCommand *)command {
     logoutEmailCallbackId = command.callbackId;
     
-    [OneSignal logoutEmailWithSuccess: ^() {
+    [OneSignal logoutEmailWithSuccess:^{
         successCallback(logoutEmailCallbackId, nil);
-    } withFailure: ^(NSError *error) {
-        failureCallback(logoutEmailCallbackId, error);
+    } withFailure:^(NSError *error) {
+        failureCallback(logoutEmailCallbackId, error.userInfo);
     }];
 }
-
 // Android only
 - (void)enableVibrate:(CDVInvokedUrlCommand*)command {}
 - (void)enableSound:(CDVInvokedUrlCommand*)command {}
