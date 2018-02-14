@@ -239,9 +239,6 @@ OneSignal.prototype.setEmail = function(email, emailAuthToken, onSuccess, onFail
     } else if (emailAuthToken == undefined) {
         cordova.exec(onSuccess, onFailure, "OneSignalPush", "setUnauthenticatedEmail", [email]);
     } else {
-        onFailure = onSuccess;
-        onSuccess = emailAuthToken;
-
         cordova.exec(onSuccess, onFailure, "OneSignalPush", "setEmail", [email, emailAuthToken]);
     }
 }
