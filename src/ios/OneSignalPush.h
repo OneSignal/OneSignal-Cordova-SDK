@@ -43,7 +43,7 @@
 
 - (void)addPermissionObserver:(CDVInvokedUrlCommand*)command;
 - (void)addSubscriptionObserver:(CDVInvokedUrlCommand*)command;
-
+- (void)addEmailSubscriptionObserver:(CDVInvokedUrlCommand *)command;
 
 - (void)getTags:(CDVInvokedUrlCommand*)command;
 - (void)getIds:(CDVInvokedUrlCommand*)command;
