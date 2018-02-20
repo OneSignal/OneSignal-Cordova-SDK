@@ -362,6 +362,8 @@ public class OneSignalPush extends CordovaPlugin {
                 }
               }
             });
+
+          result = true;
         } catch(Throwable t) {
             t.printStackTrace();
         }
@@ -386,6 +388,8 @@ public class OneSignalPush extends CordovaPlugin {
                 }
               }
             });
+
+          result = true;
         } catch (Throwable t) {
             t.printStackTrace();
         }
@@ -408,6 +412,8 @@ public class OneSignalPush extends CordovaPlugin {
             }
           }
         });
+
+      result = true;
     }
     else {
       result = false;
