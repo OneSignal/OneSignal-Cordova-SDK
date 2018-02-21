@@ -372,7 +372,7 @@ public class OneSignalPush extends CordovaPlugin {
               public void onFailure(EmailUpdateError error) {
                 try {
                   JSONObject errorObject = new JSONObject("{'error' : '" + error.getMessage() + "'}");
-                  callbackError(callbackContext, errorObject);
+                  callbackError(jsSetEmailContext, errorObject);
                 } catch (JSONException e) {
                   e.printStackTrace();
                 }
@@ -398,7 +398,7 @@ public class OneSignalPush extends CordovaPlugin {
               public void onFailure(EmailUpdateError error) {
                 try {
                   JSONObject errorObject = new JSONObject("{'error' : '" + error.getMessage() + "'}");
-                  callbackError(callbackContext, errorObject);
+                  callbackError(jsSetEmailContext, errorObject);
                 } catch (JSONException e) {
                   e.printStackTrace();
                 }
@@ -422,7 +422,7 @@ public class OneSignalPush extends CordovaPlugin {
           public void onFailure(EmailUpdateError error) {
             try {
               JSONObject errorObject = new JSONObject("{'error' : '" + error.getMessage() + "'}");
-              callbackError(callbackContext, errorObject);
+              callbackError(jsSetEmailContext, errorObject);
             } catch (JSONException e) {
               e.printStackTrace();
             }
