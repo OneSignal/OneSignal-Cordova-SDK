@@ -50,6 +50,7 @@ OneSignal._displayOption = OneSignal.prototype.OSInFocusDisplayOption.InAppAlert
 
 OneSignal._permissionObserverList = [];
 OneSignal._subscriptionObserverList = [];
+OneSignal._emailSubscriptionObserverList = [];
 
 
 // You must call init before any other OneSignal function.
@@ -125,6 +126,14 @@ OneSignal.prototype.addSubscriptionObserver = function(callback) {
   };
   cordova.exec(subscriptionCallBackProcessor, function(){}, "OneSignalPush", "addSubscriptionObserver", []);
 };
+
+OneSignal.prototype.addEmailSubscriptionObserver = function(callback) {
+    OneSignal._emailSubscriptionObserverList.push(callback);
+    var emailSubscriptionCallbackProcessor = function(state) {
+        OneSignal._processFunctionList(OneSignal._emailSubscriptionObserverList, state);
+    };
+    cordova.exec(emailSubscriptionCallbackProcessor, function(){}, "OneSignalPush", "addEmailSubscriptionObserver", []);
+}
 
 OneSignal.prototype.setInFocusDisplaying = function(displayType) {
   OneSignal._displayOption = displayType;
