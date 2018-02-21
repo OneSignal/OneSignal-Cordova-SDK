@@ -91,6 +91,7 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String SET_EMAIL = "setEmail";
   private static final String SET_UNAUTHENTICATED_EMAIL = "setUnauthenticatedEmail";
   private static final String LOGOUT_EMAIL = "logoutEmail";
+  private static final String ADD_EMAIL_SUBSCRIPTION_OBSERVER = "addEmailSubscriptionObserver";
   
   private static final String SET_LOG_LEVEL = "setLogLevel";
 
@@ -100,9 +101,11 @@ public class OneSignalPush extends CordovaPlugin {
   
   private static CallbackContext jsPermissionObserverCallBack;
   private static CallbackContext jsSubscriptionObserverCallBack;
+  private static CallbackContext jsEmailSubscriptionObserverCallBack;
   
   private static OSPermissionObserver permissionObserver;
   private static OSSubscriptionObserver subscriptionObserver;
+  private static OSEmailSubscriptionObserver emailSubscriptionObserver;
 
   // This is to prevent an issue where if two Javascript calls are made to OneSignal expecting a callback then only one would fire.
   private static void callbackSuccess(CallbackContext callbackContext, JSONObject jsonObject) {
@@ -203,6 +206,19 @@ public class OneSignalPush extends CordovaPlugin {
           }
         };
         OneSignal.addSubscriptionObserver(subscriptionObserver);
+      }
+      result = true;
+    }
+    else if (ADD_EMAIL_SUBSCRIPTION_OBSERVER.equals(action)) {
+      jsEmailSubscriptionObserverCallBack = callbackContext;
+      if (emailSubscriptionObserver == null) {
+        emailSubscriptionObserver = new OSEmailSubscriptionObserver() {
+          @Override
+          public void onOSEmailSubscriptionChanged(OSEmailSubscriptionStateChanges stateChanges) {
+            callbackSuccess(jsEmailSubscriptionObserverCallBack, stateChanges.toJSONObject());
+          }
+        };
+        OneSignal.addEmailSubscriptionObserver(emailSubscriptionObserver);
       }
       result = true;
     }
