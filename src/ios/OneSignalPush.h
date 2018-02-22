@@ -43,7 +43,7 @@
 
 - (void)addPermissionObserver:(CDVInvokedUrlCommand*)command;
 - (void)addSubscriptionObserver:(CDVInvokedUrlCommand*)command;
-
+- (void)addEmailSubscriptionObserver:(CDVInvokedUrlCommand *)command;
 
 - (void)getTags:(CDVInvokedUrlCommand*)command;
 - (void)getIds:(CDVInvokedUrlCommand*)command;
@@ -56,6 +56,11 @@
 - (void)setLogLevel:(CDVInvokedUrlCommand*)command;
 - (void)promptLocation:(CDVInvokedUrlCommand*)command;
 - (void)syncHashedEmail:(CDVInvokedUrlCommand*)command;
+
+//email
+- (void)setEmail:(CDVInvokedUrlCommand *)command;
+- (void)setUnauthenticatedEmail:(CDVInvokedUrlCommand *)command;
+- (void)logoutEmail:(CDVInvokedUrlCommand *)command;
 
 // Android Only
 - (void)enableVibrate:(CDVInvokedUrlCommand*)command;

@@ -39,11 +39,17 @@ NSString* postNotificationCallbackId;
 NSString* permissionObserverCallbackId;
 NSString* subscriptionObserverCallbackId;
 NSString* promptForPushNotificationsWithUserResponseCallbackId;
+NSString* setEmailCallbackId;
+NSString* setUnauthenticatedEmailCallbackId;
+NSString* logoutEmailCallbackId;
+NSString* emailSubscriptionCallbackId;
 
 OSNotificationOpenedResult* actionNotification;
 OSNotification *notification;
 
 id <CDVCommandDelegate> pluginCommandDelegate;
+
+bool initialLaunchFired = false;
 
 void successCallback(NSString* callbackId, NSDictionary* data) {
     CDVPluginResult* commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
@@ -87,20 +93,24 @@ void initOneSignalObject(NSDictionary* launchOptions, const char* appId, int dis
     [OneSignal setValue:@"cordova" forKey:@"mSDKType"];
 
     NSString* appIdStr = (appId ? [NSString stringWithUTF8String: appId] : nil);
-
+    
+    NSDictionary *iOSSettings = initialLaunchFired ? @{kOSSettingsKeyAutoPrompt : @(autoPrompt),
+                                                       kOSSettingsKeyInFocusDisplayOption : @(displayOption),
+                                                       kOSSettingsKeyInAppLaunchURL : @(inAppLaunchURL),
+                                                       @"kOSSettingsKeyInOmitNoAppIdLogging": @(fromColdStart)} : @{};
+    
     [OneSignal initWithLaunchOptions:launchOptions appId:appIdStr handleNotificationReceived:^(OSNotification* _notif) {
-            notification = _notif;
-            if (pluginCommandDelegate)
-               processNotificationReceived(_notif);
-        }
-        handleNotificationAction:^(OSNotificationOpenedResult* openResult) {
-            actionNotification = openResult;
-            if (pluginCommandDelegate)
-                processNotificationOpened(openResult);
-        } settings:@{kOSSettingsKeyAutoPrompt : @(autoPrompt),
-                     kOSSettingsKeyInFocusDisplayOption : @(displayOption),
-                     kOSSettingsKeyInAppLaunchURL : @(inAppLaunchURL),
-                     @"kOSSettingsKeyInOmitNoAppIdLogging": @(fromColdStart)}];
+        notification = _notif;
+        if (pluginCommandDelegate)
+            processNotificationReceived(_notif);
+    }
+            handleNotificationAction:^(OSNotificationOpenedResult* openResult) {
+                actionNotification = openResult;
+                if (pluginCommandDelegate)
+                    processNotificationOpened(openResult);
+            } settings: iOSSettings];
+    
+    initialLaunchFired = true;
 }
 
 @implementation UIApplication(OneSignalCordovaPush)
@@ -155,6 +165,10 @@ static Class delegateClass = nil;
 
 - (void)onOSSubscriptionChanged:(OSSubscriptionStateChanges*)stateChanges {
     successCallback(subscriptionObserverCallbackId, [stateChanges toDictionary]);
+}
+
+-(void)onOSEmailSubscriptionChanged:(OSEmailSubscriptionStateChanges *)stateChanges {
+    successCallback(emailSubscriptionCallbackId, [stateChanges toDictionary]);
 }
 
 - (void)setNotificationReceivedHandler:(CDVInvokedUrlCommand*)command {
@@ -269,17 +283,60 @@ static Class delegateClass = nil;
 }
 
 - (void)addPermissionObserver:(CDVInvokedUrlCommand*)command {
-   bool first = permissionObserverCallbackId  == nil;
-   permissionObserverCallbackId = command.callbackId;
-   if (first)
-      [OneSignal addPermissionObserver:self];
+    bool first = permissionObserverCallbackId  == nil;
+    permissionObserverCallbackId = command.callbackId;
+    if (first)
+        [OneSignal addPermissionObserver:self];
 }
 
 - (void)addSubscriptionObserver:(CDVInvokedUrlCommand*)command {
     bool first = subscriptionObserverCallbackId  == nil;
     subscriptionObserverCallbackId = command.callbackId;
     if (first)
-       [OneSignal addSubscriptionObserver:self];
+        [OneSignal addSubscriptionObserver:self];
+}
+
+- (void)addEmailSubscriptionObserver:(CDVInvokedUrlCommand *)command {
+    bool first = emailSubscriptionCallbackId == nil;
+    emailSubscriptionCallbackId = command.callbackId;
+    if (first)
+        [OneSignal addEmailSubscriptionObserver:self];
+}
+
+- (void)setEmail:(CDVInvokedUrlCommand *)command {
+    setEmailCallbackId = command.callbackId;
+    
+    NSString *email = command.arguments[0];
+    NSString *emailAuthToken = command.arguments[1];
+    
+    [OneSignal setEmail:email withEmailAuthHashToken:emailAuthToken withSuccess:^{
+        successCallback(setEmailCallbackId, nil);
+    } withFailure:^(NSError *error) {
+        failureCallback(setEmailCallbackId, error.userInfo);
+    }];
+}
+
+- (void)setUnauthenticatedEmail:(CDVInvokedUrlCommand *)command {
+    setUnauthenticatedEmailCallbackId = command.callbackId;
+    
+    NSString *email = command.arguments[0];
+    
+    [OneSignal setEmail:email withSuccess:^{
+        successCallback(setUnauthenticatedEmailCallbackId, nil);
+    } withFailure:^(NSError *error) {
+        failureCallback(setUnauthenticatedEmailCallbackId, error.userInfo);
+    }];
+}
+
+- (void)logoutEmail:(CDVInvokedUrlCommand *)command {
+    logoutEmailCallbackId = command.callbackId;
+    
+    [OneSignal logoutEmailWithSuccess:^{
+        successCallback(logoutEmailCallbackId, nil);
+    } withFailure:^(NSError *error) {
+        failureCallback(logoutEmailCallbackId, error.userInfo);
+    }];
 }
 
 @end
+
