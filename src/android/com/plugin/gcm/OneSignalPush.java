@@ -55,9 +55,11 @@ import com.onesignal.OneSignal.EmailUpdateHandler;
 import com.onesignal.OneSignal.EmailUpdateError;
 
 import com.onesignal.OSPermissionObserver;
+import com.onesignal.OSEmailSubscriptionObserver;
 import com.onesignal.OSSubscriptionObserver;
 import com.onesignal.OSPermissionStateChanges;
 import com.onesignal.OSSubscriptionStateChanges;
+import com.onesignal.OSEmailSubscriptionStateChanges;
 
 public class OneSignalPush extends CordovaPlugin {
   private static final String TAG = "OneSignalPush";
