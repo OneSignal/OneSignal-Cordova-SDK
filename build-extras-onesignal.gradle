@@ -12,14 +12,14 @@ repositories {
 def versionGroupAligns = [
     // ### Google Play Services library
     'com.google.android.gms': [
-        'version': '11.2.+'
+        'version': '11.8.+'
     ],
 
     // ### Google Firebase library
     // Although not used by OneSignal Firebase has some dependencies on gms
     // If present, ensuring they are aligned
     'com.google.firebase': [
-        'version': '11.2.+'
+        'version': '11.8.+'
     ],
 
     // ### Android Support Library
