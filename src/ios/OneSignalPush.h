@@ -31,7 +31,7 @@
 
 #import <OneSignal/OneSignal.h>
 
-@interface OneSignalPush : CDVPlugin <OSPermissionObserver, OSSubscriptionObserver>
+@interface OneSignalPush : CDVPlugin <OSPermissionObserver, OSSubscriptionObserver, OSEmailSubscriptionObserver>
 
 - (void)setNotificationReceivedHandler:(CDVInvokedUrlCommand*)command;
 - (void)setNotificationOpenedHandler:(CDVInvokedUrlCommand*)command;
