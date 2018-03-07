@@ -435,7 +435,11 @@ public class OneSignalPush extends CordovaPlugin {
       result = true;
     } 
     else if (SET_LOCATION_SHARED.equals(action)) {
-      OneSignal.setLocationShared(data.getBoolean(0));
+      try {
+         OneSignal.setLocationShared(data.getBoolean(0));
+      } catch (JSONException e) {
+         e.printStackTrace();
+      }
     }
     else {
       result = false;
