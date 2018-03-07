@@ -226,6 +226,10 @@ static Class delegateClass = nil;
 - (void)registerForPushNotifications:(CDVInvokedUrlCommand*)command {
     [OneSignal registerForPushNotifications];
 }
+    
+- (void)setLocationShared:(CDVInvokedUrlCommand *)command {
+   [OneSignal setLocationShared:command.arguments[0]];
+}
 
 - (void)promptForPushNotificationsWithUserResponse:(CDVInvokedUrlCommand*)command {
    promptForPushNotificationsWithUserResponseCallbackId = command.callbackId;

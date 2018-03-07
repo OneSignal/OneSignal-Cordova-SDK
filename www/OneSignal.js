@@ -231,6 +231,10 @@ OneSignal.prototype.setLogLevel = function(logLevel) {
     cordova.exec(function(){}, function(){}, "OneSignalPush", "setLogLevel", [logLevel]);
 };
 
+OneSignal.prototype.setLocationShared = function(shared) {
+   cordova.exec(function() {}, "OneSignalPush", "setLocationShared", [shared]);
+};
+
 //email
 
 OneSignal.prototype.setEmail = function(email, emailAuthToken, onSuccess, onFailure) {

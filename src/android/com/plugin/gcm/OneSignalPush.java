@@ -97,6 +97,7 @@ public class OneSignalPush extends CordovaPlugin {
   
   private static final String SET_LOG_LEVEL = "setLogLevel";
 
+  private static final String SET_LOCATION_SHARED = "setLocationShared";
   
   private static CallbackContext notifReceivedCallbackContext;
   private static CallbackContext notifOpenedCallbackContext;
@@ -432,6 +433,9 @@ public class OneSignalPush extends CordovaPlugin {
         });
 
       result = true;
+    } 
+    else if (SET_LOCATION_SHARED.equals(action)) {
+      OneSignal.setLocationShared(data.getBoolean(0));
     }
     else {
       result = false;
