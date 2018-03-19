@@ -54,8 +54,7 @@ OneSignal._emailSubscriptionObserverList = [];
 
 
 // You must call init before any other OneSignal function.
-// options is a JSON object that includes:
-//  Android - googleProjectNumber: is required.
+//  Android - googleProjectNumber: Deprecated; pulled from dashboard, local value is ignored
 OneSignal.prototype.startInit = function(appId, googleProjectNumber) {
     OneSignal._appID = appId;
     OneSignal._googleProjectNumber = googleProjectNumber;
