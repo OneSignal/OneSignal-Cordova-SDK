@@ -97,7 +97,9 @@ void initOneSignalObject(NSDictionary* launchOptions, const char* appId, int dis
     NSDictionary *iOSSettings = initialLaunchFired ? @{kOSSettingsKeyAutoPrompt : @(autoPrompt),
                                                        kOSSettingsKeyInFocusDisplayOption : @(displayOption),
                                                        kOSSettingsKeyInAppLaunchURL : @(inAppLaunchURL),
-                                                       @"kOSSettingsKeyInOmitNoAppIdLogging": @(fromColdStart)} : @{@"kOSSettingsKeyInOmitNoAppIdLogging": @(fromColdStart)};
+                                                       @"kOSSettingsKeyInOmitNoAppIdLogging": @(fromColdStart)} : @{@"kOSSettingsKeyInOmitNoAppIdLogging": @(fromColdStart),
+                                                                                                                          kOSSettingsKeyAutoPrompt : @false
+                                                                                                                        };
     
     [OneSignal initWithLaunchOptions:launchOptions appId:appIdStr handleNotificationReceived:^(OSNotification* _notif) {
         notification = _notif;
