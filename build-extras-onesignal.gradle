@@ -24,8 +24,8 @@ def versionGroupAligns = [
 
     // ### Android Support Library
     'com.android.support': [
-        'requiredCompileSdkVersion': 26,
-        'version': '26.1.+',
+        'requiredCompileSdkVersion': 27,
+        'version': '27.0.+',
         'omitModules': ['multidex', 'multidex-instrumentation'],
 
         // Can't use 26 of com.android.support when compileSdkVersion 25 is set
