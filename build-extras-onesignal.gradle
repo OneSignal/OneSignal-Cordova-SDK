@@ -1,62 +1,36 @@
 android.defaultConfig {
-   manifestPlaceholders = [onesignal_app_id: '', // Use from js code
-                          onesignal_google_project_number: 'REMOTE']
+  manifestPlaceholders = [
+    onesignal_app_id: '', // Use from js code
+    onesignal_google_project_number: 'REMOTE'
+  ]
 }
 
+// Required for Android Support Library 26.0.0+ and Google Play services 11.+
 repositories {
-   maven { url 'https://maven.google.com' }
+  maven { url 'https://maven.google.com' }
 }
 
-// ## Align gms and support group versions on all dependencies 
-
-def versionGroupAligns = [
-    // ### Google Play Services library
-    'com.google.android.gms': [
-        'version': '11.8.+'
-    ],
-
-    // ### Google Firebase library
-    // Although not used by OneSignal Firebase has some dependencies on gms
-    // If present, ensuring they are aligned
-    'com.google.firebase': [
-        'version': '11.8.+'
-    ],
-
-    // ### Android Support Library
-    'com.android.support': [
-        'requiredCompileSdkVersion': 26,
-        'version': '26.1.+',
-        'omitModules': ['multidex', 'multidex-instrumentation'],
-
-        // Can't use 26 of com.android.support when compileSdkVersion 25 is set
-        // The following error will be thrown if there is a mismatch here.
-        // "No resource found that matches the given name: attr 'android:keyboardNavigationCluster'"
-        'versionFallback': '25.+'
-    ]
-]
-
-def resolveVersion(def versionOverride) {
-    def curCompileSdkVersion = android.compileSdkVersion.split('-')[1].toInteger()
-    def requiredCompileSdk = versionOverride['requiredCompileSdkVersion']
-    if (curCompileSdkVersion < requiredCompileSdk)
-        return versionOverride['versionFallback']
-    return versionOverride['version']
+// Adding Onesignal-Gradle-Plugin to align gms, android support library, and firebase
+//   dependencies between other plugins.
+// Source for Onesignal-Gradle-Plugin: https://github.com/OneSignal/OneSignal-Gradle-Plugin
+buildscript {
+  repositories {
+    maven { url 'https://plugins.gradle.org/m2/'}
+  }
+  dependencies {
+    classpath 'gradle.plugin.com.onesignal:onesignal-gradle-plugin:[0.10.0, 0.99.99]'
+  }
 }
+apply plugin: com.onesignal.androidsdk.GradleProjectPlugin
 
-configurations.all { resolutionStrategy {
 
-    // Enable to find root causes of any remaining version mismatches
-    // failOnVersionConflict()
-
-    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
-        def versionOverride = versionGroupAligns[details.requested.group]
-        if (!versionOverride)
-            return
-
-        def omitModules = versionOverride['omitModules']
-        if (omitModules && omitModules.contains(details.requested.name))
-            return
-
-        details.useVersion(resolveVersion(versionOverride))
-    }
-}}
+// Local testing
+// buildscript {
+//   repositories {
+//     maven { url uri('file:/full/paht/to/maven/repo/') }
+//   }
+//   dependencies {
+//     classpath 'com.onesignal:onesignal-gradle-plugin:[0.10.0, 0.99.99]'
+//   }
+// }
+// apply plugin: com.onesignal.androidsdk.GradleProjectPlugin
