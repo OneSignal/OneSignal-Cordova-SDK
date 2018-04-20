@@ -7,7 +7,7 @@ We love the open source community and enjoy the support and contributions of man
 
 If your proposed contribution is a small bug fix, please feel free to create your own fork of the repository and create a pull request.
 
-If your contribution would _break_ or _change_ the functionality of the SDK, please reach out to us on (contact) before you put in a lot of effort into a change we may not be able to use. We try our best to make sure that the SDK remains stable so that developers do not have to continually change their code, however some breaking changes _are_ desirable, so please get in touch to discuss your idea before you put in a lot of effort.
+If your contribution would _break_ or _change_ the functionality of the SDK, please reach out to us before you put in a lot of effort into a change we may not be able to use. We try our best to make sure that the SDK remains stable so that developers do not have to continually change their code, however some breaking changes _are_ desirable, so please get in touch to discuss your idea before you put in a lot of effort.
 
 #### Before Submitting A Bug Report
 Before creating bug reports, please check this list of steps to follow.
@@ -21,6 +21,6 @@ Before creating bug reports, please check this list of steps to follow.
 #### How Do I Submit a Good Bug Report
 * **Use a clear and descriptive title** for the issue to identify the problem.
 * **Include Reproducibility** It is nearly always a good idea to include steps to reproduct the issue. If you cannot reliably reproduce the issue yourself, that's ok, but reproducible steps help best.
-* **Describe your environment**, tell us what version of the iOS SDK you are using, how you added it to your project (ie. cocoapods, manual installation, etc), whether your project is Swift vs. Objective-C, and so on.
+* **Describe your environment**, tell us what version of the Cordova SDK you are using, what packages/dependencies you are using, what version of iOS/Android the issue occurs on, etc.
 * **Include a Stack Trace** If your issue involves a crash/exception, ***PLEASE*** post the stack trace to help us identify the root issue.
-* **Include an Example Project** This isn't required, but if you want your issue fixed quickly, it's often a good idea to include an example project as a zip and include it with the issue. You can also download the Demo project (included in the `/examples` folder of this repo) and set up an example project with this code as a starting point.
+* **Include an Example Project** This isn't required, but if you want your issue fixed quickly, it's often a good idea to include an example project as a zip and include it with the issue. You can also download the Demo project ([Cordova demo](https://github.com/OneSignal/OneSignal-Cordova-Example), [Ionic demo](https://github.com/OneSignal/OneSignal-Ionic-Example)) and set up an example project with this code as a starting point.
