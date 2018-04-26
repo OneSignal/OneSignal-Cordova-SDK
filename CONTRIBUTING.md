@@ -21,6 +21,6 @@ Before creating bug reports, please check this list of steps to follow.
 #### How Do I Submit a Good Bug Report
 * **Use a clear and descriptive title** for the issue to identify the problem.
 * **Include Reproducibility** It is nearly always a good idea to include steps to reproduct the issue. If you cannot reliably reproduce the issue yourself, that's ok, but reproducible steps help best.
-* **Describe your environment**, tell us what version of the Cordova SDK you are using, what packages/dependencies you are using, what version of iOS/Android the issue occurs on, etc.
+* **Describe your environment**, tell us what version of the Cordova/Ionic/PhoneGap SDK you are using, what packages/dependencies you are using, what version of iOS/Android the issue occurs on, etc.
 * **Include a Stack Trace** If your issue involves a crash/exception, ***PLEASE*** post the stack trace to help us identify the root issue.
 * **Include an Example Project** This isn't required, but if you want your issue fixed quickly, it's often a good idea to include an example project as a zip and include it with the issue. You can also download the Demo project ([Cordova demo](https://github.com/OneSignal/OneSignal-Cordova-Example), [Ionic demo](https://github.com/OneSignal/OneSignal-Ionic-Example)) and set up an example project with this code as a starting point.
