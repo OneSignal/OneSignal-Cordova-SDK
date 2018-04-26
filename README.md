@@ -33,3 +33,5 @@ To make things easier, we have published demo projects for [Cordova](https://git
 
 #### Supports:
 * Cordova, Ionic (1 and 2), Phonegap, and Intel XDK
+* Android 4.0.3 (API Level 15) through 8.1 (API Level 27), and derivatives such as Amazon ADM
+* iOS 7 - 11.3
