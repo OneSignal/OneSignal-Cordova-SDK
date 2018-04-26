@@ -13,7 +13,7 @@
 **Environment**
 <!-- Example:
 1. What version of the Cordova SDK are you using?
-2. Provide a list of your project dependencies
+2. Provide a list of your project dependencies (using `cordova plugin list` or copy-pasting your config.xml)
  -->
 
 
