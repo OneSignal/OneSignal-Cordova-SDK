@@ -68,4 +68,9 @@
 - (void)enableSound:(CDVInvokedUrlCommand*)command;
 - (void)clearOneSignalNotifications:(CDVInvokedUrlCommand*)command;
 
+- (void)userProvidedPrivacyConsent:(CDVInvokedUrlCommand *)command;
+- (void)setRequiresUserPrivacyConsent:(CDVInvokedUrlCommand *)command;
+- (void)provideUserConsent:(CDVInvokedUrlCommand *)command;
+    
+    
 @end
