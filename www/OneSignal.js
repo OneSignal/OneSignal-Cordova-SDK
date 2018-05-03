@@ -267,7 +267,7 @@ OneSignal.prototype.logoutEmail = function(onSuccess, onFailure) {
 }
 
 OneSignal.prototype.userProvidedPrivacyConsent = function(callback) {
-   cordova.exec(callback, function(){}, "OneSignalPush", "requiresUserPrivacyConsent", []);
+   cordova.exec(callback, function(){}, "OneSignalPush", "userProvidedPrivacyConsent", []);
  }
  
  OneSignal.prototype.setRequiresUserPrivacyConsent = function(required) {

@@ -349,15 +349,15 @@ static Class delegateClass = nil;
     commandResult.keepCallback = @1;
     [pluginCommandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
 }
-
+    
 - (void)setRequiresUserPrivacyConsent:(CDVInvokedUrlCommand *)command {
     if (command.arguments.count >= 1)
-        [OneSignal setRequiresUserPrivacyConsent:command.arguments[0]];
+    [OneSignal setRequiresUserPrivacyConsent:[command.arguments[0] boolValue]];
 }
-
+    
 - (void)provideUserConsent:(CDVInvokedUrlCommand *)command {
     if (command.arguments.count >= 1)
-        [OneSignal consentGranted:command.arguments[0]];
+    [OneSignal consentGranted:[command.arguments[0] boolValue]];
 }
 
 @end
