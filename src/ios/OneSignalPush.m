@@ -344,5 +344,21 @@ static Class delegateClass = nil;
     }];
 }
 
+- (void)userProvidedPrivacyConsent:(CDVInvokedUrlCommand *)command {
+    CDVPluginResult* commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:!OneSignal.requiresUserPrivacyConsent];
+    commandResult.keepCallback = @1;
+    [pluginCommandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
+}
+    
+- (void)setRequiresUserPrivacyConsent:(CDVInvokedUrlCommand *)command {
+    if (command.arguments.count >= 1)
+    [OneSignal setRequiresUserPrivacyConsent:[command.arguments[0] boolValue]];
+}
+    
+- (void)provideUserConsent:(CDVInvokedUrlCommand *)command {
+    if (command.arguments.count >= 1)
+    [OneSignal consentGranted:[command.arguments[0] boolValue]];
+}
+
 @end
 
