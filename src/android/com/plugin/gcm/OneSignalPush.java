@@ -464,7 +464,7 @@ public class OneSignalPush extends CordovaPlugin {
       }
     } else if (GRANT_CONSENT.equals(action)) {
       try {
-         Oneignal.provideUserConsent(data.getBoolean(0));
+         OneSignal.provideUserConsent(data.getBoolean(0));
          result = true;
       } catch (JSONException e) {
          e.printStackTrace();
