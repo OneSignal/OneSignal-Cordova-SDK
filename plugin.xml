@@ -83,7 +83,7 @@
       <string>production</string>
     </config-file>
 
-    <framework src="OneSignal" type="podspec" spec="2.8.7" />
+    <framework src="OneSignal" type="podspec" spec="2.8.8" />
     <header-file src="src/ios/OneSignalPush.h" />
     <source-file src="src/ios/OneSignalPush.m" />
 
