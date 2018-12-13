@@ -352,12 +352,22 @@ static Class delegateClass = nil;
     
 - (void)setRequiresUserPrivacyConsent:(CDVInvokedUrlCommand *)command {
     if (command.arguments.count >= 1)
-    [OneSignal setRequiresUserPrivacyConsent:[command.arguments[0] boolValue]];
+        [OneSignal setRequiresUserPrivacyConsent:[command.arguments[0] boolValue]];
 }
-    
+
 - (void)provideUserConsent:(CDVInvokedUrlCommand *)command {
     if (command.arguments.count >= 1)
-    [OneSignal consentGranted:[command.arguments[0] boolValue]];
+        [OneSignal consentGranted:[command.arguments[0] boolValue]];
+}
+
+- (void)setExternalUserId:(CDVInvokedUrlCommand *)command {
+    NSString *externalId = command.arguments[0];
+    
+    [OneSignal setExternalUserId:externalId];
+}
+
+- (void)removeExternalUserId:(CDVInvokedUrlCommand *)command {
+    [OneSignal removeExternalUserId];
 }
 
 @end

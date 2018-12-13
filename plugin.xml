@@ -27,7 +27,7 @@
   </engines>
   
   <platform name="android">
-    <framework src="com.onesignal:OneSignal:3.10.3" />
+    <framework src="com.onesignal:OneSignal:3.10.5" />
     <framework src="build-extras-onesignal.gradle" custom="true" type="gradleReference" />
     
     <config-file target="res/xml/config.xml" parent="/*">
@@ -83,7 +83,7 @@
       <string>production</string>
     </config-file>
 
-    <framework src="OneSignal" type="podspec" spec="2.9.3" />
+    <framework src="OneSignal" type="podspec" spec="2.9.4" />
     <header-file src="src/ios/OneSignalPush.h" />
     <source-file src="src/ios/OneSignalPush.m" />
 

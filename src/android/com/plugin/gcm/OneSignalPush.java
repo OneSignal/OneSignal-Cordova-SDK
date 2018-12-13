@@ -102,6 +102,9 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String USER_PROVIDED_CONSENT = "userProvidedPrivacyConsent";
   private static final String SET_REQUIRES_CONSENT = "setRequiresUserPrivacyConsent";
   private static final String GRANT_CONSENT = "provideUserConsent";
+
+  private static final String SET_EXTERNAL_USER_ID = "setExternalUserId";
+  private static final String REMOVE_EXTERNAL_USER_ID = "removeExternalUserId";
   
   private static CallbackContext notifReceivedCallbackContext;
   private static CallbackContext notifOpenedCallbackContext;
@@ -468,6 +471,21 @@ public class OneSignalPush extends CordovaPlugin {
          result = true;
       } catch (JSONException e) {
          e.printStackTrace();
+      }
+    } else if (SET_EXTERNAL_USER_ID.equals(action)) {
+       try {
+          OneSignal.setExternalUserId(data.getString(0));
+          result = true;
+       } catch (JSONException e) {
+          e.printStackTrace();
+       }
+    } else if (REMOVE_EXTERNAL_USER_ID.equals(action)) {
+      try {
+        OneSignal.removeExternalUserId();
+        result = true;
+      }
+      catch(Throwable t) {
+        t.printStackTrace();
       }
     }
     else {
