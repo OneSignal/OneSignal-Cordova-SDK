@@ -1,5 +1,5 @@
 {
-  "version": "2.4.5",
+  "version": "2.4.6",
   "name": "onesignal-cordova-plugin",
   "cordova_name": "OneSignal Push Notifications",
   "description": "OneSignal is a high volume Push Notification service for mobile apps. In addition to basic notification delivery, OneSignal also provides tools to localize, target, schedule, and automate notifications that you send.",
