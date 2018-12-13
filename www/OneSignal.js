@@ -278,6 +278,14 @@ OneSignal.prototype.userProvidedPrivacyConsent = function(callback) {
    cordova.exec(function() {}, function() {}, "OneSignalPush", "provideUserConsent", [granted]);
  }
 
+ OneSignal.prototype.setExternalUserId = function(externalId) {
+    cordova.exec(function() {}, function() {}, "OneSignalPush", "setExternalUserId", [externalId]);
+ }
+
+ OneSignal.prototype.removeExternalUserId = function() {
+    cordova.exec(function() {}, function() {}, "OneSignalPush", "removeExternalUserId", []);
+ }
+
 
 //-------------------------------------------------------------------
 
