@@ -7,7 +7,10 @@ android.defaultConfig {
 
 // Required for Android Support Library 26.0.0+ and Google Play services 11.+
 repositories {
-  maven { url 'https://maven.google.com' }
+    mavenCentral()
+    maven {
+        url "https://maven.google.com"
+    }
 }
 
 // Adding Onesignal-Gradle-Plugin to align gms, android support library, and firebase
@@ -16,8 +19,12 @@ repositories {
 buildscript {
   repositories {
     maven { url 'https://plugins.gradle.org/m2/'}
+    google()
+    mavenCentral()
+    jcenter()
   }
   dependencies {
+    classpath 'com.google.android.gms:play-services-base:17.0.0'
     classpath 'gradle.plugin.com.onesignal:onesignal-gradle-plugin:[0.12.1, 0.99.99]'
   }
 }
