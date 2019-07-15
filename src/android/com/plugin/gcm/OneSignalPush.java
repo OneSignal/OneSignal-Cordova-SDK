@@ -42,10 +42,13 @@ import org.json.JSONObject;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
+import java.util.HashMap;
 
 import com.onesignal.OneSignal;
 import com.onesignal.OSNotification;
 import com.onesignal.OSNotificationOpenResult;
+import com.onesignal.OSInAppMessageAction;
 import com.onesignal.OneSignal.NotificationOpenedHandler;
 import com.onesignal.OneSignal.NotificationReceivedHandler;
 import com.onesignal.OneSignal.InAppMessageClickHandler;
@@ -183,13 +186,13 @@ public class OneSignalPush extends CordovaPlugin {
         OneSignal.Builder builder = OneSignal.getCurrentOrNewInitBuilder();
         builder.unsubscribeWhenNotificationsAreDisabled(true);
         builder.filterOtherGCMReceivers(true);
+        builder.setInAppMessageClickHandler(new CordovaInAppMessageClickHandler(inAppMessageClickedCallbackContext));
         
         OneSignal.init(this.cordova.getActivity(),
                   googleProjectNumber,
                   appId,
                   new CordovaNotificationOpenedHandler(notifOpenedCallbackContext),
-                  new CordovaNotificationReceivedHandler(notifReceivedCallbackContext),
-                  new CordovaInAppMessageClickHandler(inAppMessageClickedCallbackContext)
+                  new CordovaNotificationReceivedHandler(notifReceivedCallbackContext)
                   );
 
          // data.getJSONObject(2) is for iOS settings.
@@ -511,7 +514,15 @@ public class OneSignalPush extends CordovaPlugin {
       }
     } else if (ADD_TRIGGERS.equals(action)) {
       try {
-        OneSignal.addTriggers(data.getJSONObject(0));
+        JSONObject jo = data.getJSONObject(0);
+        Iterator<String> keys = jo.keys();
+        Map<String, Object> map = new HashMap<String, Object>();
+
+        while(keys.hasNext()) {
+          String key = keys.next();
+          map.put(key, jo.get(key));
+        }
+        OneSignal.addTriggers(map);
         result = true;
       } catch (JSONException e){
         e.printStackTrace();
@@ -540,6 +551,8 @@ public class OneSignalPush extends CordovaPlugin {
     } else if (SET_IN_APP_MESSAGE_CLICK_HANDLER.equals(action)) {
       try {
         // TO DO
+        OneSignal.pauseInAppMessages(data.getBoolean(0)); // remove (this is just so it builds)
+        result = true;
       } catch (JSONException e){
         e.printStackTrace();
       }
@@ -601,7 +614,8 @@ public class OneSignalPush extends CordovaPlugin {
     @Override
     public void inAppMessageClicked(OSInAppMessageAction result) {      
       try {
-        callbackSuccess(jsInAppMessageClickedCallback, new JSONObject(result.stringify()));
+        // TO DO: pass stringified result into JSONObject
+        callbackSuccess(jsInAppMessageClickedCallback, new JSONObject());
       }
       catch (Throwable t) {
         t.printStackTrace();
