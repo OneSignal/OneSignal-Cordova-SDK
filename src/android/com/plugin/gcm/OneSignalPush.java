@@ -66,6 +66,7 @@ public class OneSignalPush extends CordovaPlugin {
   
   private static final String SET_NOTIFICATION_RECEIVED_HANDLER = "setNotificationReceivedHandler";
   private static final String SET_NOTIFICATION_OPENED_HANDLER = "setNotificationOpenedHandler";
+  private static final String SET_IN_APP_MESSAGE_CLICK_HANDLER = "setInAppMessageClickHandler";
   private static final String INIT = "init";
   
   private static final String SET_IN_FOCUS_DISPLAYING = "setInFocusDisplaying";
@@ -105,9 +106,17 @@ public class OneSignalPush extends CordovaPlugin {
 
   private static final String SET_EXTERNAL_USER_ID = "setExternalUserId";
   private static final String REMOVE_EXTERNAL_USER_ID = "removeExternalUserId";
+
+  private static final String ADD_TRIGGER = "addTrigger";
+  private static final String ADD_TRIGGERS = "addTriggers";
+  private static final String REMOVE_TRIGGER_FOR_KEY = "removeTriggerForKey";
+  private static final String REMOVE_TRIGGER_FOR_KEYS = "removeTriggerForKeys";
+  private static final String GET_TRIGGER_VALUE_FOR_KEY = "getTriggerValueForKey";
+  private static final String PAUSE_IN_APP_MESSAGES = "pauseInAppMessages";
   
   private static CallbackContext notifReceivedCallbackContext;
   private static CallbackContext notifOpenedCallbackContext;
+  private static CallbackContext inAppMessageClickedCallbackContext;
   
   private static CallbackContext jsPermissionObserverCallBack;
   private static CallbackContext jsSubscriptionObserverCallBack;
@@ -487,8 +496,48 @@ public class OneSignalPush extends CordovaPlugin {
       catch(Throwable t) {
         t.printStackTrace();
       }
-    }
-    else {
+    } else if (ADD_TRIGGER.equals(action)) {
+      try {
+        OneSignal.addTrigger(data.getString(0), data.get(1));
+        result = true;
+      } catch (JSONException e){
+        e.printStackTrace();
+      }
+    } else if (ADD_TRIGGERS.equals(action)) {
+      try {
+        OneSignal.addTriggers(data.getJSONObject(0));
+        result = true;
+      } catch (JSONException e){
+        e.printStackTrace();
+      }
+    } else if (REMOVE_TRIGGER_FOR_KEY.equals(action)) {
+      try {
+        OneSignal.removeTriggerForKey(data.getString(0));
+        result = true;
+      } catch (JSONException e){
+        e.printStackTrace();
+      }
+    } else if (GET_TRIGGER_VALUE_FOR_KEY.equals(action)) {
+      try {
+        OneSignal.getTriggerValueForKey(data.getString(0));
+        result = true;
+      } catch (JSONException e){
+        e.printStackTrace();
+      }
+    } else if (PAUSE_IN_APP_MESSAGES.equals(action)) {
+      try {
+        OneSignal.pauseInAppMessages(data.getBoolean(0));
+        result = true;
+      } catch (JSONException e){
+        e.printStackTrace();
+      }
+    } else if (SET_IN_APP_MESSAGE_CLICK_HANDLER.equals(action)) {
+      try {
+        // TO DO
+      } catch (JSONException e){
+        e.printStackTrace();
+      }
+    } else {
       result = false;
       Log.e(TAG, "Invalid action : " + action);
       callbackError(callbackContext, "Invalid action : " + action);
