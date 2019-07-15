@@ -48,6 +48,7 @@ import com.onesignal.OSNotification;
 import com.onesignal.OSNotificationOpenResult;
 import com.onesignal.OneSignal.NotificationOpenedHandler;
 import com.onesignal.OneSignal.NotificationReceivedHandler;
+import com.onesignal.OneSignal.InAppMessageClickHandler;
 import com.onesignal.OneSignal.GetTagsHandler;
 import com.onesignal.OneSignal.IdsAvailableHandler;
 import com.onesignal.OneSignal.PostNotificationResponseHandler;
@@ -169,6 +170,10 @@ public class OneSignalPush extends CordovaPlugin {
       notifOpenedCallbackContext = callbackContext;
       result = true;
     }
+    else if(SET_IN_APP_MESSAGE_CLICK_HANDLER.equals(action)) {
+       inAppMessageClickedCallbackContext = callbackContext;
+       result = true; 
+    }
     else if (INIT.equals(action)) {
       try {
         String appId = data.getString(0);
@@ -183,7 +188,8 @@ public class OneSignalPush extends CordovaPlugin {
                   googleProjectNumber,
                   appId,
                   new CordovaNotificationOpenedHandler(notifOpenedCallbackContext),
-                  new CordovaNotificationReceivedHandler(notifReceivedCallbackContext)
+                  new CordovaNotificationReceivedHandler(notifReceivedCallbackContext),
+                  new CordovaInAppMessageClickHandler(inAppMessageClickedCallbackContext)
                   );
 
          // data.getJSONObject(2) is for iOS settings.
@@ -583,7 +589,27 @@ public class OneSignalPush extends CordovaPlugin {
       }
     }
   }
-  
+
+  private class CordovaInAppMessageClickHandler implements InAppMessageClickHandler {
+
+    private CallbackContext jsInAppMessageClickedCallback;
+
+    public CordovaInAppMessageClickHandler(CallbackContext inCallbackContext) {
+      jsInAppMessageClickedCallback = inCallbackContext;
+    }
+
+    @Override
+    public void inAppMessageClicked(OSInAppMessageAction result) {      
+      try {
+        callbackSuccess(jsInAppMessageClickedCallback, new JSONObject(result.stringify()));
+      }
+      catch (Throwable t) {
+        t.printStackTrace();
+      }
+    }
+
+  }
+
   @Override
   public void onDestroy() {
     OneSignal.removeNotificationOpenedHandler();
