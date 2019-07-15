@@ -32,6 +32,7 @@ var OneSignal = function() {
     var _iOSSettings = {};
     var _notificationReceivedDelegate = function() {};
     var _notificationOpenedDelegate = function() {};
+    var _inAppMessageClickDelegate = function () {};
 };
 
 OneSignal.prototype.OSInFocusDisplayOption = {
@@ -70,6 +71,11 @@ OneSignal.prototype.handleNotificationOpened = function(handleNotificationOpened
     OneSignal._notificationOpenedDelegate = handleNotificationOpenedCallback;
     return this;
 };
+
+OneSignal.prototype.handleInAppMessageClicked = function(handler) {
+    OneSignal._inAppMessageClickDelegate = handler;
+    return this;
+}
 
 OneSignal.prototype.inFocusDisplaying = function(display) {
     OneSignal._displayOption = display;
@@ -314,12 +320,6 @@ OneSignal.prototype.getTriggerValueForKey = function(key) {
 OneSignal.prototype.pauseInAppMessages = function(pause) {
     cordova.exec(function() {}, function() {}, "OneSignalPush", "pauseInAppMessages", [pause]);
 }
-
-OneSignal.prototype.handleInAppMessageClicked = function(handler) {
-    OneSignal._inAppMessageClickDelegate = handler;
-    return this;
-}
-
 
 //-------------------------------------------------------------------
 
