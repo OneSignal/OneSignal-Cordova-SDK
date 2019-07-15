@@ -89,7 +89,7 @@ OneSignal.prototype.endInit = function() {
     //Pass notification received handler
     cordova.exec(OneSignal._notificationReceivedDelegate, function(){}, "OneSignalPush", "setNotificationReceivedHandler", []);
     cordova.exec(OneSignal._notificationOpenedDelegate, function(){}, "OneSignalPush", "setNotificationOpenedHandler", []);
-    cordova.exec(OneSignal._setInAppMessageClickHandler, function() {}, "OneSignalPush", "setInAppMessageClickHandler");
+    cordova.exec(OneSignal._inAppMessageClickDelegate, function() {}, "OneSignalPush", "setInAppMessageClickHandler", []);
     //Call Init
     cordova.exec(function() {}, function(){}, "OneSignalPush", "init", [OneSignal._appID, OneSignal._googleProjectNumber, OneSignal._iOSSettings, OneSignal._displayOption]);
 };
@@ -286,7 +286,9 @@ OneSignal.prototype.userProvidedPrivacyConsent = function(callback) {
     cordova.exec(function() {}, function() {}, "OneSignalPush", "removeExternalUserId", []);
  }
 
-// in app messaging
+/**
+ * in app messaging
+ */
 
 OneSignal.prototype.addTrigger = function(key, value) {
     cordova.exec(function() {}, function() {}, "OneSignalPush", "addTrigger", [key, value]);
@@ -313,8 +315,8 @@ OneSignal.prototype.pauseInAppMessages = function(pause) {
     cordova.exec(function() {}, function() {}, "OneSignalPush", "pauseInAppMessages", [pause]);
 }
 
-OneSignal.prototype.setInAppMessageClickHandler = function(handler) {
-    OneSignal._setInAppMessageClickHandler = handler;
+OneSignal.prototype.handleInAppMessageClicked = function(handler) {
+    OneSignal._inAppMessageClickDelegate = handler;
     return this;
 }
 
