@@ -313,8 +313,11 @@ OneSignal.prototype.removeTriggerForKeys = function(key, value) {
     cordova.exec(function() {}, function() {}, "OneSignalPush", "removeTriggerForKeys", [key]);
 }
 
-OneSignal.prototype.getTriggerValueForKey = function(key) {
-    cordova.exec(function() {}, function() {}, "OneSignalPush", "getTriggerValueForKey", [key]);
+OneSignal.prototype.getTriggerValueForKey = function(key, callback) {
+    var getTriggerValueForKeyCallback = function(obj) {
+      callback(obj.value);
+    };
+    cordova.exec(getTriggerValueForKeyCallback, function() {}, "OneSignalPush", "getTriggerValueForKey", [key]);
 }
 
 OneSignal.prototype.pauseInAppMessages = function(pause) {
