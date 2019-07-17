@@ -114,7 +114,7 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String ADD_TRIGGER = "addTrigger";
   private static final String ADD_TRIGGERS = "addTriggers";
   private static final String REMOVE_TRIGGER_FOR_KEY = "removeTriggerForKey";
-  private static final String REMOVE_TRIGGER_FOR_KEYS = "removeTriggerForKeys";
+  private static final String REMOVE_TRIGGERS_FOR_KEYS = "removeTriggersForKeys";
   private static final String GET_TRIGGER_VALUE_FOR_KEY = "getTriggerValueForKey";
   private static final String PAUSE_IN_APP_MESSAGES = "pauseInAppMessages";
   
@@ -513,12 +513,8 @@ public class OneSignalPush extends CordovaPlugin {
         e.printStackTrace();
       }
     } else if (ADD_TRIGGERS.equals(action)) {
-      //try {
         OneSignal.addTriggersFromJsonString(data.toString());
         result = true;
-      //} catch (JSONException e){
-      //  e.printStackTrace();
-      //}
     } else if (REMOVE_TRIGGER_FOR_KEY.equals(action)) {
       try {
         OneSignal.removeTriggerForKey(data.getString(0));
@@ -526,19 +522,20 @@ public class OneSignalPush extends CordovaPlugin {
       } catch (JSONException e){
         e.printStackTrace();
       }
-    } else if (REMOVE_TRIGGER_FOR_KEYS.equals(action)) {
-      //try {
+    } else if (REMOVE_TRIGGERS_FOR_KEYS.equals(action)) {
         OneSignal.removeTriggersForKeysFromJsonArrayString(data.toString());
         result = true;
-      //} catch (JSONException e){
-      //  e.printStackTrace();
-      //}
     } else if (GET_TRIGGER_VALUE_FOR_KEY.equals(action)) {
       try {
-        callbackSuccess(callbackContext, new JSONObject(
-          "{value:"
-          + OneSignal.getTriggerValueForKey(data.getString(0)).toString()
-          + "}"));
+        Object value = OneSignal.getTriggerValueForKey(data.getString(0));
+        if (value == null) {
+          callbackSuccess(callbackContext, new JSONObject());
+        } else {
+          callbackSuccess(callbackContext, new JSONObject(
+            "{value:"
+            + value.toString()
+            + "}"));
+        }
         result = true;
       } catch (JSONException e){
         e.printStackTrace();
