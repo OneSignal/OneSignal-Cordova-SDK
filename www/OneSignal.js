@@ -1,7 +1,7 @@
 /**
  * Modified MIT License
  * 
- * Copyright 2017 OneSignal
+ * Copyright 2019 OneSignal
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -309,8 +309,8 @@ OneSignal.prototype.removeTriggerForKey = function(key) {
     cordova.exec(function() {}, function() {}, "OneSignalPush", "removeTriggerForKey", [key]);
 }
 
-OneSignal.prototype.removeTriggerForKeys = function(key, value) {
-    cordova.exec(function() {}, function() {}, "OneSignalPush", "removeTriggerForKeys", [key]);
+OneSignal.prototype.removeTriggersForKeys = function(key) {
+    cordova.exec(function() {}, function() {}, "OneSignalPush", "removeTriggersForKeys", [key]);
 }
 
 OneSignal.prototype.getTriggerValueForKey = function(key, callback) {
