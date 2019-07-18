@@ -296,21 +296,25 @@ OneSignal.prototype.userProvidedPrivacyConsent = function(callback) {
  * in app messaging
  */
 
-OneSignal.prototype.addTrigger = function(key, value) {
-    cordova.exec(function() {}, function() {}, "OneSignalPush", "addTrigger", [key, value]);
-}
-
-
 OneSignal.prototype.addTriggers = function(triggers) {
     cordova.exec(function() {}, function() {}, "OneSignalPush", "addTriggers", [triggers]);
 }
 
-OneSignal.prototype.removeTriggerForKey = function(key) {
-    cordova.exec(function() {}, function() {}, "OneSignalPush", "removeTriggerForKey", [key]);
+OneSignal.prototype.addTrigger = function(key, value) {
+    let obj = {};
+    obj[key] = value;
+    OneSignal.prototype.addTriggers(obj);
 }
 
-OneSignal.prototype.removeTriggersForKeys = function(key) {
-    cordova.exec(function() {}, function() {}, "OneSignalPush", "removeTriggersForKeys", [key]);
+OneSignal.prototype.removeTriggerForKey = function(key) {
+    OneSignal.prototype.removeTriggersForKeys([key]);
+}
+
+OneSignal.prototype.removeTriggersForKeys = function(keys) {
+    if (!Array.isArray(keys)){
+        console.error("OneSignal: removeTriggersForKeys: argument must be of type Array")
+    }
+    cordova.exec(function() {}, function() {}, "OneSignalPush", "removeTriggersForKeys", [keys]);
 }
 
 OneSignal.prototype.getTriggerValueForKey = function(key, callback) {

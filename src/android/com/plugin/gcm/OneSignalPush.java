@@ -111,9 +111,7 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String SET_EXTERNAL_USER_ID = "setExternalUserId";
   private static final String REMOVE_EXTERNAL_USER_ID = "removeExternalUserId";
 
-  private static final String ADD_TRIGGER = "addTrigger";
   private static final String ADD_TRIGGERS = "addTriggers";
-  private static final String REMOVE_TRIGGER_FOR_KEY = "removeTriggerForKey";
   private static final String REMOVE_TRIGGERS_FOR_KEYS = "removeTriggersForKeys";
   private static final String GET_TRIGGER_VALUE_FOR_KEY = "getTriggerValueForKey";
   private static final String PAUSE_IN_APP_MESSAGES = "pauseInAppMessages";
@@ -505,26 +503,20 @@ public class OneSignalPush extends CordovaPlugin {
       catch(Throwable t) {
         t.printStackTrace();
       }
-    } else if (ADD_TRIGGER.equals(action)) {
-      try {
-        OneSignal.addTrigger(data.getString(0), data.get(1));
-        result = true;
-      } catch (JSONException e){
-        e.printStackTrace();
-      }
     } else if (ADD_TRIGGERS.equals(action)) {
-        OneSignal.addTriggersFromJsonString(data.toString());
-        result = true;
-    } else if (REMOVE_TRIGGER_FOR_KEY.equals(action)) {
       try {
-        OneSignal.removeTriggerForKey(data.getString(0));
+        OneSignal.addTriggersFromJsonString(data.getJSONObject(0).toString());
         result = true;
       } catch (JSONException e){
         e.printStackTrace();
-      }
+      } 
     } else if (REMOVE_TRIGGERS_FOR_KEYS.equals(action)) {
-        OneSignal.removeTriggersForKeysFromJsonArrayString(data.toString());
-        result = true;
+      try{
+          OneSignal.removeTriggersForKeysFromJsonArrayString(data.getString(0));
+          result = true;
+      } catch (JSONException e){
+        e.printStackTrace();
+      } 
     } else if (GET_TRIGGER_VALUE_FOR_KEY.equals(action)) {
       try {
         Object value = OneSignal.getTriggerValueForKey(data.getString(0));
