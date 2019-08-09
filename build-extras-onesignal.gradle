@@ -18,19 +18,7 @@ buildscript {
     maven { url 'https://plugins.gradle.org/m2/'}
   }
   dependencies {
-    classpath 'gradle.plugin.com.onesignal:onesignal-gradle-plugin:[0.12.1, 0.99.99]'
+    classpath 'gradle.plugin.com.onesignal:onesignal-gradle-plugin:[0.12.3, 0.99.99]'
   }
 }
 apply plugin: com.onesignal.androidsdk.GradleProjectPlugin
-
-
-// Local testing
-// buildscript {
-//   repositories {
-//     maven { url uri('file:/full/paht/to/maven/repo/') }
-//   }
-//   dependencies {
-//     classpath 'com.onesignal:onesignal-gradle-plugin:[0.12.1, 0.99.99]'
-//   }
-// }
-// apply plugin: com.onesignal.androidsdk.GradleProjectPlugin
