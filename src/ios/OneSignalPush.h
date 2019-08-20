@@ -35,6 +35,7 @@
 
 - (void)setNotificationReceivedHandler:(CDVInvokedUrlCommand*)command;
 - (void)setNotificationOpenedHandler:(CDVInvokedUrlCommand*)command;
+- (void)setInAppMessageClickHandler:(CDVInvokedUrlCommand*)command;
 - (void)init:(CDVInvokedUrlCommand*)command;
 
 - (void)setInFocusDisplaying:(CDVInvokedUrlCommand*)command;

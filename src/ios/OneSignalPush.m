@@ -179,6 +179,9 @@ static Class delegateClass = nil;
 - (void)setNotificationOpenedHandler:(CDVInvokedUrlCommand*)command {
     notficationOpenedCallbackId = command.callbackId;
 }
+- (void)setInAppMessageClickHandler:(CDVInvokedUrlCommand*)command {
+    // unimplemented in ios
+}
 
 - (void)init:(CDVInvokedUrlCommand*)command {
     
