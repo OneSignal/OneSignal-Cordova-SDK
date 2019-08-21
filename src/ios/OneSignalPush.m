@@ -370,5 +370,24 @@ static Class delegateClass = nil;
     [OneSignal removeExternalUserId];
 }
 
+- (void)setInAppMessageClickHandler:(CDVInvokedUrlCommand*)command {
+    // unimplemented in ios
+}
+
+- (void)addTriggers:(CDVInvokedUrlCommand*)command {
+   // unimplemented in ios 
+}
+
+- (void)removeTriggersForKeys:(CDVInvokedUrlCommand*)command {
+   // unimplemented in ios 
+}
+
+- (void)getTriggerValueForKey:(CDVInvokedUrlCommand*)command {
+   // unimplemented in ios 
+}
+
+- (void)pauseInAppMessages:(CDVInvokedUrlCommand*)command {
+   // unimplemented in ios 
+}
 @end
 

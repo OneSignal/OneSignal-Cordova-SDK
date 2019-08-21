@@ -72,5 +72,12 @@
 - (void)setRequiresUserPrivacyConsent:(CDVInvokedUrlCommand *)command;
 - (void)provideUserConsent:(CDVInvokedUrlCommand *)command;
     
-    
+
+// in app
+- (void)setInAppMessageClickHandler:(CDVInvokedUrlCommand*)command;
+- (void)addTriggers:(CDVInvokedUrlCommand*)command;
+- (void)removeTriggersForKeys:(CDVInvokedUrlCommand*)command;
+- (void)getTriggerValueForKey:(CDVInvokedUrlCommand*)command;
+- (void)pauseInAppMessages:(CDVInvokedUrlCommand*)command;
+
 @end
