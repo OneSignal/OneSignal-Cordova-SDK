@@ -35,7 +35,6 @@
 
 - (void)setNotificationReceivedHandler:(CDVInvokedUrlCommand*)command;
 - (void)setNotificationOpenedHandler:(CDVInvokedUrlCommand*)command;
-- (void)setInAppMessageClickHandler:(CDVInvokedUrlCommand*)command;
 - (void)init:(CDVInvokedUrlCommand*)command;
 
 - (void)setInFocusDisplaying:(CDVInvokedUrlCommand*)command;
@@ -73,5 +72,12 @@
 - (void)setRequiresUserPrivacyConsent:(CDVInvokedUrlCommand *)command;
 - (void)provideUserConsent:(CDVInvokedUrlCommand *)command;
     
-    
+
+// in app
+- (void)setInAppMessageClickHandler:(CDVInvokedUrlCommand*)command;
+- (void)addTriggers:(CDVInvokedUrlCommand*)command;
+- (void)removeTriggersForKeys:(CDVInvokedUrlCommand*)command;
+- (void)getTriggerValueForKey:(CDVInvokedUrlCommand*)command;
+- (void)pauseInAppMessages:(CDVInvokedUrlCommand*)command;
+
 @end
