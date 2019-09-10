@@ -30,9 +30,11 @@
 
 #import "OneSignalPush.h"
 #import <OneSignal/OneSignal.h>
+#import <Foundation/Foundation.h>
 
-NSString* notficationReceivedCallbackId;
-NSString* notficationOpenedCallbackId;
+NSString* notificationReceivedCallbackId;
+NSString* notificationOpenedCallbackId;
+NSString* inAppMessageClickedCallbackId;
 NSString* getTagsCallbackId;
 NSString* getIdsCallbackId;
 NSString* postNotificationCallbackId;
@@ -71,7 +73,7 @@ void processNotificationReceived(OSNotification* _notif) {
                                                          options:NSJSONReadingMutableContainers
                                                            error:&jsonError];
     if(!jsonError) {
-        successCallback(notficationReceivedCallbackId, json);
+        successCallback(notificationReceivedCallbackId, json);
         notification = nil;
     }
 }
@@ -84,13 +86,15 @@ void processNotificationOpened(OSNotificationOpenedResult* result) {
                                                          options:NSJSONReadingMutableContainers
                                                            error:&jsonError];
     if(!jsonError) {
-        successCallback(notficationOpenedCallbackId, json);
+        successCallback(notificationOpenedCallbackId, json);
         actionNotification = nil;
     }
 }
 
 void initOneSignalObject(NSDictionary* launchOptions, const char* appId, int displayOption, BOOL inAppLaunchURL, BOOL autoPrompt, BOOL fromColdStart) {
     [OneSignal setValue:@"cordova" forKey:@"mSDKType"];
+    NSLog(@"Version:");
+    NSLog([OneSignal sdk_version_raw]);
 
     NSString* appIdStr = (appId ? [NSString stringWithUTF8String: appId] : nil);
     
@@ -111,6 +115,7 @@ void initOneSignalObject(NSDictionary* launchOptions, const char* appId, int dis
                 if (pluginCommandDelegate)
                     processNotificationOpened(openResult);
             } settings: iOSSettings];
+
     
     initialLaunchFired = true;
 }
@@ -174,10 +179,11 @@ static Class delegateClass = nil;
 }
 
 - (void)setNotificationReceivedHandler:(CDVInvokedUrlCommand*)command {
-    notficationReceivedCallbackId = command.callbackId;
+    notificationReceivedCallbackId = command.callbackId;
 }
+
 - (void)setNotificationOpenedHandler:(CDVInvokedUrlCommand*)command {
-    notficationOpenedCallbackId = command.callbackId;
+    notificationOpenedCallbackId = command.callbackId;
 }
 
 - (void)init:(CDVInvokedUrlCommand*)command {
@@ -370,16 +376,29 @@ static Class delegateClass = nil;
     [OneSignal removeExternalUserId];
 }
 
+/**
+ * In-App Messaging
+ */
+
 - (void)setInAppMessageClickHandler:(CDVInvokedUrlCommand*)command {
-    // unimplemented in ios
+    [OneSignal setInAppMessageClickHandler:^(OSInAppMessageAction* action) {
+            NSDictionary *result = @{
+            @"clickName": action.clickName ?: [NSNull null],
+            @"clickUrl" : action.clickUrl.absoluteString ?: [NSNull null],
+            @"firstClick" : @(action.firstClick),
+            @"closesMessage" : @(action.closesMessage)
+            };
+            successCallback(command.callbackId, result);
+        }
+    ];
 }
 
 - (void)addTriggers:(CDVInvokedUrlCommand*)command {
-   // unimplemented in ios 
+   [OneSignal addTriggers:command.arguments[0]]; 
 }
 
 - (void)removeTriggersForKeys:(CDVInvokedUrlCommand*)command {
-   // unimplemented in ios 
+   [OneSignal removeTriggersForKeys:command.arguments[0]];
 }
 
 - (void)getTriggerValueForKey:(CDVInvokedUrlCommand*)command {
@@ -387,7 +406,7 @@ static Class delegateClass = nil;
 }
 
 - (void)pauseInAppMessages:(CDVInvokedUrlCommand*)command {
-   // unimplemented in ios 
+   [OneSignal pauseInAppMessages:command.arguments[0]];
 }
 @end
 
