@@ -297,6 +297,12 @@ OneSignal.prototype.userProvidedPrivacyConsent = function(callback) {
  */
 
 OneSignal.prototype.addTriggers = function(triggers) {
+    Object.keys(triggers).forEach((key)=>{
+        // forces values to be string types
+        if (typeof triggers[key] !== "string") {
+            triggers[key] = JSON.stringify(triggers[key]);
+        }
+    });
     cordova.exec(function() {}, function() {}, "OneSignalPush", "addTriggers", [triggers]);
 }
 

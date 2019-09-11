@@ -402,11 +402,16 @@ static Class delegateClass = nil;
 }
 
 - (void)getTriggerValueForKey:(CDVInvokedUrlCommand*)command {
-   // unimplemented in ios 
+    NSString *key = command.arguments[0];
+    NSString *val = [OneSignal getTriggerValueForKey:key];
+    NSDictionary *result = @{
+            @"value" : val ?: [NSNull null]
+    };
+    successCallback(command.callbackId, result);
 }
 
 - (void)pauseInAppMessages:(CDVInvokedUrlCommand*)command {
-   [OneSignal pauseInAppMessages:command.arguments[0]];
+   bool pause = [command.arguments[0] boolValue];
+   [OneSignal pauseInAppMessages:pause];
 }
 @end
-
