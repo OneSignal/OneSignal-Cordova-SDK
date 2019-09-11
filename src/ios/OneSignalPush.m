@@ -30,11 +30,9 @@
 
 #import "OneSignalPush.h"
 #import <OneSignal/OneSignal.h>
-#import <Foundation/Foundation.h>
 
 NSString* notificationReceivedCallbackId;
 NSString* notificationOpenedCallbackId;
-NSString* inAppMessageClickedCallbackId;
 NSString* getTagsCallbackId;
 NSString* getIdsCallbackId;
 NSString* postNotificationCallbackId;
@@ -93,11 +91,8 @@ void processNotificationOpened(OSNotificationOpenedResult* result) {
 
 void initOneSignalObject(NSDictionary* launchOptions, const char* appId, int displayOption, BOOL inAppLaunchURL, BOOL autoPrompt, BOOL fromColdStart) {
     [OneSignal setValue:@"cordova" forKey:@"mSDKType"];
-    NSLog(@"Version:");
-    NSLog([OneSignal sdk_version_raw]);
 
-    NSString* appIdStr = (appId ? [NSString stringWithUTF8String: appId] : nil);
-    
+    NSString* appIdStr = (appId ? [NSString stringWithUTF8String: appId] : nil);    
     NSDictionary *iOSSettings = initialLaunchFired ? @{kOSSettingsKeyAutoPrompt : @(autoPrompt),
                                                        kOSSettingsKeyInFocusDisplayOption : @(displayOption),
                                                        kOSSettingsKeyInAppLaunchURL : @(inAppLaunchURL),
@@ -116,7 +111,6 @@ void initOneSignalObject(NSDictionary* launchOptions, const char* appId, int dis
                     processNotificationOpened(openResult);
             } settings: iOSSettings];
 
-    
     initialLaunchFired = true;
 }
 
