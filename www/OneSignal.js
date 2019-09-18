@@ -297,7 +297,7 @@ OneSignal.prototype.userProvidedPrivacyConsent = function(callback) {
  */
 
 OneSignal.prototype.addTriggers = function(triggers) {
-    Object.keys(triggers).forEach((key)=>{
+    Object.keys(triggers).forEach(function(key) {
         // forces values to be string types
         if (typeof triggers[key] !== "string") {
             triggers[key] = JSON.stringify(triggers[key]);
