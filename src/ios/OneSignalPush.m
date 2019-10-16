@@ -408,4 +408,36 @@ static Class delegateClass = nil;
    bool pause = [command.arguments[0] boolValue];
    [OneSignal pauseInAppMessages:pause];
 }
+
+- (void)sendUniqueOutcome:(CDVInvokedUrlCommand*)command {
+    // NSString *name = command.arguments[0];
+
+    // [OneSignal sendUniqueOutcome:name onSuccess:^(NSDictionary *result){
+    //     successCallback(command.callbackId, result);
+    // } onFailure:^(NSError *error){
+    //     failureCallback(command.callbackId, error.userInfo);
+    // }]
+}
+
+- (void)sendOutcome:(CDVInvokedUrlCommand*)command {
+    // NSString *name = command.arguments[0];
+
+    // [OneSignal sendOutcome:name onSuccess:^(NSDictionary *result){
+    //     successCallback(command.callbackId, result);
+    // } onFailure:^(NSError *error){
+    //     failureCallback(command.callbackId, error.userInfo);
+    // }]
+}
+
+- (void)sendOutcomeWithValue:(CDVInvokedUrlCommand*)command {
+    // NSString *name = command.arguments[0];
+    // NSNumber *outcomeValue = command.arguments[1];
+
+    // [OneSignal sendOutcomeWithValue:name value:outcomeValue onSuccess:^(NSDictionary *result){
+    //     successCallback(command.callbackId, result);
+    // } onFailure:^(NSError *error){
+    //     failureCallback(command.callbackId, error.userInfo);
+    // }]
+}
+
 @end

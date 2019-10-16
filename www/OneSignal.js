@@ -24,7 +24,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
+import invariant from 'invariant';
 
 var OneSignal = function() {
     var _appID = "";
@@ -333,6 +333,49 @@ OneSignal.prototype.getTriggerValueForKey = function(key, callback) {
 OneSignal.prototype.pauseInAppMessages = function(pause) {
     cordova.exec(function() {}, function() {}, "OneSignalPush", "pauseInAppMessages", [pause]);
 }
+
+/**
+ * outcomes
+ */
+
+ OneSignal.prototype.sendUniqueOutcome = function(name, callback=()=>{}) {
+    invariant(
+        typeof callback === 'function',
+        'Must provide a valid callback'
+    );
+
+    const sendUniqueOutcomeCallback = function(result) {
+        callback(result);
+    }
+
+    cordova.exec(sendUniqueOutcomeCallback, function() {}, "OneSignalPush", "sendUniqueOutcome", [name]);
+ }
+
+ OneSignal.prototype.sendOutcome = function(name, callback=()=>{}) {
+    invariant(
+        typeof callback === 'function',
+        'Must provide a valid callback'
+    );
+
+    const sendOutcomeCallback = function(result) {
+        callback(result);
+    }
+
+    cordova.exec(sendOutcomeCallback, function() {}, "OneSignalPush", "sendOutcome", [name]);
+ }
+
+ OneSignal.prototype.sendOutcomeWithValue = function(name, value, callback=()=>{}) {
+    invariant(
+        typeof callback === 'function',
+        'Must provide a valid callback'
+    );
+
+    const sendOutcomeWithValueCallback = function(result) {
+        callback(result);
+    }
+
+    cordova.exec(sendOutcomeWithValueCallback, function() {}, "OneSignalPush", "sendOutcomeWithValue", [name, Number(value)]);
+ }
 
 //-------------------------------------------------------------------
 

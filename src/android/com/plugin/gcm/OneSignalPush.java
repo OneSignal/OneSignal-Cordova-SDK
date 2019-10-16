@@ -57,6 +57,7 @@ import com.onesignal.OneSignal.IdsAvailableHandler;
 import com.onesignal.OneSignal.PostNotificationResponseHandler;
 import com.onesignal.OneSignal.EmailUpdateHandler;
 import com.onesignal.OneSignal.EmailUpdateError;
+import com.onesignal.OneSignal.OutcomeCallback;
 
 import com.onesignal.OSPermissionObserver;
 import com.onesignal.OSEmailSubscriptionObserver;
@@ -115,7 +116,11 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String REMOVE_TRIGGERS_FOR_KEYS = "removeTriggersForKeys";
   private static final String GET_TRIGGER_VALUE_FOR_KEY = "getTriggerValueForKey";
   private static final String PAUSE_IN_APP_MESSAGES = "pauseInAppMessages";
-  
+
+  private static final String SEND_UNIQUE_OUTCOMES = "sendUniqueOutcome";
+  private static final String SEND_OUTCOME = "sendOutcome"
+  private static final String SEND_OUTCOME_WITH_VALUE = "sendOutcomeWithValue";
+
   private static CallbackContext notifReceivedCallbackContext;
   private static CallbackContext notifOpenedCallbackContext;
   private static CallbackContext inAppMessageClickedCallbackContext;
@@ -537,6 +542,58 @@ public class OneSignalPush extends CordovaPlugin {
         OneSignal.pauseInAppMessages(data.getBoolean(0));
         result = true;
       } catch (JSONException e){
+        e.printStackTrace();
+      }
+    } else if (SEND_UNIQUE_OUTCOME.equals(action)) {
+      try {
+        String name = data.getString(0);
+        OneSignal.sendUniqueOutcome(name, new OutcomeCallback(){
+          @Override
+          public void onOutcomeSuccess(String name) {
+             callback.invoke(name);
+          }
+ 
+          @Override
+          public void onOutcomeFail(int statusCode, String response) {
+             callback.invoke(statusCode, response);
+          }
+       });
+      }catch (JSONException e) {
+        e.printStackTrace();
+      }
+    } else if (SEND_OUTCOME.equals(action)) {
+      try {
+        String name = data.getString(0);
+        OneSignal.sendOutcome(name, new OutcomeCallback(){
+          @Override
+          public void onOutcomeSuccess(String name) {
+             callback.invoke(name);
+          }
+ 
+          @Override
+          public void onOutcomeFail(int statusCode, String response) {
+             callback.invoke(statusCode, response);
+          }
+       });
+      }catch (JSONException e) {
+        e.printStackTrace();
+      }
+    } else if (SEND_OUTCOME_WITH_VALUE.equals(action)) {
+      try {
+        String name = data.getString(0);
+        float value = (float)data.getJsonNumber(1).doubleValue();
+        OneSignal.sendOutcomeWithValue(name, value, new OutcomeCallback(){
+          @Override
+          public void onOutcomeSuccess(String name) {
+             callback.invoke(name);
+          }
+ 
+          @Override
+          public void onOutcomeFail(int statusCode, String response) {
+             callback.invoke(statusCode, response);
+          }
+       });
+      }catch (JSONException e) {
         e.printStackTrace();
       }
     } else {
