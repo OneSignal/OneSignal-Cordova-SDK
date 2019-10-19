@@ -24,7 +24,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-import invariant from 'invariant';
 
 var OneSignal = function() {
     var _appID = "";
@@ -339,10 +338,10 @@ OneSignal.prototype.pauseInAppMessages = function(pause) {
  */
 
  OneSignal.prototype.sendUniqueOutcome = function(name, callback=()=>{}) {
-    invariant(
-        typeof callback === 'function',
-        'Must provide a valid callback'
-    );
+    if (typeof callback !== "function") {
+        console.error("OneSignal: sendUniqueOutcome: must provide a valid callback");
+        return;
+    }
 
     const sendUniqueOutcomeCallback = function(result) {
         callback(result);
@@ -352,10 +351,10 @@ OneSignal.prototype.pauseInAppMessages = function(pause) {
  }
 
  OneSignal.prototype.sendOutcome = function(name, callback=()=>{}) {
-    invariant(
-        typeof callback === 'function',
-        'Must provide a valid callback'
-    );
+    if (typeof callback !== "function") {
+        console.error("OneSignal: sendOutcome: must provide a valid callback");
+        return;
+    }
 
     const sendOutcomeCallback = function(result) {
         callback(result);
@@ -365,10 +364,10 @@ OneSignal.prototype.pauseInAppMessages = function(pause) {
  }
 
  OneSignal.prototype.sendOutcomeWithValue = function(name, value, callback=()=>{}) {
-    invariant(
-        typeof callback === 'function',
-        'Must provide a valid callback'
-    );
+    if (typeof callback !== "function") {
+        console.error("OneSignal: sendOutcomeWithValue: must provide a valid callback");
+        return;
+    }
 
     const sendOutcomeWithValueCallback = function(result) {
         callback(result);

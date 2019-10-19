@@ -117,8 +117,8 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String GET_TRIGGER_VALUE_FOR_KEY = "getTriggerValueForKey";
   private static final String PAUSE_IN_APP_MESSAGES = "pauseInAppMessages";
 
-  private static final String SEND_UNIQUE_OUTCOMES = "sendUniqueOutcome";
-  private static final String SEND_OUTCOME = "sendOutcome"
+  private static final String SEND_UNIQUE_OUTCOME = "sendUniqueOutcome";
+  private static final String SEND_OUTCOME = "sendOutcome";
   private static final String SEND_OUTCOME_WITH_VALUE = "sendOutcomeWithValue";
 
   private static CallbackContext notifReceivedCallbackContext;
@@ -546,55 +546,94 @@ public class OneSignalPush extends CordovaPlugin {
       }
     } else if (SEND_UNIQUE_OUTCOME.equals(action)) {
       try {
+        final CallbackContext jsSendUniqueOutcomeCallback = callbackContext;
         String name = data.getString(0);
         OneSignal.sendUniqueOutcome(name, new OutcomeCallback(){
           @Override
           public void onOutcomeSuccess(String name) {
-             callback.invoke(name);
+            try {
+              callbackSuccess(jsSendUniqueOutcomeCallback, new JSONObject("{response:"+name+"}"));
+            } catch (JSONException e) {
+              e.printStackTrace();
+            }
           }
  
           @Override
           public void onOutcomeFail(int statusCode, String response) {
-             callback.invoke(statusCode, response);
+            try {
+              callbackError(jsSendUniqueOutcomeCallback, new JSONObject("{response:"
+              + response + "}"));
+              Log.e(TAG, "sendUniqueOutcome: statusCode: " + statusCode);
+              Log.e(TAG, "sendUniqueOutcome: response: " + response);
+            } catch (JSONException e) {
+              e.printStackTrace();
+            }
           }
-       });
-      }catch (JSONException e) {
+        });
+        result = true;
+      } catch (JSONException e) {
         e.printStackTrace();
       }
     } else if (SEND_OUTCOME.equals(action)) {
       try {
+        final CallbackContext jsSendOutcomeCallback = callbackContext;
         String name = data.getString(0);
         OneSignal.sendOutcome(name, new OutcomeCallback(){
           @Override
           public void onOutcomeSuccess(String name) {
-             callback.invoke(name);
+            try {
+              callbackSuccess(jsSendOutcomeCallback, new JSONObject("{response:"+name+"}"));
+            } catch (JSONException e) {
+              e.printStackTrace();
+            }
           }
  
           @Override
           public void onOutcomeFail(int statusCode, String response) {
-             callback.invoke(statusCode, response);
+            try {
+              callbackError(jsSendOutcomeCallback, new JSONObject("{response:"
+              + response + "}"));
+              Log.e(TAG, "sendOutcome: statusCode: " + statusCode);
+              Log.e(TAG, "sendOutcome: response: " + response);
+            } catch (JSONException e) {
+              e.printStackTrace();
+            }
           }
-       });
-      }catch (JSONException e) {
+        });
+        result = true;
+      } catch (JSONException e) {
         e.printStackTrace();
       }
     } else if (SEND_OUTCOME_WITH_VALUE.equals(action)) {
       try {
+        final CallbackContext jsSendOutcomeWithValueCallback = callbackContext;
         String name = data.getString(0);
-        float value = (float)data.getJsonNumber(1).doubleValue();
+        Float value = Double.valueOf(data.optDouble(1)).floatValue();
         OneSignal.sendOutcomeWithValue(name, value, new OutcomeCallback(){
           @Override
           public void onOutcomeSuccess(String name) {
-             callback.invoke(name);
-          }
- 
-          @Override
-          public void onOutcomeFail(int statusCode, String response) {
-             callback.invoke(statusCode, response);
-          }
-       });
-      }catch (JSONException e) {
-        e.printStackTrace();
+              try {
+               callbackSuccess(jsSendOutcomeWithValueCallback, new JSONObject("{response:"+name+"}"));
+              } catch (JSONException e) {
+                e.printStackTrace();
+              }
+            }
+   
+            @Override
+            public void onOutcomeFail(int statusCode, String response) {
+              try {
+                callbackError(jsSendOutcomeWithValueCallback, new JSONObject("{response:"
+                + response + "}"));
+                Log.e(TAG, "sendOutcomeWithValue: statusCode: " + statusCode);
+                Log.e(TAG, "sendOutcomeWithValue: response: " + response);
+              } catch (JSONException e) {
+                e.printStackTrace();
+              }
+            }
+          });
+          result = true;
+      } catch (JSONException e) {
+              e.printStackTrace();
       }
     } else {
       result = false;

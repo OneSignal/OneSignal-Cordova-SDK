@@ -27,7 +27,7 @@
   </engines>
   
   <platform name="android">
-    <framework src="com.onesignal:OneSignal:3.11.3" />
+    <framework src="com.onesignal:OneSignal:3.12.0" />
     <framework src="build-extras-onesignal.gradle" custom="true" type="gradleReference" />
     
     <config-file target="res/xml/config.xml" parent="/*">
