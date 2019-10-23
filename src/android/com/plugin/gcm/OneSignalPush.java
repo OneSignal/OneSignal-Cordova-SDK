@@ -552,7 +552,7 @@ public class OneSignalPush extends CordovaPlugin {
           @Override
           public void onSuccess(OutcomeEvent event) {
             try {
-              callbackSuccess(jsSendOutcomeWithValueCallback, event.toJSONObject());
+              callbackSuccess(jsSendUniqueOutcomeCallback, event.toJSONObject());
             } catch (JSONException e) {
               e.printStackTrace();
             }
@@ -570,7 +570,7 @@ public class OneSignalPush extends CordovaPlugin {
           @Override
           public void onSuccess(OutcomeEvent event) {
             try {
-              callbackSuccess(jsSendOutcomeWithValueCallback, event.toJSONObject());
+              callbackSuccess(jsSendOutcomeCallback, event.toJSONObject());
             } catch (JSONException e) {
               e.printStackTrace();
             }
