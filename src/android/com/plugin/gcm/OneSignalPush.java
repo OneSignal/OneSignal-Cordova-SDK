@@ -58,6 +58,7 @@ import com.onesignal.OneSignal.PostNotificationResponseHandler;
 import com.onesignal.OneSignal.EmailUpdateHandler;
 import com.onesignal.OneSignal.EmailUpdateError;
 import com.onesignal.OneSignal.OutcomeCallback;
+// import com.onesignal.OneSignal.OutcomeEvent;
 
 import com.onesignal.OSPermissionObserver;
 import com.onesignal.OSEmailSubscriptionObserver;
@@ -550,21 +551,9 @@ public class OneSignalPush extends CordovaPlugin {
         String name = data.getString(0);
         OneSignal.sendUniqueOutcome(name, new OutcomeCallback(){
           @Override
-          public void onOutcomeSuccess(String name) {
+          public void onSuccess(OutcomeEvent event) {
             try {
-              callbackSuccess(jsSendUniqueOutcomeCallback, new JSONObject("{response:"+name+"}"));
-            } catch (JSONException e) {
-              e.printStackTrace();
-            }
-          }
- 
-          @Override
-          public void onOutcomeFail(int statusCode, String response) {
-            try {
-              callbackError(jsSendUniqueOutcomeCallback, new JSONObject("{response:"
-              + response + "}"));
-              Log.e(TAG, "sendUniqueOutcome: statusCode: " + statusCode);
-              Log.e(TAG, "sendUniqueOutcome: response: " + response);
+              callbackSuccess(jsSendOutcomeWithValueCallback, event.toJSONObject());
             } catch (JSONException e) {
               e.printStackTrace();
             }
@@ -580,21 +569,9 @@ public class OneSignalPush extends CordovaPlugin {
         String name = data.getString(0);
         OneSignal.sendOutcome(name, new OutcomeCallback(){
           @Override
-          public void onOutcomeSuccess(String name) {
+          public void onSuccess(OutcomeEvent event) {
             try {
-              callbackSuccess(jsSendOutcomeCallback, new JSONObject("{response:"+name+"}"));
-            } catch (JSONException e) {
-              e.printStackTrace();
-            }
-          }
- 
-          @Override
-          public void onOutcomeFail(int statusCode, String response) {
-            try {
-              callbackError(jsSendOutcomeCallback, new JSONObject("{response:"
-              + response + "}"));
-              Log.e(TAG, "sendOutcome: statusCode: " + statusCode);
-              Log.e(TAG, "sendOutcome: response: " + response);
+              callbackSuccess(jsSendOutcomeWithValueCallback, event.toJSONObject());
             } catch (JSONException e) {
               e.printStackTrace();
             }
@@ -611,27 +588,15 @@ public class OneSignalPush extends CordovaPlugin {
         Float value = Double.valueOf(data.optDouble(1)).floatValue();
         OneSignal.sendOutcomeWithValue(name, value, new OutcomeCallback(){
           @Override
-          public void onOutcomeSuccess(String name) {
-              try {
-               callbackSuccess(jsSendOutcomeWithValueCallback, new JSONObject("{response:"+name+"}"));
-              } catch (JSONException e) {
-                e.printStackTrace();
-              }
+          public void onSuccess(OutcomeEvent event) {
+            try {
+              callbackSuccess(jsSendOutcomeWithValueCallback, event.toJSONObject());
+            } catch (JSONException e) {
+              e.printStackTrace();
             }
-   
-            @Override
-            public void onOutcomeFail(int statusCode, String response) {
-              try {
-                callbackError(jsSendOutcomeWithValueCallback, new JSONObject("{response:"
-                + response + "}"));
-                Log.e(TAG, "sendOutcomeWithValue: statusCode: " + statusCode);
-                Log.e(TAG, "sendOutcomeWithValue: response: " + response);
-              } catch (JSONException e) {
-                e.printStackTrace();
-              }
-            }
-          });
-          result = true;
+          }
+        });
+        result = true;
       } catch (JSONException e) {
               e.printStackTrace();
       }
