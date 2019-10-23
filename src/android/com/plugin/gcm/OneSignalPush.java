@@ -58,7 +58,6 @@ import com.onesignal.OneSignal.PostNotificationResponseHandler;
 import com.onesignal.OneSignal.EmailUpdateHandler;
 import com.onesignal.OneSignal.EmailUpdateError;
 import com.onesignal.OneSignal.OutcomeCallback;
-// import com.onesignal.OneSignal.OutcomeEvent;
 
 import com.onesignal.OSPermissionObserver;
 import com.onesignal.OSEmailSubscriptionObserver;

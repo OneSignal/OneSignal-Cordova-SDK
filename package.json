@@ -64,6 +64,5 @@
   "bugs": {
     "url": "https://github.com/onesignal/OneSignal-Cordova-SDK/issues"
   },
-  "homepage": "https://github.com/onesignal/OneSignal-Cordova-SDK#readme",
-  "dependencies": {}
+  "homepage": "https://github.com/onesignal/OneSignal-Cordova-SDK#readme"
 }
