@@ -59,6 +59,7 @@ import com.onesignal.OneSignal.EmailUpdateHandler;
 import com.onesignal.OneSignal.EmailUpdateError;
 import com.onesignal.OneSignal.OutcomeCallback;
 
+import com.onesignal.OutcomeEvent;
 import com.onesignal.OSPermissionObserver;
 import com.onesignal.OSEmailSubscriptionObserver;
 import com.onesignal.OSSubscriptionObserver;
@@ -551,11 +552,7 @@ public class OneSignalPush extends CordovaPlugin {
         OneSignal.sendUniqueOutcome(name, new OutcomeCallback(){
           @Override
           public void onSuccess(OutcomeEvent event) {
-            try {
-              callbackSuccess(jsSendUniqueOutcomeCallback, event.toJSONObject());
-            } catch (JSONException e) {
-              e.printStackTrace();
-            }
+            callbackSuccess(jsSendUniqueOutcomeCallback, event.toJSONObject());
           }
         });
         result = true;
@@ -569,11 +566,7 @@ public class OneSignalPush extends CordovaPlugin {
         OneSignal.sendOutcome(name, new OutcomeCallback(){
           @Override
           public void onSuccess(OutcomeEvent event) {
-            try {
-              callbackSuccess(jsSendOutcomeCallback, event.toJSONObject());
-            } catch (JSONException e) {
-              e.printStackTrace();
-            }
+            callbackSuccess(jsSendOutcomeCallback, event.toJSONObject());
           }
         });
         result = true;
@@ -588,11 +581,7 @@ public class OneSignalPush extends CordovaPlugin {
         OneSignal.sendOutcomeWithValue(name, value, new OutcomeCallback(){
           @Override
           public void onSuccess(OutcomeEvent event) {
-            try {
-              callbackSuccess(jsSendOutcomeWithValueCallback, event.toJSONObject());
-            } catch (JSONException e) {
-              e.printStackTrace();
-            }
+            callbackSuccess(jsSendOutcomeWithValueCallback, event.toJSONObject());
           }
         });
         result = true;
