@@ -1,6 +1,6 @@
 /**
   * Modified MIT License
-  * 
+  *
   * Copyright 2017 OneSignal
   *
   * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -9,13 +9,13 @@
   * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   * copies of the Software, and to permit persons to whom the Software is
   * furnished to do so, subject to the following conditions:
-  * 
+  *
   * 1. The above copyright notice and this permission notice shall be included in
   * all copies or substantial portions of the Software.
-  * 
+  *
   * 2. All copies of substantial portions of the Software may only be used in connection
   * with services provided by OneSignal.
-  * 
+  *
   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -57,7 +57,9 @@ import com.onesignal.OneSignal.IdsAvailableHandler;
 import com.onesignal.OneSignal.PostNotificationResponseHandler;
 import com.onesignal.OneSignal.EmailUpdateHandler;
 import com.onesignal.OneSignal.EmailUpdateError;
+import com.onesignal.OneSignal.OutcomeCallback;
 
+import com.onesignal.OutcomeEvent;
 import com.onesignal.OSPermissionObserver;
 import com.onesignal.OSEmailSubscriptionObserver;
 import com.onesignal.OSSubscriptionObserver;
@@ -67,25 +69,25 @@ import com.onesignal.OSEmailSubscriptionStateChanges;
 
 public class OneSignalPush extends CordovaPlugin {
   private static final String TAG = "OneSignalPush";
-  
+
   private static final String SET_NOTIFICATION_RECEIVED_HANDLER = "setNotificationReceivedHandler";
   private static final String SET_NOTIFICATION_OPENED_HANDLER = "setNotificationOpenedHandler";
   private static final String SET_IN_APP_MESSAGE_CLICK_HANDLER = "setInAppMessageClickHandler";
   private static final String INIT = "init";
-  
+
   private static final String SET_IN_FOCUS_DISPLAYING = "setInFocusDisplaying";
-  
+
   private static final String GET_PERMISSION_SUBCRIPTION_STATE = "getPermissionSubscriptionState";
   private static final String GET_IDS = "getIds";
-  
+
   private static final String ADD_PERMISSION_OBSERVER = "addPermissionObserver";
   private static final String ADD_SUBSCRIPTION_OBSERVER = "addSubscriptionObserver";
-  
+
   private static final String GET_TAGS = "getTags";
   private static final String DELETE_TAGS = "deleteTags";
   private static final String SEND_TAGS = "sendTags";
   private static final String SYNC_HASHED_EMAIL = "syncHashedEmail";
-  
+
   private static final String REGISTER_FOR_PUSH_NOTIFICATIONS = "registerForPushNotifications";
   private static final String ENABLE_VIBRATE = "enableVibrate";
   private static final String ENABLE_SOUND = "enableSound";
@@ -94,16 +96,16 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String POST_NOTIFICATION = "postNotification";
   private static final String PROMPT_LOCATION = "promptLocation";
   private static final String CLEAR_ONESIGNAL_NOTIFICATIONS = "clearOneSignalNotifications";
-    
+
   private static final String SET_EMAIL = "setEmail";
   private static final String SET_UNAUTHENTICATED_EMAIL = "setUnauthenticatedEmail";
   private static final String LOGOUT_EMAIL = "logoutEmail";
   private static final String ADD_EMAIL_SUBSCRIPTION_OBSERVER = "addEmailSubscriptionObserver";
-  
+
   private static final String SET_LOG_LEVEL = "setLogLevel";
 
   private static final String SET_LOCATION_SHARED = "setLocationShared";
-    
+
   private static final String USER_PROVIDED_CONSENT = "userProvidedPrivacyConsent";
   private static final String SET_REQUIRES_CONSENT = "setRequiresUserPrivacyConsent";
   private static final String GRANT_CONSENT = "provideUserConsent";
@@ -115,15 +117,19 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String REMOVE_TRIGGERS_FOR_KEYS = "removeTriggersForKeys";
   private static final String GET_TRIGGER_VALUE_FOR_KEY = "getTriggerValueForKey";
   private static final String PAUSE_IN_APP_MESSAGES = "pauseInAppMessages";
-  
+
+  private static final String SEND_OUTCOME = "sendOutcome";
+  private static final String SEND_UNIQUE_OUTCOME = "sendUniqueOutcome";
+  private static final String SEND_OUTCOME_WITH_VALUE = "sendOutcomeWithValue";
+
   private static CallbackContext notifReceivedCallbackContext;
   private static CallbackContext notifOpenedCallbackContext;
   private static CallbackContext inAppMessageClickedCallbackContext;
-  
+
   private static CallbackContext jsPermissionObserverCallBack;
   private static CallbackContext jsSubscriptionObserverCallBack;
   private static CallbackContext jsEmailSubscriptionObserverCallBack;
-  
+
   private static OSPermissionObserver permissionObserver;
   private static OSSubscriptionObserver subscriptionObserver;
   private static OSEmailSubscriptionObserver emailSubscriptionObserver;
@@ -137,32 +143,32 @@ public class OneSignalPush extends CordovaPlugin {
     pluginResult.setKeepCallback(true);
     callbackContext.sendPluginResult(pluginResult);
   }
-    
+
   private static void callbackSuccessBoolean(CallbackContext callbackContext, boolean param) {
     PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, param);
     pluginResult.setKeepCallback(true);
     callbackContext.sendPluginResult(pluginResult);
   }
-  
+
   private static void callbackError(CallbackContext callbackContext, JSONObject jsonObject) {
     if (jsonObject == null) // in case there are no data
       jsonObject = new JSONObject();
-    
+
     PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, jsonObject);
     pluginResult.setKeepCallback(true);
     callbackContext.sendPluginResult(pluginResult);
   }
-  
+
   private static void callbackError(CallbackContext callbackContext, String str) {
     PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, str);
     pluginResult.setKeepCallback(true);
     callbackContext.sendPluginResult(pluginResult);
   }
-  
+
   @Override
   public boolean execute(String action, JSONArray data, CallbackContext callbackContext) {
     boolean result = false;
-    
+
     if(SET_NOTIFICATION_RECEIVED_HANDLER.equals(action)) {
       notifReceivedCallbackContext = callbackContext;
       result = true;
@@ -173,7 +179,7 @@ public class OneSignalPush extends CordovaPlugin {
     }
     else if(SET_IN_APP_MESSAGE_CLICK_HANDLER.equals(action)) {
        inAppMessageClickedCallbackContext = callbackContext;
-       result = true; 
+       result = true;
     }
     else if (INIT.equals(action)) {
       try {
@@ -185,7 +191,7 @@ public class OneSignalPush extends CordovaPlugin {
         builder.unsubscribeWhenNotificationsAreDisabled(true);
         builder.filterOtherGCMReceivers(true);
         builder.setInAppMessageClickHandler(new CordovaInAppMessageClickHandler(inAppMessageClickedCallbackContext));
-        
+
         OneSignal.init(this.cordova.getActivity(),
                   googleProjectNumber,
                   appId,
@@ -197,7 +203,7 @@ public class OneSignalPush extends CordovaPlugin {
 
          int displayOption = data.getInt(3);
          OneSignal.setInFocusDisplaying(displayOption);
-         
+
          result = true;
       }
       catch (JSONException e) {
@@ -280,7 +286,7 @@ public class OneSignalPush extends CordovaPlugin {
               jsonIds.put("pushToken", registrationId);
             else
               jsonIds.put("pushToken", "");
-            
+
             callbackSuccess(jsIdsAvailableCallBack, jsonIds);
           }
           catch (Throwable t) {
@@ -351,13 +357,13 @@ public class OneSignalPush extends CordovaPlugin {
             public void onSuccess(JSONObject response) {
               callbackSuccess(jsPostNotificationCallBack, response);
             }
-            
+
             @Override
             public void onFailure(JSONObject response) {
               callbackError(jsPostNotificationCallBack, response);
             }
           });
-        
+
         result = true;
       }
       catch (Throwable t) {
@@ -462,7 +468,7 @@ public class OneSignalPush extends CordovaPlugin {
         });
 
       result = true;
-    } 
+    }
     else if (SET_LOCATION_SHARED.equals(action)) {
       try {
          OneSignal.setLocationShared(data.getBoolean(0));
@@ -509,14 +515,14 @@ public class OneSignalPush extends CordovaPlugin {
         result = true;
       } catch (JSONException e){
         e.printStackTrace();
-      } 
+      }
     } else if (REMOVE_TRIGGERS_FOR_KEYS.equals(action)) {
       try{
           OneSignal.removeTriggersForKeysFromJsonArrayString(data.getString(0));
           result = true;
       } catch (JSONException e){
         e.printStackTrace();
-      } 
+      }
     } else if (GET_TRIGGER_VALUE_FOR_KEY.equals(action)) {
       try {
         Object value = OneSignal.getTriggerValueForKey(data.getString(0));
@@ -539,25 +545,77 @@ public class OneSignalPush extends CordovaPlugin {
       } catch (JSONException e){
         e.printStackTrace();
       }
+    } else if (SEND_OUTCOME.equals(action)) {
+      try {
+        final CallbackContext jsSendOutcomeCallback = callbackContext;
+        String name = data.getString(0);
+        OneSignal.sendOutcome(name, new OutcomeCallback() {
+          @Override
+          public void onSuccess(OutcomeEvent outcomeEvent) {
+            if (outcomeEvent == null)
+                callbackSuccess(jsSendOutcomeCallback, new JSONObject());
+            else
+                callbackSuccess(jsSendOutcomeCallback, outcomeEvent.toJSONObject());
+          }
+        });
+        result = true;
+      } catch (JSONException e) {
+        e.printStackTrace();
+      }
+    } else if (SEND_UNIQUE_OUTCOME.equals(action)) {
+      try {
+        final CallbackContext jsSendUniqueOutcomeCallback = callbackContext;
+        String name = data.getString(0);
+        OneSignal.sendUniqueOutcome(name, new OutcomeCallback(){
+          @Override
+          public void onSuccess(OutcomeEvent outcomeEvent) {
+            if (outcomeEvent == null)
+                callbackSuccess(jsSendUniqueOutcomeCallback, new JSONObject());
+            else
+                callbackSuccess(jsSendUniqueOutcomeCallback, outcomeEvent.toJSONObject());
+          }
+        });
+        result = true;
+      } catch (JSONException e) {
+        e.printStackTrace();
+      }
+    } else if (SEND_OUTCOME_WITH_VALUE.equals(action)) {
+      try {
+        final CallbackContext jsSendOutcomeWithValueCallback = callbackContext;
+        String name = data.getString(0);
+        float value = Double.valueOf(data.optDouble(1)).floatValue();
+        OneSignal.sendOutcomeWithValue(name, value, new OutcomeCallback() {
+          @Override
+          public void onSuccess(OutcomeEvent outcomeEvent) {
+            if (outcomeEvent == null)
+                callbackSuccess(jsSendOutcomeWithValueCallback, new JSONObject());
+            else
+                callbackSuccess(jsSendOutcomeWithValueCallback, outcomeEvent.toJSONObject());
+          }
+        });
+        result = true;
+      } catch (JSONException e) {
+              e.printStackTrace();
+      }
     } else {
       result = false;
       Log.e(TAG, "Invalid action : " + action);
       callbackError(callbackContext, "Invalid action : " + action);
     }
-    
+
     return result;
   }
 
   private class CordovaNotificationReceivedHandler implements NotificationReceivedHandler {
-    
+
     private CallbackContext jsNotificationReceivedCallBack;
-    
+
     public CordovaNotificationReceivedHandler(CallbackContext inCallbackContext) {
       jsNotificationReceivedCallBack = inCallbackContext;
     }
-    
+
     @Override
-    public void notificationReceived(OSNotification notification) {      
+    public void notificationReceived(OSNotification notification) {
       try {
         callbackSuccess(jsNotificationReceivedCallBack, new JSONObject(notification.stringify()));
       }
@@ -566,17 +624,17 @@ public class OneSignalPush extends CordovaPlugin {
       }
     }
   }
-  
+
   private class CordovaNotificationOpenedHandler implements NotificationOpenedHandler {
-    
+
     private CallbackContext jsNotificationOpenedCallBack;
-    
+
     public CordovaNotificationOpenedHandler(CallbackContext inCallbackContext) {
       jsNotificationOpenedCallBack = inCallbackContext;
     }
-    
+
     @Override
-    public void notificationOpened(OSNotificationOpenResult result) {      
+    public void notificationOpened(OSNotificationOpenResult result) {
       try {
         callbackSuccess(jsNotificationOpenedCallBack, new JSONObject(result.stringify()));
       }
@@ -595,7 +653,7 @@ public class OneSignalPush extends CordovaPlugin {
     }
 
     @Override
-    public void inAppMessageClicked(OSInAppMessageAction result) {      
+    public void inAppMessageClicked(OSInAppMessageAction result) {
       try {
         callbackSuccess(jsInAppMessageClickedCallback, result.toJSONObject());
       }

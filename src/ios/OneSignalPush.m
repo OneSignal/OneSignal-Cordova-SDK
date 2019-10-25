@@ -408,4 +408,42 @@ static Class delegateClass = nil;
    bool pause = [command.arguments[0] boolValue];
    [OneSignal pauseInAppMessages:pause];
 }
+
+- (void)sendOutcome:(CDVInvokedUrlCommand*)command {
+    // NSString *name = command.arguments[0];
+
+    // [OneSignal sendOutcome:name onSuccess:^(NSDictionary *result){
+    //     successCallback(command.callbackId, result);
+    // } onFailure:^(NSError *error){
+    //     failureCallback(command.callbackId, error.userInfo);
+    // }]
+    [OneSignal onesignal_Log:ONE_S_LL_WARN message:@"Method sendOutcome() not yet implemented for iOS!"];
+    successCallback(command.callbackId, @{});
+}
+
+- (void)sendUniqueOutcome:(CDVInvokedUrlCommand*)command {
+    // NSString *name = command.arguments[0];
+
+    // [OneSignal sendUniqueOutcome:name onSuccess:^(NSDictionary *result){
+    //     successCallback(command.callbackId, result);
+    // } onFailure:^(NSError *error){
+    //     failureCallback(command.callbackId, error.userInfo);
+    // }]
+    [OneSignal onesignal_Log:ONE_S_LL_WARN message:@"Method sendUniqueOutcome() not yet implemented for iOS!"];
+    successCallback(command.callbackId, @{});
+}
+
+- (void)sendOutcomeWithValue:(CDVInvokedUrlCommand*)command {
+    // NSString *name = command.arguments[0];
+    // NSNumber *value = command.arguments[1];
+
+    // [OneSignal sendOutcomeWithValue:name value:value onSuccess:^(NSDictionary *result){
+    //     successCallback(command.callbackId, result);
+    // } onFailure:^(NSError *error){
+    //     failureCallback(command.callbackId, error.userInfo);
+    // }]
+    [OneSignal onesignal_Log:ONE_S_LL_WARN message:@"Method sendOutcomeWithValue() not yet implemented for iOS!"];
+    successCallback(command.callbackId, @{});
+}
+
 @end
