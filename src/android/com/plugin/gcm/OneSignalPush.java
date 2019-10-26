@@ -1,6 +1,6 @@
 /**
   * Modified MIT License
-  * 
+  *
   * Copyright 2017 OneSignal
   *
   * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -9,13 +9,13 @@
   * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   * copies of the Software, and to permit persons to whom the Software is
   * furnished to do so, subject to the following conditions:
-  * 
+  *
   * 1. The above copyright notice and this permission notice shall be included in
   * all copies or substantial portions of the Software.
-  * 
+  *
   * 2. All copies of substantial portions of the Software may only be used in connection
   * with services provided by OneSignal.
-  * 
+  *
   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -47,25 +47,25 @@ import com.onesignal.OSSubscriptionObserver;
 
 public class OneSignalPush extends CordovaPlugin {
   private static final String TAG = "OneSignalPush";
-  
+
   private static final String SET_NOTIFICATION_RECEIVED_HANDLER = "setNotificationReceivedHandler";
   private static final String SET_NOTIFICATION_OPENED_HANDLER = "setNotificationOpenedHandler";
   private static final String SET_IN_APP_MESSAGE_CLICK_HANDLER = "setInAppMessageClickHandler";
   private static final String INIT = "init";
-  
+
   private static final String SET_IN_FOCUS_DISPLAYING = "setInFocusDisplaying";
-  
+
   private static final String GET_PERMISSION_SUBCRIPTION_STATE = "getPermissionSubscriptionState";
   private static final String GET_IDS = "getIds";
-  
+
   private static final String ADD_PERMISSION_OBSERVER = "addPermissionObserver";
   private static final String ADD_SUBSCRIPTION_OBSERVER = "addSubscriptionObserver";
-  
+
   private static final String GET_TAGS = "getTags";
   private static final String DELETE_TAGS = "deleteTags";
   private static final String SEND_TAGS = "sendTags";
   private static final String SYNC_HASHED_EMAIL = "syncHashedEmail";
-  
+
   private static final String REGISTER_FOR_PUSH_NOTIFICATIONS = "registerForPushNotifications";
   private static final String ENABLE_VIBRATE = "enableVibrate";
   private static final String ENABLE_SOUND = "enableSound";
@@ -74,16 +74,16 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String POST_NOTIFICATION = "postNotification";
   private static final String PROMPT_LOCATION = "promptLocation";
   private static final String CLEAR_ONESIGNAL_NOTIFICATIONS = "clearOneSignalNotifications";
-    
+
   private static final String SET_EMAIL = "setEmail";
   private static final String SET_UNAUTHENTICATED_EMAIL = "setUnauthenticatedEmail";
   private static final String LOGOUT_EMAIL = "logoutEmail";
   private static final String ADD_EMAIL_SUBSCRIPTION_OBSERVER = "addEmailSubscriptionObserver";
-  
+
   private static final String SET_LOG_LEVEL = "setLogLevel";
 
   private static final String SET_LOCATION_SHARED = "setLocationShared";
-    
+
   private static final String USER_PROVIDED_CONSENT = "userProvidedPrivacyConsent";
   private static final String SET_REQUIRES_CONSENT = "setRequiresUserPrivacyConsent";
   private static final String GRANT_CONSENT = "provideUserConsent";
@@ -96,13 +96,14 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String GET_TRIGGER_VALUE_FOR_KEY = "getTriggerValueForKey";
   private static final String PAUSE_IN_APP_MESSAGES = "pauseInAppMessages";
 
-  private static final String SEND_UNIQUE_OUTCOME = "sendUniqueOutcome";
   private static final String SEND_OUTCOME = "sendOutcome";
+  private static final String SEND_UNIQUE_OUTCOME = "sendUniqueOutcome";
   private static final String SEND_OUTCOME_WITH_VALUE = "sendOutcomeWithValue";
 
   private static CallbackContext notifReceivedCallbackContext;
   private static CallbackContext notifOpenedCallbackContext;
   private static CallbackContext inAppMessageClickedCallbackContext;
+
 
   public static boolean setNotificationReceivedHandler(CallbackContext callbackContext) {
     notifReceivedCallbackContext = callbackContext;
@@ -152,6 +153,7 @@ public class OneSignalPush extends CordovaPlugin {
   @Override
   public boolean execute(String action, JSONArray data, CallbackContext callbackContext) {
     boolean result = false;
+
 
     switch(action) {
       case SET_NOTIFICATION_OPENED_HANDLER:
@@ -310,7 +312,7 @@ public class OneSignalPush extends CordovaPlugin {
           Log.e(TAG, "Invalid action : " + action);
           CallbackHelper.callbackError(callbackContext, "Invalid action : " + action);
     }
-    
+
     return result;
   }
 
