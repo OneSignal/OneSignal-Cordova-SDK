@@ -6,23 +6,11 @@ import com.onesignal.OneSignal.OutcomeCallback;
 
 import org.apache.cordova.CallbackContext;
 
-import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class OneSignalOutcomeController {
-  private static CallbackContext inAppMessageClickedCallbackContext;
-
-  // This is to prevent an issue where if two Javascript calls are made to OneSignal expecting a callback then only one would fire.
-  private static void callbackSuccess(CallbackContext callbackContext, JSONObject jsonObject) {
-    if (jsonObject == null) // in case there are no data
-      jsonObject = new JSONObject();
-
-    PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jsonObject);
-    pluginResult.setKeepCallback(true);
-    callbackContext.sendPluginResult(pluginResult);
-  }
 
   public static boolean sendUniqueOutcome(CallbackContext callbackContext, JSONArray data) {
     try {
@@ -30,8 +18,11 @@ public class OneSignalOutcomeController {
       String name = data.getString(0);
       OneSignal.sendUniqueOutcome(name, new OutcomeCallback(){
         @Override
-        public void onSuccess(OutcomeEvent event) {
-          callbackSuccess(jsSendUniqueOutcomeCallback, event.toJSONObject());
+        public void onSuccess(OutcomeEvent outcomeEvent) {
+          if (outcomeEvent == null)
+            CallbackHelper.callbackSuccess(jsSendUniqueOutcomeCallback, new JSONObject());
+          else
+            CallbackHelper.callbackSuccess(jsSendUniqueOutcomeCallback, outcomeEvent.toJSONObject());
         }
       });
       return true;
@@ -45,10 +36,13 @@ public class OneSignalOutcomeController {
     try {
       final CallbackContext jsSendOutcomeCallback = callbackContext;
       String name = data.getString(0);
-      OneSignal.sendOutcome(name, new OutcomeCallback(){
+      OneSignal.sendOutcome(name, new OutcomeCallback() {
         @Override
-        public void onSuccess(OutcomeEvent event) {
-          callbackSuccess(jsSendOutcomeCallback, event.toJSONObject());
+        public void onSuccess(OutcomeEvent outcomeEvent) {
+          if (outcomeEvent == null)
+            CallbackHelper.callbackSuccess(jsSendOutcomeCallback, new JSONObject());
+          else
+            CallbackHelper.callbackSuccess(jsSendOutcomeCallback, outcomeEvent.toJSONObject());
         }
       });
       return true;
@@ -62,11 +56,14 @@ public class OneSignalOutcomeController {
     try {
       final CallbackContext jsSendOutcomeWithValueCallback = callbackContext;
       String name = data.getString(0);
-      Float value = Double.valueOf(data.optDouble(1)).floatValue();
-      OneSignal.sendOutcomeWithValue(name, value, new OutcomeCallback(){
+      float value = Double.valueOf(data.optDouble(1)).floatValue();
+      OneSignal.sendOutcomeWithValue(name, value, new OutcomeCallback() {
         @Override
-        public void onSuccess(OutcomeEvent event) {
-          callbackSuccess(jsSendOutcomeWithValueCallback, event.toJSONObject());
+        public void onSuccess(OutcomeEvent outcomeEvent) {
+          if (outcomeEvent == null)
+            CallbackHelper.callbackSuccess(jsSendOutcomeWithValueCallback, new JSONObject());
+          else
+            CallbackHelper.callbackSuccess(jsSendOutcomeWithValueCallback, outcomeEvent.toJSONObject());
         }
       });
       return true;
