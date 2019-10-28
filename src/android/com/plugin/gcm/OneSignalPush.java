@@ -40,6 +40,7 @@ import com.onesignal.OSNotificationOpenResult;
 import com.onesignal.OSInAppMessageAction;
 import com.onesignal.OneSignal.NotificationOpenedHandler;
 import com.onesignal.OneSignal.NotificationReceivedHandler;
+import com.onesignal.OneSignal.InAppMessageClickHandler;
 
 import com.onesignal.OSPermissionObserver;
 import com.onesignal.OSEmailSubscriptionObserver;
@@ -359,7 +360,7 @@ public class OneSignalPush extends CordovaPlugin {
     }
   }
 
-  private class CordovaInAppMessageClickHandler implements OneSignal.InAppMessageClickHandler {
+  private class CordovaInAppMessageClickHandler implements InAppMessageClickHandler {
 
     private CallbackContext jsInAppMessageClickedCallback;
 
