@@ -16,6 +16,7 @@ repositories {
 buildscript {
   repositories {
     maven { url 'https://plugins.gradle.org/m2/'}
+    google()
   }
   dependencies {
     classpath 'gradle.plugin.com.onesignal:onesignal-gradle-plugin:[0.12.3, 0.99.99]'
