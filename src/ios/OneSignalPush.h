@@ -83,5 +83,4 @@
 - (void)sendOutcome:(CDVInvokedUrlCommand*)command;
 - (void)sendUniqueOutcome:(CDVInvokedUrlCommand*)command;
 - (void)sendOutcomeWithValue:(CDVInvokedUrlCommand*)command;
-
 @end
