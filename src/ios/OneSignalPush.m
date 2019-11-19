@@ -377,10 +377,10 @@ static Class delegateClass = nil;
 - (void)setInAppMessageClickHandler:(CDVInvokedUrlCommand*)command {
     [OneSignal setInAppMessageClickHandler:^(OSInAppMessageAction* action) {
             NSDictionary *result = @{
-            @"clickName": action.clickName ?: [NSNull null],
-            @"clickUrl" : action.clickUrl.absoluteString ?: [NSNull null],
-            @"firstClick" : @(action.firstClick),
-            @"closesMessage" : @(action.closesMessage)
+            @"click_name": action.clickName ?: [NSNull null],
+            @"click_url" : action.clickUrl.absoluteString ?: [NSNull null],
+            @"first_click" : @(action.firstClick),
+            @"closes_message" : @(action.closesMessage)
             };
             successCallback(command.callbackId, result);
         }
