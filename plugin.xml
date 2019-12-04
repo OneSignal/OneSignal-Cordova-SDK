@@ -4,7 +4,6 @@
     id="onesignal-cordova-plugin"
     version="2.8.0">
 
-
   <name>OneSignal Push Notifications</name>
   <author>Josh Kasten, Bradley Hesse</author>
 
