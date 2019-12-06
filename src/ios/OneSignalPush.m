@@ -409,18 +409,18 @@ static Class delegateClass = nil;
    [OneSignal pauseInAppMessages:pause];
 }
 
-- (void)sendUniqueOutcome:(CDVInvokedUrlCommand*)command {
-    NSString *name = command.arguments[0];
-
-    [OneSignal sendUniqueOutcome:name onSuccess:^(OSOutcomeEvent *outcome){
-        successCallback(command.callbackId, [outcome jsonRepresentation]);
-    }];
-}
-
 - (void)sendOutcome:(CDVInvokedUrlCommand*)command {
     NSString *name = command.arguments[0];
 
     [OneSignal sendOutcome:name onSuccess:^(OSOutcomeEvent *outcome){
+        successCallback(command.callbackId, [outcome jsonRepresentation]);
+    }];
+}
+
+- (void)sendUniqueOutcome:(CDVInvokedUrlCommand*)command {
+    NSString *name = command.arguments[0];
+
+    [OneSignal sendUniqueOutcome:name onSuccess:^(OSOutcomeEvent *outcome){
         successCallback(command.callbackId, [outcome jsonRepresentation]);
     }];
 }
