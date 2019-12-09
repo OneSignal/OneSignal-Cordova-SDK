@@ -27,23 +27,12 @@
 
 package com.plugin.gcm;
 
-import android.app.Activity;
-import android.content.Context;
-import android.os.Bundle;
 import android.util.Log;
 import org.apache.cordova.CallbackContext;
-import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
-import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.Iterator;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.HashMap;
 
 import com.onesignal.OneSignal;
 import com.onesignal.OSNotification;
@@ -52,20 +41,10 @@ import com.onesignal.OSInAppMessageAction;
 import com.onesignal.OneSignal.NotificationOpenedHandler;
 import com.onesignal.OneSignal.NotificationReceivedHandler;
 import com.onesignal.OneSignal.InAppMessageClickHandler;
-import com.onesignal.OneSignal.GetTagsHandler;
-import com.onesignal.OneSignal.IdsAvailableHandler;
-import com.onesignal.OneSignal.PostNotificationResponseHandler;
-import com.onesignal.OneSignal.EmailUpdateHandler;
-import com.onesignal.OneSignal.EmailUpdateError;
-import com.onesignal.OneSignal.OutcomeCallback;
 
-import com.onesignal.OutcomeEvent;
 import com.onesignal.OSPermissionObserver;
 import com.onesignal.OSEmailSubscriptionObserver;
 import com.onesignal.OSSubscriptionObserver;
-import com.onesignal.OSPermissionStateChanges;
-import com.onesignal.OSSubscriptionStateChanges;
-import com.onesignal.OSEmailSubscriptionStateChanges;
 
 public class OneSignalPush extends CordovaPlugin {
   private static final String TAG = "OneSignalPush";
@@ -126,485 +105,222 @@ public class OneSignalPush extends CordovaPlugin {
   private static CallbackContext notifOpenedCallbackContext;
   private static CallbackContext inAppMessageClickedCallbackContext;
 
-  private static CallbackContext jsPermissionObserverCallBack;
-  private static CallbackContext jsSubscriptionObserverCallBack;
-  private static CallbackContext jsEmailSubscriptionObserverCallBack;
 
-  private static OSPermissionObserver permissionObserver;
-  private static OSSubscriptionObserver subscriptionObserver;
-  private static OSEmailSubscriptionObserver emailSubscriptionObserver;
-
-  // This is to prevent an issue where if two Javascript calls are made to OneSignal expecting a callback then only one would fire.
-  private static void callbackSuccess(CallbackContext callbackContext, JSONObject jsonObject) {
-    if (jsonObject == null) // in case there are no data
-      jsonObject = new JSONObject();
-
-    PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jsonObject);
-    pluginResult.setKeepCallback(true);
-    callbackContext.sendPluginResult(pluginResult);
+  public static boolean setNotificationReceivedHandler(CallbackContext callbackContext) {
+    notifReceivedCallbackContext = callbackContext;
+    return true;
   }
 
-  private static void callbackSuccessBoolean(CallbackContext callbackContext, boolean param) {
-    PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, param);
-    pluginResult.setKeepCallback(true);
-    callbackContext.sendPluginResult(pluginResult);
+  public static boolean setNotificationOpenedHandler(CallbackContext callbackContext) {
+    notifOpenedCallbackContext = callbackContext;
+    return true;
   }
 
-  private static void callbackError(CallbackContext callbackContext, JSONObject jsonObject) {
-    if (jsonObject == null) // in case there are no data
-      jsonObject = new JSONObject();
-
-    PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, jsonObject);
-    pluginResult.setKeepCallback(true);
-    callbackContext.sendPluginResult(pluginResult);
+  public static boolean setInAppMessageClickHandler(CallbackContext callbackContext) {
+    inAppMessageClickedCallbackContext = callbackContext;
+    return true;
   }
 
-  private static void callbackError(CallbackContext callbackContext, String str) {
-    PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, str);
-    pluginResult.setKeepCallback(true);
-    callbackContext.sendPluginResult(pluginResult);
+  public boolean init(CallbackContext callbackContext, JSONArray data) {
+    try {
+      String appId = data.getString(0);
+      String googleProjectNumber = data.getString(1);
+
+      OneSignal.sdkType = "cordova";
+      OneSignal.Builder builder = OneSignal.getCurrentOrNewInitBuilder();
+      builder.unsubscribeWhenNotificationsAreDisabled(true);
+      builder.filterOtherGCMReceivers(true);
+      builder.setInAppMessageClickHandler(new CordovaInAppMessageClickHandler(inAppMessageClickedCallbackContext));
+
+      OneSignal.init(this.cordova.getActivity(),
+              googleProjectNumber,
+              appId,
+              new CordovaNotificationOpenedHandler(notifOpenedCallbackContext),
+              new CordovaNotificationReceivedHandler(notifReceivedCallbackContext)
+      );
+
+      // data.getJSONObject(2) is for iOS settings.
+
+      int displayOption = data.getInt(3);
+      OneSignal.setInFocusDisplaying(displayOption);
+
+      return true;
+    } catch (JSONException e) {
+      Log.e(TAG, "execute: Got JSON Exception " + e.getMessage());
+      return false;
+    }
   }
 
   @Override
   public boolean execute(String action, JSONArray data, CallbackContext callbackContext) {
     boolean result = false;
 
-    if(SET_NOTIFICATION_RECEIVED_HANDLER.equals(action)) {
-      notifReceivedCallbackContext = callbackContext;
-      result = true;
-    }
-    else if(SET_NOTIFICATION_OPENED_HANDLER.equals(action)) {
-      notifOpenedCallbackContext = callbackContext;
-      result = true;
-    }
-    else if(SET_IN_APP_MESSAGE_CLICK_HANDLER.equals(action)) {
-       inAppMessageClickedCallbackContext = callbackContext;
-       result = true;
-    }
-    else if (INIT.equals(action)) {
-      try {
-        String appId = data.getString(0);
-        String googleProjectNumber = data.getString(1);
 
-        OneSignal.sdkType = "cordova";
-        OneSignal.Builder builder = OneSignal.getCurrentOrNewInitBuilder();
-        builder.unsubscribeWhenNotificationsAreDisabled(true);
-        builder.filterOtherGCMReceivers(true);
-        builder.setInAppMessageClickHandler(new CordovaInAppMessageClickHandler(inAppMessageClickedCallbackContext));
+    switch(action) {
+      case SET_NOTIFICATION_OPENED_HANDLER:
+        result = setNotificationOpenedHandler(callbackContext);
+        break;
 
-        OneSignal.init(this.cordova.getActivity(),
-                  googleProjectNumber,
-                  appId,
-                  new CordovaNotificationOpenedHandler(notifOpenedCallbackContext),
-                  new CordovaNotificationReceivedHandler(notifReceivedCallbackContext)
-                  );
+      case SET_NOTIFICATION_RECEIVED_HANDLER:
+        result = setNotificationReceivedHandler(callbackContext);
+        break;
 
-         // data.getJSONObject(2) is for iOS settings.
+      case SET_IN_APP_MESSAGE_CLICK_HANDLER:
+        result = setInAppMessageClickHandler(callbackContext);
+        break;
 
-         int displayOption = data.getInt(3);
-         OneSignal.setInFocusDisplaying(displayOption);
+      case INIT:
+        result = init(callbackContext, data);
+        break;
 
-         result = true;
-      }
-      catch (JSONException e) {
-         Log.e(TAG, "execute: Got JSON Exception " + e.getMessage());
-         result = false;
-      }
-    }
-    else if (SET_IN_FOCUS_DISPLAYING.equals(action)) {
-      try {
-        OneSignal.setInFocusDisplaying(data.getInt(0));
-        result = true;
-      }
-      catch (JSONException e) {
-         Log.e(TAG, "execute: Got JSON Exception " + e.getMessage());
-         result = false;
-      }
-    }
-    else if (ADD_PERMISSION_OBSERVER.equals(action)) {
-      jsPermissionObserverCallBack = callbackContext;
-      if (permissionObserver == null) {
-        permissionObserver = new OSPermissionObserver() {
-          @Override
-          public void onOSPermissionChanged(OSPermissionStateChanges stateChanges) {
-            callbackSuccess(jsPermissionObserverCallBack, stateChanges.toJSONObject());
-          }
-        };
-        OneSignal.addPermissionObserver(permissionObserver);
-      }
-      result = true;
-    }
-    else if (ADD_SUBSCRIPTION_OBSERVER.equals(action)) {
-      jsSubscriptionObserverCallBack = callbackContext;
-      if (subscriptionObserver == null) {
-        subscriptionObserver = new OSSubscriptionObserver() {
-          @Override
-          public void onOSSubscriptionChanged(OSSubscriptionStateChanges stateChanges) {
-            callbackSuccess(jsSubscriptionObserverCallBack, stateChanges.toJSONObject());
-          }
-        };
-        OneSignal.addSubscriptionObserver(subscriptionObserver);
-      }
-      result = true;
-    }
-    else if (ADD_EMAIL_SUBSCRIPTION_OBSERVER.equals(action)) {
-      jsEmailSubscriptionObserverCallBack = callbackContext;
-      if (emailSubscriptionObserver == null) {
-        emailSubscriptionObserver = new OSEmailSubscriptionObserver() {
-          @Override
-          public void onOSEmailSubscriptionChanged(OSEmailSubscriptionStateChanges stateChanges) {
-            callbackSuccess(jsEmailSubscriptionObserverCallBack, stateChanges.toJSONObject());
-          }
-        };
-        OneSignal.addEmailSubscriptionObserver(emailSubscriptionObserver);
-      }
-      result = true;
-    }
-    else if (GET_TAGS.equals(action)) {
-      final CallbackContext jsTagsAvailableCallBack = callbackContext;
-      OneSignal.getTags(new GetTagsHandler() {
-        @Override
-        public void tagsAvailable(JSONObject tags) {
-          callbackSuccess(jsTagsAvailableCallBack, tags);
-        }
-      });
-      result = true;
-    }
-    else if (GET_PERMISSION_SUBCRIPTION_STATE.equals(action)) {
-      callbackSuccess(callbackContext, OneSignal.getPermissionSubscriptionState().toJSONObject());
-      result = true;
-    }
-    else if (GET_IDS.equals(action)) {
-      final CallbackContext jsIdsAvailableCallBack = callbackContext;
-      OneSignal.idsAvailable(new IdsAvailableHandler() {
-        @Override
-        public void idsAvailable(String userId, String registrationId) {
-          JSONObject jsonIds = new JSONObject();
-          try {
-            jsonIds.put("userId", userId);
-            if (registrationId != null)
-              jsonIds.put("pushToken", registrationId);
-            else
-              jsonIds.put("pushToken", "");
+      case SET_IN_FOCUS_DISPLAYING:
+        result = OneSignalController.setInFocusDisplaying(callbackContext, data);
+        break;
 
-            callbackSuccess(jsIdsAvailableCallBack, jsonIds);
-          }
-          catch (Throwable t) {
-            t.printStackTrace();
-          }
-        }
-      });
-      result = true;
-    }
-    else if (SEND_TAGS.equals(action)) {
-      try {
-        OneSignal.sendTags(data.getJSONObject(0));
-      }
-      catch (Throwable t) {
-        t.printStackTrace();
-      }
-      result = true;
-    }
-    else if (DELETE_TAGS.equals(action)) {
-      try {
-        Collection<String> list = new ArrayList<String>();
-        for (int i = 0; i < data.length(); i++)
-          list.add(data.get(i).toString());
-        OneSignal.deleteTags(list);
-        result = true;
-      } catch (Throwable t) {
-        t.printStackTrace();
-      }
-    }
-    else if (REGISTER_FOR_PUSH_NOTIFICATIONS.equals(action)) {
-      // Does not apply to Android.
-      result = true;
-    }
-    else if (ENABLE_VIBRATE.equals(action)) {
-      try {
-        OneSignal.enableVibrate(data.getBoolean(0));
-        result = true;
-      }
-      catch (Throwable t) {
-        t.printStackTrace();
-      }
-    }
-    else if (ENABLE_SOUND.equals(action)) {
-      try {
-        OneSignal.enableSound(data.getBoolean(0));
-        result = true;
-      }
-      catch (Throwable t) {
-        t.printStackTrace();
-      }
-    }
-    else if (SET_SUBSCRIPTION.equals(action)) {
-      try {
-        OneSignal.setSubscription(data.getBoolean(0));
-        result = true;
-      }
-      catch (Throwable t) {
-        t.printStackTrace();
-      }
-    }
-    else if (POST_NOTIFICATION.equals(action)) {
-      try {
-        JSONObject jo = data.getJSONObject(0);
-        final CallbackContext jsPostNotificationCallBack = callbackContext;
-        OneSignal.postNotification(jo,
-          new PostNotificationResponseHandler() {
-            @Override
-            public void onSuccess(JSONObject response) {
-              callbackSuccess(jsPostNotificationCallBack, response);
-            }
+      case ADD_PERMISSION_OBSERVER:
+        result = OneSignalObserverController.addPermissionObserver(callbackContext);
+        break;
 
-            @Override
-            public void onFailure(JSONObject response) {
-              callbackError(jsPostNotificationCallBack, response);
-            }
-          });
+      case ADD_SUBSCRIPTION_OBSERVER:
+        result = OneSignalObserverController.addSubscriptionObserver(callbackContext);
+        break;
 
-        result = true;
-      }
-      catch (Throwable t) {
-        t.printStackTrace();
-      }
-    }
-    else if (PROMPT_LOCATION.equals(action))
-      OneSignal.promptLocation();
-    else if (SYNC_HASHED_EMAIL.equals(action)) {
-      try {
-        OneSignal.syncHashedEmail(data.getString(0));
-      } catch(Throwable t) {
-        t.printStackTrace();
-      }
-    }
-    else if (SET_LOG_LEVEL.equals(action)) {
-      try {
-        JSONObject jo = data.getJSONObject(0);
-        OneSignal.setLogLevel(jo.optInt("logLevel", 0), jo.optInt("visualLevel", 0));
-      }
-      catch(Throwable t) {
-        t.printStackTrace();
-      }
-    }
-    else if (CLEAR_ONESIGNAL_NOTIFICATIONS.equals(action)) {
-      try {
-        OneSignal.clearOneSignalNotifications();
-        result = true;
-      }
-      catch(Throwable t) {
-        t.printStackTrace();
-      }
-    }
-    else if (SET_EMAIL.equals(action)) {
-      final CallbackContext jsSetEmailContext = callbackContext;
-        try {
-            OneSignal.setEmail(data.getString(0), data.getString(1), new EmailUpdateHandler() {
-              @Override
-              public void onSuccess() {
-                callbackSuccess(jsSetEmailContext, null);
-              }
+      case ADD_EMAIL_SUBSCRIPTION_OBSERVER:
+        result = OneSignalObserverController.addEmailSubscriptionObserver(callbackContext);
+        break;
 
-              @Override
-              public void onFailure(EmailUpdateError error) {
-                try {
-                  JSONObject errorObject = new JSONObject("{'error' : '" + error.getMessage() + "'}");
-                  callbackError(jsSetEmailContext, errorObject);
-                } catch (JSONException e) {
-                  e.printStackTrace();
-                }
-              }
-            });
+      case GET_TAGS:
+        result = OneSignalController.getTags(callbackContext);
+        break;
 
-          result = true;
-        } catch(Throwable t) {
-            t.printStackTrace();
-        }
-    }
-    else if (SET_UNAUTHENTICATED_EMAIL.equals(action)) {
-      final CallbackContext jsSetEmailContext = callbackContext;
+      case GET_PERMISSION_SUBCRIPTION_STATE:
+        result = OneSignalController.getPermissionSubscriptionState(callbackContext);
+        break;
 
-        try {
-            OneSignal.setEmail(data.getString(0), null, new EmailUpdateHandler() {
-              @Override
-              public void onSuccess() {
-                callbackSuccess(jsSetEmailContext, null);
-              }
+      case GET_IDS:
+        result = OneSignalController.getIds(callbackContext);
+        break;
 
-              @Override
-              public void onFailure(EmailUpdateError error) {
-                try {
-                  JSONObject errorObject = new JSONObject("{'error' : '" + error.getMessage() + "'}");
-                  callbackError(jsSetEmailContext, errorObject);
-                } catch (JSONException e) {
-                  e.printStackTrace();
-                }
-              }
-            });
+      case SEND_TAGS:
+        result = OneSignalController.sendTags(data);
+        break;
 
-          result = true;
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-    else if (LOGOUT_EMAIL.equals(action)) {
-      final CallbackContext jsSetEmailContext = callbackContext;
-        OneSignal.logoutEmail(new EmailUpdateHandler() {
-          @Override
-          public void onSuccess() {
-            callbackSuccess(jsSetEmailContext, null);
-          }
+      case DELETE_TAGS:
+        result = OneSignalController.deleteTags(data);
+        break;
 
-          @Override
-          public void onFailure(EmailUpdateError error) {
-            try {
-              JSONObject errorObject = new JSONObject("{'error' : '" + error.getMessage() + "'}");
-              callbackError(jsSetEmailContext, errorObject);
-            } catch (JSONException e) {
-              e.printStackTrace();
-            }
-          }
-        });
+      case REGISTER_FOR_PUSH_NOTIFICATIONS:
+        result = OneSignalController.registerForPushNotifications();
+        break;
 
-      result = true;
-    }
-    else if (SET_LOCATION_SHARED.equals(action)) {
-      try {
-         OneSignal.setLocationShared(data.getBoolean(0));
-      } catch (JSONException e) {
-         e.printStackTrace();
-      }
-    } else if (USER_PROVIDED_CONSENT.equals(action)) {
-      boolean providedConsent = OneSignal.userProvidedPrivacyConsent();
-      final CallbackContext jsUserProvidedConsentContext = callbackContext;
-      callbackSuccessBoolean(callbackContext, providedConsent);
-      result = true;
-    } else if (SET_REQUIRES_CONSENT.equals(action)) {
-      try {
-         OneSignal.setRequiresUserPrivacyConsent(data.getBoolean(0));
-         result = true;
-      } catch (JSONException e) {
-         e.printStackTrace();
-      }
-    } else if (GRANT_CONSENT.equals(action)) {
-      try {
-         OneSignal.provideUserConsent(data.getBoolean(0));
-         result = true;
-      } catch (JSONException e) {
-         e.printStackTrace();
-      }
-    } else if (SET_EXTERNAL_USER_ID.equals(action)) {
-       try {
-          OneSignal.setExternalUserId(data.getString(0));
-          result = true;
-       } catch (JSONException e) {
-          e.printStackTrace();
-       }
-    } else if (REMOVE_EXTERNAL_USER_ID.equals(action)) {
-      try {
-        OneSignal.removeExternalUserId();
-        result = true;
-      }
-      catch(Throwable t) {
-        t.printStackTrace();
-      }
-    } else if (ADD_TRIGGERS.equals(action)) {
-      try {
-        OneSignal.addTriggersFromJsonString(data.getJSONObject(0).toString());
-        result = true;
-      } catch (JSONException e){
-        e.printStackTrace();
-      }
-    } else if (REMOVE_TRIGGERS_FOR_KEYS.equals(action)) {
-      try{
-          OneSignal.removeTriggersForKeysFromJsonArrayString(data.getString(0));
-          result = true;
-      } catch (JSONException e){
-        e.printStackTrace();
-      }
-    } else if (GET_TRIGGER_VALUE_FOR_KEY.equals(action)) {
-      try {
-        Object value = OneSignal.getTriggerValueForKey(data.getString(0));
-        if (value == null) {
-          callbackSuccess(callbackContext, new JSONObject());
-        } else {
-          callbackSuccess(callbackContext, new JSONObject(
-            "{value:"
-            + value.toString()
-            + "}"));
-        }
-        result = true;
-      } catch (JSONException e){
-        e.printStackTrace();
-      }
-    } else if (PAUSE_IN_APP_MESSAGES.equals(action)) {
-      try {
-        OneSignal.pauseInAppMessages(data.getBoolean(0));
-        result = true;
-      } catch (JSONException e){
-        e.printStackTrace();
-      }
-    } else if (SEND_OUTCOME.equals(action)) {
-      try {
-        final CallbackContext jsSendOutcomeCallback = callbackContext;
-        String name = data.getString(0);
-        OneSignal.sendOutcome(name, new OutcomeCallback() {
-          @Override
-          public void onSuccess(OutcomeEvent outcomeEvent) {
-            if (outcomeEvent == null)
-                callbackSuccess(jsSendOutcomeCallback, new JSONObject());
-            else
-                callbackSuccess(jsSendOutcomeCallback, outcomeEvent.toJSONObject());
-          }
-        });
-        result = true;
-      } catch (JSONException e) {
-        e.printStackTrace();
-      }
-    } else if (SEND_UNIQUE_OUTCOME.equals(action)) {
-      try {
-        final CallbackContext jsSendUniqueOutcomeCallback = callbackContext;
-        String name = data.getString(0);
-        OneSignal.sendUniqueOutcome(name, new OutcomeCallback(){
-          @Override
-          public void onSuccess(OutcomeEvent outcomeEvent) {
-            if (outcomeEvent == null)
-                callbackSuccess(jsSendUniqueOutcomeCallback, new JSONObject());
-            else
-                callbackSuccess(jsSendUniqueOutcomeCallback, outcomeEvent.toJSONObject());
-          }
-        });
-        result = true;
-      } catch (JSONException e) {
-        e.printStackTrace();
-      }
-    } else if (SEND_OUTCOME_WITH_VALUE.equals(action)) {
-      try {
-        final CallbackContext jsSendOutcomeWithValueCallback = callbackContext;
-        String name = data.getString(0);
-        float value = Double.valueOf(data.optDouble(1)).floatValue();
-        OneSignal.sendOutcomeWithValue(name, value, new OutcomeCallback() {
-          @Override
-          public void onSuccess(OutcomeEvent outcomeEvent) {
-            if (outcomeEvent == null)
-                callbackSuccess(jsSendOutcomeWithValueCallback, new JSONObject());
-            else
-                callbackSuccess(jsSendOutcomeWithValueCallback, outcomeEvent.toJSONObject());
-          }
-        });
-        result = true;
-      } catch (JSONException e) {
-              e.printStackTrace();
-      }
-    } else {
-      result = false;
-      Log.e(TAG, "Invalid action : " + action);
-      callbackError(callbackContext, "Invalid action : " + action);
+      case ENABLE_VIBRATE:
+        result = OneSignalController.enableVibrate(data);
+        break;
+
+      case ENABLE_SOUND:
+        result = OneSignalController.enableSound(data);
+        break;
+
+      case SET_SUBSCRIPTION:
+        result = OneSignalController.setSubscription(data);
+        break;
+
+      case POST_NOTIFICATION:
+        result = OneSignalController.postNotification(callbackContext, data);
+        break;
+
+      case PROMPT_LOCATION:
+        OneSignalController.promptLocation();
+        break;
+
+      case SYNC_HASHED_EMAIL:
+        OneSignalEmailController.syncHashedEmail(data);
+        break;
+
+      case SET_LOG_LEVEL:
+        OneSignalController.setLogLevel(data);
+        break;
+
+      case CLEAR_ONESIGNAL_NOTIFICATIONS:
+        result = OneSignalController.clearOneSignalNotifications();
+        break;
+
+      case SET_EMAIL:
+        result = OneSignalEmailController.setEmail(callbackContext, data);
+        break;
+
+      case SET_UNAUTHENTICATED_EMAIL:
+        result = OneSignalEmailController.setUnauthenticatedEmail(callbackContext, data);
+        break;
+
+      case LOGOUT_EMAIL:
+        result = OneSignalEmailController.logoutEmail(callbackContext);
+        break;
+
+      case SET_LOCATION_SHARED:
+        OneSignalController.setLocationShared(data);
+        break;
+
+      case USER_PROVIDED_CONSENT:
+        result = OneSignalController.userProvidedConsent(callbackContext);
+        break;
+
+      case SET_REQUIRES_CONSENT:
+        result = OneSignalController.setRequiresConsent(callbackContext, data);
+        break;
+
+      case GRANT_CONSENT:
+        result = OneSignalController.grantConsent(data);
+        break;
+
+      case SET_EXTERNAL_USER_ID:
+        result = OneSignalController.setExternalUserId(data);
+        break;
+
+      case REMOVE_EXTERNAL_USER_ID:
+        result = OneSignalController.removeExternalUserId();
+        break;
+
+      case ADD_TRIGGERS:
+        result = OneSignalInAppMessagingController.addTriggers(data);
+        break;
+
+      case REMOVE_TRIGGERS_FOR_KEYS:
+        result = OneSignalInAppMessagingController.removeTriggersForKeys(data);
+        break;
+
+      case GET_TRIGGER_VALUE_FOR_KEY:
+        result = OneSignalInAppMessagingController.getTriggerValueForKey(callbackContext, data);
+        break;
+
+      case PAUSE_IN_APP_MESSAGES:
+        result = OneSignalInAppMessagingController.pauseInAppMessages(data);
+        break;
+
+      case SEND_OUTCOME:
+        result = OneSignalOutcomeController.sendOutcome(callbackContext, data);
+        break;
+
+      case SEND_UNIQUE_OUTCOME:
+        result = OneSignalOutcomeController.sendUniqueOutcome(callbackContext, data);
+        break;
+
+      case SEND_OUTCOME_WITH_VALUE:
+        result = OneSignalOutcomeController.sendOutcomeWithValue(callbackContext, data);
+        break;
+
+        default:
+          Log.e(TAG, "Invalid action : " + action);
+          CallbackHelper.callbackError(callbackContext, "Invalid action : " + action);
     }
 
     return result;
   }
+
+
+  /**
+   * Handlers
+   */
 
   private class CordovaNotificationReceivedHandler implements NotificationReceivedHandler {
 
@@ -617,7 +333,7 @@ public class OneSignalPush extends CordovaPlugin {
     @Override
     public void notificationReceived(OSNotification notification) {
       try {
-        callbackSuccess(jsNotificationReceivedCallBack, new JSONObject(notification.stringify()));
+        CallbackHelper.callbackSuccess(jsNotificationReceivedCallBack, new JSONObject(notification.stringify()));
       }
       catch (Throwable t) {
         t.printStackTrace();
@@ -636,7 +352,7 @@ public class OneSignalPush extends CordovaPlugin {
     @Override
     public void notificationOpened(OSNotificationOpenResult result) {
       try {
-        callbackSuccess(jsNotificationOpenedCallBack, new JSONObject(result.stringify()));
+        CallbackHelper.callbackSuccess(jsNotificationOpenedCallBack, new JSONObject(result.stringify()));
       }
       catch (Throwable t) {
         t.printStackTrace();
@@ -655,13 +371,12 @@ public class OneSignalPush extends CordovaPlugin {
     @Override
     public void inAppMessageClicked(OSInAppMessageAction result) {
       try {
-        callbackSuccess(jsInAppMessageClickedCallback, result.toJSONObject());
+        CallbackHelper.callbackSuccess(jsInAppMessageClickedCallback, result.toJSONObject());
       }
       catch (Throwable t) {
         t.printStackTrace();
       }
     }
-
   }
 
   @Override

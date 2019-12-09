@@ -5,7 +5,7 @@
     version="2.8.0">
 
   <name>OneSignal Push Notifications</name>
-  <author>Josh Kasten, Bradley Hesse</author>
+  <author>Josh Kasten, Bradley Hesse, Rodrigo Gomez-Palacio</author>
 
   <description>OneSignal is a high volume Push Notification service for mobile apps. In addition to basic notification delivery, OneSignal also provides tools to localize, target, schedule, A/B test, and automate notifications that you send.</description>
 
@@ -56,6 +56,12 @@
     </config-file>
 
     <source-file src="src/android/com/plugin/gcm/OneSignalPush.java" target-dir="src/com/plugin/gcm/" />
+    <source-file src="src/android/com/plugin/gcm/OneSignalController.java" target-dir="src/com/plugin/gcm/" />
+    <source-file src="src/android/com/plugin/gcm/OneSignalEmailController.java" target-dir="src/com/plugin/gcm/" />
+    <source-file src="src/android/com/plugin/gcm/OneSignalObserverController.java" target-dir="src/com/plugin/gcm/" />
+    <source-file src="src/android/com/plugin/gcm/OneSignalOutcomeController.java" target-dir="src/com/plugin/gcm/" />
+    <source-file src="src/android/com/plugin/gcm/OneSignalInAppMessagingController.java" target-dir="src/com/plugin/gcm/" />
+    <source-file src="src/android/com/plugin/gcm/CallbackHelper.java" target-dir="src/com/plugin/gcm/" />
   </platform>
 
   <!-- ios -->
