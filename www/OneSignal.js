@@ -337,7 +337,10 @@ OneSignal.prototype.pauseInAppMessages = function(pause) {
  * outcomes
  */
 
-OneSignal.prototype.sendOutcome = function(name, callback=function() {}) {
+OneSignal.prototype.sendOutcome = function(name, callback) {
+    if (typeof callback === "undefined")
+        callback = function() {};
+
     if (typeof callback !== "function") {
         console.error("OneSignal: sendOutcome: must provide a valid callback");
         return;
@@ -350,7 +353,10 @@ OneSignal.prototype.sendOutcome = function(name, callback=function() {}) {
     cordova.exec(sendOutcomeCallback, function() {}, "OneSignalPush", "sendOutcome", [name]);
 };
 
-OneSignal.prototype.sendUniqueOutcome = function(name, callback=function() {}) {
+OneSignal.prototype.sendUniqueOutcome = function(name, callback) {
+    if (typeof callback === "undefined")
+        callback = function() {};
+
     if (typeof callback !== "function") {
         console.error("OneSignal: sendUniqueOutcome: must provide a valid callback");
         return;
@@ -363,7 +369,10 @@ OneSignal.prototype.sendUniqueOutcome = function(name, callback=function() {}) {
     cordova.exec(sendUniqueOutcomeCallback, function() {}, "OneSignalPush", "sendUniqueOutcome", [name]);
 };
 
-OneSignal.prototype.sendOutcomeWithValue = function(name, value, callback=function() {}) {
+OneSignal.prototype.sendOutcomeWithValue = function(name, value, callback) {
+    if (typeof callback === "undefined")
+        callback = function() {};
+
     if (typeof callback !== "function") {
         console.error("OneSignal: sendOutcomeWithValue: must provide a valid callback");
         return;
