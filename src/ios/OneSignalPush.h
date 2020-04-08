@@ -40,7 +40,6 @@
 - (void)setInFocusDisplaying:(CDVInvokedUrlCommand*)command;
 - (void)getPermissionSubscriptionState:(CDVInvokedUrlCommand*)command;
 
-
 - (void)addPermissionObserver:(CDVInvokedUrlCommand*)command;
 - (void)addSubscriptionObserver:(CDVInvokedUrlCommand*)command;
 - (void)addEmailSubscriptionObserver:(CDVInvokedUrlCommand *)command;
@@ -71,6 +70,9 @@
 - (void)userProvidedPrivacyConsent:(CDVInvokedUrlCommand *)command;
 - (void)setRequiresUserPrivacyConsent:(CDVInvokedUrlCommand *)command;
 - (void)provideUserConsent:(CDVInvokedUrlCommand *)command;
+
+- (void)setExternalUserId:(CDVInvokedUrlCommand *)command;
+- (void)removeExternalUserId:(CDVInvokedUrlCommand *)command;
     
 // in app
 - (void)setInAppMessageClickHandler:(CDVInvokedUrlCommand*)command;
