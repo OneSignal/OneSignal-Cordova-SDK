@@ -283,12 +283,21 @@ OneSignal.prototype.provideUserConsent = function(granted) {
     cordova.exec(function() {}, function() {}, "OneSignalPush", "provideUserConsent", [granted]);
 };
 
-OneSignal.prototype.setExternalUserId = function(externalId) {
-    cordova.exec(function() {}, function() {}, "OneSignalPush", "setExternalUserId", [externalId]);
+OneSignal.prototype.setExternalUserId = function(externalId, externalUserIdCallback) {
+    if (externalId == undefined)
+        externalId = null;
+
+    if (externalUserIdCallback == undefined)
+        externalUserIdCallback = function() {};
+
+    cordova.exec(externalUserIdCallback, function() {}, "OneSignalPush", "setExternalUserId", [externalId]);
 };
 
-OneSignal.prototype.removeExternalUserId = function() {
-    cordova.exec(function() {}, function() {}, "OneSignalPush", "removeExternalUserId", []);
+OneSignal.prototype.removeExternalUserId = function(externalUserIdCallback) {
+    if (externalUserIdCallback == undefined)
+        externalUserIdCallback = function() {};
+
+    cordova.exec(externalUserIdCallback, function() {}, "OneSignalPush", "removeExternalUserId", []);
 };
 
 /**

@@ -104,12 +104,11 @@ void initOneSignalObject(NSDictionary* launchOptions, const char* appId, int dis
         notification = _notif;
         if (pluginCommandDelegate)
             processNotificationReceived(_notif);
-    }
-            handleNotificationAction:^(OSNotificationOpenedResult* openResult) {
-                actionNotification = openResult;
-                if (pluginCommandDelegate)
-                    processNotificationOpened(openResult);
-            } settings: iOSSettings];
+    } handleNotificationAction:^(OSNotificationOpenedResult* openResult) {
+        actionNotification = openResult;
+        if (pluginCommandDelegate)
+            processNotificationOpened(openResult);
+    } settings: iOSSettings];
 
     initialLaunchFired = true;
 }
@@ -362,12 +361,15 @@ static Class delegateClass = nil;
 
 - (void)setExternalUserId:(CDVInvokedUrlCommand *)command {
     NSString *externalId = command.arguments[0];
-    
-    [OneSignal setExternalUserId:externalId];
+    [OneSignal setExternalUserId:externalId withCompletion:^(NSDictionary *results) {
+        successCallback(command.callbackId, results);
+    }];
 }
 
 - (void)removeExternalUserId:(CDVInvokedUrlCommand *)command {
-    [OneSignal removeExternalUserId];
+    [OneSignal removeExternalUserId:^(NSDictionary *results) {
+        successCallback(command.callbackId, results);
+    }];
 }
 
 /**
@@ -377,10 +379,10 @@ static Class delegateClass = nil;
 - (void)setInAppMessageClickHandler:(CDVInvokedUrlCommand*)command {
     [OneSignal setInAppMessageClickHandler:^(OSInAppMessageAction* action) {
             NSDictionary *result = @{
-            @"click_name": action.clickName ?: [NSNull null],
-            @"click_url" : action.clickUrl.absoluteString ?: [NSNull null],
-            @"first_click" : @(action.firstClick),
-            @"closes_message" : @(action.closesMessage)
+                @"click_name": action.clickName ?: [NSNull null],
+                @"click_url" : action.clickUrl.absoluteString ?: [NSNull null],
+                @"first_click" : @(action.firstClick),
+                @"closes_message" : @(action.closesMessage)
             };
             successCallback(command.callbackId, result);
         }
