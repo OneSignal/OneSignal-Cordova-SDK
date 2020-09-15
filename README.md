@@ -32,6 +32,6 @@ For account issues and support please contact OneSignal support from the [OneSig
 To make things easier, we have published demo projects for [Cordova](https://github.com/OneSignal/OneSignal-Cordova-Example) and [Ionic](https://github.com/OneSignal/OneSignal-Ionic-Example)
 
 #### Supports:
-* Cordova, Ionic (1 through 4), and Phonegap
+* Cordova, Ionic, Ionic Capacitor, and Phonegap
 * Android 4.0.3 (API Level 15) through 10 (API Level 29), and Amazon FireOS
 * iOS 7 - 13
