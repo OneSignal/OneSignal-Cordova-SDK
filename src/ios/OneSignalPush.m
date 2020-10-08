@@ -229,7 +229,7 @@ static Class delegateClass = nil;
 }
     
 - (void)setLocationShared:(CDVInvokedUrlCommand *)command {
-   [OneSignal setLocationShared:command.arguments[0]];
+   [OneSignal setLocationShared:[command.arguments[0] boolValue]];
 }
 
 - (void)promptForPushNotificationsWithUserResponse:(CDVInvokedUrlCommand*)command {
