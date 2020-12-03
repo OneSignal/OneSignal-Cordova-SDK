@@ -241,7 +241,11 @@ public class OneSignalController {
 
   public static boolean setExternalUserId(final CallbackContext callback, JSONArray data) {
     try {
-      OneSignal.setExternalUserId(data.getString(0), new OneSignal.OSExternalUserIdUpdateCompletionHandler() {
+      String authHashToken = null;
+      if (data.length() > 1)
+        authHashToken = data.getString(1);
+
+      OneSignal.setExternalUserId(data.getString(0), authHashToken, new OneSignal.OSExternalUserIdUpdateCompletionHandler() {
         @Override
         public void onComplete(JSONObject results) {
           CallbackHelper.callbackSuccess(callback, results);

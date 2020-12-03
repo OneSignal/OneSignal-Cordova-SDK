@@ -41,6 +41,7 @@ NSString* subscriptionObserverCallbackId;
 NSString* promptForPushNotificationsWithUserResponseCallbackId;
 NSString* setEmailCallbackId;
 NSString* setUnauthenticatedEmailCallbackId;
+NSString* setExternalIdCallbackId;
 NSString* logoutEmailCallbackId;
 NSString* emailSubscriptionCallbackId;
 
@@ -239,7 +240,6 @@ static Class delegateClass = nil;
     }];
 }
 
-
 - (void)setSubscription:(CDVInvokedUrlCommand*)command {
     [OneSignal setSubscription:[command.arguments[0] boolValue]];
 }
@@ -360,9 +360,19 @@ static Class delegateClass = nil;
 }
 
 - (void)setExternalUserId:(CDVInvokedUrlCommand *)command {
+    setExternalIdCallbackId = command.callbackId;
+
     NSString *externalId = command.arguments[0];
-    [OneSignal setExternalUserId:externalId withCompletion:^(NSDictionary *results) {
-        successCallback(command.callbackId, results);
+    NSString *authHashToken = nil;
+
+    if (command.arguments.count > 1)
+        authHashToken = command.arguments[1];
+
+    [OneSignal setExternalUserId:externalId withExternalIdAuthHashToken:authHashToken withSuccess:^(NSDictionary *results) {
+        successCallback(setExternalIdCallbackId, results);
+    } withFailure: ^(NSError* error) {
+        [OneSignal onesignal_Log:ONE_S_LL_VERBOSE message:[NSString stringWithFormat:@"Set external user id Failure with error: %@", error]];
+        failureCallback(setExternalIdCallbackId, error.userInfo);
     }];
 }
 
