@@ -283,22 +283,41 @@ OneSignal.prototype.provideUserConsent = function(granted) {
     cordova.exec(function() {}, function() {}, "OneSignalPush", "provideUserConsent", [granted]);
 };
 
+/** Possible function usages
+  setExternalUserId(externalId: string?): void
+  setExternalUserId(externalId: string?, callback: function): void
+  setExternalUserId(externalId: string?, externalIdAuthHash: string?, callback: function): void
+*/
 OneSignal.prototype.setExternalUserId = function(externalId, varArg1, varArg2) {
     if (externalId == undefined)
         externalId = null;
 
+    var externalIdAuthHash = null;
+    var callback = function() {};
+
     if (typeof varArg1 === "function") {
-        cordova.exec(varArg1, function() {}, "OneSignalPush", "setExternalUserId", [externalId]);
-        return;
+        // Method was called like setExternalUserId(externalId: string?, callback: function)
+        callback = varArg1;
+    }
+    else if (typeof varArg1 === "string") {
+        // Method was called like setExternalUserId(externalId: string?, externalIdAuthHash: string?, callback: function)
+        externalIdAuthHash = varArg1;
+        callback = varArg2;
+    }
+    else if (typeof varArg1 === "undefined") {
+        // Method was called like setExternalUserId(externalId: string?)
+        // Defaults defined above for externalIdAuthHash and callback
+    }
+    else {
+      // This does not catch all possible wrongly typed params but prevents a good number of them
+      console.error("Invalid param types passed to OneSignal.setExternalUserId(). Definition is setExternalUserId(externalId: string?, externalIdAuthHash: string?, callback?: function): void")
+      return;
     }
 
-    if (varArg1 == undefined && varArg2 == undefined) {
-        varArg1 = function() {};
-        cordova.exec(varArg1, function() {}, "OneSignalPush", "setExternalUserId", [externalId]);
-        return;
-    }
-
-    cordova.exec(externalUserIdCallback, function() {}, "OneSignalPush", "setExternalUserId", [externalId, varArg1]);
+    var passToNativeParams = [externalId];
+    if (externalIdAuthHash !== null)
+        passToNativeParams.push(externalIdAuthHash)
+    cordova.exec(callback, function() {}, "OneSignalPush", "setExternalUserId", passToNativeParams);
 };
 
 OneSignal.prototype.removeExternalUserId = function(externalUserIdCallback) {
