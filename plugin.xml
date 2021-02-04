@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="onesignal-cordova-plugin"
-    version="2.11.2">
+    version="2.11.3">
 
   <name>OneSignal Push Notifications</name>
   <author>Josh Kasten, Bradley Hesse, Rodrigo Gomez-Palacio</author>
@@ -26,7 +26,7 @@
   </engines>
 
   <platform name="android">
-    <framework src="com.onesignal:OneSignal:3.15.6" />
+    <framework src="com.onesignal:OneSignal:3.15.7" />
     <framework src="build-extras-onesignal.gradle" custom="true" type="gradleReference" />
 
     <config-file target="res/xml/config.xml" parent="/*">
@@ -88,7 +88,7 @@
       <string>production</string>
     </config-file>
 
-    <framework src="OneSignal" type="podspec" spec="2.16.1" />
+    <framework src="OneSignal" type="podspec" spec="2.16.2" />
     <header-file src="src/ios/OneSignalPush.h" />
     <source-file src="src/ios/OneSignalPush.m" />
 
