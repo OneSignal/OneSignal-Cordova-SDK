@@ -12,11 +12,17 @@ module.exports = function (context) {
 
   var configXml = fs.readFileSync(path.join(rootdir, 'config.xml'), 'utf8');
   var appName = configXml.match(/<name>(.+?)<\/name>/);
+  var projectid = config.configXml(/<widget.+id="(.+?)"/);
   if (!!!appName) {
     console.error(log + 'Can\'t get App Name from ./config.xml');
     process.exit(1);
   }
   appName = appName[1];
+  if (!!!projectid) {
+    console.error(log + 'Can\'t get Project ID from ./config.xml');
+    process.exit(1);
+  }
+  projectid = projectid[1];
 
   var info = fs.readFileSync(path.join(project, appName, appName + '-Info.plist'), 'utf8');
   var config = [];
@@ -29,11 +35,10 @@ module.exports = function (context) {
     config[key] = matchs[1];
   }
 
-  var projectid = config['CFBundleURLName'];
   var appVersion = config['CFBundleShortVersionString'];
   var appBuild = config['CFBundleVersion'];
   var appTarget = '11.0';
-  
+
   var cnt = fs.readFileSync(path.join(project, appName + '.xcodeproj/project.pbxproj'), 'utf8');
 
   if (cnt.indexOf('NotificationService.m') > -1) {
