@@ -26,7 +26,7 @@ module.exports = function (context) {
 
   var info = fs.readFileSync(path.join(project, appName, appName + '-Info.plist'), 'utf8');
   var config = [];
-  for (var key of ['CFBundleShortVersionString', 'CFBundleVersion', 'CFBundleURLName']) {
+  for (var key of ['CFBundleShortVersionString', 'CFBundleVersion']) {
     var matchs = info.match(new RegExp('<key>' + key + '<\/key>(?:(?:.|\n)+?)<string>(.+?)<\/string>'));
     if (!!!matchs) {
       console.error(log + 'Can\'t get ' + key + ' from ./' + appName + '-Info.plist');
