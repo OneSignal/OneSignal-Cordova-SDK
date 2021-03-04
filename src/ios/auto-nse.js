@@ -12,7 +12,7 @@ module.exports = function (context) {
 
   var configXml = fs.readFileSync(path.join(rootdir, 'config.xml'), 'utf8');
   var appName = configXml.match(/<name>(.+?)<\/name>/);
-  var projectid = configXml.match(/<widget.+ id="(.+?)"/);
+  var projectid = configXml.match(/<widget(?: |.+ )id="(.+?)"/);
   if (!!!appName) {
     console.error(log + 'Can\'t get App Name from ./config.xml');
     process.exit(1);
