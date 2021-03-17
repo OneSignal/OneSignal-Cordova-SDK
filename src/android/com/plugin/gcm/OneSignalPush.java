@@ -153,10 +153,6 @@ public class OneSignalPush extends CordovaPlugin {
         result = init(callbackContext, data);
         break;
 
-      case SET_IN_FOCUS_DISPLAYING:
-        result = OneSignalController.setInFocusDisplaying(data);
-        break;
-
       case ADD_PERMISSION_OBSERVER:
         result = OneSignalObserverController.addPermissionObserver(callbackContext);
         break;
@@ -174,7 +170,7 @@ public class OneSignalPush extends CordovaPlugin {
         break;
 
       case GET_PERMISSION_SUBCRIPTION_STATE:
-        result = OneSignalController.getPermissionSubscriptionState(callbackContext);
+        result = OneSignalController.getDeviceState(callbackContext);
         break;
 
       case GET_IDS:
@@ -193,16 +189,8 @@ public class OneSignalPush extends CordovaPlugin {
         result = OneSignalController.registerForPushNotifications();
         break;
 
-      case ENABLE_VIBRATE:
-        result = OneSignalController.enableVibrate(data);
-        break;
-
-      case ENABLE_SOUND:
-        result = OneSignalController.enableSound(data);
-        break;
-
       case SET_SUBSCRIPTION:
-        result = OneSignalController.setSubscription(data);
+        result = OneSignalController.disablePush(data);
         break;
 
       case POST_NOTIFICATION:
