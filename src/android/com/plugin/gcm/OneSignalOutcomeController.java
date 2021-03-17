@@ -2,12 +2,12 @@ package com.plugin.gcm;
 
 import android.util.Log;
 
+import androidx.annotation.Nullable;
+
+import com.onesignal.OSOutcomeEvent;
 import com.onesignal.OneSignal;
-import com.onesignal.OutcomeEvent;
-import com.onesignal.OneSignal.OutcomeCallback;
 
 import org.apache.cordova.CallbackContext;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,9 +20,9 @@ public class OneSignalOutcomeController {
     try {
       final CallbackContext jsSendUniqueOutcomeCallback = callbackContext;
       final String name = data.getString(0);
-      OneSignal.sendUniqueOutcome(name, new OutcomeCallback(){
+      OneSignal.sendUniqueOutcome(name, new OneSignal.OutcomeCallback(){
         @Override
-        public void onSuccess(OutcomeEvent outcomeEvent) {
+        public void onSuccess(@Nullable OSOutcomeEvent outcomeEvent) {
           if (outcomeEvent == null)
             CallbackHelper.callbackSuccess(jsSendUniqueOutcomeCallback, new JSONObject());
           else {
@@ -45,9 +45,9 @@ public class OneSignalOutcomeController {
     try {
       final CallbackContext jsSendOutcomeCallback = callbackContext;
       final String name = data.getString(0);
-      OneSignal.sendOutcome(name, new OutcomeCallback() {
+      OneSignal.sendOutcome(name, new OneSignal.OutcomeCallback(){
         @Override
-        public void onSuccess(OutcomeEvent outcomeEvent) {
+        public void onSuccess(@Nullable OSOutcomeEvent outcomeEvent) {
           if (outcomeEvent == null)
             CallbackHelper.callbackSuccess(jsSendOutcomeCallback, new JSONObject());
           else {
@@ -71,9 +71,9 @@ public class OneSignalOutcomeController {
       final CallbackContext jsSendOutcomeWithValueCallback = callbackContext;
       final String name = data.getString(0);
       final float value = Double.valueOf(data.optDouble(1)).floatValue();
-      OneSignal.sendOutcomeWithValue(name, value, new OutcomeCallback() {
+      OneSignal.sendOutcomeWithValue(name, value,new OneSignal.OutcomeCallback(){
         @Override
-        public void onSuccess(OutcomeEvent outcomeEvent) {
+        public void onSuccess(@Nullable OSOutcomeEvent outcomeEvent) {
           if (outcomeEvent == null)
             CallbackHelper.callbackSuccess(jsSendOutcomeWithValueCallback, new JSONObject());
           else {
