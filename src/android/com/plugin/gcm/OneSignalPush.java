@@ -1,7 +1,7 @@
 /**
  * Modified MIT License
  *
- * Copyright 2017 OneSignal
+ * Copyright 2021 OneSignal
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,23 +28,16 @@
 package com.plugin.gcm;
 
 import android.util.Log;
+
+import com.onesignal.OSInAppMessageAction;
+import com.onesignal.OSNotificationReceivedEvent;
+import com.onesignal.OneSignal;
+
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.onesignal.OneSignal;
-import com.onesignal.OSNotification;
-import com.onesignal.OSNotificationOpenResult;
-import com.onesignal.OSInAppMessageAction;
-import com.onesignal.OneSignal.NotificationOpenedHandler;
-import com.onesignal.OneSignal.NotificationReceivedHandler;
-import com.onesignal.OneSignal.InAppMessageClickHandler;
-
-import com.onesignal.OSPermissionObserver;
-import com.onesignal.OSEmailSubscriptionObserver;
-import com.onesignal.OSSubscriptionObserver;
 
 public class OneSignalPush extends CordovaPlugin {
   private static final String TAG = "OneSignalPush";
@@ -127,22 +120,10 @@ public class OneSignalPush extends CordovaPlugin {
       String googleProjectNumber = data.getString(1);
 
       OneSignal.sdkType = "cordova";
-      OneSignal.Builder builder = OneSignal.getCurrentOrNewInitBuilder();
-      builder.unsubscribeWhenNotificationsAreDisabled(true);
-      builder.filterOtherGCMReceivers(true);
-      builder.setInAppMessageClickHandler(new CordovaInAppMessageClickHandler(inAppMessageClickedCallbackContext));
 
-      OneSignal.init(this.cordova.getActivity(),
-              googleProjectNumber,
-              appId,
-              new CordovaNotificationOpenedHandler(notifOpenedCallbackContext),
-              new CordovaNotificationReceivedHandler(notifReceivedCallbackContext)
-      );
-
-      // data.getJSONObject(2) is for iOS settings.
-
-      int displayOption = data.getInt(3);
-      OneSignal.setInFocusDisplaying(displayOption);
+      OneSignal.setInAppMessageClickHandler(new CordovaInAppMessageClickHandler(inAppMessageClickedCallbackContext));
+      OneSignal.setAppId(appId);
+      OneSignal.initWithContext(this.cordova.getActivity());
 
       return true;
     } catch (JSONException e) {
@@ -154,7 +135,6 @@ public class OneSignalPush extends CordovaPlugin {
   @Override
   public boolean execute(String action, JSONArray data, CallbackContext callbackContext) {
     boolean result = false;
-
 
     switch(action) {
       case SET_NOTIFICATION_OPENED_HANDLER:
@@ -322,37 +302,19 @@ public class OneSignalPush extends CordovaPlugin {
    * Handlers
    */
 
-  private class CordovaNotificationReceivedHandler implements NotificationReceivedHandler {
-
-    private CallbackContext jsNotificationReceivedCallBack;
-
-    public CordovaNotificationReceivedHandler(CallbackContext inCallbackContext) {
-      jsNotificationReceivedCallBack = inCallbackContext;
-    }
-
-    @Override
-    public void notificationReceived(OSNotification notification) {
-      try {
-        CallbackHelper.callbackSuccess(jsNotificationReceivedCallBack, new JSONObject(notification.stringify()));
-      }
-      catch (Throwable t) {
-        t.printStackTrace();
-      }
-    }
-  }
-
-  private class CordovaNotificationOpenedHandler implements NotificationOpenedHandler {
+  private class CordovaNotificationInForegroundHandler implements OneSignal.OSNotificationWillShowInForegroundHandler {
 
     private CallbackContext jsNotificationOpenedCallBack;
 
-    public CordovaNotificationOpenedHandler(CallbackContext inCallbackContext) {
+    public CordovaNotificationInForegroundHandler(CallbackContext inCallbackContext) {
       jsNotificationOpenedCallBack = inCallbackContext;
     }
 
     @Override
-    public void notificationOpened(OSNotificationOpenResult result) {
+    public void notificationWillShowInForeground(OSNotificationReceivedEvent notificationReceivedEvent) {
       try {
-        CallbackHelper.callbackSuccess(jsNotificationOpenedCallBack, new JSONObject(result.stringify()));
+        notificationReceivedEvent.complete(notificationReceivedEvent.getNotification());
+        CallbackHelper.callbackSuccess(jsNotificationOpenedCallBack, new JSONObject(notificationReceivedEvent.toJSONObject().toString()));
       }
       catch (Throwable t) {
         t.printStackTrace();
@@ -360,7 +322,7 @@ public class OneSignalPush extends CordovaPlugin {
     }
   }
 
-  private class CordovaInAppMessageClickHandler implements InAppMessageClickHandler {
+  private class CordovaInAppMessageClickHandler implements OneSignal.OSInAppMessageClickHandler {
 
     private CallbackContext jsInAppMessageClickedCallback;
 
@@ -381,7 +343,7 @@ public class OneSignalPush extends CordovaPlugin {
 
   @Override
   public void onDestroy() {
-    OneSignal.removeNotificationOpenedHandler();
-    OneSignal.removeNotificationReceivedHandler();
+    OneSignal.setNotificationOpenedHandler(null);
+    OneSignal.setNotificationWillShowInForegroundHandler(null);
   }
 }
