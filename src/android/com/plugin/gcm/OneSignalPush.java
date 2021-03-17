@@ -201,10 +201,6 @@ public class OneSignalPush extends CordovaPlugin {
         OneSignalController.promptLocation();
         break;
 
-      case SYNC_HASHED_EMAIL:
-        OneSignalEmailController.syncHashedEmail(data);
-        break;
-
       case SET_LOG_LEVEL:
         OneSignalController.setLogLevel(data);
         break;
