@@ -37,8 +37,7 @@
 - (void)setNotificationOpenedHandler:(CDVInvokedUrlCommand*)command;
 - (void)init:(CDVInvokedUrlCommand*)command;
 
-- (void)setInFocusDisplaying:(CDVInvokedUrlCommand*)command;
-- (void)getPermissionSubscriptionState:(CDVInvokedUrlCommand*)command;
+- (void)getDeviceState:(CDVInvokedUrlCommand*)command;
 
 - (void)addPermissionObserver:(CDVInvokedUrlCommand*)command;
 - (void)addSubscriptionObserver:(CDVInvokedUrlCommand*)command;
@@ -49,12 +48,10 @@
 - (void)sendTags:(CDVInvokedUrlCommand*)command;
 - (void)deleteTags:(CDVInvokedUrlCommand*)command;
 - (void)promptForPushNotificationsWithUserResponse:(CDVInvokedUrlCommand*)command;
-- (void)registerForPushNotifications:(CDVInvokedUrlCommand*)command;
-- (void)setSubscription:(CDVInvokedUrlCommand*)command;
+- (void)disablePush:(CDVInvokedUrlCommand*)command;
 - (void)postNotification:(CDVInvokedUrlCommand*)command;
 - (void)setLogLevel:(CDVInvokedUrlCommand*)command;
 - (void)promptLocation:(CDVInvokedUrlCommand*)command;
-- (void)syncHashedEmail:(CDVInvokedUrlCommand*)command;
 - (void)setLocationShared:(CDVInvokedUrlCommand *)command;
 
 //email
