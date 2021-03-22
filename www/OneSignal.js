@@ -141,8 +141,8 @@ OneSignal.prototype.deleteTags = function(keys) {
 
 // Only applies to iOS (does nothing on Android as it always silently registers)
 // Call only if you passed false to autoRegister
-OneSignal.prototype.registerForPushNotifications = function() {
-    cordova.exec(function(){}, function(){}, "OneSignalPush", "registerForPushNotifications", []);
+OneSignal.prototype.registerForProvisionalAuthorization = function() {
+    cordova.exec(function(){}, function(){}, "OneSignalPush", "registerForProvisionalAuthorization", []);
 };
 
 // Only applies to iOS (does nothing on Android as it always silently registers without user permission)
@@ -153,6 +153,7 @@ OneSignal.prototype.promptForPushNotificationsWithUserResponse = function(callba
     cordova.exec(internalCallback, function(){}, "OneSignalPush", "promptForPushNotificationsWithUserResponse", []);
 };
 
+// Only applies to Android.
 OneSignal.prototype.clearOneSignalNotifications = function() {
     cordova.exec(function(){}, function(){}, "OneSignalPush", "clearOneSignalNotifications", []);
 };
@@ -386,6 +387,10 @@ OneSignal.prototype.promptLocation = function() {
 
 OneSignal.prototype.setLocationShared = function(shared) {
     cordova.exec(function() {}, function() {}, "OneSignalPush", "setLocationShared", [shared]);
+};
+
+OneSignal.prototype.isLocationShared = function(shared) {
+    cordova.exec(function() {}, function() {}, "OneSignalPush", "isLocationShared", [shared]);
 };
 
 //-------------------------------------------------------------------
