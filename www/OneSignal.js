@@ -27,17 +27,9 @@
 
 var OneSignal = function() {
     var _appID = "";
-    var _googleProjectNumber = "";
-    var _iOSSettings = {};
-    var _notificationReceivedDelegate = function() {};
+    var _notificationWillShowInForegroundDelegate = function() {};
     var _notificationOpenedDelegate = function() {};
     var _inAppMessageClickDelegate = function () {};
-};
-
-OneSignal.prototype.OSInFocusDisplayOption = {
-    None: 0,
-    InAppAlert : 1,
-    Notification : 2
 };
 
 OneSignal.prototype.OSNotificationPermission = {
@@ -46,23 +38,19 @@ OneSignal.prototype.OSNotificationPermission = {
     Denied: 2
 };
 
-OneSignal._displayOption = OneSignal.prototype.OSInFocusDisplayOption.InAppAlert;
-
 OneSignal._permissionObserverList = [];
 OneSignal._subscriptionObserverList = [];
 OneSignal._emailSubscriptionObserverList = [];
 
 
 // You must call init before any other OneSignal function.
-//  Android - googleProjectNumber: Deprecated; pulled from dashboard, local value is ignored
-OneSignal.prototype.startInit = function(appId, googleProjectNumber) {
+OneSignal.prototype.startInit = function(appId) {
     OneSignal._appID = appId;
-    OneSignal._googleProjectNumber = googleProjectNumber;
     return this;
 };
 
-OneSignal.prototype.handleNotificationReceived = function(handleNotificationReceivedCallback) {
-    OneSignal._notificationReceivedDelegate = handleNotificationReceivedCallback;
+OneSignal.prototype.handleNotificationWillShowInForeground = function(handleNotificationWillShowInForegroundCallback) {
+    OneSignal._notificationWillShowInForegroundDelegate = handleNotificationWillShowInForegroundCallback;
     return this;
 };
 
@@ -76,27 +64,13 @@ OneSignal.prototype.handleInAppMessageClicked = function(handler) {
     return this;
 };
 
-OneSignal.prototype.inFocusDisplaying = function(display) {
-    OneSignal._displayOption = display;
-    return this;
-};
-
-//Possible settings keys:
-// kOSSettingsKeyInAppLaunchURL: Bool. Enable in-app webviews for urls. Default: Enabled
-// kOSSettingsKeyAutoPrompt: Bool. Enable automatic prompting for notifications. Default: Enabled
-OneSignal.prototype.iOSSettings = function(settings) {
-    OneSignal._iOSSettings = settings;
-    return this;
-};
-
 OneSignal.prototype.endInit = function() {
-
-    //Pass notification received handler
-    cordova.exec(OneSignal._notificationReceivedDelegate, function(){}, "OneSignalPush", "setNotificationReceivedHandler", []);
+    // Pass notification received handler
+    cordova.exec(OneSignal._notificationWillShowInForegroundDelegate, function(){}, "OneSignalPush", "setNotificationWillShowInForegroundHandler", []);
     cordova.exec(OneSignal._notificationOpenedDelegate, function(){}, "OneSignalPush", "setNotificationOpenedHandler", []);
     cordova.exec(OneSignal._inAppMessageClickDelegate, function() {}, "OneSignalPush", "setInAppMessageClickHandler", []);
-    //Call Init
-    cordova.exec(function() {}, function(){}, "OneSignalPush", "init", [OneSignal._appID, OneSignal._googleProjectNumber, OneSignal._iOSSettings, OneSignal._displayOption]);
+    // Call Init
+    cordova.exec(function() {}, function(){}, "OneSignalPush", "init", [OneSignal._appID]);
 };
 
 OneSignal._processFunctionList = function(array, param) {
@@ -113,14 +87,8 @@ OneSignal._formatPermissionObj = function(state) {
     }
 };
 
-OneSignal.prototype.addPermissionObserver = function(callback) {
-    OneSignal._permissionObserverList.push(callback);
-    var permissionCallBackProcessor = function(state) {
-        OneSignal._formatPermissionObj(state.to);
-        OneSignal._formatPermissionObj(state.from);
-        OneSignal._processFunctionList(OneSignal._permissionObserverList, state);
-    };
-    cordova.exec(permissionCallBackProcessor, function(){}, "OneSignalPush", "addPermissionObserver", []);
+OneSignal.prototype.getDeviceState = function(deviceStateReceivedCallBack) {
+    cordova.exec(deviceStateReceivedCallBack, function(){}, "OneSignalPush", "getDeviceState", []);
 };
 
 OneSignal.prototype.addSubscriptionObserver = function(callback) {
@@ -139,21 +107,14 @@ OneSignal.prototype.addEmailSubscriptionObserver = function(callback) {
     cordova.exec(emailSubscriptionCallbackProcessor, function(){}, "OneSignalPush", "addEmailSubscriptionObserver", []);
 };
 
-OneSignal.prototype.setInFocusDisplaying = function(displayType) {
-    OneSignal._displayOption = displayType;
-    cordova.exec(function(){}, function(){}, "OneSignalPush", "setInFocusDisplaying", [displayType]);
-};
-
-OneSignal.prototype.getPermissionSubscriptionState = function(callback) {
-    var internalCallBackProcessor = function(state) {
-        OneSignal._formatPermissionObj(state.permissionStatus);
-        callback(state);
+OneSignal.prototype.addPermissionObserver = function(callback) {
+    OneSignal._permissionObserverList.push(callback);
+    var permissionCallBackProcessor = function(state) {
+        OneSignal._formatPermissionObj(state.to);
+        OneSignal._formatPermissionObj(state.from);
+        OneSignal._processFunctionList(OneSignal._permissionObserverList, state);
     };
-    cordova.exec(internalCallBackProcessor, function(){}, "OneSignalPush", "getPermissionSubscriptionState", []);
-};
-
-OneSignal.prototype.getIds = function(IdsReceivedCallBack) {
-    cordova.exec(IdsReceivedCallBack, function(){}, "OneSignalPush", "getIds", []);
+    cordova.exec(permissionCallBackProcessor, function(){}, "OneSignalPush", "addPermissionObserver", []);
 };
 
 OneSignal.prototype.getTags = function(tagsReceivedCallBack) {
@@ -178,12 +139,13 @@ OneSignal.prototype.deleteTags = function(keys) {
     cordova.exec(function(){}, function(){}, "OneSignalPush", "deleteTags", keys);
 };
 
-// Only applies to iOS(does nothing on Android as it always silently registers)
+// Only applies to iOS (does nothing on Android as it always silently registers)
 // Call only if you passed false to autoRegister
 OneSignal.prototype.registerForPushNotifications = function() {
     cordova.exec(function(){}, function(){}, "OneSignalPush", "registerForPushNotifications", []);
 };
 
+// Only applies to iOS (does nothing on Android as it always silently registers without user permission)
 OneSignal.prototype.promptForPushNotificationsWithUserResponse = function(callback) {
     var internalCallback = function(data) {
         callback(data.accepted === "true");
@@ -195,22 +157,24 @@ OneSignal.prototype.clearOneSignalNotifications = function() {
     cordova.exec(function(){}, function(){}, "OneSignalPush", "clearOneSignalNotifications", []);
 };
 
-// Only applies to Android, vibrate is on by default but can be disabled by passing in false.
-OneSignal.prototype.enableVibrate = function(enable) {
-    cordova.exec(function(){}, function(){}, "OneSignalPush", "enableVibrate", [enable]);
+// Only applies to Android.
+// If notifications are disabled for your app, unsubscribe the user from OneSignal.
+OneSignal.prototype.unsubscribeWhenNotificationsAreDisabled = function(unsubscribe) {
+    cordova.exec(function(){}, function(){}, "OneSignalPush", "unsubscribeWhenNotificationsAreDisabled", [unsubscribe]);
 };
 
-// Only applies to Android, sound is on by default but can be disabled by passing in false.
-OneSignal.prototype.enableSound = function(enable) {
-    cordova.exec(function(){}, function(){}, "OneSignalPush", "enableSound", [enable]);
+// Only applies to Android. Cancels a single OneSignal notification based on its Android notification integer ID
+OneSignal.prototype.removeNotification = function(id) {
+    cordova.exec(function(){}, function(){}, "OneSignalPush", "removeNotification", []);
 };
 
-OneSignal.prototype.enableNotificationsWhenActive = function(enable) {
-    cordova.exec(function(){}, function(){}, "OneSignalPush", "enableNotificationsWhenActive", [enable]);
+// Only applies to Android. Cancels a single OneSignal notification based on its Android notification group ID
+OneSignal.prototype.removeGroupedNotifications = function(groupId) {
+    cordova.exec(function(){}, function(){}, "OneSignalPush", "removeGroupedNotifications", [groupId]);
 };
 
-OneSignal.prototype.setSubscription = function(enable) {
-    cordova.exec(function(){}, function(){}, "OneSignalPush", "setSubscription", [enable]);
+OneSignal.prototype.disablePush = function(disable) {
+    cordova.exec(function(){}, function(){}, "OneSignalPush", "disablePush", [disable]);
 };
 
 OneSignal.prototype.postNotification = function(jsonData, onSuccess, onFailure) {
@@ -223,24 +187,29 @@ OneSignal.prototype.postNotification = function(jsonData, onSuccess, onFailure) 
     cordova.exec(onSuccess, onFailure, "OneSignalPush", "postNotification", [jsonData]);
 };
 
-OneSignal.prototype.promptLocation = function() {
-    cordova.exec(function(){}, function(){}, "OneSignalPush", "promptLocation", []);
-};
-
-OneSignal.prototype.syncHashedEmail = function(email) {
-    cordova.exec(function(){}, function(){}, "OneSignalPush", "syncHashedEmail", [email]);
-};
-
 OneSignal.prototype.setLogLevel = function(logLevel) {
     cordova.exec(function(){}, function(){}, "OneSignalPush", "setLogLevel", [logLevel]);
 };
 
-OneSignal.prototype.setLocationShared = function(shared) {
-    cordova.exec(function() {}, function() {}, "OneSignalPush", "setLocationShared", [shared]);
+OneSignal.prototype.userProvidedPrivacyConsent = function(callback) {
+    cordova.exec(callback, function(){}, "OneSignalPush", "userProvidedPrivacyConsent", []);
 };
 
-//email
+OneSignal.prototype.requiresUserPrivacyConsent = function(callback) {
+    cordova.exec(callback, function(){}, "OneSignalPush", "requiresUserPrivacyConsent", []);
+};
 
+OneSignal.prototype.setRequiresUserPrivacyConsent = function(required) {
+    cordova.exec(function() {}, function() {}, "OneSignalPush", "setRequiresUserPrivacyConsent", [required]);
+};
+
+OneSignal.prototype.provideUserConsent = function(granted) {
+    cordova.exec(function() {}, function() {}, "OneSignalPush", "provideUserConsent", [granted]);
+};
+
+/**
+ * Email
+ */
 OneSignal.prototype.setEmail = function(email, emailAuthToken, onSuccess, onFailure) {
     if (onSuccess == null)
         onSuccess = function() {};
@@ -269,18 +238,6 @@ OneSignal.prototype.logoutEmail = function(onSuccess, onFailure) {
         onFailure = function() {};
 
     cordova.exec(onSuccess, onFailure, "OneSignalPush", "logoutEmail", []);
-};
-
-OneSignal.prototype.userProvidedPrivacyConsent = function(callback) {
-    cordova.exec(callback, function(){}, "OneSignalPush", "userProvidedPrivacyConsent", []);
-};
-
-OneSignal.prototype.setRequiresUserPrivacyConsent = function(required) {
-    cordova.exec(function() {}, function() {}, "OneSignalPush", "setRequiresUserPrivacyConsent", [required]);
-};
-
-OneSignal.prototype.provideUserConsent = function(granted) {
-    cordova.exec(function() {}, function() {}, "OneSignalPush", "provideUserConsent", [granted]);
 };
 
 /** Possible function usages
@@ -328,9 +285,8 @@ OneSignal.prototype.removeExternalUserId = function(externalUserIdCallback) {
 };
 
 /**
- * in app messaging
+ * In app messaging
  */
-
 OneSignal.prototype.addTriggers = function(triggers) {
     Object.keys(triggers).forEach(function(key){
         // forces values to be string types
@@ -370,9 +326,8 @@ OneSignal.prototype.pauseInAppMessages = function(pause) {
 };
 
 /**
- * outcomes
+ * Outcomes
  */
-
 OneSignal.prototype.sendOutcome = function(name, callback) {
     if (typeof callback === "undefined")
         callback = function() {};
@@ -419,6 +374,18 @@ OneSignal.prototype.sendOutcomeWithValue = function(name, value, callback) {
     };
 
     cordova.exec(sendOutcomeWithValueCallback, function() {}, "OneSignalPush", "sendOutcomeWithValue", [name, Number(value)]);
+};
+
+/**
+ * Location
+ */
+
+OneSignal.prototype.promptLocation = function() {
+    cordova.exec(function(){}, function(){}, "OneSignalPush", "promptLocation", []);
+};
+
+OneSignal.prototype.setLocationShared = function(shared) {
+    cordova.exec(function() {}, function() {}, "OneSignalPush", "setLocationShared", [shared]);
 };
 
 //-------------------------------------------------------------------
