@@ -13,23 +13,46 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class OneSignalController {
-  private static CallbackContext notifReceivedCallbackContext;
-  private static CallbackContext notifOpenedCallbackContext;
-  private static CallbackContext inAppMessageClickedCallbackContext;
 
-  private static final String TAG = "OneSignalPush";
+  /**
+   * Subscriptions
+   */
+  public static boolean getDeviceState(CallbackContext callbackContext) {
+    OSDeviceState deviceState = OneSignal.getDeviceState();
+    if (deviceState != null)
+      CallbackHelper.callbackSuccess(callbackContext, deviceState.toJSONObject());
+    return true;
+  }
+
+  public static boolean disablePush(JSONArray data) {
+    try {
+      OneSignal.disablePush(data.getBoolean(0));
+      return true;
+    }
+    catch (Throwable t) {
+      t.printStackTrace();
+      return false;
+    }
+  }
+
+  /**
+   * Misc
+   */
+  public static void setLogLevel(JSONArray data) {
+    try {
+      JSONObject jo = data.getJSONObject(0);
+      OneSignal.setLogLevel(jo.optInt("logLevel", 0), jo.optInt("visualLevel", 0));
+    } catch (Throwable t) {
+      t.printStackTrace();
+    }
+  }
 
   /**
    * Tags
    */
   public static boolean getTags(CallbackContext callbackContext) {
     final CallbackContext jsTagsAvailableCallBack = callbackContext;
-    OneSignal.getTags(new OneSignal.OSGetTagsHandler() {
-      @Override
-      public void tagsAvailable(JSONObject tags) {
-        CallbackHelper.callbackSuccess(jsTagsAvailableCallBack, tags);
-      }
-    });
+    OneSignal.getTags(tags -> CallbackHelper.callbackSuccess(jsTagsAvailableCallBack, tags));
     return true;
   }
 
@@ -51,27 +74,6 @@ public class OneSignalController {
       OneSignal.deleteTags(list);
       return true;
     } catch (Throwable t) {
-      t.printStackTrace();
-      return false;
-    }
-  }
-
-  /**
-   * Subscriptions
-   */
-  public static boolean getDeviceState(CallbackContext callbackContext) {
-    OSDeviceState deviceState = OneSignal.getDeviceState();
-    if (deviceState != null)
-      CallbackHelper.callbackSuccess(callbackContext, deviceState.toJSONObject());
-    return true;
-  }
-
-  public static boolean disablePush(JSONArray data) {
-    try {
-      OneSignal.disablePush(data.getBoolean(0));
-      return true;
-    }
-    catch (Throwable t) {
       t.printStackTrace();
       return false;
     }
@@ -116,62 +118,58 @@ public class OneSignalController {
     }
   }
 
-  /**
-   * Location
-   */
-
-  public static void promptLocation() {
-    OneSignal.promptLocation();
-  }
-
-  public static void setLocationShared(JSONArray data) {
+  public static boolean removeNotification(JSONArray data) {
     try {
-      OneSignal.setLocationShared(data.getBoolean(0));
-    } catch (JSONException e) {
-      e.printStackTrace();
+      OneSignal.removeNotification(data.getInt(0));
+      return true;
+    } catch (Throwable t) {
+      t.printStackTrace();
+      return false;
     }
   }
 
-  /**
-   * Misc
-   */
+  public static boolean removeGroupedNotifications(JSONArray data) {
+    try {
+      OneSignal.removeGroupedNotifications(data.getString(0));
+      return true;
+    } catch (Throwable t) {
+      t.printStackTrace();
+      return false;
+    }
+  }
+
   public static boolean registerForPushNotifications() {
     // doesn't apply to Android
     return true;
   }
 
-  public static boolean getIds(CallbackContext callbackContext) {
-    OSDeviceState deviceState = OneSignal.getDeviceState();
-
-    if (deviceState == null)
-      return false;
-
-    JSONObject jsonIds = new JSONObject();
-    try {
-      jsonIds.put("userId", deviceState.getUserId());
-      jsonIds.put("pushToken", deviceState.getPushToken() == null ? "" : deviceState.getPushToken());
-
-      CallbackHelper.callbackSuccess(callbackContext, jsonIds);
-    } catch (Throwable t) {
-      t.printStackTrace();
-    }
-
+  public static boolean promptForPushNotificationsWithUserResponse() {
+    // doesn't apply to Android
     return true;
   }
 
-  public static void setLogLevel(JSONArray data) {
+  public static boolean unsubscribeWhenNotificationsAreDisabled(JSONArray data) {
     try {
-      JSONObject jo = data.getJSONObject(0);
-      OneSignal.setLogLevel(jo.optInt("logLevel", 0), jo.optInt("visualLevel", 0));
+      OneSignal.unsubscribeWhenNotificationsAreDisabled(data.getBoolean(0));
+      return true;
+    } catch (JSONException e) {
+      e.printStackTrace();
     }
-    catch(Throwable t) {
-      t.printStackTrace();
-    }
+    return false;
   }
 
+  /**
+   * Privacy consent
+   */
   public static boolean userProvidedConsent(CallbackContext callbackContext) {
     boolean providedConsent = OneSignal.userProvidedPrivacyConsent();
     CallbackHelper.callbackSuccessBoolean(callbackContext, providedConsent);
+    return true;
+  }
+
+  public static boolean requiresUserPrivacyConsent(CallbackContext callbackContext) {
+    boolean requiresUserPrivacyConsent = OneSignal.requiresUserPrivacyConsent();
+    CallbackHelper.callbackSuccessBoolean(callbackContext, requiresUserPrivacyConsent);
     return true;
   }
 
@@ -185,7 +183,7 @@ public class OneSignalController {
     }
   }
 
-  public static boolean grantConsent(JSONArray data) {
+  public static boolean provideUserConsent(JSONArray data) {
     try {
       OneSignal.provideUserConsent(data.getBoolean(0));
       return true;
@@ -195,6 +193,9 @@ public class OneSignalController {
     }
   }
 
+  /**
+   * External User Is
+   */
   public static boolean setExternalUserId(final CallbackContext callback, JSONArray data) {
     try {
       String authHashToken = null;
@@ -234,4 +235,22 @@ public class OneSignalController {
     return true;
   }
 
+  /**
+   * Location
+   */
+  public static void promptLocation() {
+    OneSignal.promptLocation();
+  }
+
+  public static void setLocationShared(JSONArray data) {
+    try {
+      OneSignal.setLocationShared(data.getBoolean(0));
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public static void isLocationShared(JSONArray data) {
+    // doesn't apply to Android
+  }
 }

@@ -90,4 +90,10 @@ public class OneSignalInAppMessagingController {
         }
     }
 
+    public static boolean isInAppMessagingPaused(CallbackContext callbackContext) {
+        boolean inAppMessagingPaused = OneSignal.isInAppMessagingPaused();
+        CallbackHelper.callbackSuccessBoolean(callbackContext, inAppMessagingPaused);
+        return true;
+    }
+
 }

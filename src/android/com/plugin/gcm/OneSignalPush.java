@@ -42,45 +42,45 @@ import org.json.JSONObject;
 public class OneSignalPush extends CordovaPlugin {
   private static final String TAG = "OneSignalPush";
 
-  private static final String SET_NOTIFICATION_RECEIVED_HANDLER = "setNotificationReceivedHandler";
+  private static final String SET_NOTIFICATION_WILL_SHOW_IN_FOREGROUND_HANDLER = "setNotificationWillShowInForegroundHandler";
   private static final String SET_NOTIFICATION_OPENED_HANDLER = "setNotificationOpenedHandler";
   private static final String SET_IN_APP_MESSAGE_CLICK_HANDLER = "setInAppMessageClickHandler";
   private static final String INIT = "init";
 
-  private static final String SET_IN_FOCUS_DISPLAYING = "setInFocusDisplaying";
-
-  private static final String GET_PERMISSION_SUBCRIPTION_STATE = "getPermissionSubscriptionState";
-  private static final String GET_IDS = "getIds";
+  private static final String GET_DEVICE_STATE = "getDeviceState";
 
   private static final String ADD_PERMISSION_OBSERVER = "addPermissionObserver";
   private static final String ADD_SUBSCRIPTION_OBSERVER = "addSubscriptionObserver";
+  private static final String ADD_EMAIL_SUBSCRIPTION_OBSERVER = "addEmailSubscriptionObserver";
 
   private static final String GET_TAGS = "getTags";
   private static final String DELETE_TAGS = "deleteTags";
   private static final String SEND_TAGS = "sendTags";
-  private static final String SYNC_HASHED_EMAIL = "syncHashedEmail";
 
   private static final String REGISTER_FOR_PUSH_NOTIFICATIONS = "registerForPushNotifications";
-  private static final String ENABLE_VIBRATE = "enableVibrate";
-  private static final String ENABLE_SOUND = "enableSound";
+  private static final String PROMPT_FOR_PUSH_NOTIFICATIONS_WITH_USER_RESPONSE = "promptForPushNotificationsWithUserResponse";
+  private static final String UNSUBSCRIBE_WHEN_NOTIFICATIONS_DISABLED = "unsubscribeWhenNotificationsAreDisabled";
 
-  private static final String SET_SUBSCRIPTION = "setSubscription";
-  private static final String POST_NOTIFICATION = "postNotification";
-  private static final String PROMPT_LOCATION = "promptLocation";
   private static final String CLEAR_ONESIGNAL_NOTIFICATIONS = "clearOneSignalNotifications";
+  private static final String REMOVE_NOTIFICATION = "removeNotification";
+  private static final String REMOVE_GROUPED_NOTIFICATIONS = "removeGroupedNotifications";
+
+  private static final String DISABLE_PUSH = "disablePush";
+  private static final String POST_NOTIFICATION = "postNotification";
 
   private static final String SET_EMAIL = "setEmail";
   private static final String SET_UNAUTHENTICATED_EMAIL = "setUnauthenticatedEmail";
   private static final String LOGOUT_EMAIL = "logoutEmail";
-  private static final String ADD_EMAIL_SUBSCRIPTION_OBSERVER = "addEmailSubscriptionObserver";
 
   private static final String SET_LOG_LEVEL = "setLogLevel";
 
   private static final String SET_LOCATION_SHARED = "setLocationShared";
+  private static final String PROMPT_LOCATION = "promptLocation";
 
   private static final String USER_PROVIDED_CONSENT = "userProvidedPrivacyConsent";
+  private static final String REQUIRES_CONSENT = "requiresUserPrivacyConsent";
   private static final String SET_REQUIRES_CONSENT = "setRequiresUserPrivacyConsent";
-  private static final String GRANT_CONSENT = "provideUserConsent";
+  private static final String PROVIDE_USER_CONSENT = "provideUserConsent";
 
   private static final String SET_EXTERNAL_USER_ID = "setExternalUserId";
   private static final String REMOVE_EXTERNAL_USER_ID = "removeExternalUserId";
@@ -88,19 +88,21 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String ADD_TRIGGERS = "addTriggers";
   private static final String REMOVE_TRIGGERS_FOR_KEYS = "removeTriggersForKeys";
   private static final String GET_TRIGGER_VALUE_FOR_KEY = "getTriggerValueForKey";
+
   private static final String PAUSE_IN_APP_MESSAGES = "pauseInAppMessages";
+  private static final String IN_APP_MESSAGING_PAUSED = "isInAppMessagingPaused";
 
   private static final String SEND_OUTCOME = "sendOutcome";
   private static final String SEND_UNIQUE_OUTCOME = "sendUniqueOutcome";
   private static final String SEND_OUTCOME_WITH_VALUE = "sendOutcomeWithValue";
 
-  private static CallbackContext notifReceivedCallbackContext;
+  private static CallbackContext notifWillShowInForegroundCallbackContext;
   private static CallbackContext notifOpenedCallbackContext;
   private static CallbackContext inAppMessageClickedCallbackContext;
 
 
-  public static boolean setNotificationReceivedHandler(CallbackContext callbackContext) {
-    notifReceivedCallbackContext = callbackContext;
+  public static boolean setNotificationWillShowInForegroundHandler(CallbackContext callbackContext) {
+    notifWillShowInForegroundCallbackContext = callbackContext;
     return true;
   }
 
@@ -117,7 +119,6 @@ public class OneSignalPush extends CordovaPlugin {
   public boolean init(CallbackContext callbackContext, JSONArray data) {
     try {
       String appId = data.getString(0);
-      String googleProjectNumber = data.getString(1);
 
       OneSignal.sdkType = "cordova";
 
@@ -141,8 +142,8 @@ public class OneSignalPush extends CordovaPlugin {
         result = setNotificationOpenedHandler(callbackContext);
         break;
 
-      case SET_NOTIFICATION_RECEIVED_HANDLER:
-        result = setNotificationReceivedHandler(callbackContext);
+      case SET_NOTIFICATION_WILL_SHOW_IN_FOREGROUND_HANDLER:
+        result = setNotificationWillShowInForegroundHandler(callbackContext);
         break;
 
       case SET_IN_APP_MESSAGE_CLICK_HANDLER:
@@ -151,6 +152,10 @@ public class OneSignalPush extends CordovaPlugin {
 
       case INIT:
         result = init(callbackContext, data);
+        break;
+
+      case GET_DEVICE_STATE:
+        result = OneSignalController.getDeviceState(callbackContext);
         break;
 
       case ADD_PERMISSION_OBSERVER:
@@ -169,14 +174,6 @@ public class OneSignalPush extends CordovaPlugin {
         result = OneSignalController.getTags(callbackContext);
         break;
 
-      case GET_PERMISSION_SUBCRIPTION_STATE:
-        result = OneSignalController.getDeviceState(callbackContext);
-        break;
-
-      case GET_IDS:
-        result = OneSignalController.getIds(callbackContext);
-        break;
-
       case SEND_TAGS:
         result = OneSignalController.sendTags(data);
         break;
@@ -189,7 +186,27 @@ public class OneSignalPush extends CordovaPlugin {
         result = OneSignalController.registerForPushNotifications();
         break;
 
-      case SET_SUBSCRIPTION:
+      case PROMPT_FOR_PUSH_NOTIFICATIONS_WITH_USER_RESPONSE:
+        result = OneSignalController.promptForPushNotificationsWithUserResponse();
+        break;
+
+      case UNSUBSCRIBE_WHEN_NOTIFICATIONS_DISABLED:
+        result = OneSignalController.unsubscribeWhenNotificationsAreDisabled(data);
+        break;
+
+      case CLEAR_ONESIGNAL_NOTIFICATIONS:
+        result = OneSignalController.clearOneSignalNotifications();
+        break;
+
+      case REMOVE_NOTIFICATION:
+        result = OneSignalController.removeNotification(data);
+        break;
+
+      case REMOVE_GROUPED_NOTIFICATIONS:
+        result = OneSignalController.removeGroupedNotifications(data);
+        break;
+
+      case DISABLE_PUSH:
         result = OneSignalController.disablePush(data);
         break;
 
@@ -197,16 +214,8 @@ public class OneSignalPush extends CordovaPlugin {
         result = OneSignalController.postNotification(callbackContext, data);
         break;
 
-      case PROMPT_LOCATION:
-        OneSignalController.promptLocation();
-        break;
-
       case SET_LOG_LEVEL:
         OneSignalController.setLogLevel(data);
-        break;
-
-      case CLEAR_ONESIGNAL_NOTIFICATIONS:
-        result = OneSignalController.clearOneSignalNotifications();
         break;
 
       case SET_EMAIL:
@@ -221,6 +230,10 @@ public class OneSignalPush extends CordovaPlugin {
         result = OneSignalEmailController.logoutEmail(callbackContext);
         break;
 
+      case PROMPT_LOCATION:
+        OneSignalController.promptLocation();
+        break;
+
       case SET_LOCATION_SHARED:
         OneSignalController.setLocationShared(data);
         break;
@@ -229,12 +242,16 @@ public class OneSignalPush extends CordovaPlugin {
         result = OneSignalController.userProvidedConsent(callbackContext);
         break;
 
+      case REQUIRES_CONSENT:
+        result = OneSignalController.requiresUserPrivacyConsent(callbackContext);
+        break;
+
       case SET_REQUIRES_CONSENT:
         result = OneSignalController.setRequiresConsent(callbackContext, data);
         break;
 
-      case GRANT_CONSENT:
-        result = OneSignalController.grantConsent(data);
+      case PROVIDE_USER_CONSENT:
+        result = OneSignalController.provideUserConsent(data);
         break;
 
       case SET_EXTERNAL_USER_ID:
@@ -259,6 +276,10 @@ public class OneSignalPush extends CordovaPlugin {
 
       case PAUSE_IN_APP_MESSAGES:
         result = OneSignalInAppMessagingController.pauseInAppMessages(data);
+        break;
+
+      case IN_APP_MESSAGING_PAUSED:
+        result = OneSignalInAppMessagingController.isInAppMessagingPaused(callbackContext);
         break;
 
       case SEND_OUTCOME:
