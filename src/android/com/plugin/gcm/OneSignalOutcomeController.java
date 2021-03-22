@@ -2,9 +2,6 @@ package com.plugin.gcm;
 
 import android.util.Log;
 
-import androidx.annotation.Nullable;
-
-import com.onesignal.OSOutcomeEvent;
 import com.onesignal.OneSignal;
 
 import org.apache.cordova.CallbackContext;
@@ -20,17 +17,14 @@ public class OneSignalOutcomeController {
     try {
       final CallbackContext jsSendUniqueOutcomeCallback = callbackContext;
       final String name = data.getString(0);
-      OneSignal.sendUniqueOutcome(name, new OneSignal.OutcomeCallback(){
-        @Override
-        public void onSuccess(@Nullable OSOutcomeEvent outcomeEvent) {
-          if (outcomeEvent == null)
-            CallbackHelper.callbackSuccess(jsSendUniqueOutcomeCallback, new JSONObject());
-          else {
-            try {
-              CallbackHelper.callbackSuccess(jsSendUniqueOutcomeCallback, outcomeEvent.toJSONObject());
-            } catch (JSONException e) {
-              Log.e(TAG, "sendUniqueOutcome with name: " + name + ", failed with message: " + e.getMessage());
-            }
+      OneSignal.sendUniqueOutcome(name, outcomeEvent -> {
+        if (outcomeEvent == null)
+          CallbackHelper.callbackSuccess(jsSendUniqueOutcomeCallback, new JSONObject());
+        else {
+          try {
+            CallbackHelper.callbackSuccess(jsSendUniqueOutcomeCallback, outcomeEvent.toJSONObject());
+          } catch (JSONException e) {
+            Log.e(TAG, "sendUniqueOutcome with name: " + name + ", failed with message: " + e.getMessage());
           }
         }
       });
@@ -45,17 +39,14 @@ public class OneSignalOutcomeController {
     try {
       final CallbackContext jsSendOutcomeCallback = callbackContext;
       final String name = data.getString(0);
-      OneSignal.sendOutcome(name, new OneSignal.OutcomeCallback(){
-        @Override
-        public void onSuccess(@Nullable OSOutcomeEvent outcomeEvent) {
-          if (outcomeEvent == null)
-            CallbackHelper.callbackSuccess(jsSendOutcomeCallback, new JSONObject());
-          else {
-            try {
-              CallbackHelper.callbackSuccess(jsSendOutcomeCallback, outcomeEvent.toJSONObject());
-            } catch (JSONException e) {
-              Log.e(TAG, "sendOutcome with name: " + name + ", failed with message: " + e.getMessage());
-            }
+      OneSignal.sendOutcome(name, outcomeEvent -> {
+        if (outcomeEvent == null)
+          CallbackHelper.callbackSuccess(jsSendOutcomeCallback, new JSONObject());
+        else {
+          try {
+            CallbackHelper.callbackSuccess(jsSendOutcomeCallback, outcomeEvent.toJSONObject());
+          } catch (JSONException e) {
+            Log.e(TAG, "sendOutcome with name: " + name + ", failed with message: " + e.getMessage());
           }
         }
       });
@@ -71,17 +62,14 @@ public class OneSignalOutcomeController {
       final CallbackContext jsSendOutcomeWithValueCallback = callbackContext;
       final String name = data.getString(0);
       final float value = Double.valueOf(data.optDouble(1)).floatValue();
-      OneSignal.sendOutcomeWithValue(name, value,new OneSignal.OutcomeCallback(){
-        @Override
-        public void onSuccess(@Nullable OSOutcomeEvent outcomeEvent) {
-          if (outcomeEvent == null)
-            CallbackHelper.callbackSuccess(jsSendOutcomeWithValueCallback, new JSONObject());
-          else {
-            try {
-              CallbackHelper.callbackSuccess(jsSendOutcomeWithValueCallback, outcomeEvent.toJSONObject());
-            } catch (JSONException e) {
-              Log.e(TAG, "sendOutcomeWithValue with name: " + name + " and value: " + value + ", failed with message: " + e.getMessage());
-            }
+      OneSignal.sendOutcomeWithValue(name, value, outcomeEvent -> {
+        if (outcomeEvent == null)
+          CallbackHelper.callbackSuccess(jsSendOutcomeWithValueCallback, new JSONObject());
+        else {
+          try {
+            CallbackHelper.callbackSuccess(jsSendOutcomeWithValueCallback, outcomeEvent.toJSONObject());
+          } catch (JSONException e) {
+            Log.e(TAG, "sendOutcomeWithValue with name: " + name + " and value: " + value + ", failed with message: " + e.getMessage());
           }
         }
       });
