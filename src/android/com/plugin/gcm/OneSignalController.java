@@ -138,7 +138,7 @@ public class OneSignalController {
     }
   }
 
-  public static boolean registerForPushNotifications() {
+  public static boolean registerForProvisionalAuthorization() {
     // doesn't apply to Android
     return true;
   }

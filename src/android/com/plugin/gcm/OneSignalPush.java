@@ -57,7 +57,7 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String DELETE_TAGS = "deleteTags";
   private static final String SEND_TAGS = "sendTags";
 
-  private static final String REGISTER_FOR_PUSH_NOTIFICATIONS = "registerForPushNotifications";
+  private static final String REGISTER_FOR_PROVISIONAL_AUTHORIZATION = "registerForProvisionalAuthorization";
   private static final String PROMPT_FOR_PUSH_NOTIFICATIONS_WITH_USER_RESPONSE = "promptForPushNotificationsWithUserResponse";
   private static final String UNSUBSCRIBE_WHEN_NOTIFICATIONS_DISABLED = "unsubscribeWhenNotificationsAreDisabled";
 
@@ -182,8 +182,8 @@ public class OneSignalPush extends CordovaPlugin {
         result = OneSignalController.deleteTags(data);
         break;
 
-      case REGISTER_FOR_PUSH_NOTIFICATIONS:
-        result = OneSignalController.registerForPushNotifications();
+      case REGISTER_FOR_PROVISIONAL_AUTHORIZATION:
+        result = OneSignalController.registerForProvisionalAuthorization();
         break;
 
       case PROMPT_FOR_PUSH_NOTIFICATIONS_WITH_USER_RESPONSE:

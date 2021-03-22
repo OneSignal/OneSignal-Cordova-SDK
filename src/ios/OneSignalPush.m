@@ -39,6 +39,7 @@ NSString* postNotificationCallbackId;
 NSString* permissionObserverCallbackId;
 NSString* subscriptionObserverCallbackId;
 NSString* promptForPushNotificationsWithUserResponseCallbackId;
+NSString* registerForProvisionalAuthorizationCallbackId;
 NSString* setEmailCallbackId;
 NSString* setUnauthenticatedEmailCallbackId;
 NSString* setExternalIdCallbackId;
@@ -235,7 +236,10 @@ static Class delegateClass = nil;
 }
 
 - (void)registerForProvisionalAuthorization:(CDVInvokedUrlCommand *)command {
-
+    registerForProvisionalAuthorizationCallbackId = command.callbackId;
+    [OneSignal registerForProvisionalAuthorization:^(BOOL accepted) {
+        successCallback(registerForProvisionalAuthorizationCallbackId, @{@"accepted": (accepted ? @"true" : @"false")});
+    }];
 }
 
 - (void)disablePush:(CDVInvokedUrlCommand*)command {
@@ -256,6 +260,40 @@ static Class delegateClass = nil;
                 failureCallback(postNotificationCallbackId, @{@"error": @"HTTP no response error"});
 
     }];
+}
+
+// Start Android only
+- (void)clearOneSignalNotifications:(CDVInvokedUrlCommand*)command {}
+
+- (void)unsubscribeWhenNotificationsAreDisabled:(CDVInvokedUrlCommand *)command {}
+
+- (void)removeNotification:(CDVInvokedUrlCommand *)command {}
+
+- (void)removeGroupedNotifications:(CDVInvokedUrlCommand *)command {}
+// Finish Android only
+
+- (void)userProvidedPrivacyConsent:(CDVInvokedUrlCommand *)command {
+    CDVPluginResult* commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:!OneSignal.requiresUserPrivacyConsent];
+    commandResult.keepCallback = @1;
+    [pluginCommandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
+}
+    
+- (void)requiresUserPrivacyConsent:(CDVInvokedUrlCommand *)command {
+    BOOL requiresUserPrivacyConsent = [OneSignal requiresUserPrivacyConsent];
+    NSDictionary *result = @{
+        @"value" : @(requiresUserPrivacyConsent)
+    };
+    successCallback(command.callbackId, result);
+}
+
+- (void)setRequiresUserPrivacyConsent:(CDVInvokedUrlCommand *)command {
+    if (command.arguments.count >= 1)
+        [OneSignal setRequiresUserPrivacyConsent:[command.arguments[0] boolValue]];
+}
+
+- (void)provideUserConsent:(CDVInvokedUrlCommand *)command {
+    if (command.arguments.count >= 1)
+        [OneSignal consentGranted:[command.arguments[0] boolValue]];
 }
 
 - (void)setEmail:(CDVInvokedUrlCommand *)command {
@@ -291,35 +329,6 @@ static Class delegateClass = nil;
     } withFailure:^(NSError *error) {
         failureCallback(logoutEmailCallbackId, error.userInfo);
     }];
-}
-
-
-// Start Android only
-- (void)clearOneSignalNotifications:(CDVInvokedUrlCommand*)command {}
-// Finish Android only
-
-- (void)consentGranted:(CDVInvokedUrlCommand *)command {
-    
-}
-
-- (void)requiresUserPrivacyConsent:(CDVInvokedUrlCommand *)command {
-
-}
-
-- (void)userProvidedPrivacyConsent:(CDVInvokedUrlCommand *)command {
-    CDVPluginResult* commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:!OneSignal.requiresUserPrivacyConsent];
-    commandResult.keepCallback = @1;
-    [pluginCommandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
-}
-    
-- (void)setRequiresUserPrivacyConsent:(CDVInvokedUrlCommand *)command {
-    if (command.arguments.count >= 1)
-        [OneSignal setRequiresUserPrivacyConsent:[command.arguments[0] boolValue]];
-}
-
-- (void)provideUserConsent:(CDVInvokedUrlCommand *)command {
-    if (command.arguments.count >= 1)
-        [OneSignal consentGranted:[command.arguments[0] boolValue]];
 }
 
 - (void)setExternalUserId:(CDVInvokedUrlCommand *)command {
@@ -392,6 +401,10 @@ static Class delegateClass = nil;
    [OneSignal pauseInAppMessages:pause];
 }
 
+/**
+ * Outcomes
+ */
+
 - (void)sendOutcome:(CDVInvokedUrlCommand*)command {
     NSString *name = command.arguments[0];
 
@@ -417,16 +430,24 @@ static Class delegateClass = nil;
     }];
 }
 
+/**
+ * Location
+ */
+
 - (void)promptLocation:(CDVInvokedUrlCommand*)command {
-  [OneSignal promptLocation];
+    [OneSignal promptLocation];
 }
 
 - (void)setLocationShared:(CDVInvokedUrlCommand *)command {
-  [OneSignal setLocationShared:[command.arguments[0] boolValue]];
+    [OneSignal setLocationShared:[command.arguments[0] boolValue]];
 }
 
 - (void)isLocationShared:(CDVInvokedUrlCommand *)command {
-    
+    BOOL locationShared = [OneSignal isLocationShared];
+    NSDictionary *result = @{
+        @"value" : @(locationShared)
+    };
+    successCallback(command.callbackId, result);
 }
 
 @end
