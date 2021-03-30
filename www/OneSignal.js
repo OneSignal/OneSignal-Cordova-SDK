@@ -27,9 +27,9 @@
 
 var OneSignal = function() {
     var _appID = "";
-    var _notificationWillShowInForegroundDelegate = function() {};
-    var _notificationOpenedDelegate = function() {};
-    var _inAppMessageClickDelegate = function () {};
+    var _notificationWillShowInForegroundDelegate = function(notificationReceived) {};
+    var _notificationOpenedDelegate = function(notificationOpened) {};
+    var _inAppMessageClickDelegate = function (action) {};
 };
 
 OneSignal.prototype.OSNotificationPermission = {
@@ -85,6 +85,10 @@ OneSignal._formatPermissionObj = function(state) {
         state.state = state.enabled ? OneSignal.prototype.OSNotificationPermission.Authorized : OneSignal.prototype.OSNotificationPermission.Denied;
         delete state.enabled
     }
+};
+
+OneSignal.prototype.completeNotification = function(notificationId, shouldDisplay) {
+    cordova.exec(function(){}, function(){}, "OneSignalPush", "completeNotification", [notificationId, shouldDisplay]);
 };
 
 OneSignal.prototype.getDeviceState = function(deviceStateReceivedCallBack) {
