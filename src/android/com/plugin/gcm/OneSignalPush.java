@@ -30,6 +30,8 @@ package com.plugin.gcm;
 import android.util.Log;
 
 import com.onesignal.OSInAppMessageAction;
+import com.onesignal.OSNotification;
+import com.onesignal.OSNotificationOpenedResult;
 import com.onesignal.OSNotificationReceivedEvent;
 import com.onesignal.OneSignal;
 
@@ -37,7 +39,8 @@ import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
+
+import java.util.HashMap;
 
 public class OneSignalPush extends CordovaPlugin {
   private static final String TAG = "OneSignalPush";
@@ -45,6 +48,7 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String SET_NOTIFICATION_WILL_SHOW_IN_FOREGROUND_HANDLER = "setNotificationWillShowInForegroundHandler";
   private static final String SET_NOTIFICATION_OPENED_HANDLER = "setNotificationOpenedHandler";
   private static final String SET_IN_APP_MESSAGE_CLICK_HANDLER = "setInAppMessageClickHandler";
+  private static final String COMPLETE_NOTIFICATION = "completeNotification";
   private static final String INIT = "init";
 
   private static final String GET_DEVICE_STATE = "getDeviceState";
@@ -96,10 +100,11 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String SEND_UNIQUE_OUTCOME = "sendUniqueOutcome";
   private static final String SEND_OUTCOME_WITH_VALUE = "sendOutcomeWithValue";
 
+  private static final HashMap<String, OSNotificationReceivedEvent> notificationReceivedEventCache = new HashMap<>();
+
   private static CallbackContext notifWillShowInForegroundCallbackContext;
   private static CallbackContext notifOpenedCallbackContext;
   private static CallbackContext inAppMessageClickedCallbackContext;
-
 
   public static boolean setNotificationWillShowInForegroundHandler(CallbackContext callbackContext) {
     notifWillShowInForegroundCallbackContext = callbackContext;
@@ -123,6 +128,8 @@ public class OneSignalPush extends CordovaPlugin {
       OneSignal.sdkType = "cordova";
 
       OneSignal.setInAppMessageClickHandler(new CordovaInAppMessageClickHandler(inAppMessageClickedCallbackContext));
+      OneSignal.setNotificationOpenedHandler(new CordovaNotificationOpenHandler(notifOpenedCallbackContext));
+      OneSignal.setNotificationWillShowInForegroundHandler(new CordovaNotificationInForegroundHandler(notifWillShowInForegroundCallbackContext));
       OneSignal.setAppId(appId);
       OneSignal.initWithContext(this.cordova.getActivity());
 
@@ -148,6 +155,10 @@ public class OneSignalPush extends CordovaPlugin {
 
       case SET_IN_APP_MESSAGE_CLICK_HANDLER:
         result = setInAppMessageClickHandler(callbackContext);
+        break;
+
+      case COMPLETE_NOTIFICATION:
+        result = completeNotification(data);
         break;
 
       case INIT:
@@ -302,6 +313,29 @@ public class OneSignalPush extends CordovaPlugin {
     return result;
   }
 
+  private boolean completeNotification(JSONArray data) {
+    try {
+      String notificationId = data.getString(0);
+      boolean shouldDisplay = data.getBoolean(0);
+
+      OSNotificationReceivedEvent notificationReceivedEvent = notificationReceivedEventCache.get(notificationId);
+
+      if (notificationReceivedEvent == null) {
+        OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR, "Could not find notification completion block with id: " + notificationId);
+        return false;
+      }
+
+      if (shouldDisplay)
+        notificationReceivedEvent.complete(notificationReceivedEvent.getNotification());
+      else
+        notificationReceivedEvent.complete(null);
+
+      return true;
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return false;
+  }
 
   /**
    * Handlers
@@ -309,19 +343,44 @@ public class OneSignalPush extends CordovaPlugin {
 
   private class CordovaNotificationInForegroundHandler implements OneSignal.OSNotificationWillShowInForegroundHandler {
 
-    private CallbackContext jsNotificationOpenedCallBack;
+    private CallbackContext jsNotificationInForegroundCallBack;
 
     public CordovaNotificationInForegroundHandler(CallbackContext inCallbackContext) {
-      jsNotificationOpenedCallBack = inCallbackContext;
+      jsNotificationInForegroundCallBack = inCallbackContext;
     }
 
     @Override
     public void notificationWillShowInForeground(OSNotificationReceivedEvent notificationReceivedEvent) {
       try {
-        notificationReceivedEvent.complete(notificationReceivedEvent.getNotification());
-        CallbackHelper.callbackSuccess(jsNotificationOpenedCallBack, new JSONObject(notificationReceivedEvent.toJSONObject().toString()));
+        if (jsNotificationInForegroundCallBack == null) {
+          notificationReceivedEvent.complete(notificationReceivedEvent.getNotification());
+          return;
+        }
+
+        OSNotification notification = notificationReceivedEvent.getNotification();
+        notificationReceivedEventCache.put(notification.getNotificationId(), notificationReceivedEvent);
+
+        CallbackHelper.callbackSuccess(jsNotificationInForegroundCallBack, notificationReceivedEvent.toJSONObject());
+      } catch (Throwable t) {
+        t.printStackTrace();
       }
-      catch (Throwable t) {
+    }
+  }
+
+  private class CordovaNotificationOpenHandler implements OneSignal.OSNotificationOpenedHandler {
+
+    private CallbackContext jsNotificationOpenedCallBack;
+
+    public CordovaNotificationOpenHandler(CallbackContext inCallbackContext) {
+      jsNotificationOpenedCallBack = inCallbackContext;
+    }
+
+    @Override
+    public void notificationOpened(OSNotificationOpenedResult result) {
+      try {
+        if (jsNotificationOpenedCallBack != null)
+          CallbackHelper.callbackSuccess(jsNotificationOpenedCallBack, result.toJSONObject());
+      } catch (Throwable t) {
         t.printStackTrace();
       }
     }
