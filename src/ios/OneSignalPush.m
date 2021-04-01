@@ -143,6 +143,13 @@ static Class delegateClass = nil;
 
 @end
 
+@interface OneSignalPush ()
+
+@property (strong, nonatomic) NSMutableDictionary* notificationCompletionCache;
+@property (strong, nonatomic) NSMutableDictionary* receivedNotificationCache;
+
+@end
+
 @implementation OneSignalPush
 
 - (void)onOSPermissionChanged:(OSPermissionStateChanges*)stateChanges {
@@ -170,15 +177,52 @@ static Class delegateClass = nil;
     notificationOpenedCallbackId = command.callbackId;
 }
 
-- (void)init:(CDVInvokedUrlCommand*)command {
+- (void)completeNotification:(CDVInvokedUrlCommand*)command {
+    NSString *notificationId = command.arguments[0];
+    BOOL shouldDisplay = [command.arguments[1] boolValue];
+    OSNotificationDisplayResponse completion = self.notificationCompletionCache[notificationId];
     
+    if (!completion) {
+        [OneSignal onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"OneSignal (objc): could not find notification completion block with id: %@", notificationId]];
+        return;
+    }
+
+    if (shouldDisplay) {
+        OSNotification *notification = self.receivedNotificationCache[notificationId];
+        completion(notification);
+    } else {
+        completion(nil);
+    }
+
+    [self.notificationCompletionCache removeObjectForKey:notificationId];
+    [self.receivedNotificationCache removeObjectForKey:notificationId];
+}
+
+- (void)init:(CDVInvokedUrlCommand*)command {
+    _receivedNotificationCache = [NSMutableDictionary new];
+    _notificationCompletionCache = [NSMutableDictionary new];;
+
     pluginCommandDelegate = self.commandDelegate;
 
     NSString* appId = (NSString*)command.arguments[0];
     initOneSignalObject(nil, [appId UTF8String]);
-    
-    if (notification)
+
+    [OneSignal setNotificationOpenedHandler:^(OSNotificationOpenedResult * _Nonnull result) {
+        actionNotification = result;
+        if (pluginCommandDelegate)
+            processNotificationOpened(actionNotification);
+    }];
+    [OneSignal setNotificationWillShowInForegroundHandler:^(OSNotification *notification, OSNotificationDisplayResponse completion) {
+        if (!notificationWillShowInForegoundCallbackId) {
+            completion(notification);
+            return;
+        }
+        
+        self.receivedNotificationCache[notification.notificationId] = notification;
+        self.notificationCompletionCache[notification.notificationId] = completion;
         processNotificationWillShowInForeground(notification);
+    }];
+    
     if (actionNotification)
         processNotificationOpened(actionNotification);
 }
