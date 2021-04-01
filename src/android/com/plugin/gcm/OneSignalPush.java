@@ -79,6 +79,7 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String SET_LOG_LEVEL = "setLogLevel";
 
   private static final String SET_LOCATION_SHARED = "setLocationShared";
+  private static final String IS_LOCATION_SHARED = "isLocationShared";
   private static final String PROMPT_LOCATION = "promptLocation";
 
   private static final String USER_PROVIDED_CONSENT = "userProvidedPrivacyConsent";
@@ -247,6 +248,10 @@ public class OneSignalPush extends CordovaPlugin {
 
       case SET_LOCATION_SHARED:
         OneSignalController.setLocationShared(data);
+        break;
+
+      case IS_LOCATION_SHARED:
+        result = OneSignalController.isLocationShared(callbackContext);
         break;
 
       case USER_PROVIDED_CONSENT:
