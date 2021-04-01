@@ -170,7 +170,7 @@ OneSignal.prototype.unsubscribeWhenNotificationsAreDisabled = function(unsubscri
 
 // Only applies to Android. Cancels a single OneSignal notification based on its Android notification integer ID
 OneSignal.prototype.removeNotification = function(id) {
-    cordova.exec(function(){}, function(){}, "OneSignalPush", "removeNotification", []);
+    cordova.exec(function(){}, function(){}, "OneSignalPush", "removeNotification", [id]);
 };
 
 // Only applies to Android. Cancels a single OneSignal notification based on its Android notification group ID
