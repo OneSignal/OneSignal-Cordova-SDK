@@ -250,7 +250,9 @@ public class OneSignalController {
     }
   }
 
-  public static void isLocationShared(JSONArray data) {
+  public static boolean isLocationShared(CallbackContext callbackContext) {
     // doesn't apply to Android
+    CallbackHelper.callbackSuccessBoolean(callbackContext, false);
+    return true;
   }
 }
