@@ -1,7 +1,7 @@
 /**
  * Modified MIT License
  * 
- * Copyright 2017 OneSignal
+ * Copyright 2021 OneSignal
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,6 +36,7 @@
 - (void)setProvidesNotificationSettingsView:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)setNotificationWillShowInForegroundHandler:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)setNotificationOpenedHandler:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)completeNotification:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)init:(CDVInvokedUrlCommand* _Nonnull)command;
 
 - (void)getDeviceState:(CDVInvokedUrlCommand* _Nonnull)command;
