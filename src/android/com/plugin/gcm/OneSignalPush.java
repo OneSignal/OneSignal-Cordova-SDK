@@ -316,7 +316,7 @@ public class OneSignalPush extends CordovaPlugin {
   private boolean completeNotification(JSONArray data) {
     try {
       String notificationId = data.getString(0);
-      boolean shouldDisplay = data.getBoolean(0);
+      boolean shouldDisplay = data.getBoolean(1);
 
       OSNotificationReceivedEvent notificationReceivedEvent = notificationReceivedEventCache.get(notificationId);
 
