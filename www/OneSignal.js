@@ -393,8 +393,8 @@ OneSignal.prototype.setLocationShared = function(shared) {
     cordova.exec(function() {}, function() {}, "OneSignalPush", "setLocationShared", [shared]);
 };
 
-OneSignal.prototype.isLocationShared = function(shared) {
-    cordova.exec(function() {}, function() {}, "OneSignalPush", "isLocationShared", [shared]);
+OneSignal.prototype.isLocationShared = function(callback) {
+    cordova.exec(callback, function() {}, "OneSignalPush", "isLocationShared", []);
 };
 
 //-------------------------------------------------------------------
