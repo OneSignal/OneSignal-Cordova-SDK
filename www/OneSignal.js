@@ -65,8 +65,13 @@ OneSignal.prototype.handleInAppMessageClicked = function(handler) {
 };
 
 OneSignal.prototype.endInit = function() {
+
+    var foregroundParsingHandler = function(notificationReceived) {
+        OneSignal._notificationWillShowInForegroundDelegate(new NotificationReceivedEvent(notificationReceived));
+    };
+
     // Pass notification received handler
-    cordova.exec(OneSignal._notificationWillShowInForegroundDelegate, function(){}, "OneSignalPush", "setNotificationWillShowInForegroundHandler", []);
+    cordova.exec(foregroundParsingHandler, function(){}, "OneSignalPush", "setNotificationWillShowInForegroundHandler", []);
     cordova.exec(OneSignal._notificationOpenedDelegate, function(){}, "OneSignalPush", "setNotificationOpenedHandler", []);
     cordova.exec(OneSignal._inAppMessageClickDelegate, function() {}, "OneSignalPush", "setInAppMessageClickHandler", []);
     // Call Init
@@ -87,8 +92,8 @@ OneSignal._formatPermissionObj = function(state) {
     }
 };
 
-OneSignal.prototype.completeNotification = function(notificationId, shouldDisplay) {
-    cordova.exec(function(){}, function(){}, "OneSignalPush", "completeNotification", [notificationId, shouldDisplay]);
+OneSignal.prototype.completeNotification = function(notification, shouldDisplay) {
+    cordova.exec(function(){}, function(){}, "OneSignalPush", "completeNotification", [notification.notificationId, shouldDisplay]);
 };
 
 OneSignal.prototype.getDeviceState = function(deviceStateReceivedCallBack) {
@@ -126,7 +131,7 @@ OneSignal.prototype.getTags = function(tagsReceivedCallBack) {
 };
 
 OneSignal.prototype.sendTag = function(key, value) {
-    jsonKeyValue = {};
+    var jsonKeyValue = {};
     jsonKeyValue[key] = value;
     cordova.exec(function(){}, function(){}, "OneSignalPush", "sendTags", [jsonKeyValue]);
 };
@@ -397,6 +402,120 @@ OneSignal.prototype.isLocationShared = function(callback) {
     cordova.exec(callback, function() {}, "OneSignalPush", "isLocationShared", []);
 };
 
+class OSNotification {
+    constructor(receivedEvent) {
+        this.notificationId = receivedEvent.notificationId;
+        this.body = receivedEvent.body;
+        this.title = receivedEvent.title;
+        
+        this.actionButtons = receivedEvent.actionButtons;
+        this.additionalData = receivedEvent.additionalData;
+        this.rawPayload = receivedEvent.rawPayload;
+        this.launchURL = receivedEvent.launchURL;
+        this.sound = receivedEvent.sound;
+
+        // Android
+        if (receivedEvent.groupKey) {
+            this.groupKey = receivedEvent.groupKey;
+        }
+        if (receivedEvent.ledColor) {
+            this.ledColor = receivedEvent.ledColor;
+        }
+        if (receivedEvent.priority) {
+            this.priority = receivedEvent.priority;
+        }
+        if (receivedEvent.smallIcon) {
+            this.smallIcon = receivedEvent.smallIcon;
+        }
+        if (receivedEvent.largeIcon) {
+            this.largeIcon = receivedEvent.largeIcon;
+        }
+        if (receivedEvent.bigPicture) {
+            this.bigPicture = receivedEvent.bigPicture;
+        }
+        if (receivedEvent.collapseId) {
+            this.collapseId = receivedEvent.collapseId;
+        }
+        if (receivedEvent.groupMessage) {
+            this.groupMessage = receivedEvent.groupMessage;
+        }
+        if (receivedEvent.fromProjectNumber) {
+            this.fromProjectNumber = receivedEvent.fromProjectNumber;
+        }
+        if (receivedEvent.smallIconAccentColor) {
+            this.smallIconAccentColor = receivedEvent.smallIconAccentColor;
+        }
+        if (receivedEvent.lockScreenVisibililty) {
+            this.lockScreenVisibility = receivedEvent.lockScreenVisibililty;
+        }
+        if (receivedEvent.androidNotificationId) {
+            this.androidNotificationId = receivedEvent.androidNotificationId;
+        }
+
+        // iOS
+        if (receivedEvent.badge) {
+            this.badge = receivedEvent.badge;
+        }
+        if (receivedEvent.category) {
+            this.category = receivedEvent.category;
+        }
+        if (receivedEvent.threadId) {
+            this.threadId = receivedEvent.threadId;
+        }
+        if (receivedEvent.subtitle) {
+            this.subtitle = receivedEvent.subtitle;
+        }
+        if (receivedEvent.templateId) {
+            this.templateId = receivedEvent.templateId;
+        }
+        if (receivedEvent.attachments) {
+            this.attachments = receivedEvent.attachments;
+        }
+        if (receivedEvent.templateName) {
+            this.templateName = receivedEvent.templateName;
+        }
+        if (receivedEvent.mutableContent) {
+            this.mutableContent = receivedEvent.mutableContent;
+        }
+        if (receivedEvent.badgeIncrement) {
+            this.badgeIncrement = receivedEvent.badgeIncrement;
+        }
+        if (receivedEvent.contentAvailable) {
+            this.contentAvailable = receivedEvent.contentAvailable;
+        }
+    }
+}
+
+class NotificationReceivedEvent {
+    constructor(receivedEvent) {
+        if (receivedEvent.notification) {
+            // Android case
+            this.notification = new OSNotification(receivedEvent.notification);
+        } else {
+            // iOS case
+            this.notification = new OSNotification(receivedEvent);
+        }
+    }
+
+    complete(notification) {
+        if (!notification) {
+            // if the notificationReceivedEvent is null, we want to call the native-side
+            // complete/completion with null to silence the notification
+            cordova.exec(function(){}, function(){}, "OneSignalPush", "completeNotification", [this.notification.notificationId, false]);
+            return;
+        }
+
+        // if the notificationReceivedEvent is not null, we want to pass the specific event
+        // future: Android side: make the notification modifiable
+        // iOS & Android: the notification id is associated with the native-side complete handler / completion block
+        cordova.exec(function(){}, function(){}, "OneSignalPush", "completeNotification", [this.notification.notificationId, true]);
+    }
+
+    getNotification() {
+        return this.notification;
+    }
+}
+
 //-------------------------------------------------------------------
 
 if(!window.plugins)
@@ -405,5 +524,6 @@ if(!window.plugins)
 if (!window.plugins.OneSignal)
     window.plugins.OneSignal = new OneSignal();
 
-if (typeof module != 'undefined' && module.exports)
+if (typeof module != 'undefined' && module.exports) {
     module.exports = OneSignal;
+}
