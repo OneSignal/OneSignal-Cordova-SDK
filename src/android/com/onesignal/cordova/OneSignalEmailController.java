@@ -1,4 +1,4 @@
-package com.plugin.gcm;
+package com.onesignal.cordova;
 
 import com.onesignal.OneSignal;
 import com.onesignal.OneSignal.EmailUpdateError;
