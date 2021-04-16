@@ -26,33 +26,13 @@
   </engines>
 
   <platform name="android">
-    <framework src="com.onesignal:OneSignal:4.2.0" />
+    <framework src="com.onesignal:OneSignal:4.3.0" />
     <framework src="build-extras-onesignal.gradle" custom="true" type="gradleReference" />
 
     <config-file target="res/xml/config.xml" parent="/*">
       <feature name="OneSignalPush" >
         <param name="android-package" value="com.plugin.gcm.OneSignalPush" />
       </feature>
-    </config-file>
-
-    <!-- PhoneGap Build (PGB) does not have a amazon build target so it include the required manifest entries in all Android builds. -->
-    <config-file target="AndroidManifest.xml" parent="/manifest">
-      <uses-permission android:name="com.amazon.device.messaging.permission.RECEIVE" />
-      <permission android:name="$PACKAGE_NAME.permission.RECEIVE_ADM_MESSAGE" android:protectionLevel="signature" />
-      <uses-permission android:name="$PACKAGE_NAME.permission.RECEIVE_ADM_MESSAGE" />
-    </config-file>
-    <config-file target="AndroidManifest.xml" parent="/manifest/application">
-      <amazon:enable-feature android:name="com.amazon.device.messaging" android:required="false" xmlns:amazon="http://schemas.amazon.com/apk/res/android" />
-      <service android:name="com.onesignal.ADMMessageHandler" android:exported="false" />
-      <receiver
-        android:name="com.onesignal.ADMMessageHandler$Receiver"
-        android:permission="com.amazon.device.messaging.permission.SEND" >
-        <intent-filter>
-          <action android:name="com.amazon.device.messaging.intent.REGISTRATION" />
-          <action android:name="com.amazon.device.messaging.intent.RECEIVE" />
-          <category android:name="$PACKAGE_NAME" />
-        </intent-filter>
-      </receiver>
     </config-file>
 
     <source-file src="src/android/com/plugin/gcm/OneSignalPush.java" target-dir="src/com/plugin/gcm/" />
@@ -75,12 +55,6 @@
 
     <framework src="SystemConfiguration.framework" />
 
-    <config-file target="*-Info.plist" parent="UIBackgroundModes">
-      <array>
-        <string>remote-notification</string>
-      </array>
-    </config-file>
-
     <config-file target="*-Debug.plist" parent="aps-environment">
       <string>development</string>
     </config-file>
@@ -88,27 +62,10 @@
       <string>production</string>
     </config-file>
 
-    <framework src="OneSignal" type="podspec" spec="3.2.3" />
+    <framework src="OneSignal" type="podspec" spec="3.4.0" />
     <header-file src="src/ios/OneSignalPush.h" />
     <source-file src="src/ios/OneSignalPush.m" />
 
-  </platform>
-
-  <!-- Windows Phone 8.1 -->
-  <platform name="windows">
-    <config-file target="config.xml" parent="/*">
-      <feature name="OneSignalPush">
-        <param name="ios-package" value="OneSignalPush"/>
-      </feature>
-    </config-file>
-
-    <js-module src="src/windows/OneSignalPushProxy.js" name="OneSignalPushProxy">
-      <merges target="" />
-    </js-module>
-
-    <framework src="src/windows/OneSignalSDK_WP_WNS_WRTC.winmd" custom="true" />
-    <framework src="src/windows/OneSignalSDK_WP_WNS.dll" custom="true" />
-    <framework src="src/windows/Newtonsoft.Json.dll" custom="true" />
   </platform>
 
 </plugin>
