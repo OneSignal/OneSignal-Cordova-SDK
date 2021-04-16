@@ -103,34 +103,27 @@ public class OneSignalPush extends CordovaPlugin {
 
   private static final HashMap<String, OSNotificationReceivedEvent> notificationReceivedEventCache = new HashMap<>();
 
-  private static CallbackContext notifWillShowInForegroundCallbackContext;
-  private static CallbackContext notifOpenedCallbackContext;
-  private static CallbackContext inAppMessageClickedCallbackContext;
-
-  public static boolean setNotificationWillShowInForegroundHandler(CallbackContext callbackContext) {
-    notifWillShowInForegroundCallbackContext = callbackContext;
+  public boolean setNotificationWillShowInForegroundHandler(CallbackContext callbackContext) {
+    OneSignal.setNotificationWillShowInForegroundHandler(new CordovaNotificationInForegroundHandler(callbackContext));
     return true;
   }
 
-  public static boolean setNotificationOpenedHandler(CallbackContext callbackContext) {
-    notifOpenedCallbackContext = callbackContext;
+  public boolean setNotificationOpenedHandler(CallbackContext callbackContext) {
+    OneSignal.setNotificationOpenedHandler(new CordovaNotificationOpenHandler(callbackContext));
     return true;
   }
 
-  public static boolean setInAppMessageClickHandler(CallbackContext callbackContext) {
-    inAppMessageClickedCallbackContext = callbackContext;
+  public boolean setInAppMessageClickHandler(CallbackContext callbackContext) {
+    OneSignal.setInAppMessageClickHandler(new CordovaInAppMessageClickHandler(callbackContext));
     return true;
   }
 
-  public boolean init(CallbackContext callbackContext, JSONArray data) {
+  public boolean init(JSONArray data) {
     try {
       String appId = data.getString(0);
 
       OneSignal.sdkType = "cordova";
 
-      OneSignal.setInAppMessageClickHandler(new CordovaInAppMessageClickHandler(inAppMessageClickedCallbackContext));
-      OneSignal.setNotificationOpenedHandler(new CordovaNotificationOpenHandler(notifOpenedCallbackContext));
-      OneSignal.setNotificationWillShowInForegroundHandler(new CordovaNotificationInForegroundHandler(notifWillShowInForegroundCallbackContext));
       OneSignal.setAppId(appId);
       OneSignal.initWithContext(this.cordova.getActivity());
 
@@ -163,7 +156,7 @@ public class OneSignalPush extends CordovaPlugin {
         break;
 
       case INIT:
-        result = init(callbackContext, data);
+        result = init(data);
         break;
 
       case GET_DEVICE_STATE:
@@ -346,7 +339,7 @@ public class OneSignalPush extends CordovaPlugin {
    * Handlers
    */
 
-  private class CordovaNotificationInForegroundHandler implements OneSignal.OSNotificationWillShowInForegroundHandler {
+  private static class CordovaNotificationInForegroundHandler implements OneSignal.OSNotificationWillShowInForegroundHandler {
 
     private CallbackContext jsNotificationInForegroundCallBack;
 
@@ -357,11 +350,6 @@ public class OneSignalPush extends CordovaPlugin {
     @Override
     public void notificationWillShowInForeground(OSNotificationReceivedEvent notificationReceivedEvent) {
       try {
-        if (jsNotificationInForegroundCallBack == null) {
-          notificationReceivedEvent.complete(notificationReceivedEvent.getNotification());
-          return;
-        }
-
         OSNotification notification = notificationReceivedEvent.getNotification();
         notificationReceivedEventCache.put(notification.getNotificationId(), notificationReceivedEvent);
 
@@ -372,7 +360,7 @@ public class OneSignalPush extends CordovaPlugin {
     }
   }
 
-  private class CordovaNotificationOpenHandler implements OneSignal.OSNotificationOpenedHandler {
+  private static class CordovaNotificationOpenHandler implements OneSignal.OSNotificationOpenedHandler {
 
     private CallbackContext jsNotificationOpenedCallBack;
 
@@ -391,7 +379,7 @@ public class OneSignalPush extends CordovaPlugin {
     }
   }
 
-  private class CordovaInAppMessageClickHandler implements OneSignal.OSInAppMessageClickHandler {
+  private static class CordovaInAppMessageClickHandler implements OneSignal.OSInAppMessageClickHandler {
 
     private CallbackContext jsInAppMessageClickedCallback;
 

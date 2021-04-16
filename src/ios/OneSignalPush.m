@@ -171,10 +171,22 @@ static Class delegateClass = nil;
 
 - (void)setNotificationWillShowInForegroundHandler:(CDVInvokedUrlCommand*)command {
     notificationWillShowInForegoundCallbackId = command.callbackId;
+    
+    [OneSignal setNotificationWillShowInForegroundHandler:^(OSNotification *notification, OSNotificationDisplayResponse completion) {
+        self.receivedNotificationCache[notification.notificationId] = notification;
+        self.notificationCompletionCache[notification.notificationId] = completion;
+        processNotificationWillShowInForeground(notification);
+    }];
 }
 
 - (void)setNotificationOpenedHandler:(CDVInvokedUrlCommand*)command {
     notificationOpenedCallbackId = command.callbackId;
+    
+    [OneSignal setNotificationOpenedHandler:^(OSNotificationOpenedResult * _Nonnull result) {
+        actionNotification = result;
+        if (pluginCommandDelegate)
+            processNotificationOpened(actionNotification);
+    }];
 }
 
 - (void)completeNotification:(CDVInvokedUrlCommand*)command {
@@ -206,22 +218,6 @@ static Class delegateClass = nil;
 
     NSString* appId = (NSString*)command.arguments[0];
     initOneSignalObject(nil, [appId UTF8String]);
-
-    [OneSignal setNotificationOpenedHandler:^(OSNotificationOpenedResult * _Nonnull result) {
-        actionNotification = result;
-        if (pluginCommandDelegate)
-            processNotificationOpened(actionNotification);
-    }];
-    [OneSignal setNotificationWillShowInForegroundHandler:^(OSNotification *notification, OSNotificationDisplayResponse completion) {
-        if (!notificationWillShowInForegoundCallbackId) {
-            completion(notification);
-            return;
-        }
-        
-        self.receivedNotificationCache[notification.notificationId] = notification;
-        self.notificationCompletionCache[notification.notificationId] = completion;
-        processNotificationWillShowInForeground(notification);
-    }];
     
     if (actionNotification)
         processNotificationOpened(actionNotification);

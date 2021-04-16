@@ -27,7 +27,7 @@
 
 var OneSignal = function() {
     var _appID = "";
-    var _notificationWillShowInForegroundDelegate = function(notificationReceived) {};
+    var _notificationWillShowInForegroundDelegate = null; //Sintax function(notificationReceived) {};
     var _notificationOpenedDelegate = function(notificationOpened) {};
     var _inAppMessageClickDelegate = function (action) {};
 };
@@ -44,46 +44,45 @@ OneSignal._emailSubscriptionObserverList = [];
 
 
 // You must call init before any other OneSignal function.
-OneSignal.prototype.startInit = function(appId) {
+OneSignal.prototype.setAppId = function(appId) {
     OneSignal._appID = appId;
-    return this;
+
+    cordova.exec(function() {}, function(){}, "OneSignalPush", "init", [OneSignal._appID]);
 };
 
 OneSignal.prototype.handleNotificationWillShowInForeground = function(handleNotificationWillShowInForegroundCallback) {
     OneSignal._notificationWillShowInForegroundDelegate = handleNotificationWillShowInForegroundCallback;
-    return this;
+    
+    var foregroundParsingHandler = function(notificationReceived) {
+        let notificationReceivedEvent = new NotificationReceivedEvent(notificationReceived)
+        if (OneSignal._notificationWillShowInForegroundDelegate != null) {
+           OneSignal._notificationWillShowInForegroundDelegate(notificationReceivedEvent);
+        } else {
+            notificationReceivedEvent.complete(notificationReceivedEvent.notification);
+        }
+    };
+
+    cordova.exec(foregroundParsingHandler, function(){}, "OneSignalPush", "setNotificationWillShowInForegroundHandler", []);
 };
 
 OneSignal.prototype.handleNotificationOpened = function(handleNotificationOpenedCallback) {
     OneSignal._notificationOpenedDelegate = handleNotificationOpenedCallback;
-    return this;
-};
-
-OneSignal.prototype.handleInAppMessageClicked = function(handler) {
-    OneSignal._inAppMessageClickDelegate = handler;
-    return this;
-};
-
-OneSignal.prototype.endInit = function() {
-
-    var foregroundParsingHandler = function(notificationReceived) {
-        OneSignal._notificationWillShowInForegroundDelegate(new NotificationReceivedEvent(notificationReceived));
-    };
 
     var notificationOpenedHandler = function(json) {
         OneSignal._notificationOpenedDelegate(new OSNotificationOpenedResult(json));
     };
 
+    cordova.exec(notificationOpenedHandler, function(){}, "OneSignalPush", "setNotificationOpenedHandler", []);
+};
+
+OneSignal.prototype.handleInAppMessageClicked = function(handler) {
+    OneSignal._inAppMessageClickDelegate = handler;
+
     var inAppMessageClickHandler = function(json) {
         OneSignal._inAppMessageClickDelegate(new OSInAppMessageAction(json));
     };
 
-    // Pass notification received handler
-    cordova.exec(foregroundParsingHandler, function(){}, "OneSignalPush", "setNotificationWillShowInForegroundHandler", []);
-    cordova.exec(notificationOpenedHandler, function(){}, "OneSignalPush", "setNotificationOpenedHandler", []);
     cordova.exec(inAppMessageClickHandler, function() {}, "OneSignalPush", "setInAppMessageClickHandler", []);
-    // Call Init
-    cordova.exec(function() {}, function(){}, "OneSignalPush", "init", [OneSignal._appID]);
 };
 
 OneSignal._processFunctionList = function(array, param) {
