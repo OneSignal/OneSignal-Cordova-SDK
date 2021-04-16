@@ -31,17 +31,17 @@
 
     <config-file target="res/xml/config.xml" parent="/*">
       <feature name="OneSignalPush" >
-        <param name="android-package" value="com.plugin.gcm.OneSignalPush" />
+        <param name="android-package" value="com.onesignal.cordova.OneSignalPush" />
       </feature>
     </config-file>
 
-    <source-file src="src/android/com/plugin/gcm/OneSignalPush.java" target-dir="src/com/plugin/gcm/" />
-    <source-file src="src/android/com/plugin/gcm/OneSignalController.java" target-dir="src/com/plugin/gcm/" />
-    <source-file src="src/android/com/plugin/gcm/OneSignalEmailController.java" target-dir="src/com/plugin/gcm/" />
-    <source-file src="src/android/com/plugin/gcm/OneSignalObserverController.java" target-dir="src/com/plugin/gcm/" />
-    <source-file src="src/android/com/plugin/gcm/OneSignalOutcomeController.java" target-dir="src/com/plugin/gcm/" />
-    <source-file src="src/android/com/plugin/gcm/OneSignalInAppMessagingController.java" target-dir="src/com/plugin/gcm/" />
-    <source-file src="src/android/com/plugin/gcm/CallbackHelper.java" target-dir="src/com/plugin/gcm/" />
+    <source-file src="src/android/com/onesignal/cordova/OneSignalPush.java" target-dir="src/com/onesignal/cordova/" />
+    <source-file src="src/android/com/onesignal/cordova/OneSignalController.java" target-dir="src/com/onesignal/cordova/" />
+    <source-file src="src/android/com/onesignal/cordova/OneSignalEmailController.java" target-dir="src/com/onesignal/cordova/" />
+    <source-file src="src/android/com/onesignal/cordova/OneSignalObserverController.java" target-dir="src/com/onesignal/cordova/" />
+    <source-file src="src/android/com/onesignal/cordova/OneSignalOutcomeController.java" target-dir="src/com/onesignal/cordova/" />
+    <source-file src="src/android/com/onesignal/cordova/OneSignalInAppMessagingController.java" target-dir="src/com/onesignal/cordova/" />
+    <source-file src="src/android/com/onesignal/cordova/CallbackHelper.java" target-dir="src/com/onesignal/cordova/" />
   </platform>
 
   <!-- ios -->
