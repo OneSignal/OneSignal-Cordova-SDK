@@ -27,7 +27,7 @@
 
 var OneSignal = function() {
     var _appID = "";
-    var _notificationWillShowInForegroundDelegate = null; //Sintax function(notificationReceived) {};
+    var _notificationWillShowInForegroundDelegate = function(notificationReceived) {};
     var _notificationOpenedDelegate = function(notificationOpened) {};
     var _inAppMessageClickDelegate = function (action) {};
 };
@@ -54,12 +54,7 @@ OneSignal.prototype.handleNotificationWillShowInForeground = function(handleNoti
     OneSignal._notificationWillShowInForegroundDelegate = handleNotificationWillShowInForegroundCallback;
     
     var foregroundParsingHandler = function(notificationReceived) {
-        let notificationReceivedEvent = new NotificationReceivedEvent(notificationReceived)
-        if (OneSignal._notificationWillShowInForegroundDelegate != null) {
-           OneSignal._notificationWillShowInForegroundDelegate(notificationReceivedEvent);
-        } else {
-            notificationReceivedEvent.complete(notificationReceivedEvent.notification);
-        }
+        OneSignal._notificationWillShowInForegroundDelegate(new NotificationReceivedEvent(notificationReceived));
     };
 
     cordova.exec(foregroundParsingHandler, function(){}, "OneSignalPush", "setNotificationWillShowInForegroundHandler", []);
@@ -90,15 +85,6 @@ OneSignal._processFunctionList = function(array, param) {
         array[i](param);
 };
 
-OneSignal._formatPermissionObj = function(state) {
-    // If Android format, match it to the iOS format
-    if ("undefined" !== typeof state.enabled) {
-        state.hasPrompted = true;
-        state.state = state.enabled ? OneSignal.prototype.OSNotificationPermission.Authorized : OneSignal.prototype.OSNotificationPermission.Denied;
-        delete state.enabled
-    }
-};
-
 OneSignal.prototype.completeNotification = function(notification, shouldDisplay) {
     cordova.exec(function(){}, function(){}, "OneSignalPush", "completeNotification", [notification.notificationId, shouldDisplay]);
 };
@@ -113,7 +99,7 @@ OneSignal.prototype.getDeviceState = function(deviceStateReceivedCallBack) {
 OneSignal.prototype.addSubscriptionObserver = function(callback) {
     OneSignal._subscriptionObserverList.push(callback);
     var subscriptionCallBackProcessor = function(state) {
-        OneSignal._processFunctionList(OneSignal._subscriptionObserverList, state);
+        OneSignal._processFunctionList(OneSignal._subscriptionObserverList, new OSSubscriptionStateChanges(state));
     };
     cordova.exec(subscriptionCallBackProcessor, function(){}, "OneSignalPush", "addSubscriptionObserver", []);
 };
@@ -121,7 +107,7 @@ OneSignal.prototype.addSubscriptionObserver = function(callback) {
 OneSignal.prototype.addEmailSubscriptionObserver = function(callback) {
     OneSignal._emailSubscriptionObserverList.push(callback);
     var emailSubscriptionCallbackProcessor = function(state) {
-        OneSignal._processFunctionList(OneSignal._emailSubscriptionObserverList, state);
+        OneSignal._processFunctionList(OneSignal._emailSubscriptionObserverList, new OSEmailSubscriptionStateChanges(state));
     };
     cordova.exec(emailSubscriptionCallbackProcessor, function(){}, "OneSignalPush", "addEmailSubscriptionObserver", []);
 };
@@ -129,9 +115,7 @@ OneSignal.prototype.addEmailSubscriptionObserver = function(callback) {
 OneSignal.prototype.addPermissionObserver = function(callback) {
     OneSignal._permissionObserverList.push(callback);
     var permissionCallBackProcessor = function(state) {
-        OneSignal._formatPermissionObj(state.to);
-        OneSignal._formatPermissionObj(state.from);
-        OneSignal._processFunctionList(OneSignal._permissionObserverList, state);
+        OneSignal._processFunctionList(OneSignal._permissionObserverList, new OSPermissionStateChanges(state));
     };
     cordova.exec(permissionCallBackProcessor, function(){}, "OneSignalPush", "addPermissionObserver", []);
 };
@@ -715,7 +699,6 @@ class OSInAppMessageAction {
 
 class OSDeviceState {
     constructor(json) {
-        console.log("OSDeviceState: " + JSON.stringify(json));
         if (json.hasNotificationPermission) {
             this.hasNotificationPermission = json.hasNotificationPermission;
         } else {
@@ -733,6 +716,94 @@ class OSDeviceState {
         this.pushToken = json.pushToken;
         this.emailUserId = json.emailUserId;
         this.emailAddress = json.emailAddress;
+    }
+}
+
+class OSPermissionState {
+    constructor(json) {
+        if (json.status != null) {
+            this.status = json.status;
+        } else {
+            this.status = json.areNotificationsEnabled ? OneSignal.prototype.OSNotificationPermission.Authorized : OneSignal.prototype.OSNotificationPermission.Denied;
+        }
+
+        // iOS only
+        if (json.provisional != null) {
+            this.provisional = json.provisional;
+        } else {
+            this.provisional = false;
+        }
+
+        // iOS only
+        if (json.hasPrompted != null) {
+            this.hasPrompted = json.hasPrompted;
+        } else {
+            this.hasPrompted = false;
+        }
+    }
+}
+  
+class OSPermissionStateChanges {
+    constructor(json) {
+        if (json.from) {
+            this.from = new OSPermissionState(json.from);
+        }
+        if (json.to) {
+            this.to = new OSPermissionState(json.to);
+        }
+    }
+}
+
+/// Represents the current user's subscription state with OneSignal
+class OSSubscriptionState {
+    constructor(json) {
+        /// A boolean parameter that indicates if the  user
+        /// is subscribed to your app with OneSignal
+        /// This is only true if the `userId`, `pushToken`, and
+        /// `userSubscriptionSetting` parameters are defined/true.
+        this.subscribed = json.isSubscribed;
+
+        /// The current user's User ID (AKA playerID) with OneSignal
+        this.userId = json.userId;
+
+        /// The APNS (iOS), GCM/FCM (Android) push token
+        this.pushToken = json.pushToken;
+    }
+}
+
+/// An instance of this class describes a change in the user's OneSignal
+/// push notification subscription state, ie. the user subscribed to
+/// push notifications with your app.
+class OSSubscriptionStateChanges {
+    constructor(json) {
+        if (json.from) {
+          this.from = new OSSubscriptionState(json.from);
+        }
+        if (json.to) {
+          this.to = new OSSubscriptionState(json.to);
+        }
+    }
+}
+
+/// Represents the user's OneSignal email subscription state,
+class OSEmailSubscriptionState {
+    constructor(json) {
+        this.subscribed = json.isSubscribed;
+        this.emailAddress = json.emailAddress;
+        this.emailUserId = json.emailUserId;
+    }
+}
+
+/// An instance of this class describes a change in the user's
+/// email subscription state with OneSignal
+class OSEmailSubscriptionStateChanges {
+    constructor(json) {
+        if (json.from) {
+            this.from = new OSEmailSubscriptionState(json.from);
+        }
+        if (json.to) {
+            this.to = new OSEmailSubscriptionState(json.to);
+        }
     }
 }
 
