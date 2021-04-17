@@ -104,7 +104,10 @@ OneSignal.prototype.completeNotification = function(notification, shouldDisplay)
 };
 
 OneSignal.prototype.getDeviceState = function(deviceStateReceivedCallBack) {
-    cordova.exec(deviceStateReceivedCallBack, function(){}, "OneSignalPush", "getDeviceState", []);
+    var deviceStateCallback = function(json) {
+        deviceStateReceivedCallBack(new OSDeviceState(json));
+    };
+    cordova.exec(deviceStateCallback, function(){}, "OneSignalPush", "getDeviceState", []);
 };
 
 OneSignal.prototype.addSubscriptionObserver = function(callback) {
@@ -710,7 +713,28 @@ class OSInAppMessageAction {
     }
 }
 
+class OSDeviceState {
+    constructor(json) {
+        console.log("OSDeviceState: " + JSON.stringify(json));
+        if (json.hasNotificationPermission) {
+            this.hasNotificationPermission = json.hasNotificationPermission;
+        } else {
+            this.hasNotificationPermission = json.areNotificationsEnabled;
+        }
 
+        if (json.notificationPermissionStatus != null) {
+            this.notificationPermissionStatus = json.notificationPermissionStatus;
+        }
+        
+        this.pushDisabled = json.isPushDisabled;
+        this.subscribed = json.isSubscribed;
+        this.emailSubscribed = json.isEmailSubscribed;
+        this.userId = json.userId;
+        this.pushToken = json.pushToken;
+        this.emailUserId = json.emailUserId;
+        this.emailAddress = json.emailAddress;
+    }
+}
 
 //-------------------------------------------------------------------
 
