@@ -251,7 +251,7 @@ public class OneSignalController {
   }
 
   public static boolean isLocationShared(CallbackContext callbackContext) {
-    // doesn't apply to Android
+    // Need to be implemented in Android
     CallbackHelper.callbackSuccessBoolean(callbackContext, false);
     return true;
   }

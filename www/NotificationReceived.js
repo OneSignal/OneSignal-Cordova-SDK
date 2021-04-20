@@ -50,8 +50,7 @@ function OSNotification (receivedEvent) {
     /// The priority used with GCM/FCM to describe how
     /// urgent the notification is. A higher priority
     /// means the notification will be delivered faster.
-    /// Default = 10.
-    if (receivedEvent.priority) {
+    if (typeof(receivedEvent.priority) != "undefined") {
         this.priority = receivedEvent.priority;
     }
     /// (Android Only)
