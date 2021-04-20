@@ -5,7 +5,7 @@ function OSDeviceState(json) {
         this.hasNotificationPermission = json.areNotificationsEnabled;
     }
 
-    if (json.notificationPermissionStatus != null) {
+    if (json.notificationPermissionStatus !== null) {
         this.notificationPermissionStatus = json.notificationPermissionStatus;
     }
     
@@ -19,21 +19,21 @@ function OSDeviceState(json) {
 }
 
 function OSPermissionState(json) {
-    if (json.status != null) {
+    if (json.status !== null) {
         this.status = json.status;
     } else {
         this.status = json.areNotificationsEnabled ? OneSignal.prototype.OSNotificationPermission.Authorized : OneSignal.prototype.OSNotificationPermission.Denied;
     }
 
     // iOS only
-    if (json.provisional != null) {
+    if (json.provisional !== null) {
         this.provisional = json.provisional;
     } else {
         this.provisional = false;
     }
 
     // iOS only
-    if (json.hasPrompted != null) {
+    if (json.hasPrompted !== null) {
         this.hasPrompted = json.hasPrompted;
     } else {
         this.hasPrompted = false;

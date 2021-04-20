@@ -134,7 +134,7 @@ OneSignal.prototype.getTags = function(tagsReceivedCallBack) {
 };
 
 OneSignal.prototype.sendTag = function(key, value) {
-    var jsonKeyValue = {};
+    const jsonKeyValue = {};
     jsonKeyValue[key] = value;
     cordova.exec(function(){}, function(){}, "OneSignalPush", "sendTags", [jsonKeyValue]);
 };
