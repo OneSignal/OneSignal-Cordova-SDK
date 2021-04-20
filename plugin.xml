@@ -35,6 +35,10 @@
       </feature>
     </config-file>
 
+    <js-module src="www/NotificationReceived.js" name="NotificationReceived" />
+    <js-module src="www/NotificationOpened.js" name="NotificationOpened" />
+    <js-module src="www/InAppMessage.js" name="InAppMessage" />
+    <js-module src="www/Subscription.js" name="Subscription" />
     <source-file src="src/android/com/onesignal/cordova/OneSignalPush.java" target-dir="src/com/onesignal/cordova/" />
     <source-file src="src/android/com/onesignal/cordova/OneSignalController.java" target-dir="src/com/onesignal/cordova/" />
     <source-file src="src/android/com/onesignal/cordova/OneSignalEmailController.java" target-dir="src/com/onesignal/cordova/" />
@@ -66,6 +70,10 @@
     <header-file src="src/ios/OneSignalPush.h" />
     <source-file src="src/ios/OneSignalPush.m" />
 
+    <js-module src="www/NotificationReceived.js" name="NotificationReceived" />
+    <js-module src="www/NotificationOpened.js" name="NotificationOpened" />
+    <js-module src="www/InAppMessage.js" name="InAppMessage" />
+    <js-module src="www/Subscription.js" name="Subscription" />
   </platform>
 
 </plugin>
