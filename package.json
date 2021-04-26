@@ -23,7 +23,6 @@
   "platforms": [
     "android",
     "ios",
-    "windows",
     "amazon-fireos"
   ],
   "engines": [
@@ -53,7 +52,6 @@
     "platforms": [
       "android",
       "ios",
-      "windows",
       "amazon-fireos"
     ]
   },
