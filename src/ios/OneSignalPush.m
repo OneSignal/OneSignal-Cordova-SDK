@@ -235,7 +235,7 @@ static Class delegateClass = nil;
 }
 
 - (void)addSubscriptionObserver:(CDVInvokedUrlCommand*)command {
-    bool first = subscriptionObserverCallbackId  == nil;
+    bool first = subscriptionObserverCallbackId == nil;
     subscriptionObserverCallbackId = command.callbackId;
     if (first)
         [OneSignal addSubscriptionObserver:self];
