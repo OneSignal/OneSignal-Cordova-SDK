@@ -153,8 +153,8 @@ OneSignal.prototype.deleteTags = function(keys) {
 
 // Only applies to iOS (does nothing on Android as it always silently registers)
 // Call only if you passed false to autoRegister
-OneSignal.prototype.registerForProvisionalAuthorization = function() {
-    cordova.exec(function(){}, function(){}, "OneSignalPush", "registerForProvisionalAuthorization", []);
+OneSignal.prototype.registerForProvisionalAuthorization = function(provisionalAuthCallback) {
+    cordova.exec(provisionalAuthCallback, function(){}, "OneSignalPush", "registerForProvisionalAuthorization", []);
 };
 
 // Only applies to iOS (does nothing on Android as it always silently registers without user permission)
