@@ -56,6 +56,7 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String ADD_PERMISSION_OBSERVER = "addPermissionObserver";
   private static final String ADD_SUBSCRIPTION_OBSERVER = "addSubscriptionObserver";
   private static final String ADD_EMAIL_SUBSCRIPTION_OBSERVER = "addEmailSubscriptionObserver";
+  private static final String ADD_SMS_SUBSCRIPTION_OBSERVER = "addSMSSubscriptionObserver";
 
   private static final String GET_TAGS = "getTags";
   private static final String DELETE_TAGS = "deleteTags";
@@ -177,6 +178,10 @@ public class OneSignalPush extends CordovaPlugin {
 
       case ADD_EMAIL_SUBSCRIPTION_OBSERVER:
         result = OneSignalObserverController.addEmailSubscriptionObserver(callbackContext);
+        break;
+
+      case ADD_SMS_SUBSCRIPTION_OBSERVER:
+        result = OneSignalObserverController.addSMSSubscriptionObserver(callbackContext);
         break;
 
       case GET_TAGS:
