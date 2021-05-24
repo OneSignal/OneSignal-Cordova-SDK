@@ -42,8 +42,11 @@ NSString* promptForPushNotificationsWithUserResponseCallbackId;
 NSString* registerForProvisionalAuthorizationCallbackId;
 NSString* setEmailCallbackId;
 NSString* setUnauthenticatedEmailCallbackId;
+NSString* setSMSNumberCallbackId;
+NSString* setUnauthenticatedSMSNumberCallbackId;
 NSString* setExternalIdCallbackId;
 NSString* logoutEmailCallbackId;
+NSString* logoutSMSNumberCallbackId;
 NSString* emailSubscriptionCallbackId;
 
 OSNotificationOpenedResult* actionNotification;
@@ -368,6 +371,41 @@ static Class delegateClass = nil;
         successCallback(logoutEmailCallbackId, nil);
     } withFailure:^(NSError *error) {
         failureCallback(logoutEmailCallbackId, error.userInfo);
+    }];
+}
+
+- (void)setSMSNumber:(CDVInvokedUrlCommand *)command {
+    setSMSNumberCallbackId = command.callbackId;
+    
+    NSString *smsNumber = command.arguments[0];
+    NSString *smsAuthHashToken = command.arguments[1];
+
+    [OneSignal setSMSNumber:smsNumber withSMSAuthHashToken:smsAuthHashToken withSuccess:^(NSDictionary *results){
+        successCallback(setSMSNumberCallbackId, results);
+    } withFailure:^(NSError *error) {
+        failureCallback(setSMSNumberCallbackId, error.userInfo);
+    }];
+}
+
+- (void)setUnauthenticatedSMSNumber:(CDVInvokedUrlCommand *)command {
+    setUnauthenticatedSMSNumberCallbackId = command.callbackId;
+    
+    NSString *smsNumber = command.arguments[0];
+    
+    [OneSignal setSMSNumber:smsNumber withSuccess:^(NSDictionary *results){
+        successCallback(setUnauthenticatedSMSNumberCallbackId, results);
+    } withFailure:^(NSError *error) {
+        failureCallback(setUnauthenticatedSMSNumberCallbackId, error.userInfo);
+    }];
+}
+
+- (void)logoutSMSNumber:(CDVInvokedUrlCommand *)command {
+    logoutSMSNumberCallbackId = command.callbackId;
+
+    [OneSignal logoutSMSNumberWithSuccess:^(NSDictionary *results){
+        successCallback(logoutSMSNumberCallbackId, results);
+    } withFailure:^(NSError *error) {
+        failureCallback(logoutSMSNumberCallbackId, error.userInfo);
     }];
 }
 

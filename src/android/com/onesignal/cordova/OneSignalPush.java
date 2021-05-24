@@ -76,6 +76,10 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String SET_UNAUTHENTICATED_EMAIL = "setUnauthenticatedEmail";
   private static final String LOGOUT_EMAIL = "logoutEmail";
 
+  private static final String SET_SMS_NUMBER = "setSMSNumber";
+  private static final String SET_UNAUTHENTICATED_SMS_NUMBER = "setUnauthenticatedSMSNumber";
+  private static final String LOGOUT_SMS_NUMBER = "logoutSMSNumber";
+
   private static final String SET_LOG_LEVEL = "setLogLevel";
 
   private static final String SET_LOCATION_SHARED = "setLocationShared";
@@ -233,6 +237,18 @@ public class OneSignalPush extends CordovaPlugin {
 
       case LOGOUT_EMAIL:
         result = OneSignalEmailController.logoutEmail(callbackContext);
+        break;
+
+      case SET_SMS_NUMBER:
+        result = OneSignalSMSController.setSMSNumber(callbackContext, data);
+        break;
+
+      case SET_UNAUTHENTICATED_SMS_NUMBER:
+        result = OneSignalSMSController.setUnauthenticatedEmail(callbackContext, data);
+        break;
+
+      case LOGOUT_SMS_NUMBER:
+        result = OneSignalSMSController.logoutSMSNumber(callbackContext);
         break;
 
       case PROMPT_LOCATION:
