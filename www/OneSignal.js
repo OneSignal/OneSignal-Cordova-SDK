@@ -253,6 +253,39 @@ OneSignal.prototype.logoutEmail = function(onSuccess, onFailure) {
     cordova.exec(onSuccess, onFailure, "OneSignalPush", "logoutEmail", []);
 };
 
+/**
+ * SMS
+ */
+OneSignal.prototype.setSMSNumber = function(smsNumber, smsAuthToken, onSuccess, onFailure) {
+    if (onSuccess == null)
+        onSuccess = function() {};
+
+    if (onFailure == null)
+        onFailure = function() {};
+
+    if (typeof smsAuthToken == 'function') {
+        onFailure = onSuccess;
+        onSuccess = smsAuthToken;
+
+        cordova.exec(onSuccess, onFailure, "OneSignalPush", "setUnauthenticatedSMSNumber", [smsNumber]);
+    } else if (smsAuthToken == undefined) {
+        cordova.exec(onSuccess, onFailure, "OneSignalPush", "setUnauthenticatedSMSNumber", [smsNumber]);
+    } else {
+        cordova.exec(onSuccess, onFailure, "OneSignalPush", "setSMSNumber", [smsNumber, smsAuthToken]);
+    }
+};
+
+OneSignal.prototype.logoutSMSNumber = function(onSuccess, onFailure) {
+    if (onSuccess == null)
+        onSuccess = function() {};
+
+
+    if (onFailure == null)
+        onFailure = function() {};
+
+    cordova.exec(onSuccess, onFailure, "OneSignalPush", "logoutSMSNumber", []);
+};
+
 /** Possible function usages
   setExternalUserId(externalId: string?): void
   setExternalUserId(externalId: string?, callback: function): void

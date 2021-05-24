@@ -75,6 +75,11 @@
 - (void)setEmail:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)setUnauthenticatedEmail:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)logoutEmail:(CDVInvokedUrlCommand* _Nonnull)command;
+
+// SMS
+- (void)setSMSNumber:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)setUnauthenticatedSMSNumber:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)logoutSMSNumber:(CDVInvokedUrlCommand* _Nonnull)command;
     
 // In App Message
 - (void)setLaunchURLsInApp:(CDVInvokedUrlCommand* _Nonnull)command;
