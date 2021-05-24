@@ -48,6 +48,7 @@ NSString* setExternalIdCallbackId;
 NSString* logoutEmailCallbackId;
 NSString* logoutSMSNumberCallbackId;
 NSString* emailSubscriptionCallbackId;
+NSString* smsSubscriptionCallbackId;
 
 OSNotificationOpenedResult* actionNotification;
 OSNotification *notification;
@@ -167,6 +168,10 @@ static Class delegateClass = nil;
     successCallback(emailSubscriptionCallbackId, [stateChanges toDictionary]);
 }
 
+- (void)onOSSMSSubscriptionChanged:(OSSMSSubscriptionStateChanges *)stateChanges {
+    successCallback(smsSubscriptionCallbackId, [stateChanges toDictionary]);
+}
+
 - (void)setProvidesNotificationSettingsView:(CDVInvokedUrlCommand *)command {
     BOOL providesView = command.arguments[0];
     [OneSignal setProvidesNotificationSettingsView:providesView];
@@ -249,6 +254,13 @@ static Class delegateClass = nil;
     emailSubscriptionCallbackId = command.callbackId;
     if (first)
         [OneSignal addEmailSubscriptionObserver:self];
+}
+
+- (void)addSMSSubscriptionObserver:(CDVInvokedUrlCommand *)command {
+    bool first = smsSubscriptionCallbackId == nil;
+    smsSubscriptionCallbackId = command.callbackId;
+    if (first)
+        [OneSignal addSMSSubscriptionObserver:self];
 }
 
 - (void)setLogLevel:(CDVInvokedUrlCommand*)command {
