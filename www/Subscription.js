@@ -94,9 +94,28 @@ function OSEmailSubscriptionStateChanges(json) {
     }
 }
 
+/// Represents the user's OneSignal SMS subscription state,
+function OSSMSSubscriptionState(json) {
+    this.subscribed = json.isSubscribed;
+    this.smsNumber = json.smsNumber;
+    this.smsUserId = json.smsUserId;
+}
+
+/// An instance of this class describes a change in the user's
+/// SMS subscription state with OneSignal
+function OSSMSSubscriptionStateChanges(json) {
+    if (json.from) {
+        this.from = new OSSMSSubscriptionState(json.from);
+    }
+    if (json.to) {
+        this.to = new OSSMSSubscriptionState(json.to);
+    }
+}
+
 module.exports = {
     OSDeviceState: OSDeviceState,
     OSPermissionStateChanges: OSPermissionStateChanges,
     OSSubscriptionStateChanges: OSSubscriptionStateChanges,
     OSEmailSubscriptionStateChanges: OSEmailSubscriptionStateChanges,
+    OSSMSSubscriptionStateChanges: OSSMSSubscriptionStateChanges,
 };

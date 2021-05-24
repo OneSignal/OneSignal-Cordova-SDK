@@ -32,6 +32,7 @@ var OSDeviceState = require('./Subscription').OSDeviceState;
 var OSPermissionStateChanges = require('./Subscription').OSPermissionStateChanges;
 var OSSubscriptionStateChanges = require('./Subscription').OSSubscriptionStateChanges;
 var OSEmailSubscriptionStateChanges = require('./Subscription').OSEmailSubscriptionStateChanges;
+var OSSMSSubscriptionStateChanges = require('./Subscription').OSSMSSubscriptionStateChanges;
 
 var OneSignal = function() {
     var _appID = "";
@@ -49,6 +50,7 @@ OneSignal.prototype.OSNotificationPermission = {
 OneSignal._permissionObserverList = [];
 OneSignal._subscriptionObserverList = [];
 OneSignal._emailSubscriptionObserverList = [];
+OneSignal._smsSubscriptionObserverList = [];
 
 
 // You must call init before any other OneSignal function.
@@ -119,6 +121,14 @@ OneSignal.prototype.addEmailSubscriptionObserver = function(callback) {
         OneSignal._processFunctionList(OneSignal._emailSubscriptionObserverList, new OSEmailSubscriptionStateChanges(state));
     };
     cordova.exec(emailSubscriptionCallbackProcessor, function(){}, "OneSignalPush", "addEmailSubscriptionObserver", []);
+};
+
+OneSignal.prototype.addSMSSubscriptionObserver = function(callback) {
+    OneSignal._smsSubscriptionObserverList.push(callback);
+    var smsSubscriptionCallbackProcessor = function(state) {
+        OneSignal._processFunctionList(OneSignal._smsSubscriptionObserverList, new OSSMSSubscriptionStateChanges(state));
+    };
+    cordova.exec(smsSubscriptionCallbackProcessor, function(){}, "OneSignalPush", "addSMSSubscriptionObserver", []);
 };
 
 OneSignal.prototype.addPermissionObserver = function(callback) {

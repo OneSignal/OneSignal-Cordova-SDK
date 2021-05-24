@@ -44,6 +44,7 @@
 - (void)addPermissionObserver:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)addSubscriptionObserver:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)addEmailSubscriptionObserver:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)addSMSSubscriptionObserver:(CDVInvokedUrlCommand* _Nonnull)command;
 
 - (void)setLogLevel:(CDVInvokedUrlCommand* _Nonnull)command;
 
