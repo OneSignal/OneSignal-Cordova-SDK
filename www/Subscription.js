@@ -12,10 +12,13 @@ function OSDeviceState(json) {
     this.pushDisabled = json.isPushDisabled;
     this.subscribed = json.isSubscribed;
     this.emailSubscribed = json.isEmailSubscribed;
+    this.smsSubscribed = json.isSMSSubscribed;
     this.userId = json.userId;
     this.pushToken = json.pushToken;
     this.emailUserId = json.emailUserId;
     this.emailAddress = json.emailAddress;
+    this.smsUserId = json.smsUserId;
+    this.smsNumber = json.smsNumber;
 }
 
 function OSPermissionState(json) {
