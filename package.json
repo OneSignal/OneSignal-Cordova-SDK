@@ -1,5 +1,5 @@
 {
-  "version": "2.11.3",
+  "version": "3.0.0-beta1",
 
   "name": "onesignal-cordova-plugin",
   "cordova_name": "OneSignal Push Notifications",
@@ -23,7 +23,6 @@
   "platforms": [
     "android",
     "ios",
-    "windows",
     "amazon-fireos"
   ],
   "engines": [
@@ -53,7 +52,6 @@
     "platforms": [
       "android",
       "ios",
-      "windows",
       "amazon-fireos"
     ]
   },
