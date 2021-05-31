@@ -13,7 +13,7 @@
 
   <license>MIT</license>
 
-  <js-module src="www/OneSignal.js" name="OneSignal">
+  <js-module src="www/OneSignalPlugin.js" name="OneSignalPlugin">
     <clobbers target="OneSignal" />
   </js-module>
 
