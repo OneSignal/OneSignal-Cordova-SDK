@@ -38,8 +38,8 @@
     <!-- PhoneGap Build (PGB) does not have a amazon build target so it include the required manifest entries in all Android builds. -->
     <config-file target="AndroidManifest.xml" parent="/manifest">
       <uses-permission android:name="com.amazon.device.messaging.permission.RECEIVE" />
-      <permission android:name="$PACKAGE_NAME.permission.RECEIVE_ADM_MESSAGE" android:protectionLevel="signature" />
-      <uses-permission android:name="$PACKAGE_NAME.permission.RECEIVE_ADM_MESSAGE" />
+      <permission android:name="${applicationId}.permission.RECEIVE_ADM_MESSAGE" android:protectionLevel="signature" />
+      <uses-permission android:name="${applicationId}.permission.RECEIVE_ADM_MESSAGE" />
     </config-file>
     <config-file target="AndroidManifest.xml" parent="/manifest/application">
       <amazon:enable-feature android:name="com.amazon.device.messaging" android:required="false" xmlns:amazon="http://schemas.amazon.com/apk/res/android" />
@@ -50,7 +50,7 @@
         <intent-filter>
           <action android:name="com.amazon.device.messaging.intent.REGISTRATION" />
           <action android:name="com.amazon.device.messaging.intent.RECEIVE" />
-          <category android:name="$PACKAGE_NAME" />
+          <category android:name="${applicationId}" />
         </intent-filter>
       </receiver>
     </config-file>
