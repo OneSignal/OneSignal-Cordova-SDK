@@ -92,6 +92,8 @@
     <header-file src="src/ios/OneSignalPush.h" />
     <source-file src="src/ios/OneSignalPush.m" />
 
+    <hook type="after_plugin_add" src="src/ios/auto-nse.js" />
+
   </platform>
 
   <!-- Windows Phone 8.1 -->
