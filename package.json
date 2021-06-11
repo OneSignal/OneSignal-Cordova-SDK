@@ -5,8 +5,8 @@
   "cordova_name": "OneSignal Push Notifications",
   "description": "OneSignal is a high volume Push Notification service for mobile apps. In addition to basic notification delivery, OneSignal also provides tools to localize, target, schedule, and automate notifications that you send.",
   "license": "MIT",
-  "main": "www/OneSignal.js",
-  "typings": "typings/index.d.ts",
+  "main": "www/OneSignalPlugin.js",
+  "typings": "types/index.d.ts",
   "keywords": [
     "push",
     "notification",
