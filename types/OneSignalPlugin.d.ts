@@ -1,10 +1,11 @@
 import { NotificationReceivedEvent, OpenedEvent, OpenedEventAction } from './Notification';
 import { OutcomeEvent } from './Outcomes';
+import { InAppMessageAction } from './InAppMessage';
 import { PermissionChange, SubscriptionChange, EmailSubscriptionChange, SMSSubscriptionChange, DeviceState } from './Subscription';
 import { LogLevel, ChangeEvent } from './Extras';
 
 /* O N E S I G N A L  I N T E R F A C E */
-export interface OneSignalPlugin{
+export interface OneSignalPlugin {
     /**
      * Completes OneSignal initialization by setting the OneSignal Application ID.
      * @param  {string} appId

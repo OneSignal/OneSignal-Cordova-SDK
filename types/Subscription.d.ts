@@ -13,7 +13,7 @@ export interface DeviceState {
     isPushDisabled                  : boolean;
     isEmailSubscribed               : boolean;
     isSMSSubscribed                 : boolean;
-    hasNotificationPermission       ?: boolean; // ios only
+    hasNotificationPermission       ?: boolean;
     notificationPermissionStatus    ?: IosPermissionStatus;  // ios only
     // areNotificationsEnabled (android) not included since it is converted to hasNotificationPermission in bridge
 }
@@ -23,23 +23,23 @@ export interface PermissionChange {
     hasPrompted             ?: boolean;   // ios
     provisional             ?: boolean;   // ios
     areNotificationsEnabled ?: boolean;   // android
-};
+}
 
 export interface SubscriptionChange {
     userId                  ?: string;
     pushToken               ?: string;
     isSubscribed            : boolean;
     isPushDisabled          : boolean;
-};
+}
 
 export interface EmailSubscriptionChange {
     emailAddress        ?: string;
     emailUserId         ?: string;
     isEmailSubscribed   : boolean;
-};
+}
 
 export interface SMSSubscriptionChange {
     smsNumber         ?: string;
     smsUserId         ?: string;
     isSMSSubscribed   : boolean;
-};
+}

@@ -41,7 +41,7 @@ export interface OSNotification {
 export interface NotificationReceivedEvent {
     complete        : (notification?: OSNotification) => void;
     getNotification : () => OSNotification;
-};
+}
 
 export interface OpenedEvent {
     action          : OpenedEventAction;
