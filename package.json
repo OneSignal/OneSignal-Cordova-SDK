@@ -27,9 +27,6 @@
     "ios",
     "amazon-fireos"
   ],
-  "dependencies": {
-    "typescript": "^4.1.3"
-  },
   "engines": [
     {
       "name": "cordova-android",
