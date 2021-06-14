@@ -40,8 +40,9 @@ public class OneSignalController {
    */
   public static void setLogLevel(JSONArray data) {
     try {
-      JSONObject jo = data.getJSONObject(0);
-      OneSignal.setLogLevel(jo.optInt("logLevel", 0), jo.optInt("visualLevel", 0));
+      int logLevel = data.getInt(0);
+      int visualLevel = data.getInt(1);
+      OneSignal.setLogLevel(logLevel, visualLevel);
     } catch (Throwable t) {
       t.printStackTrace();
     }

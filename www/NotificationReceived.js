@@ -229,6 +229,7 @@ class OSAndroidBackgroundImageLayout {
 }
 
 var OSNotificationReceivedEvent = {
+    notification: null,
     create : function (receivedEvent) {
         if (receivedEvent.notification) {
             // Android case
@@ -251,6 +252,9 @@ var OSNotificationReceivedEvent = {
         // future: Android side: make the notification modifiable
         // iOS & Android: the notification id is associated with the native-side complete handler / completion block
         cordova.exec(function(){}, function(){}, "OneSignalPush", "completeNotification", [this.notification.notificationId, true]);
+    },
+    getNotification: function() {
+        return this.notification; 
     }
 };
 
