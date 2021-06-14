@@ -1,5 +1,5 @@
 // 0 = NotDetermined, 1 = Denied, 2 = Authorized, 3 = Provisional, 4 = Ephemeral
-export type IosPermissionStatus = 0 | 1 | 2 | 3 | 4; 
+export type PermissionStatus = 0 | 1 | 2 | 3 | 4; 
 
 /* D E V I C E */
 export interface DeviceState {
@@ -13,23 +13,21 @@ export interface DeviceState {
     isPushDisabled                  : boolean;
     isEmailSubscribed               : boolean;
     isSMSSubscribed                 : boolean;
-    hasNotificationPermission       ?: boolean;
-    notificationPermissionStatus    ?: IosPermissionStatus;  // ios only
+    hasNotificationPermission       : boolean;
+    notificationPermissionStatus    ?: PermissionStatus;  // ios only
     // areNotificationsEnabled (android) not included since it is converted to hasNotificationPermission in bridge
 }
 
 export interface PermissionChange {
-    status                  ?: IosPermissionStatus;    // ios
+    status                  : PermissionStatus; 
     hasPrompted             ?: boolean;   // ios
     provisional             ?: boolean;   // ios
-    areNotificationsEnabled ?: boolean;   // android
 }
 
 export interface SubscriptionChange {
     userId                  ?: string;
     pushToken               ?: string;
     isSubscribed            : boolean;
-    isPushDisabled          : boolean;
 }
 
 export interface EmailSubscriptionChange {
