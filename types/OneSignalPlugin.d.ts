@@ -306,12 +306,6 @@ export interface OneSignalPlugin {
     setLogLevel(nsLogLevel: LogLevel, visualLogLevel: LogLevel): void;
 
     /**
-     * Clears all handlers and observers.
-     * @returns void
-     */
-    clearHandlers(): void;
-
-    /**
      * Did the user provide privacy consent for GDPR purposes.
      * @returns Promise<boolean>
      */
