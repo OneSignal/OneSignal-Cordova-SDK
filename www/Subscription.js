@@ -58,7 +58,7 @@ function OSSubscriptionState(json) {
     /// is subscribed to your app with OneSignal
     /// This is only true if the `userId`, `pushToken`, and
     /// `userSubscriptionSetting` parameters are defined/true.
-    this.subscribed = json.isSubscribed;
+    this.isSubscribed = json.isSubscribed;
 
     /// The current user's User ID (AKA playerID) with OneSignal
     this.userId = json.userId;
@@ -81,7 +81,7 @@ function OSSubscriptionStateChanges(json) {
 
 /// Represents the user's OneSignal email subscription state,
 function OSEmailSubscriptionState(json) {
-    this.subscribed = json.isSubscribed;
+    this.isEmailSubscribed = json.isSubscribed;
     this.emailAddress = json.emailAddress;
     this.emailUserId = json.emailUserId;
 }
@@ -99,7 +99,7 @@ function OSEmailSubscriptionStateChanges(json) {
 
 /// Represents the user's OneSignal SMS subscription state,
 function OSSMSSubscriptionState(json) {
-    this.subscribed = json.isSubscribed;
+    this.isSMSSubscribed = json.isSubscribed;
     this.smsNumber = json.smsNumber;
     this.smsUserId = json.smsUserId;
 }
