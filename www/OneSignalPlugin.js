@@ -59,7 +59,7 @@ OneSignalPlugin.prototype.setAppId = function(appId) {
     window.cordova.exec(function() {}, function(){}, "OneSignalPush", "init", [OneSignalPlugin._appID]);
 };
 
-OneSignalPlugin.prototype.handleNotificationWillShowInForeground = function(handleNotificationWillShowInForegroundCallback) {
+OneSignalPlugin.prototype.setNotificationWillShowInForegroundHandler = function(handleNotificationWillShowInForegroundCallback) {
     OneSignalPlugin._notificationWillShowInForegroundDelegate = handleNotificationWillShowInForegroundCallback;
     
     var foregroundParsingHandler = function(notificationReceived) {
@@ -70,7 +70,7 @@ OneSignalPlugin.prototype.handleNotificationWillShowInForeground = function(hand
     window.cordova.exec(foregroundParsingHandler, function(){}, "OneSignalPush", "setNotificationWillShowInForegroundHandler", []);
 };
 
-OneSignalPlugin.prototype.handleNotificationOpened = function(handleNotificationOpenedCallback) {
+OneSignalPlugin.prototype.setNotificationOpenedHandler = function(handleNotificationOpenedCallback) {
     OneSignalPlugin._notificationOpenedDelegate = handleNotificationOpenedCallback;
 
     var notificationOpenedHandler = function(json) {
@@ -80,7 +80,7 @@ OneSignalPlugin.prototype.handleNotificationOpened = function(handleNotification
     window.cordova.exec(notificationOpenedHandler, function(){}, "OneSignalPush", "setNotificationOpenedHandler", []);
 };
 
-OneSignalPlugin.prototype.handleInAppMessageClicked = function(handler) {
+OneSignalPlugin.prototype.setInAppMessageClickHandler = function(handler) {
     OneSignalPlugin._inAppMessageClickDelegate = handler;
 
     var inAppMessageClickHandler = function(json) {
@@ -209,8 +209,8 @@ OneSignalPlugin.prototype.postNotification = function(jsonData, onSuccess, onFai
     window.cordova.exec(onSuccess, onFailure, "OneSignalPush", "postNotification", [jsonData]);
 };
 
-OneSignalPlugin.prototype.setLogLevel = function(logLevel) {
-    window.cordova.exec(function(){}, function(){}, "OneSignalPush", "setLogLevel", [logLevel]);
+OneSignalPlugin.prototype.setLogLevel = function(nsLogLevel, visualLogLevel) {
+    window.cordova.exec(function(){}, function(){}, "OneSignalPush", "setLogLevel", [nsLogLevel, visualLogLevel]);
 };
 
 OneSignalPlugin.prototype.userProvidedPrivacyConsent = function(callback) {
@@ -450,5 +450,10 @@ OneSignalPlugin.prototype.isLocationShared = function(callback) {
 //-------------------------------------------------------------------
 
 var OneSignal = new OneSignalPlugin();
-
 module.exports = OneSignal;
+
+if(!window.plugins)
+    window.plugins = {};
+
+if (!window.plugins.OneSignal)
+    window.plugins.OneSignal = OneSignal;
