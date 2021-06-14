@@ -3,6 +3,4 @@ export interface InAppMessageAction {
     first_click     : boolean;
     click_name      ?: string;
     click_url       ?: string;
-    outcomes        ?: object[];
-    tags            ?: object;
 }
