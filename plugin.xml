@@ -56,7 +56,7 @@
     <config-file target="config.xml" parent="/*">
       <feature name="OneSignalPush">
         <param name="ios-package" value="OneSignalPush"/>
-        </feature>
+      </feature>
     </config-file>
 
     <config-file target="*-Info.plist" parent="UIBackgroundModes">
