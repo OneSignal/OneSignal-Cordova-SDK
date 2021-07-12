@@ -100,4 +100,6 @@
 - (void)setLocationShared:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)isLocationShared:(CDVInvokedUrlCommand* _Nonnull)command;
 
+- (void)setLanguage:(CDVInvokedUrlCommand* _Nonnull)command;
+
 @end
