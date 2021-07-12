@@ -235,6 +235,10 @@ static Class delegateClass = nil;
     successCallback(command.callbackId, [[OneSignal getDeviceState] jsonRepresentation]);
 }
 
+- (void)setLanguage:(CDVInvokedUrlCommand*)command {
+    [OneSignal setLanguage:command.arguments[0]];
+}
+
 - (void)addPermissionObserver:(CDVInvokedUrlCommand*)command {
     bool first = permissionObserverCallbackId  == nil;
     permissionObserverCallbackId = command.callbackId;

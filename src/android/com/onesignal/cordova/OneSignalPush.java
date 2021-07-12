@@ -53,6 +53,8 @@ public class OneSignalPush extends CordovaPlugin {
 
   private static final String GET_DEVICE_STATE = "getDeviceState";
 
+  private static final String SET_LANGUAGE = "setLanguage";
+
   private static final String ADD_PERMISSION_OBSERVER = "addPermissionObserver";
   private static final String ADD_SUBSCRIPTION_OBSERVER = "addSubscriptionObserver";
   private static final String ADD_EMAIL_SUBSCRIPTION_OBSERVER = "addEmailSubscriptionObserver";
@@ -166,6 +168,10 @@ public class OneSignalPush extends CordovaPlugin {
 
       case GET_DEVICE_STATE:
         result = OneSignalController.getDeviceState(callbackContext);
+        break;
+
+      case SET_LANGUAGE:
+        result = OneSignalController.setLanguage(language);
         break;
 
       case ADD_PERMISSION_OBSERVER:
