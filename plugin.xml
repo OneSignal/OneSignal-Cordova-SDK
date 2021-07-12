@@ -72,7 +72,16 @@
       <string>production</string>
     </config-file>
 
-    <framework src="OneSignal" type="podspec" spec="3.4.3" />
+    <podspec>
+        <config>
+            <source url="https://github.com/CocoaPods/Specs.git"/>
+            <source url="https://github.com/OneSignal/OneSignal-iOS-SDK.git"/>
+        </config>
+        <pods use-frameworks="true">
+            <pod name="OneSignal" spec="3.5.3" />
+        </pods>
+    </podspec>
+
     <header-file src="src/ios/OneSignalPush.h" />
     <source-file src="src/ios/OneSignalPush.m" />
 
