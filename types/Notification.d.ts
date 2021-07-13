@@ -7,7 +7,7 @@ export interface OSNotification {
     sound           ?: string;
     title           ?: string;
     launchURL       ?: string;
-    rawPayload      : object | string; // platform bridges return different types
+    rawPayload      : object;
     actionButtons   ?: object[];
     additionalData  : object;
     notificationId  : string;
