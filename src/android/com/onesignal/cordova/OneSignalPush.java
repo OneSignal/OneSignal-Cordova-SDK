@@ -171,7 +171,7 @@ public class OneSignalPush extends CordovaPlugin {
         break;
 
       case SET_LANGUAGE:
-        result = OneSignalController.setLanguage(language);
+        result = OneSignalController.setLanguage(data);
         break;
 
       case ADD_PERMISSION_OBSERVER:
