@@ -10,7 +10,11 @@ function OSNotification (receivedEvent) {
     this.additionalData = receivedEvent.additionalData;
     /// A hashmap object representing the raw key/value
     /// properties of the push notification
-    this.rawPayload = receivedEvent.rawPayload;
+    if (typeof receivedEvent.rawPayload === 'string' || receivedEvent.rawPayload instanceof String) {
+        this.rawPayload = JSON.parse(receivedEvent.rawPayload);
+    } else {
+        this.rawPayload = receivedEvent.rawPayload;
+    }
     /// If set, he launch URL will be opened when the user
     /// taps on your push notification. You can control
     /// whether or not it opens in an in-app webview or
