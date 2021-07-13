@@ -106,6 +106,10 @@ OneSignalPlugin.prototype.getDeviceState = function(deviceStateReceivedCallBack)
     window.cordova.exec(deviceStateCallback, function(){}, "OneSignalPush", "getDeviceState", []);
 };
 
+OneSignalPlugin.prototype.setLanguage = function(language) {
+    window.cordova.exec(function(){}, function(){}, "OneSignalPush", "setLanguage", [language]);
+}
+
 OneSignalPlugin.prototype.addSubscriptionObserver = function(callback) {
     OneSignalPlugin._subscriptionObserverList.push(callback);
     var subscriptionCallBackProcessor = function(state) {
