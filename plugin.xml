@@ -78,7 +78,7 @@
             <source url="https://github.com/OneSignal/OneSignal-iOS-SDK.git"/>
         </config>
         <pods use-frameworks="true">
-            <pod name="OneSignal" spec="3.5.3" />
+            <pod name="OneSignalXCFramework" spec="3.6.0" />
         </pods>
     </podspec>
 
