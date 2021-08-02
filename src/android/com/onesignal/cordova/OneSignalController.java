@@ -48,6 +48,17 @@ public class OneSignalController {
     }
   }
 
+  public static boolean setLanguage(JSONArray data) {
+    try {
+      OneSignal.setLanguage(data.getString(0));
+      return true;
+    }
+    catch (Throwable t) {
+      t.printStackTrace();
+      return false;
+    }
+  }
+  
   /**
    * Tags
    */
