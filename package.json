@@ -1,5 +1,5 @@
 {
-  "version": "3.0.0-beta3",
+  "version": "3.0.0",
 
   "name": "onesignal-cordova-plugin",
   "cordova_name": "OneSignal Push Notifications",
