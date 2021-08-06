@@ -31,7 +31,7 @@
   <js-module src="www/Subscription.js" name="Subscription" />
 
   <platform name="android">
-    <framework src="com.onesignal:OneSignal:4.4.1" />
+    <framework src="com.onesignal:OneSignal:4.4.2" />
     <framework src="build-extras-onesignal.gradle" custom="true" type="gradleReference" />
 
     <config-file target="res/xml/config.xml" parent="/*">
