@@ -1,4 +1,4 @@
-package com.plugin.gcm;
+package com.onesignal.cordova;
 
 import org.apache.cordova.CallbackContext;
 import org.json.JSONObject;

@@ -1,4 +1,4 @@
-package com.plugin.gcm;
+package com.onesignal.cordova;
 
 import org.apache.cordova.CallbackContext;
 
@@ -10,19 +10,23 @@ import com.onesignal.OneSignal;
 
 import com.onesignal.OSPermissionObserver;
 import com.onesignal.OSEmailSubscriptionObserver;
+import com.onesignal.OSSMSSubscriptionObserver;
 import com.onesignal.OSSubscriptionObserver;
 import com.onesignal.OSPermissionStateChanges;
 import com.onesignal.OSSubscriptionStateChanges;
 import com.onesignal.OSEmailSubscriptionStateChanges;
+import com.onesignal.OSSMSSubscriptionStateChanges;
 
 public class OneSignalObserverController {
   private static CallbackContext jsPermissionObserverCallBack;
   private static CallbackContext jsSubscriptionObserverCallBack;
   private static CallbackContext jsEmailSubscriptionObserverCallBack;
+  private static CallbackContext jsSMSSubscriptionObserverCallBack;
 
   private static OSPermissionObserver permissionObserver;
   private static OSSubscriptionObserver subscriptionObserver;
   private static OSEmailSubscriptionObserver emailSubscriptionObserver;
+  private static OSSMSSubscriptionObserver smsSubscriptionObserver;
 
   // This is to prevent an issue where if two Javascript calls are made to OneSignal expecting a callback then only one would fire.
   private static void callbackSuccess(CallbackContext callbackContext, JSONObject jsonObject) {
@@ -72,6 +76,20 @@ public class OneSignalObserverController {
           }
         };
         OneSignal.addEmailSubscriptionObserver(emailSubscriptionObserver);
+      }
+      return true;
+  }
+
+  public static boolean addSMSSubscriptionObserver(CallbackContext callbackContext) {
+    jsSMSSubscriptionObserverCallBack = callbackContext;
+      if (smsSubscriptionObserver == null) {
+        smsSubscriptionObserver = new OSSMSSubscriptionObserver() {
+          @Override
+          public void onSMSSubscriptionChanged(OSSMSSubscriptionStateChanges stateChanges) {
+            callbackSuccess(jsSMSSubscriptionObserverCallBack, stateChanges.toJSONObject());
+          }
+        };
+        OneSignal.addSMSSubscriptionObserver(smsSubscriptionObserver);
       }
       return true;
   }
