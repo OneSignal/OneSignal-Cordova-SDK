@@ -1,43 +1,70 @@
-package com.plugin.gcm;
+package com.onesignal.cordova;
 
-import android.util.Log;
+import com.onesignal.OSDeviceState;
+import com.onesignal.OneSignal;
+import com.onesignal.OneSignal.PostNotificationResponseHandler;
+
 import org.apache.cordova.CallbackContext;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
-
-import com.onesignal.OneSignal;
-import com.onesignal.OSNotification;
-import com.onesignal.OSNotificationOpenResult;
-import com.onesignal.OSInAppMessageAction;
-
-import com.onesignal.OneSignal.NotificationOpenedHandler;
-import com.onesignal.OneSignal.NotificationReceivedHandler;
-import com.onesignal.OneSignal.GetTagsHandler;
-import com.onesignal.OneSignal.IdsAvailableHandler;
-import com.onesignal.OneSignal.PostNotificationResponseHandler;
-
 public class OneSignalController {
-  private static CallbackContext notifReceivedCallbackContext;
-  private static CallbackContext notifOpenedCallbackContext;
-  private static CallbackContext inAppMessageClickedCallbackContext;
 
-  private static final String TAG = "OneSignalPush";
+  /**
+   * Subscriptions
+   */
+  public static boolean getDeviceState(CallbackContext callbackContext) {
+    OSDeviceState deviceState = OneSignal.getDeviceState();
+    if (deviceState != null)
+      CallbackHelper.callbackSuccess(callbackContext, deviceState.toJSONObject());
+    return true;
+  }
 
+  public static boolean disablePush(JSONArray data) {
+    try {
+      OneSignal.disablePush(data.getBoolean(0));
+      return true;
+    }
+    catch (Throwable t) {
+      t.printStackTrace();
+      return false;
+    }
+  }
+
+  /**
+   * Misc
+   */
+  public static void setLogLevel(JSONArray data) {
+    try {
+      int logLevel = data.getInt(0);
+      int visualLevel = data.getInt(1);
+      OneSignal.setLogLevel(logLevel, visualLevel);
+    } catch (Throwable t) {
+      t.printStackTrace();
+    }
+  }
+
+  public static boolean setLanguage(JSONArray data) {
+    try {
+      OneSignal.setLanguage(data.getString(0));
+      return true;
+    }
+    catch (Throwable t) {
+      t.printStackTrace();
+      return false;
+    }
+  }
+  
   /**
    * Tags
    */
   public static boolean getTags(CallbackContext callbackContext) {
     final CallbackContext jsTagsAvailableCallBack = callbackContext;
-    OneSignal.getTags(new GetTagsHandler() {
-      @Override
-      public void tagsAvailable(JSONObject tags) {
-        CallbackHelper.callbackSuccess(jsTagsAvailableCallBack, tags);
-      }
-    });
+    OneSignal.getTags(tags -> CallbackHelper.callbackSuccess(jsTagsAvailableCallBack, tags));
     return true;
   }
 
@@ -59,25 +86,6 @@ public class OneSignalController {
       OneSignal.deleteTags(list);
       return true;
     } catch (Throwable t) {
-      t.printStackTrace();
-      return false;
-    }
-  }
-
-  /**
-   * Subscriptions
-   */
-  public static boolean getPermissionSubscriptionState(CallbackContext callbackContext) {
-    CallbackHelper.callbackSuccess(callbackContext, OneSignal.getPermissionSubscriptionState().toJSONObject());
-    return true;
-  }
-
-  public static boolean setSubscription(JSONArray data) {
-    try {
-      OneSignal.setSubscription(data.getBoolean(0));
-      return true;
-    }
-    catch (Throwable t) {
       t.printStackTrace();
       return false;
     }
@@ -122,100 +130,58 @@ public class OneSignalController {
     }
   }
 
-  /**
-   * Location
-   */
-
-  public static void promptLocation() {
-    OneSignal.promptLocation();
-  }
-
-  public static void setLocationShared(JSONArray data) {
+  public static boolean removeNotification(JSONArray data) {
     try {
-      OneSignal.setLocationShared(data.getBoolean(0));
-    } catch (JSONException e) {
-      e.printStackTrace();
+      OneSignal.removeNotification(data.getInt(0));
+      return true;
+    } catch (Throwable t) {
+      t.printStackTrace();
+      return false;
     }
   }
 
-  /**
-   * Misc
-   */
-  public static boolean registerForPushNotifications() {
+  public static boolean removeGroupedNotifications(JSONArray data) {
+    try {
+      OneSignal.removeGroupedNotifications(data.getString(0));
+      return true;
+    } catch (Throwable t) {
+      t.printStackTrace();
+      return false;
+    }
+  }
+
+  public static boolean registerForProvisionalAuthorization() {
     // doesn't apply to Android
     return true;
   }
 
-  public static boolean getIds(CallbackContext callbackContext) {
-    final CallbackContext jsIdsAvailableCallBack = callbackContext;
-    OneSignal.idsAvailable(new IdsAvailableHandler() {
-      @Override
-      public void idsAvailable(String userId, String registrationId) {
-        JSONObject jsonIds = new JSONObject();
-        try {
-          jsonIds.put("userId", userId);
-          if (registrationId != null)
-            jsonIds.put("pushToken", registrationId);
-          else
-            jsonIds.put("pushToken", "");
-
-          CallbackHelper.callbackSuccess(jsIdsAvailableCallBack, jsonIds);
-        }
-        catch (Throwable t) {
-          t.printStackTrace();
-        }
-      }
-    });
+  public static boolean promptForPushNotificationsWithUserResponse() {
+    // doesn't apply to Android
     return true;
   }
 
-  public static boolean enableVibrate(JSONArray data) {
+  public static boolean unsubscribeWhenNotificationsAreDisabled(JSONArray data) {
     try {
-      OneSignal.enableVibrate(data.getBoolean(0));
+      OneSignal.unsubscribeWhenNotificationsAreDisabled(data.getBoolean(0));
       return true;
+    } catch (JSONException e) {
+      e.printStackTrace();
     }
-    catch (Throwable t) {
-      t.printStackTrace();
-      return false;
-    }
+    return false;
   }
 
-  public static boolean enableSound(JSONArray data) {
-    try {
-      OneSignal.enableSound(data.getBoolean(0));
-      return true;
-    }
-    catch (Throwable t) {
-      t.printStackTrace();
-      return false;
-    }
-  }
-
-  public static boolean setInFocusDisplaying(JSONArray data) {
-    try {
-      OneSignal.setInFocusDisplaying(data.getInt(0));
-      return true;
-    }
-    catch (JSONException e) {
-      Log.e(TAG, "execute: Got JSON Exception " + e.getMessage());
-      return false;
-    }
-  }
-
-  public static void setLogLevel(JSONArray data) {
-    try {
-      JSONObject jo = data.getJSONObject(0);
-      OneSignal.setLogLevel(jo.optInt("logLevel", 0), jo.optInt("visualLevel", 0));
-    }
-    catch(Throwable t) {
-      t.printStackTrace();
-    }
-  }
-
+  /**
+   * Privacy consent
+   */
   public static boolean userProvidedConsent(CallbackContext callbackContext) {
     boolean providedConsent = OneSignal.userProvidedPrivacyConsent();
-    final CallbackContext jsUserProvidedConsentContext = callbackContext;
     CallbackHelper.callbackSuccessBoolean(callbackContext, providedConsent);
+    return true;
+  }
+
+  public static boolean requiresUserPrivacyConsent(CallbackContext callbackContext) {
+    boolean requiresUserPrivacyConsent = OneSignal.requiresUserPrivacyConsent();
+    CallbackHelper.callbackSuccessBoolean(callbackContext, requiresUserPrivacyConsent);
     return true;
   }
 
@@ -229,7 +195,7 @@ public class OneSignalController {
     }
   }
 
-  public static boolean grantConsent(JSONArray data) {
+  public static boolean provideUserConsent(JSONArray data) {
     try {
       OneSignal.provideUserConsent(data.getBoolean(0));
       return true;
@@ -239,6 +205,9 @@ public class OneSignalController {
     }
   }
 
+  /**
+   * External User Is
+   */
   public static boolean setExternalUserId(final CallbackContext callback, JSONArray data) {
     try {
       String authHashToken = null;
@@ -247,8 +216,13 @@ public class OneSignalController {
 
       OneSignal.setExternalUserId(data.getString(0), authHashToken, new OneSignal.OSExternalUserIdUpdateCompletionHandler() {
         @Override
-        public void onComplete(JSONObject results) {
+        public void onSuccess(JSONObject results) {
           CallbackHelper.callbackSuccess(callback, results);
+        }
+
+        @Override
+        public void onFailure(OneSignal.ExternalIdError error) {
+          CallbackHelper.callbackError(callback, error.getMessage());
         }
       });
       return true;
@@ -261,11 +235,36 @@ public class OneSignalController {
   public static boolean removeExternalUserId(final CallbackContext callback) {
     OneSignal.removeExternalUserId(new OneSignal.OSExternalUserIdUpdateCompletionHandler() {
       @Override
-      public void onComplete(JSONObject results) {
+      public void onSuccess(JSONObject results) {
         CallbackHelper.callbackSuccess(callback, results);
+      }
+
+      @Override
+      public void onFailure(OneSignal.ExternalIdError error) {
+        CallbackHelper.callbackError(callback, error.getMessage());
       }
     });
     return true;
   }
 
+  /**
+   * Location
+   */
+  public static void promptLocation() {
+    OneSignal.promptLocation();
+  }
+
+  public static void setLocationShared(JSONArray data) {
+    try {
+      OneSignal.setLocationShared(data.getBoolean(0));
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public static boolean isLocationShared(CallbackContext callbackContext) {
+    // Need to be implemented in Android
+    CallbackHelper.callbackSuccessBoolean(callbackContext, false);
+    return true;
+  }
 }
