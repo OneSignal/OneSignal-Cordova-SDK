@@ -35,6 +35,8 @@ export interface OSNotification {
     attachments         ?: object;
     mutableContent      ?: boolean;
     contentAvailable    ?: string;
+    relevanceScore      ?: number;
+    interruptionLevel   ?: string;
 }
 
 /* N O T I F I C A T I O N   &   I A M   E V E N T S */
