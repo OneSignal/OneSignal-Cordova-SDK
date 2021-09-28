@@ -190,6 +190,18 @@ function OSNotification (receivedEvent) {
     if (receivedEvent.contentAvailable) {
         this.contentAvailable = receivedEvent.contentAvailable;
     }
+    /// (iOS Only)
+    /// value between 0 and 1 for sorting notifications in a notification summary
+    if (receivedEvent.relevanceScore) {
+        this.relevanceScore = receivedEvent.relevanceScore;
+    }
+    /// (iOS Only)
+    /// The interruption level for the notification. This controls how the
+    /// notification will be displayed to the user if they are using focus modes
+    /// or notification summaries
+    if (receivedEvent.interruptionLevel) {
+        this.interruptionLevel = receivedEvent.interruptionLevel;
+    }
 }
   
 /// Represents a button sent as part of a push notification
