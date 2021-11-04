@@ -89,9 +89,10 @@ export interface OneSignalPlugin {
 
     /**
      * True if the application has location share activated, false otherwise
-     * @returns Promise<boolean>
+     * @param  {(response: boolean) => void} handler
+     * @returns void
      */
-    isLocationShared(): Promise<boolean>;
+    isLocationShared(handler: (response: boolean) => void): void;
 
     /**
      * Disable or enable location collection (defaults to enabled if your app has location permission).
@@ -108,9 +109,10 @@ export interface OneSignalPlugin {
 
     /**
      * This method returns a "snapshot" of the device state for when it was called.
-     * @returns Promise<DeviceState>
+     * @param  {(response: DeviceState) => void} handler
+     * @returns void
      */
-    getDeviceState(): Promise<DeviceState>;
+    getDeviceState(handler: (response: DeviceState) => void): void;
 
     /**
      * Allows you to set the app defined language with the OneSignal SDK.
@@ -267,9 +269,10 @@ export interface OneSignalPlugin {
     /**
      * Gets a trigger value for a provided trigger key.
      * @param  {string} key
+     * @param  {(value: string) => void} handler
      * @returns void
      */
-    getTriggerValueForKey(key: string): Promise<string>;
+    getTriggerValueForKey(key: string, handler: (value: string) => void): void;
 
     /**
      * Pause & unpause In-App Messages
@@ -314,15 +317,17 @@ export interface OneSignalPlugin {
 
     /**
      * Did the user provide privacy consent for GDPR purposes.
-     * @returns Promise<boolean>
+     * @param  {(response: boolean) => void} handler
+     * @returns void
      */
-    userProvidedPrivacyConsent(): Promise<boolean>;
+    userProvidedPrivacyConsent(handler: (response: boolean) => void): void;
 
     /**
      * True if the application requires user privacy consent, false otherwise
-     * @returns Promise<boolean>
+     * @param  {(response: boolean) => void} handler
+     * @returns void
      */
-    requiresUserPrivacyConsent(): Promise<boolean>;
+    requiresUserPrivacyConsent(handler: (response: boolean) => void): void;
 
     /**
      * For GDPR users, your application should call this method before setting the App ID.
