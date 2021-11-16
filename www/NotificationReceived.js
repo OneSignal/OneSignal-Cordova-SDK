@@ -132,7 +132,7 @@ function OSNotification (receivedEvent) {
     /// Summary notifications grouped
     /// Notification payload will have the most recent notification received.
     if (receivedEvent.groupedNotifications && receivedEvent.groupedNotifications.length) {
-        this.groupedNotifications = receivedEvent.groupedNotificationss.map(function(num) {
+        this.groupedNotifications = receivedEvent.groupedNotifications.map(function(item) {
             return new OSNotification(item);
         });
     }
