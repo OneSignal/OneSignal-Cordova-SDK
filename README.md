@@ -33,5 +33,5 @@ To make things easier, we have published demo projects for [Cordova](https://git
 
 #### Supports:
 * Cordova, Ionic, Ionic Capacitor, and Phonegap
-* Android 4.0.3 (API Level 15) through 10 (API Level 29), and Amazon FireOS
-* iOS 7 - 13
+* Android 4.1 (API Level 16) through 12 (API Level 31), and Amazon FireOS
+* iOS 9 - 15
