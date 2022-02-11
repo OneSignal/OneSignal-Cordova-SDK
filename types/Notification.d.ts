@@ -41,7 +41,7 @@ export interface OSNotification {
 
 /* N O T I F I C A T I O N   &   I A M   E V E N T S */
 export interface NotificationReceivedEvent {
-    complete        : (notification: OSNotification | null) => void;
+    complete        : (notification?: OSNotification | null) => void;
     getNotification : () => OSNotification;
 }
 
