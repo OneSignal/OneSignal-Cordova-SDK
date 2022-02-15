@@ -153,8 +153,9 @@ export interface OneSignalPlugin {
     /**
      * Deletes multiple tags that were previously set on a user.
      * @param  {string[]} keys
+     * @returns void
      */
-    deleteTags(keys: string[]);
+    deleteTags(keys: string[]): void;
 
     /**
      * Allows you to set the user's email address with the OneSignal SDK.
@@ -168,8 +169,9 @@ export interface OneSignalPlugin {
     /**
      * If your app implements logout functionality, you can call logoutEmail to dissociate the email from the device.
      * @param  {Function} handler
+     * @returns void
      */
-    logoutEmail(handler?: Function);
+    logoutEmail(handler?: Function): void;
 
     /**
      * Allows you to set the user's SMS number with the OneSignal SDK.
@@ -183,8 +185,9 @@ export interface OneSignalPlugin {
     /**
      * If your app implements logout functionality, you can call logoutSMSNumber to dissociate the SMS number from the device.
      * @param  {Function} handler
+     * @returns void
      */
-    logoutSMSNumber(handler?: Function);
+    logoutSMSNumber(handler?: Function): void;
 
     /**
      * Send a notification
