@@ -9,10 +9,10 @@ export interface DeviceState {
     emailAddress                    : string;
     smsUserId                       : string;
     smsNumber                       : string;
-    isSubscribed                    : boolean;
-    isPushDisabled                  : boolean;
-    isEmailSubscribed               : boolean;
-    isSMSSubscribed                 : boolean;
+    subscribed                      : boolean;
+    pushDisabled                    : boolean;
+    emailSubscribed                 : boolean;
+    smsSubscribed                   : boolean;
     hasNotificationPermission       : boolean;
     notificationPermissionStatus    ?: PermissionStatus;  // ios only
     // areNotificationsEnabled (android) not included since it is converted to hasNotificationPermission in bridge
