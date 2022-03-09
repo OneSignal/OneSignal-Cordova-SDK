@@ -213,6 +213,11 @@ OneSignalPlugin.prototype.postNotification = function(jsonData, onSuccess, onFai
     window.cordova.exec(onSuccess, onFailure, "OneSignalPush", "postNotification", [jsonData]);
 };
 
+// Only applies to iOS
+OneSignalPlugin.prototype.setLaunchURLsInApp = function(isEnabled) {
+    window.cordova.exec(function(){}, function(){}, "OneSignalPush", "setLaunchURLsInApp", [isEnabled]);
+};
+
 OneSignalPlugin.prototype.setLogLevel = function(nsLogLevel, visualLogLevel) {
     window.cordova.exec(function(){}, function(){}, "OneSignalPush", "setLogLevel", [nsLogLevel, visualLogLevel]);
 };

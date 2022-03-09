@@ -74,6 +74,7 @@ public class OneSignalPush extends CordovaPlugin {
 
   private static final String DISABLE_PUSH = "disablePush";
   private static final String POST_NOTIFICATION = "postNotification";
+  private static final String SET_LAUNCH_URLS_IN_APP = "setLaunchURLsInApp";
 
   private static final String SET_EMAIL = "setEmail";
   private static final String SET_UNAUTHENTICATED_EMAIL = "setUnauthenticatedEmail";
@@ -232,6 +233,10 @@ public class OneSignalPush extends CordovaPlugin {
 
       case POST_NOTIFICATION:
         result = OneSignalController.postNotification(callbackContext, data);
+        break;
+
+      case SET_LAUNCH_URLS_IN_APP:
+        result = OneSignalController.setLaunchURLsInApp();
         break;
 
       case SET_LOG_LEVEL:

@@ -219,6 +219,14 @@ export interface OneSignalPlugin {
     removeGroupedNotifications(id: string): void;
 
     /**
+     * iOS only.
+     * This method can be used to set if launch URLs should be opened within the application or in Safari.
+     * @param  {boolean} isEnabled - false will open the link in Safari or user's default browser
+     * @returns void
+     */
+    setLaunchURLsInApp(isEnabled: boolean): void;
+
+    /**
      * Allows you to use your own system's user ID's to send push notifications to your users.
      * @param  {string} externalId
      * @param  {(results:object)=>void} handler
