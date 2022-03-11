@@ -455,7 +455,7 @@ static Class delegateClass = nil;
  */
 
 - (void)setLaunchURLsInApp:(CDVInvokedUrlCommand *)command {
-    BOOL launchInApp = command.arguments[0];
+    BOOL launchInApp = [command.arguments[0] boolValue];
     [OneSignal setLaunchURLsInApp:launchInApp];
 }
 
