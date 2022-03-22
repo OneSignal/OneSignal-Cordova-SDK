@@ -1,3 +1,5 @@
+import java.nio.file.Files
+
 android.defaultConfig {
   manifestPlaceholders = [
     onesignal_app_id: '', // Use from js code
@@ -22,3 +24,9 @@ buildscript {
   }
 }
 apply plugin: com.onesignal.androidsdk.GradleProjectPlugin
+
+gradle.afterProject { project ->
+   def androidManifest = new File("${project.rootDir}/app/src/main/AndroidManifest.xml")
+   String fileContentsReplaced = androidManifest.text.replaceFirst('<service .*android:name="com.huawei.hms.cordova.push.remote.HmsPushMessageService"(>[\\s]*<intent-filter>[\\s]*.*[\\s]*<\\/intent-filter>[\\s]*<\\/service>|.*[\\s]\\/>){1}', "")
+   androidManifest.text = fileContentsReplaced
+}
