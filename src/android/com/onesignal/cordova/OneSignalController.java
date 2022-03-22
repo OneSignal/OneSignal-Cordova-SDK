@@ -160,6 +160,11 @@ public class OneSignalController {
     return true;
   }
 
+  public static boolean setLaunchURLsInApp() {
+    // doesn't apply to Android
+    return true;
+  }
+
   public static boolean unsubscribeWhenNotificationsAreDisabled(JSONArray data) {
     try {
       OneSignal.unsubscribeWhenNotificationsAreDisabled(data.getBoolean(0));
