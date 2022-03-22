@@ -1,0 +1,7 @@
+import java.nio.file.Files
+
+gradle.afterProject { project ->
+   def androidManifest = new File("${project.rootDir}/app/src/main/AndroidManifest.xml")
+   String fileContentsReplaced = androidManifest.text.replaceFirst('<service .*android:name="com.huawei.hms.cordova.push.remote.HmsPushMessageService"(>[\\s]*<intent-filter>[\\s]*.*[\\s]*<\\/intent-filter>[\\s]*<\\/service>|.*[\\s]\\/>){1}', "")
+   androidManifest.text = fileContentsReplaced
+}
