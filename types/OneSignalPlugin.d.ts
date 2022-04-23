@@ -130,7 +130,7 @@ export interface OneSignalPlugin {
     sendTag(key: string, value: string): void;
 
     /**
-     * Tag a user wiht multiple tags based on an app event of your choosing so they can be targeted later via segments.
+     * Tag a user with multiple tags based on an app event of your choosing so they can be targeted later via segments.
      * @param  {object} tags
      * @returns void
      */
