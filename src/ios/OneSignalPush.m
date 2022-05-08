@@ -50,6 +50,11 @@ NSString* logoutSMSNumberCallbackId;
 NSString* emailSubscriptionCallbackId;
 NSString* smsSubscriptionCallbackId;
 
+NSString* inAppMessageWillDisplayCallbackId;
+NSString* inAppMessageDidDisplayCallbackId;
+NSString* inAppMessageWillDismissCallbackId;
+NSString* inAppMessageDidDismissCallbackId;
+
 OSNotificationOpenedResult* actionNotification;
 OSNotification *notification;
 
@@ -470,6 +475,50 @@ static Class delegateClass = nil;
             successCallback(command.callbackId, result);
         }
     ];
+}
+
+- (void)setInAppMessageLifecycleHandler:(CDVInvokedUrlCommand *)command {
+    [OneSignal setInAppMessageLifecycleHandler:self];
+}
+
+- (void)setOnWillDisplayInAppMessageHandler:(CDVInvokedUrlCommand*)command {
+    inAppMessageWillDisplayCallbackId = command.callbackId;
+}
+
+- (void)setOnDidDisplayInAppMessageHandler:(CDVInvokedUrlCommand*)command {
+    inAppMessageDidDisplayCallbackId = command.callbackId;
+}
+
+- (void)setOnWillDismissInAppMessageHandler:(CDVInvokedUrlCommand*)command {
+    inAppMessageWillDismissCallbackId = command.callbackId;
+}
+
+- (void)setOnDidDismissInAppMessageHandler:(CDVInvokedUrlCommand*)command {
+    inAppMessageDidDismissCallbackId = command.callbackId;
+}
+
+- (void)onWillDisplayInAppMessage:(OSInAppMessage * _Nonnull)message {
+    if (inAppMessageWillDisplayCallbackId != nil) {
+        successCallback(inAppMessageWillDisplayCallbackId, [message jsonRepresentation]);
+    }
+}
+
+- (void)onDidDisplayInAppMessage:(OSInAppMessage * _Nonnull)message {
+    if (inAppMessageDidDisplayCallbackId != nil) {
+        successCallback(inAppMessageDidDisplayCallbackId, [message jsonRepresentation]);
+    }
+}
+
+- (void)onWillDismissInAppMessage:(OSInAppMessage * _Nonnull)message {
+    if (inAppMessageWillDismissCallbackId != nil) {
+        successCallback(inAppMessageWillDismissCallbackId, [message jsonRepresentation]);
+    }
+}
+
+- (void)onDidDismissInAppMessage:(OSInAppMessage * _Nonnull)message {
+    if (inAppMessageDidDismissCallbackId != nil) {
+        successCallback(inAppMessageDidDismissCallbackId, [message jsonRepresentation]);
+    }
 }
 
 - (void)addTriggers:(CDVInvokedUrlCommand*)command {

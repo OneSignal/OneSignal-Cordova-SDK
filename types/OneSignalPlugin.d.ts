@@ -1,6 +1,6 @@
 import { NotificationReceivedEvent, OpenedEvent, OpenedEventAction } from './Notification';
 import { OutcomeEvent } from './Outcomes';
-import { InAppMessageAction } from './InAppMessage';
+import { InAppMessageAction, InAppMessageLifecycleHandlerObject } from './InAppMessage';
 import { PermissionChange, SubscriptionChange, EmailSubscriptionChange, SMSSubscriptionChange, DeviceState } from './Subscription';
 import { LogLevel, ChangeEvent } from './Extras';
 
@@ -247,6 +247,13 @@ export interface OneSignalPlugin {
      * @returns void
      */
     setInAppMessageClickHandler(handler: (action: InAppMessageAction) => void): void;
+
+    /**
+     * Sets the In-App Message lifecycle handler object to run on displaying and/or dismissing an In-App Message.
+     * @param  {InAppMessageLifecycleHandlerObject} handlerObject
+     * @returns void
+     */
+    setInAppMessageLifecycleHandler(handlerObject: InAppMessageLifecycleHandlerObject) : void;
 
     /**
      * Add an In-App Message Trigger.

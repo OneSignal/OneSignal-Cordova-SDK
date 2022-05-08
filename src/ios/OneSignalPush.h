@@ -31,7 +31,7 @@
 
 #import <OneSignal/OneSignal.h>
 
-@interface OneSignalPush : CDVPlugin <OSPermissionObserver, OSSubscriptionObserver, OSEmailSubscriptionObserver, OSSMSSubscriptionObserver>
+@interface OneSignalPush : CDVPlugin <OSPermissionObserver, OSSubscriptionObserver, OSEmailSubscriptionObserver, OSSMSSubscriptionObserver, OSInAppMessageLifecycleHandler>
 
 - (void)setProvidesNotificationSettingsView:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)setNotificationWillShowInForegroundHandler:(CDVInvokedUrlCommand* _Nonnull)command;
@@ -85,6 +85,11 @@
 // In App Message
 - (void)setLaunchURLsInApp:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)setInAppMessageClickHandler:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)setInAppMessageLifecycleHandler:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)setOnWillDisplayInAppMessageHandler:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)setOnDidDisplayInAppMessageHandler:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)setOnWillDismissInAppMessageHandler:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)setOnDidDismissInAppMessageHandler:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)addTriggers:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)removeTriggersForKeys:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)getTriggerValueForKey:(CDVInvokedUrlCommand* _Nonnull)command;
