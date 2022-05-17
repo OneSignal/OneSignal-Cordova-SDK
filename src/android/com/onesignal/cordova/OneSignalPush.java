@@ -144,42 +144,26 @@ public class OneSignalPush extends CordovaPlugin {
     OneSignal.setInAppMessageLifecycleHandler(new OSInAppMessageLifecycleHandler() {
       @Override
       public void onWillDisplayInAppMessage(OSInAppMessage message) {
-        try {
-          if (jsInAppMessageWillDisplayCallback != null) {
-            CallbackHelper.callbackSuccess(jsInAppMessageWillDisplayCallback, message.toJSONObject());
-          }
-        } catch (Throwable t) {
-          t.printStackTrace();
+        if (jsInAppMessageWillDisplayCallback != null) {
+          CallbackHelper.callbackSuccess(jsInAppMessageWillDisplayCallback, message.toJSONObject());
         }
       }
       @Override
       public void onDidDisplayInAppMessage(OSInAppMessage message) {
-        try {
-          if (jsInAppMessageDidDisplayCallBack != null) {
-            CallbackHelper.callbackSuccess(jsInAppMessageDidDisplayCallBack, message.toJSONObject());
-          }
-        } catch (Throwable t) {
-          t.printStackTrace();
+        if (jsInAppMessageDidDisplayCallBack != null) {
+          CallbackHelper.callbackSuccess(jsInAppMessageDidDisplayCallBack, message.toJSONObject());
         }
       }
       @Override
       public void onWillDismissInAppMessage(OSInAppMessage message) {
-        try {
-          if (jsInAppMessageWillDismissCallback != null) {
-            CallbackHelper.callbackSuccess(jsInAppMessageWillDismissCallback, message.toJSONObject());
-          }
-        } catch (Throwable t) {
-          t.printStackTrace();
+        if (jsInAppMessageWillDismissCallback != null) {
+          CallbackHelper.callbackSuccess(jsInAppMessageWillDismissCallback, message.toJSONObject());
         }
       }
       @Override
       public void onDidDismissInAppMessage(OSInAppMessage message) {
-        try {
-          if (jsInAppMessageDidDismissCallBack != null) {
-            CallbackHelper.callbackSuccess(jsInAppMessageDidDismissCallBack, message.toJSONObject());
-          }
-        } catch (Throwable t) {
-          t.printStackTrace();
+        if (jsInAppMessageDidDismissCallBack != null) {
+          CallbackHelper.callbackSuccess(jsInAppMessageDidDismissCallBack, message.toJSONObject());
         }
       }
     });
