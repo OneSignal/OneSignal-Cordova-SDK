@@ -27,7 +27,8 @@
 
 var OSNotificationReceivedEvent = require('./NotificationReceived').OSNotificationReceivedEvent;
 var OSNotificationOpenedResult = require('./NotificationOpened');
-var OSInAppMessageAction = require('./InAppMessage');
+var OSInAppMessageAction = require('./InAppMessage').OSInAppMessageAction;
+var OSInAppMessage = require('./InAppMessage').OSInAppMessage;
 var OSDeviceState = require('./Subscription').OSDeviceState;
 var OSPermissionStateChanges = require('./Subscription').OSPermissionStateChanges;
 var OSSubscriptionStateChanges = require('./Subscription').OSSubscriptionStateChanges;
@@ -39,6 +40,10 @@ var OneSignalPlugin = function() {
     var _notificationWillShowInForegroundDelegate = function(notificationReceived) {};
     var _notificationOpenedDelegate = function(notificationOpened) {};
     var _inAppMessageClickDelegate = function (action) {};
+    var _onWillDisplayInAppMessageDelegate = function(message) {};
+    var _onDidDisplayInAppMessageDelegate = function(message) {};
+    var _onWillDismissInAppMessageDelegate = function(message) {};
+    var _onDidDismissInAppMessageDelegate = function(message) {};
 };
 
 OneSignalPlugin.prototype.OSNotificationPermission = {
@@ -88,6 +93,47 @@ OneSignalPlugin.prototype.setInAppMessageClickHandler = function(handler) {
     };
 
     window.cordova.exec(inAppMessageClickHandler, function() {}, "OneSignalPush", "setInAppMessageClickHandler", []);
+};
+
+OneSignalPlugin.prototype.setInAppMessageLifecycleHandler = function(handlerObject) {
+    if (handlerObject.onWillDisplayInAppMessage) {
+        OneSignalPlugin._onWillDisplayInAppMessageDelegate = handlerObject.onWillDisplayInAppMessage;
+
+        var onWillDisplayInAppMessageHandler = function(json) {
+            OneSignalPlugin._onWillDisplayInAppMessageDelegate(new OSInAppMessage(json));
+        };
+
+        window.cordova.exec(onWillDisplayInAppMessageHandler, function() {}, "OneSignalPush", "setOnWillDisplayInAppMessageHandler", []);
+    }
+    if (handlerObject.onDidDisplayInAppMessage) {
+        OneSignalPlugin._onDidDisplayInAppMessageDelegate = handlerObject.onDidDisplayInAppMessage;
+
+        var onDidDisplayInAppMessageHandler = function(json) {
+            OneSignalPlugin._onDidDisplayInAppMessageDelegate(new OSInAppMessage(json));
+        };
+
+        window.cordova.exec(onDidDisplayInAppMessageHandler, function() {}, "OneSignalPush", "setOnDidDisplayInAppMessageHandler", []);
+    }
+    if (handlerObject.onWillDismissInAppMessage) {
+        OneSignalPlugin._onWillDismissInAppMessageDelegate = handlerObject.onWillDismissInAppMessage;
+
+        var onWillDismissInAppMessageHandler = function(json) {
+            OneSignalPlugin._onWillDismissInAppMessageDelegate(new OSInAppMessage(json));
+        };
+
+        window.cordova.exec(onWillDismissInAppMessageHandler, function() {}, "OneSignalPush", "setOnWillDismissInAppMessageHandler", []);
+    }
+    if (handlerObject.onDidDismissInAppMessage) {
+        OneSignalPlugin._onDidDismissInAppMessageDelegate = handlerObject.onDidDismissInAppMessage;
+
+        var onDidDismissInAppMessageHandler = function(json) {
+            OneSignalPlugin._onDidDismissInAppMessageDelegate(new OSInAppMessage(json));
+        };
+
+        window.cordova.exec(onDidDismissInAppMessageHandler, function() {}, "OneSignalPush", "setOnDidDismissInAppMessageHandler", []);
+    }
+
+    window.cordova.exec(function() {}, function() {}, "OneSignalPush", "setInAppMessageLifecycleHandler", []);
 };
 
 OneSignalPlugin._processFunctionList = function(array, param) {

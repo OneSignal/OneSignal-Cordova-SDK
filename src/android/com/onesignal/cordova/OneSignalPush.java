@@ -30,6 +30,8 @@ package com.onesignal.cordova;
 import android.util.Log;
 
 import com.onesignal.OSInAppMessageAction;
+import com.onesignal.OSInAppMessage;
+import com.onesignal.OSInAppMessageLifecycleHandler;
 import com.onesignal.OSNotification;
 import com.onesignal.OSNotificationOpenedResult;
 import com.onesignal.OSNotificationReceivedEvent;
@@ -48,6 +50,13 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String SET_NOTIFICATION_WILL_SHOW_IN_FOREGROUND_HANDLER = "setNotificationWillShowInForegroundHandler";
   private static final String SET_NOTIFICATION_OPENED_HANDLER = "setNotificationOpenedHandler";
   private static final String SET_IN_APP_MESSAGE_CLICK_HANDLER = "setInAppMessageClickHandler";
+
+  private static final String SET_IN_APP_MESSAGE_LIFECYCLE_HANDLER = "setInAppMessageLifecycleHandler";
+  private static final String SET_ON_WILL_DISPLAY_IN_APP_MESSAGE_HANDLER = "setOnWillDisplayInAppMessageHandler";
+  private static final String SET_ON_DID_DISPLAY_IN_APP_MESSAGE_HANDLER = "setOnDidDisplayInAppMessageHandler";
+  private static final String SET_ON_WILL_DISMISS_IN_APP_MESSAGE_HANDLER = "setOnWillDismissInAppMessageHandler";
+  private static final String SET_ON_DID_DISMISS_IN_APP_MESSAGE_HANDLER = "setOnDidDismissInAppMessageHandler";
+
   private static final String COMPLETE_NOTIFICATION = "completeNotification";
   private static final String INIT = "init";
 
@@ -111,6 +120,11 @@ public class OneSignalPush extends CordovaPlugin {
 
   private static final HashMap<String, OSNotificationReceivedEvent> notificationReceivedEventCache = new HashMap<>();
 
+  private static CallbackContext jsInAppMessageWillDisplayCallback;
+  private static CallbackContext jsInAppMessageDidDisplayCallBack;
+  private static CallbackContext jsInAppMessageWillDismissCallback;
+  private static CallbackContext jsInAppMessageDidDismissCallBack;
+
   public boolean setNotificationWillShowInForegroundHandler(CallbackContext callbackContext) {
     OneSignal.setNotificationWillShowInForegroundHandler(new CordovaNotificationInForegroundHandler(callbackContext));
     return true;
@@ -123,6 +137,56 @@ public class OneSignalPush extends CordovaPlugin {
 
   public boolean setInAppMessageClickHandler(CallbackContext callbackContext) {
     OneSignal.setInAppMessageClickHandler(new CordovaInAppMessageClickHandler(callbackContext));
+    return true;
+  }
+
+  public boolean setInAppMessageLifecycleHandler() {
+    OneSignal.setInAppMessageLifecycleHandler(new OSInAppMessageLifecycleHandler() {
+      @Override
+      public void onWillDisplayInAppMessage(OSInAppMessage message) {
+        if (jsInAppMessageWillDisplayCallback != null) {
+          CallbackHelper.callbackSuccess(jsInAppMessageWillDisplayCallback, message.toJSONObject());
+        }
+      }
+      @Override
+      public void onDidDisplayInAppMessage(OSInAppMessage message) {
+        if (jsInAppMessageDidDisplayCallBack != null) {
+          CallbackHelper.callbackSuccess(jsInAppMessageDidDisplayCallBack, message.toJSONObject());
+        }
+      }
+      @Override
+      public void onWillDismissInAppMessage(OSInAppMessage message) {
+        if (jsInAppMessageWillDismissCallback != null) {
+          CallbackHelper.callbackSuccess(jsInAppMessageWillDismissCallback, message.toJSONObject());
+        }
+      }
+      @Override
+      public void onDidDismissInAppMessage(OSInAppMessage message) {
+        if (jsInAppMessageDidDismissCallBack != null) {
+          CallbackHelper.callbackSuccess(jsInAppMessageDidDismissCallBack, message.toJSONObject());
+        }
+      }
+    });
+    return true;
+  }
+
+  public boolean setOnWillDisplayInAppMessageHandler(CallbackContext callbackContext) {
+    jsInAppMessageWillDisplayCallback = callbackContext;
+    return true;
+  }
+
+  public boolean setOnDidDisplayInAppMessageHandler(CallbackContext callbackContext) {
+    jsInAppMessageDidDisplayCallBack = callbackContext;
+    return true;
+  }
+
+  public boolean setOnWillDismissInAppMessageHandler(CallbackContext callbackContext) {
+    jsInAppMessageWillDismissCallback = callbackContext;
+    return true;
+  }
+
+  public boolean setOnDidDismissInAppMessageHandler(CallbackContext callbackContext) {
+    jsInAppMessageDidDismissCallBack = callbackContext;
     return true;
   }
 
@@ -157,6 +221,26 @@ public class OneSignalPush extends CordovaPlugin {
 
       case SET_IN_APP_MESSAGE_CLICK_HANDLER:
         result = setInAppMessageClickHandler(callbackContext);
+        break;
+
+      case SET_IN_APP_MESSAGE_LIFECYCLE_HANDLER:
+        result = setInAppMessageLifecycleHandler();
+        break;
+
+      case SET_ON_WILL_DISPLAY_IN_APP_MESSAGE_HANDLER:
+        result = setOnWillDisplayInAppMessageHandler(callbackContext);
+        break;
+
+      case SET_ON_DID_DISPLAY_IN_APP_MESSAGE_HANDLER:
+        result = setOnDidDisplayInAppMessageHandler(callbackContext);
+        break;
+
+      case SET_ON_WILL_DISMISS_IN_APP_MESSAGE_HANDLER:
+        result = setOnWillDismissInAppMessageHandler(callbackContext);
+        break;
+
+      case SET_ON_DID_DISMISS_IN_APP_MESSAGE_HANDLER:
+        result = setOnDidDismissInAppMessageHandler(callbackContext);
         break;
 
       case COMPLETE_NOTIFICATION:

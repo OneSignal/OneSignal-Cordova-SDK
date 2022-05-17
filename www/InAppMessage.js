@@ -5,4 +5,11 @@ function OSInAppMessageAction (json) {
     this.closesMessage = json.closes_message;
 }
 
-module.exports = OSInAppMessageAction;
+function OSInAppMessage (json) {
+    this.messageId = json.messageId;
+}
+
+module.exports = {
+    OSInAppMessageAction: OSInAppMessageAction,
+    OSInAppMessage: OSInAppMessage
+};

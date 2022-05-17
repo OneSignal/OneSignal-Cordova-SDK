@@ -4,3 +4,14 @@ export interface InAppMessageAction {
     click_name      ?: string;
     click_url       ?: string;
 }
+
+export interface OSInAppMessage {
+    messageId : string
+}
+
+export interface InAppMessageLifecycleHandlerObject {
+    onWillDisplayInAppMessage       ?: (message: InAppMessage) => void;
+    onDidDisplayInAppMessage        ?: (message: InAppMessage) => void;
+    onWillDismissInAppMessage       ?: (message: InAppMessage) => void;
+    onDidDismissInAppMessage        ?: (message: InAppMessage) => void;
+}
