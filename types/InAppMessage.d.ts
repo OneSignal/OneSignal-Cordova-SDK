@@ -5,7 +5,7 @@ export interface InAppMessageAction {
     click_url       ?: string;
 }
 
-export interface OSInAppMessage {
+export interface InAppMessage {
     messageId : string
 }
 
