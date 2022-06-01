@@ -33,6 +33,7 @@
 
 NSString* notificationWillShowInForegoundCallbackId;
 NSString* notificationOpenedCallbackId;
+NSString* setLanguageCallbackId;
 NSString* getTagsCallbackId;
 NSString* getIdsCallbackId;
 NSString* postNotificationCallbackId;
@@ -241,7 +242,13 @@ static Class delegateClass = nil;
 }
 
 - (void)setLanguage:(CDVInvokedUrlCommand*)command {
-    [OneSignal setLanguage:command.arguments[0]];
+    setLanguageCallbackId = command.callbackId;
+    
+    [OneSignal setLanguage:command.arguments[0] withSuccess:^{
+        successCallback(setLanguageCallbackId, nil);
+    } withFailure:^(NSError *error) {
+        failureCallback(setLanguageCallbackId, error.userInfo);
+    }];
 }
 
 - (void)addPermissionObserver:(CDVInvokedUrlCommand*)command {
