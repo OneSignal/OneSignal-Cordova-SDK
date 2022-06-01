@@ -117,9 +117,11 @@ export interface OneSignalPlugin {
     /**
      * Allows you to set the app defined language with the OneSignal SDK.
      * @param  {string} language
+     * @param  {(success:object)=>void} onSuccess
+     * @param  {(failure:object)=>void} onFailure
      * @returns void
      */
-    setLanguage(language: string): void;
+    setLanguage(language: string, onSuccess?: (success: object) => void, onFailure?: (failure: object) => void): void;
 
     /**
      * Tag a user based on an app event of your choosing so they can be targeted later via segments.
