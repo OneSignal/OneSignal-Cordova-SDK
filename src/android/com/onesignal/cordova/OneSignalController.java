@@ -3,6 +3,8 @@ package com.onesignal.cordova;
 import com.onesignal.OSDeviceState;
 import com.onesignal.OneSignal;
 import com.onesignal.OneSignal.PostNotificationResponseHandler;
+import com.onesignal.OneSignal.OSSetLanguageCompletionHandler;
+import com.onesignal.OneSignal.OSLanguageError;
 
 import org.apache.cordova.CallbackContext;
 import org.json.JSONArray;
@@ -48,9 +50,31 @@ public class OneSignalController {
     }
   }
 
-  public static boolean setLanguage(JSONArray data) {
+  public static boolean setLanguage(CallbackContext callbackContext, JSONArray data) {
     try {
-      OneSignal.setLanguage(data.getString(0));
+      final CallbackContext jsSetLanguageCallback = callbackContext;
+      OneSignal.setLanguage(data.getString(0), new OSSetLanguageCompletionHandler() {
+        @Override
+        public void onSuccess(String response) {
+          try{
+            JSONObject responseJson = new JSONObject(response);
+            CallbackHelper.callbackSuccess(jsSetLanguageCallback, new JSONObject());
+          }
+          catch (JSONException e) {
+            e.printStackTrace();
+          }
+        }
+
+        @Override
+        public void onFailure(OSLanguageError error) {
+          try {
+            JSONObject errorObject = new JSONObject("{'error' : '" + error.getMessage() + "'}");
+            CallbackHelper.callbackError(jsSetLanguageCallback, errorObject);
+          } catch (JSONException e) {
+              e.printStackTrace();
+          }
+        }
+      });
       return true;
     }
     catch (Throwable t) {
