@@ -57,8 +57,11 @@ public class OneSignalController {
         @Override
         public void onSuccess(String response) {
           try{
-            JSONObject responseJson = new JSONObject(response);
-            CallbackHelper.callbackSuccess(jsSetLanguageCallback, new JSONObject());
+            JSONObject responseJson = new JSONObject("{'success' : 'true'}");
+            if(response != null) {
+              responseJson = new JSONObject(response);
+            }
+            CallbackHelper.callbackSuccess(jsSetLanguageCallback, responseJson);
           }
           catch (JSONException e) {
             e.printStackTrace();
