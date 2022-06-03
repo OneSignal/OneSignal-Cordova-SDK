@@ -152,8 +152,14 @@ OneSignalPlugin.prototype.getDeviceState = function(deviceStateReceivedCallBack)
     window.cordova.exec(deviceStateCallback, function(){}, "OneSignalPush", "getDeviceState", []);
 };
 
-OneSignalPlugin.prototype.setLanguage = function(language) {
-    window.cordova.exec(function(){}, function(){}, "OneSignalPush", "setLanguage", [language]);
+OneSignalPlugin.prototype.setLanguage = function(language, onSuccess, onFailure) {
+    if (onSuccess == null)
+        onSuccess = function() {};
+
+    if (onFailure == null)
+        onFailure = function() {};
+         
+    window.cordova.exec(onSuccess, onFailure, "OneSignalPush", "setLanguage", [language]);
 }
 
 OneSignalPlugin.prototype.addSubscriptionObserver = function(callback) {
