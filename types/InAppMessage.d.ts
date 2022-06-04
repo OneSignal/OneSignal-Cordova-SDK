@@ -10,8 +10,8 @@ export interface OSInAppMessage {
 }
 
 export interface InAppMessageLifecycleHandlerObject {
-    onWillDisplayInAppMessage       ?: (message: InAppMessage) => void;
-    onDidDisplayInAppMessage        ?: (message: InAppMessage) => void;
-    onWillDismissInAppMessage       ?: (message: InAppMessage) => void;
-    onDidDismissInAppMessage        ?: (message: InAppMessage) => void;
+    onWillDisplayInAppMessage       ?: (message: OSInAppMessage) => void;
+    onDidDisplayInAppMessage        ?: (message: OSInAppMessage) => void;
+    onWillDismissInAppMessage       ?: (message: OSInAppMessage) => void;
+    onDidDismissInAppMessage        ?: (message: OSInAppMessage) => void;
 }
