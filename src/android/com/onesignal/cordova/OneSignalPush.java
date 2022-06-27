@@ -470,7 +470,7 @@ public class OneSignalPush extends CordovaPlugin {
         OSNotification notification = notificationReceivedEvent.getNotification();
         notificationReceivedEventCache.put(notification.getNotificationId(), notificationReceivedEvent);
 
-        CallbackHelper.callbackSuccess(jsNotificationInForegroundCallBack, notificationReceivedEvent.toJSONObject());
+        CallbackHelper.callbackSuccess(jsNotificationInForegroundCallBack, notification.toJSONObject());
       } catch (Throwable t) {
         t.printStackTrace();
       }
