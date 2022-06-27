@@ -46,12 +46,6 @@ var OneSignalPlugin = function() {
     var _onDidDismissInAppMessageDelegate = function(message) {};
 };
 
-OneSignalPlugin.prototype.OSNotificationPermission = {
-    NotDetermined: 0,
-    Authorized: 1,
-    Denied: 2
-};
-
 OneSignalPlugin._permissionObserverList = [];
 OneSignalPlugin._subscriptionObserverList = [];
 OneSignalPlugin._emailSubscriptionObserverList = [];

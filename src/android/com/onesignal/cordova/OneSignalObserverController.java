@@ -44,7 +44,22 @@ public class OneSignalObserverController {
       permissionObserver = new OSPermissionObserver() {
         @Override
         public void onOSPermissionChanged(OSPermissionStateChanges stateChanges) {
-          callbackSuccess(jsPermissionObserverCallBack, stateChanges.toJSONObject());
+          JSONObject fromJSON = stateChanges.getFrom().toJSONObject();
+          JSONObject toJSON = getTo.getFrom().toJSONObject();
+
+          // convert areNotificationsEnabled to status of type PermissionStatus
+          fromJSON.put("status", fromJSON.getBoolean("areNotificationsEnabled") ? 2 : 1);
+          fromJSON.remove("areNotificationsEnabled");
+          toJSON.put("status", toJSON.getBoolean("areNotificationsEnabled") ? 2 : 1);
+          toJSON.remove("areNotificationsEnabled");
+          JSONObject modifiedObj = new JSONObject();
+          try {
+            modifiedObj.put("from", fromJSON);
+            modifiedObj.put("to", toJSON);
+          } catch (JSONException e) {
+            e.printStackTrace();
+          }
+          callbackSuccess(jsPermissionObserverCallBack, modifiedObj);
         }
       };
       OneSignal.addPermissionObserver(permissionObserver);
