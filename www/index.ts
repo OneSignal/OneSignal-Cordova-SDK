@@ -60,13 +60,13 @@ class OneSignalPlugin {
     }
 
 // You must call init before any other OneSignal function.
-OneSignalPlugin.prototype.setAppId = function(appId) {
+setAppId(appId: string): void {
     OneSignalPlugin._appID = appId;
 
     window.cordova.exec(function() {}, function(){}, "OneSignalPush", "init", [OneSignalPlugin._appID]);
 };
 
-OneSignalPlugin.prototype.setNotificationWillShowInForegroundHandler = function(handleNotificationWillShowInForegroundCallback) {
+setNotificationWillShowInForegroundHandler(handler: (event: NotificationReceivedEvent) => void): void {
     OneSignalPlugin._notificationWillShowInForegroundDelegate = handleNotificationWillShowInForegroundCallback;
     
     var foregroundParsingHandler = function(notificationReceived) {
@@ -77,7 +77,7 @@ OneSignalPlugin.prototype.setNotificationWillShowInForegroundHandler = function(
     window.cordova.exec(foregroundParsingHandler, function(){}, "OneSignalPush", "setNotificationWillShowInForegroundHandler", []);
 };
 
-OneSignalPlugin.prototype.setNotificationOpenedHandler = function(handleNotificationOpenedCallback) {
+setNotificationOpenedHandler(handler: (openedEvent: OpenedEvent) => void): void {
     OneSignalPlugin._notificationOpenedDelegate = handleNotificationOpenedCallback;
 
     var notificationOpenedHandler = function(json) {
@@ -87,7 +87,7 @@ OneSignalPlugin.prototype.setNotificationOpenedHandler = function(handleNotifica
     window.cordova.exec(notificationOpenedHandler, function(){}, "OneSignalPush", "setNotificationOpenedHandler", []);
 };
 
-OneSignalPlugin.prototype.setInAppMessageClickHandler = function(handler) {
+setInAppMessageClickHandler(handler: (action: InAppMessageAction) => void): void {
     OneSignalPlugin._inAppMessageClickDelegate = handler;
 
     var inAppMessageClickHandler = function(json) {
@@ -97,7 +97,7 @@ OneSignalPlugin.prototype.setInAppMessageClickHandler = function(handler) {
     window.cordova.exec(inAppMessageClickHandler, function() {}, "OneSignalPush", "setInAppMessageClickHandler", []);
 };
 
-OneSignalPlugin.prototype.setInAppMessageLifecycleHandler = function(handlerObject) {
+setInAppMessageLifecycleHandler(handlerObject: InAppMessageLifecycleHandlerObject) : void {
     if (handlerObject.onWillDisplayInAppMessage) {
         OneSignalPlugin._onWillDisplayInAppMessageDelegate = handlerObject.onWillDisplayInAppMessage;
 
@@ -138,14 +138,14 @@ OneSignalPlugin.prototype.setInAppMessageLifecycleHandler = function(handlerObje
     window.cordova.exec(function() {}, function() {}, "OneSignalPush", "setInAppMessageLifecycleHandler", []);
 };
 
-OneSignalPlugin.prototype.getDeviceState = function(deviceStateReceivedCallBack) {
+getDeviceState(handler: (response: DeviceState) => void): void {
     var deviceStateCallback = function(json) {
         deviceStateReceivedCallBack(new OSDeviceState(json));
     };
     window.cordova.exec(deviceStateCallback, function(){}, "OneSignalPush", "getDeviceState", []);
 };
 
-OneSignalPlugin.prototype.setLanguage = function(language, onSuccess, onFailure) {
+setLanguage(language: string, onSuccess?: (success: object) => void, onFailure?: (failure: object) => void): void {
     if (onSuccess == null)
         onSuccess = function() {};
 
@@ -155,7 +155,7 @@ OneSignalPlugin.prototype.setLanguage = function(language, onSuccess, onFailure)
     window.cordova.exec(onSuccess, onFailure, "OneSignalPush", "setLanguage", [language]);
 }
 
-OneSignalPlugin.prototype.addSubscriptionObserver = function(callback) {
+addSubscriptionObserver(observer: (event: ChangeEvent<SubscriptionChange>) => void): void {
     OneSignalPlugin._subscriptionObserverList.push(callback);
     var subscriptionCallBackProcessor = function(state) {
         OneSignalPlugin._processFunctionList(OneSignalPlugin._subscriptionObserverList, new OSSubscriptionStateChanges(state));
@@ -163,7 +163,7 @@ OneSignalPlugin.prototype.addSubscriptionObserver = function(callback) {
     window.cordova.exec(subscriptionCallBackProcessor, function(){}, "OneSignalPush", "addSubscriptionObserver", []);
 };
 
-OneSignalPlugin.prototype.addEmailSubscriptionObserver = function(callback) {
+addEmailSubscriptionObserver(observer: (event: ChangeEvent<EmailSubscriptionChange>) => void): void {
     OneSignalPlugin._emailSubscriptionObserverList.push(callback);
     var emailSubscriptionCallbackProcessor = function(state) {
         OneSignalPlugin._processFunctionList(OneSignalPlugin._emailSubscriptionObserverList, new OSEmailSubscriptionStateChanges(state));
@@ -171,7 +171,7 @@ OneSignalPlugin.prototype.addEmailSubscriptionObserver = function(callback) {
     window.cordova.exec(emailSubscriptionCallbackProcessor, function(){}, "OneSignalPush", "addEmailSubscriptionObserver", []);
 };
 
-OneSignalPlugin.prototype.addSMSSubscriptionObserver = function(callback) {
+addSMSSubscriptionObserver(observer: (event: ChangeEvent<SMSSubscriptionChange>) => void): void {
     OneSignalPlugin._smsSubscriptionObserverList.push(callback);
     var smsSubscriptionCallbackProcessor = function(state) {
         OneSignalPlugin._processFunctionList(OneSignalPlugin._smsSubscriptionObserverList, new OSSMSSubscriptionStateChanges(state));
@@ -179,7 +179,7 @@ OneSignalPlugin.prototype.addSMSSubscriptionObserver = function(callback) {
     window.cordova.exec(smsSubscriptionCallbackProcessor, function(){}, "OneSignalPush", "addSMSSubscriptionObserver", []);
 };
 
-OneSignalPlugin.prototype.addPermissionObserver = function(callback) {
+addPermissionObserver(observer: (event: ChangeEvent<PermissionChange>) => void): void {
     OneSignalPlugin._permissionObserverList.push(callback);
     var permissionCallBackProcessor = function(state) {
         OneSignalPlugin._processFunctionList(OneSignalPlugin._permissionObserverList, new OSPermissionStateChanges(state));
@@ -187,36 +187,36 @@ OneSignalPlugin.prototype.addPermissionObserver = function(callback) {
     window.cordova.exec(permissionCallBackProcessor, function(){}, "OneSignalPush", "addPermissionObserver", []);
 };
 
-OneSignalPlugin.prototype.getTags = function(tagsReceivedCallBack) {
+getTags(handler: (tags: object) => void): void {
     window.cordova.exec(tagsReceivedCallBack, function(){}, "OneSignalPush", "getTags", []);
 };
 
-OneSignalPlugin.prototype.sendTag = function(key, value) {
+sendTag(key: string, value: string): void {
     const jsonKeyValue = {};
     jsonKeyValue[key] = value;
     window.cordova.exec(function(){}, function(){}, "OneSignalPush", "sendTags", [jsonKeyValue]);
 };
 
-OneSignalPlugin.prototype.sendTags = function(tags) {
+sendTags(tags: object): void {
     window.cordova.exec(function(){}, function(){}, "OneSignalPush", "sendTags", [tags]);
 };
 
-OneSignalPlugin.prototype.deleteTag = function(key) {
+deleteTag(key: string): void {
     window.cordova.exec(function(){}, function(){}, "OneSignalPush", "deleteTags", [key]);
 };
 
-OneSignalPlugin.prototype.deleteTags = function(keys) {
+deleteTags(keys: string[]): void {
     window.cordova.exec(function(){}, function(){}, "OneSignalPush", "deleteTags", keys);
 };
 
 // Only applies to iOS (does nothing on Android as it always silently registers)
 // Call only if you passed false to autoRegister
-OneSignalPlugin.prototype.registerForProvisionalAuthorization = function(provisionalAuthCallback) {
+registerForProvisionalAuthorization(handler?: (response: boolean) => void): void {
     window.cordova.exec(provisionalAuthCallback, function(){}, "OneSignalPush", "registerForProvisionalAuthorization", []);
 };
 
 // Only applies to iOS (does nothing on Android as it always silently registers without user permission)
-OneSignalPlugin.prototype.promptForPushNotificationsWithUserResponse = function(callback) {
+promptForPushNotificationsWithUserResponse(handler?: (response: boolean) => void): void {
     var internalCallback = function(data) {
         callback(data.accepted === "true");
     };
@@ -224,31 +224,31 @@ OneSignalPlugin.prototype.promptForPushNotificationsWithUserResponse = function(
 };
 
 // Only applies to Android.
-OneSignalPlugin.prototype.clearOneSignalNotifications = function() {
+clearOneSignalNotifications(): void {
     window.cordova.exec(function(){}, function(){}, "OneSignalPush", "clearOneSignalNotifications", []);
 };
 
 // Only applies to Android.
 // If notifications are disabled for your app, unsubscribe the user from OneSignalPlugin.
-OneSignalPlugin.prototype.unsubscribeWhenNotificationsAreDisabled = function(unsubscribe) {
+unsubscribeWhenNotificationsAreDisabled(unsubscribe: boolean): void {
     window.cordova.exec(function(){}, function(){}, "OneSignalPush", "unsubscribeWhenNotificationsAreDisabled", [unsubscribe]);
 };
 
 // Only applies to Android. Cancels a single OneSignal notification based on its Android notification integer ID
-OneSignalPlugin.prototype.removeNotification = function(id) {
+removeNotification(id: number): void {
     window.cordova.exec(function(){}, function(){}, "OneSignalPush", "removeNotification", [id]);
 };
 
 // Only applies to Android. Cancels a single OneSignal notification based on its Android notification group ID
-OneSignalPlugin.prototype.removeGroupedNotifications = function(groupId) {
+removeGroupedNotifications(id: string): void {
     window.cordova.exec(function(){}, function(){}, "OneSignalPush", "removeGroupedNotifications", [groupId]);
 };
 
-OneSignalPlugin.prototype.disablePush = function(disable) {
+disablePush(disable: boolean): void {
     window.cordova.exec(function(){}, function(){}, "OneSignalPush", "disablePush", [disable]);
 };
 
-OneSignalPlugin.prototype.postNotification = function(jsonData, onSuccess, onFailure) {
+postNotification(notificationObjectString: string, onSuccess?: (success: object) => void, onFailure?: (failure: object) => void): void {
     if (onSuccess == null)
         onSuccess = function() {};
 
@@ -259,34 +259,35 @@ OneSignalPlugin.prototype.postNotification = function(jsonData, onSuccess, onFai
 };
 
 // Only applies to iOS
-OneSignalPlugin.prototype.setLaunchURLsInApp = function(isEnabled) {
+setLaunchURLsInApp(isEnabled: boolean): void {
     window.cordova.exec(function(){}, function(){}, "OneSignalPush", "setLaunchURLsInApp", [isEnabled]);
 };
 
-OneSignalPlugin.prototype.setLogLevel = function(nsLogLevel, visualLogLevel) {
+setLogLevel(nsLogLevel: LogLevel, visualLogLevel: LogLevel): void {
     window.cordova.exec(function(){}, function(){}, "OneSignalPush", "setLogLevel", [nsLogLevel, visualLogLevel]);
 };
 
-OneSignalPlugin.prototype.userProvidedPrivacyConsent = function(callback) {
+userProvidedPrivacyConsent(handler: (response: boolean) => void): void {
     window.cordova.exec(callback, function(){}, "OneSignalPush", "userProvidedPrivacyConsent", []);
 };
 
-OneSignalPlugin.prototype.requiresUserPrivacyConsent = function(callback) {
+requiresUserPrivacyConsent(handler: (response: boolean) => void): void {
     window.cordova.exec(callback, function(){}, "OneSignalPush", "requiresUserPrivacyConsent", []);
 };
 
-OneSignalPlugin.prototype.setRequiresUserPrivacyConsent = function(required) {
+setRequiresUserPrivacyConsent(required: boolean): void {
     window.cordova.exec(function() {}, function() {}, "OneSignalPush", "setRequiresUserPrivacyConsent", [required]);
 };
 
-OneSignalPlugin.prototype.provideUserConsent = function(granted) {
+provideUserConsent(granted: boolean): void {
     window.cordova.exec(function() {}, function() {}, "OneSignalPush", "provideUserConsent", [granted]);
 };
 
 /**
  * Email
  */
-OneSignalPlugin.prototype.setEmail = function(email, emailAuthToken, onSuccess, onFailure) {
+
+setEmail(email: string, authCode?: string, onSuccess?: Function, onFailure?: Function): void {
     if (onSuccess == null)
         onSuccess = function() {};
 
@@ -305,7 +306,7 @@ OneSignalPlugin.prototype.setEmail = function(email, emailAuthToken, onSuccess, 
     }
 };
 
-OneSignalPlugin.prototype.logoutEmail = function(onSuccess, onFailure) {
+logoutEmail(onSuccess?: Function, onFailure?: Function): void {
     if (onSuccess == null)
         onSuccess = function() {};
 
@@ -319,7 +320,8 @@ OneSignalPlugin.prototype.logoutEmail = function(onSuccess, onFailure) {
 /**
  * SMS
  */
-OneSignalPlugin.prototype.setSMSNumber = function(smsNumber, smsAuthToken, onSuccess, onFailure) {
+
+setSMSNumber(smsNumber: string, authCode?: string, onSuccess?: Function, onFailure?: Function): void {
     if (onSuccess == null)
         onSuccess = function() {};
 
@@ -338,7 +340,7 @@ OneSignalPlugin.prototype.setSMSNumber = function(smsNumber, smsAuthToken, onSuc
     }
 };
 
-OneSignalPlugin.prototype.logoutSMSNumber = function(onSuccess, onFailure) {
+logoutSMSNumber(onSuccess?: Function, onFailure?: Function): void {
     if (onSuccess == null)
         onSuccess = function() {};
 
@@ -354,7 +356,7 @@ OneSignalPlugin.prototype.logoutSMSNumber = function(onSuccess, onFailure) {
   setExternalUserId(externalId: string?, callback: function): void
   setExternalUserId(externalId: string?, externalIdAuthHash: string?, callback: function): void
 */
-OneSignalPlugin.prototype.setExternalUserId = function(externalId, varArg1, varArg2) {
+setExternalUserId(externalId: string, handlerOrAuth?: ((results: object) => void) | string, handler?: (results: object) => void): void {
     if (externalId == undefined)
         externalId = null;
 
@@ -386,7 +388,7 @@ OneSignalPlugin.prototype.setExternalUserId = function(externalId, varArg1, varA
     window.cordova.exec(callback, function() {}, "OneSignalPush", "setExternalUserId", passToNativeParams);
 };
 
-OneSignalPlugin.prototype.removeExternalUserId = function(externalUserIdCallback) {
+removeExternalUserId(handler?: (results: object) => void): void {
     if (externalUserIdCallback == undefined)
         externalUserIdCallback = function() {};
 
@@ -396,7 +398,8 @@ OneSignalPlugin.prototype.removeExternalUserId = function(externalUserIdCallback
 /**
  * In app messaging
  */
-OneSignalPlugin.prototype.addTriggers = function(triggers) {
+
+addTriggers(triggers: {[key: string]: string | number | boolean}): void {
     Object.keys(triggers).forEach(function(key){
         // forces values to be string types
         if (typeof triggers[key] !== "string") {
@@ -406,38 +409,39 @@ OneSignalPlugin.prototype.addTriggers = function(triggers) {
     window.cordova.exec(function() {}, function() {}, "OneSignalPush", "addTriggers", [triggers]);
 };
 
-OneSignalPlugin.prototype.addTrigger = function(key, value) {
+addTrigger(key: string, value: string): void {
     var obj = {};
     obj[key] = value;
     OneSignalPlugin.prototype.addTriggers(obj);
 };
 
-OneSignalPlugin.prototype.removeTriggerForKey = function(key) {
+removeTriggerForKey(key: string): void {
     OneSignalPlugin.prototype.removeTriggersForKeys([key]);
 };
 
-OneSignalPlugin.prototype.removeTriggersForKeys = function(keys) {
+removeTriggersForKeys(keys: string[]): void {
     if (!Array.isArray(keys)){
         console.error("OneSignal: removeTriggersForKeys: argument must be of type Array")
     }
     window.cordova.exec(function() {}, function() {}, "OneSignalPush", "removeTriggersForKeys", [keys]);
 };
 
-OneSignalPlugin.prototype.getTriggerValueForKey = function(key, callback) {
+getTriggerValueForKey(key: string, handler: (value: string) => void): void {
     var getTriggerValueForKeyCallback = function(obj) {
         callback(obj.value);
     };
     window.cordova.exec(getTriggerValueForKeyCallback, function() {}, "OneSignalPush", "getTriggerValueForKey", [key]);
 };
 
-OneSignalPlugin.prototype.pauseInAppMessages = function(pause) {
+pauseInAppMessages(pause: boolean): void {
     window.cordova.exec(function() {}, function() {}, "OneSignalPush", "pauseInAppMessages", [pause]);
 };
 
 /**
  * Outcomes
  */
-OneSignalPlugin.prototype.sendOutcome = function(name, callback) {
+
+sendOutcome(name: string, handler?: (event: OutcomeEvent) => void): void {
     if (typeof callback === "undefined")
         callback = function() {};
 
@@ -453,7 +457,7 @@ OneSignalPlugin.prototype.sendOutcome = function(name, callback) {
     window.cordova.exec(sendOutcomeCallback, function() {}, "OneSignalPush", "sendOutcome", [name]);
 };
 
-OneSignalPlugin.prototype.sendUniqueOutcome = function(name, callback) {
+sendUniqueOutcome(name: string, handler?: (event: OutcomeEvent) => void): void {
     if (typeof callback === "undefined")
         callback = function() {};
 
@@ -469,7 +473,7 @@ OneSignalPlugin.prototype.sendUniqueOutcome = function(name, callback) {
     window.cordova.exec(sendUniqueOutcomeCallback, function() {}, "OneSignalPush", "sendUniqueOutcome", [name]);
 };
 
-OneSignalPlugin.prototype.sendOutcomeWithValue = function(name, value, callback) {
+sendOutcomeWithValue(name: string, value: string|number, handler?: (event: OutcomeEvent) => void): void {
     if (typeof callback === "undefined")
         callback = function() {};
 
@@ -489,15 +493,15 @@ OneSignalPlugin.prototype.sendOutcomeWithValue = function(name, value, callback)
  * Location
  */
 
-OneSignalPlugin.prototype.promptLocation = function() {
+promptLocation(): void {
     window.cordova.exec(function(){}, function(){}, "OneSignalPush", "promptLocation", []);
 };
 
-OneSignalPlugin.prototype.setLocationShared = function(shared) {
+setLocationShared(shared: boolean): void {
     window.cordova.exec(function() {}, function() {}, "OneSignalPush", "setLocationShared", [shared]);
 };
 
-OneSignalPlugin.prototype.isLocationShared = function(callback) {
+isLocationShared(handler: (response: boolean) => void): void {
     window.cordova.exec(callback, function() {}, "OneSignalPush", "isLocationShared", []);
 };
 }
