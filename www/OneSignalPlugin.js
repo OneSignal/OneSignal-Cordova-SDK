@@ -162,7 +162,7 @@ OneSignalPlugin.prototype.setLanguage = function(language, onSuccess, onFailure)
     window.cordova.exec(onSuccess, onFailure, "OneSignalPush", "setLanguage", [language]);
 }
 
-OneSignalPlugin.prototype.addSubscriptionObserver = function(callback) {
+addSubscriptionObserver(observer: (event: ChangeEvent<SubscriptionChange>) => void): void {
     OneSignalPlugin._subscriptionObserverList.push(callback);
     var subscriptionCallBackProcessor = function(state) {
         OneSignalPlugin._processFunctionList(OneSignalPlugin._subscriptionObserverList, new OSSubscriptionStateChanges(state));
@@ -170,7 +170,7 @@ OneSignalPlugin.prototype.addSubscriptionObserver = function(callback) {
     window.cordova.exec(subscriptionCallBackProcessor, function(){}, "OneSignalPush", "addSubscriptionObserver", []);
 };
 
-OneSignalPlugin.prototype.addEmailSubscriptionObserver = function(callback) {
+addEmailSubscriptionObserver(observer: (event: ChangeEvent<EmailSubscriptionChange>) => void): void {
     OneSignalPlugin._emailSubscriptionObserverList.push(callback);
     var emailSubscriptionCallbackProcessor = function(state) {
         OneSignalPlugin._processFunctionList(OneSignalPlugin._emailSubscriptionObserverList, new OSEmailSubscriptionStateChanges(state));
@@ -178,7 +178,7 @@ OneSignalPlugin.prototype.addEmailSubscriptionObserver = function(callback) {
     window.cordova.exec(emailSubscriptionCallbackProcessor, function(){}, "OneSignalPush", "addEmailSubscriptionObserver", []);
 };
 
-OneSignalPlugin.prototype.addSMSSubscriptionObserver = function(callback) {
+addSMSSubscriptionObserver(observer: (event: ChangeEvent<SMSSubscriptionChange>) => void): void {
     OneSignalPlugin._smsSubscriptionObserverList.push(callback);
     var smsSubscriptionCallbackProcessor = function(state) {
         OneSignalPlugin._processFunctionList(OneSignalPlugin._smsSubscriptionObserverList, new OSSMSSubscriptionStateChanges(state));
@@ -186,7 +186,7 @@ OneSignalPlugin.prototype.addSMSSubscriptionObserver = function(callback) {
     window.cordova.exec(smsSubscriptionCallbackProcessor, function(){}, "OneSignalPush", "addSMSSubscriptionObserver", []);
 };
 
-OneSignalPlugin.prototype.addPermissionObserver = function(callback) {
+addPermissionObserver(observer: (event: ChangeEvent<PermissionChange>) => void): void {
     OneSignalPlugin._permissionObserverList.push(callback);
     var permissionCallBackProcessor = function(state) {
         OneSignalPlugin._processFunctionList(OneSignalPlugin._permissionObserverList, new OSPermissionStateChanges(state));
