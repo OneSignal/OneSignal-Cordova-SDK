@@ -162,37 +162,57 @@ OneSignalPlugin.prototype.setLanguage = function(language, onSuccess, onFailure)
     window.cordova.exec(onSuccess, onFailure, "OneSignalPush", "setLanguage", [language]);
 }
 
-addSubscriptionObserver(observer: (event: ChangeEvent<SubscriptionChange>) => void): void {
-    OneSignalPlugin._subscriptionObserverList.push(callback);
-    var subscriptionCallBackProcessor = function(state) {
-        OneSignalPlugin._processFunctionList(OneSignalPlugin._subscriptionObserverList, new OSSubscriptionStateChanges(state));
+/**
+ * Add a callback that fires when the OneSignal subscription state changes.
+ * @param  {(event:ChangeEvent<SubscriptionChange>)=>void} observer
+ * @returns void
+ */
+    addSubscriptionObserver(observer: (event: ChangeEvent<SubscriptionChange>) => void): void {
+    this._subscriptionObserverList.push(observer);
+    const subscriptionCallBackProcessor = (state: ChangeEvent<SubscriptionChange>) => {
+        this._processFunctionList(this._subscriptionObserverList, state);
     };
     window.cordova.exec(subscriptionCallBackProcessor, function(){}, "OneSignalPush", "addSubscriptionObserver", []);
-};
+}
 
+/**
+ * Add a callback that fires when the OneSignal email subscription changes.
+ * @param  {(event:ChangeEvent<EmailSubscriptionChange>)=>void} observer
+ * @returns void
+ */
 addEmailSubscriptionObserver(observer: (event: ChangeEvent<EmailSubscriptionChange>) => void): void {
-    OneSignalPlugin._emailSubscriptionObserverList.push(callback);
-    var emailSubscriptionCallbackProcessor = function(state) {
-        OneSignalPlugin._processFunctionList(OneSignalPlugin._emailSubscriptionObserverList, new OSEmailSubscriptionStateChanges(state));
+    this._emailSubscriptionObserverList.push(observer);
+    const emailSubscriptionCallbackProcessor = (state: ChangeEvent<EmailSubscriptionChange>) => {
+        this._processFunctionList(this._emailSubscriptionObserverList, state);
     };
     window.cordova.exec(emailSubscriptionCallbackProcessor, function(){}, "OneSignalPush", "addEmailSubscriptionObserver", []);
-};
+}
 
+/**
+ * Add a callback that fires when the OneSignal sms subscription changes.
+ * @param  {(event:ChangeEvent<SMSSubscriptionChange>)=>void} observer
+ * @returns void
+ */
 addSMSSubscriptionObserver(observer: (event: ChangeEvent<SMSSubscriptionChange>) => void): void {
-    OneSignalPlugin._smsSubscriptionObserverList.push(callback);
-    var smsSubscriptionCallbackProcessor = function(state) {
-        OneSignalPlugin._processFunctionList(OneSignalPlugin._smsSubscriptionObserverList, new OSSMSSubscriptionStateChanges(state));
+    this._smsSubscriptionObserverList.push(observer);
+    const smsSubscriptionCallbackProcessor = (state: ChangeEvent<SMSSubscriptionChange>) => {
+        this._processFunctionList(this._smsSubscriptionObserverList, state);
     };
     window.cordova.exec(smsSubscriptionCallbackProcessor, function(){}, "OneSignalPush", "addSMSSubscriptionObserver", []);
-};
+}
 
+/**
+ * Add a callback that fires when the native push permission changes.
+ * @param  {(event:ChangeEvent<PermissionChange>)=>void} observer
+ * @returns void
+ */
 addPermissionObserver(observer: (event: ChangeEvent<PermissionChange>) => void): void {
-    OneSignalPlugin._permissionObserverList.push(callback);
-    var permissionCallBackProcessor = function(state) {
-        OneSignalPlugin._processFunctionList(OneSignalPlugin._permissionObserverList, new OSPermissionStateChanges(state));
+    this._permissionObserverList.push(observer);
+    const permissionCallBackProcessor = (state: ChangeEvent<PermissionChange>) => {
+        this._processFunctionList(this._permissionObserverList, state);
     };
     window.cordova.exec(permissionCallBackProcessor, function(){}, "OneSignalPush", "addPermissionObserver", []);
-};
+}
 
 OneSignalPlugin.prototype.getTags = function(tagsReceivedCallBack) {
     window.cordova.exec(tagsReceivedCallBack, function(){}, "OneSignalPush", "getTags", []);
