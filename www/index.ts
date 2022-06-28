@@ -25,31 +25,39 @@
  * THE SOFTWARE.
  */
 
-var OSNotificationReceivedEvent = require('./NotificationReceived').OSNotificationReceivedEvent;
-var OSNotificationOpenedResult = require('./NotificationOpened');
-var OSInAppMessageAction = require('./InAppMessage').OSInAppMessageAction;
-var OSInAppMessage = require('./InAppMessage').OSInAppMessage;
-var OSDeviceState = require('./Subscription').OSDeviceState;
-var OSPermissionStateChanges = require('./Subscription').OSPermissionStateChanges;
-var OSSubscriptionStateChanges = require('./Subscription').OSSubscriptionStateChanges;
-var OSEmailSubscriptionStateChanges = require('./Subscription').OSEmailSubscriptionStateChanges;
-var OSSMSSubscriptionStateChanges = require('./Subscription').OSSMSSubscriptionStateChanges;
+import { InAppMessageAction, OSInAppMessage } from "./models/InAppMessage";
+import { OpenedEvent } from "./models/NotificationOpened";
+import NotificationReceivedEvent from "./NotificationReceivedEvent";
+import {
+    ChangeEvent,
+    EmailSubscriptionChange,
+    PermissionChange,
+    SMSSubscriptionChange,
+    SubscriptionChange
+} from "./Subscription";
 
-var OneSignalPlugin = function() {
-    var _appID = "";
-    var _notificationWillShowInForegroundDelegate = function(notificationReceived) {};
-    var _notificationOpenedDelegate = function(notificationOpened) {};
-    var _inAppMessageClickDelegate = function (action) {};
-    var _onWillDisplayInAppMessageDelegate = function(message) {};
-    var _onDidDisplayInAppMessageDelegate = function(message) {};
-    var _onWillDismissInAppMessageDelegate = function(message) {};
-    var _onDidDismissInAppMessageDelegate = function(message) {};
-};
+// 0 = None, 1 = Fatal, 2 = Errors, 3 = Warnings, 4 = Info, 5 = Debug, 6 = Verbose
+export type LogLevel = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
-OneSignalPlugin._permissionObserverList = [];
-OneSignalPlugin._subscriptionObserverList = [];
-OneSignalPlugin._emailSubscriptionObserverList = [];
-OneSignalPlugin._smsSubscriptionObserverList = [];
+class OneSignalPlugin {
+    private _appID = "";
+    private _notificationWillShowInForegroundDelegate = function(notificationReceived: NotificationReceivedEvent) {};
+    private _notificationOpenedDelegate = function(notificationOpened: OpenedEvent) {};
+    private _inAppMessageClickDelegate = function (action: InAppMessageAction) {};
+    private _onWillDisplayInAppMessageDelegate = function(message: OSInAppMessage) {};
+    private _onDidDisplayInAppMessageDelegate = function(message: OSInAppMessage) {};
+    private _onWillDismissInAppMessageDelegate = function(message: OSInAppMessage) {};
+    private _onDidDismissInAppMessageDelegate = function(message: OSInAppMessage) {};
+
+    private _permissionObserverList: ((event:ChangeEvent<PermissionChange>)=>void)[] = [];
+    private _subscriptionObserverList: ((event:ChangeEvent<SubscriptionChange>)=>void)[] = [];
+    private _emailSubscriptionObserverList: ((event:ChangeEvent<EmailSubscriptionChange>)=>void)[] = [];
+    private _smsSubscriptionObserverList: ((event:ChangeEvent<SMSSubscriptionChange>)=>void)[] = [];
+
+    private _processFunctionList<ObserverChangeEvent>(array: ((event:ChangeEvent<ObserverChangeEvent>)=>void)[], param: ChangeEvent<ObserverChangeEvent>): void {
+        for (let i = 0; i < array.length; i++)
+            array[i](param);
+    }
 
 // You must call init before any other OneSignal function.
 OneSignalPlugin.prototype.setAppId = function(appId) {
@@ -128,15 +136,6 @@ OneSignalPlugin.prototype.setInAppMessageLifecycleHandler = function(handlerObje
     }
 
     window.cordova.exec(function() {}, function() {}, "OneSignalPush", "setInAppMessageLifecycleHandler", []);
-};
-
-OneSignalPlugin._processFunctionList = function(array, param) {
-    for (var i = 0; i < array.length; i++)
-        array[i](param);
-};
-
-OneSignalPlugin.prototype.completeNotification = function(notification, shouldDisplay) {
-    window.cordova.exec(function(){}, function(){}, "OneSignalPush", "completeNotification", [notification.notificationId, shouldDisplay]);
 };
 
 OneSignalPlugin.prototype.getDeviceState = function(deviceStateReceivedCallBack) {
@@ -501,14 +500,18 @@ OneSignalPlugin.prototype.setLocationShared = function(shared) {
 OneSignalPlugin.prototype.isLocationShared = function(callback) {
     window.cordova.exec(callback, function() {}, "OneSignalPush", "isLocationShared", []);
 };
+}
 
 //-------------------------------------------------------------------
 
-var OneSignal = new OneSignalPlugin();
-module.exports = OneSignal;
+const OneSignal = new OneSignalPlugin();
 
-if(!window.plugins)
+if (!window.plugins) {
     window.plugins = {};
+}
 
-if (!window.plugins.OneSignal)
+if (!window.plugins.OneSignal) {
     window.plugins.OneSignal = OneSignal;
+}
+
+export default OneSignal;
