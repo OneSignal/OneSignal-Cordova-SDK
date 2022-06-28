@@ -1,4 +1,4 @@
-import OSNotification from './OSNotification';
+import OSNotification from '../OSNotification';
 
 // 0 = NotificationClicked, 1 = ButtonClicked
 export type OpenedEventActionType = 0 | 1;
