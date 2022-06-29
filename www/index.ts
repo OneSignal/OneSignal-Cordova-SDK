@@ -25,11 +25,13 @@
  * THE SOFTWARE.
  */
 
-import { InAppMessageAction, OSInAppMessage } from "./models/InAppMessage";
+import { InAppMessageAction, InAppMessageLifecycleHandlerObject, OSInAppMessage } from "./models/InAppMessage";
 import { OpenedEvent } from "./models/NotificationOpened";
+import { OutcomeEvent } from "./models/Outcomes";
 import NotificationReceivedEvent from "./NotificationReceivedEvent";
 import {
     ChangeEvent,
+    DeviceState,
     EmailSubscriptionChange,
     PermissionChange,
     SMSSubscriptionChange,
@@ -76,10 +78,10 @@ setAppId(appId: string): void {
 
 setNotificationWillShowInForegroundHandler(handler: (event: NotificationReceivedEvent) => void): void {
     this._notificationWillShowInForegroundDelegate = handler;
-    
-    const foregroundParsingHandler = (notificationReceived) => {
+
+    const foregroundParsingHandler = (notificationReceived: NotificationReceivedEvent) => {
         console.log("foregroundParsingHandler " + JSON.stringify(notificationReceived));
-        this._notificationWillShowInForegroundDelegate(OSNotificationReceivedEvent.create(notificationReceived));
+        this._notificationWillShowInForegroundDelegate(notificationReceived);
     };
 
     window.cordova.exec(foregroundParsingHandler, function(){}, "OneSignalPush", "setNotificationWillShowInForegroundHandler", []);
@@ -88,8 +90,8 @@ setNotificationWillShowInForegroundHandler(handler: (event: NotificationReceived
 setNotificationOpenedHandler(handler: (openedEvent: OpenedEvent) => void): void {
     this._notificationOpenedDelegate = handler;
 
-    const notificationOpenedHandler = (json) => {
-        this._notificationOpenedDelegate(new OSNotificationOpenedResult(json));
+    const notificationOpenedHandler = (json: OpenedEvent) => {
+        this._notificationOpenedDelegate(json);
     };
 
     window.cordova.exec(notificationOpenedHandler, function(){}, "OneSignalPush", "setNotificationOpenedHandler", []);
@@ -98,8 +100,8 @@ setNotificationOpenedHandler(handler: (openedEvent: OpenedEvent) => void): void 
 setInAppMessageClickHandler(handler: (action: InAppMessageAction) => void): void {
     this._inAppMessageClickDelegate = handler;
 
-    const inAppMessageClickHandler = (json) => {
-        this._inAppMessageClickDelegate(new OSInAppMessageAction(json));
+    const inAppMessageClickHandler = (json: InAppMessageAction) => {
+        this._inAppMessageClickDelegate(json);
     };
 
     window.cordova.exec(inAppMessageClickHandler, function() {}, "OneSignalPush", "setInAppMessageClickHandler", []);
@@ -109,8 +111,8 @@ setInAppMessageLifecycleHandler(handlerObject: InAppMessageLifecycleHandlerObjec
     if (handlerObject.onWillDisplayInAppMessage) {
         this._onWillDisplayInAppMessageDelegate = handlerObject.onWillDisplayInAppMessage;
 
-        const onWillDisplayInAppMessageHandler = (json) => {
-            this._onWillDisplayInAppMessageDelegate(new OSInAppMessage(json));
+        const onWillDisplayInAppMessageHandler = (json: OSInAppMessage) => {
+            this._onWillDisplayInAppMessageDelegate(json);
         };
 
         window.cordova.exec(onWillDisplayInAppMessageHandler, function() {}, "OneSignalPush", "setOnWillDisplayInAppMessageHandler", []);
@@ -118,8 +120,8 @@ setInAppMessageLifecycleHandler(handlerObject: InAppMessageLifecycleHandlerObjec
     if (handlerObject.onDidDisplayInAppMessage) {
         this._onDidDisplayInAppMessageDelegate = handlerObject.onDidDisplayInAppMessage;
 
-        const onDidDisplayInAppMessageHandler = (json) => {
-            this._onDidDisplayInAppMessageDelegate(new OSInAppMessage(json));
+        const onDidDisplayInAppMessageHandler = (json: OSInAppMessage) => {
+            this._onDidDisplayInAppMessageDelegate(json);
         };
 
         window.cordova.exec(onDidDisplayInAppMessageHandler, function() {}, "OneSignalPush", "setOnDidDisplayInAppMessageHandler", []);
@@ -127,8 +129,8 @@ setInAppMessageLifecycleHandler(handlerObject: InAppMessageLifecycleHandlerObjec
     if (handlerObject.onWillDismissInAppMessage) {
         this._onWillDismissInAppMessageDelegate = handlerObject.onWillDismissInAppMessage;
 
-        const onWillDismissInAppMessageHandler = (json) => {
-            this._onWillDismissInAppMessageDelegate(new OSInAppMessage(json));
+        const onWillDismissInAppMessageHandler = (json: OSInAppMessage) => {
+            this._onWillDismissInAppMessageDelegate(json);
         };
 
         window.cordova.exec(onWillDismissInAppMessageHandler, function() {}, "OneSignalPush", "setOnWillDismissInAppMessageHandler", []);
@@ -136,8 +138,8 @@ setInAppMessageLifecycleHandler(handlerObject: InAppMessageLifecycleHandlerObjec
     if (handlerObject.onDidDismissInAppMessage) {
         this._onDidDismissInAppMessageDelegate = handlerObject.onDidDismissInAppMessage;
 
-        const onDidDismissInAppMessageHandler = (json) => {
-            this._onDidDismissInAppMessageDelegate(new OSInAppMessage(json));
+        const onDidDismissInAppMessageHandler = (json: OSInAppMessage) => {
+            this._onDidDismissInAppMessageDelegate(json);
         };
 
         window.cordova.exec(onDidDismissInAppMessageHandler, function() {}, "OneSignalPush", "setOnDidDismissInAppMessageHandler", []);
@@ -147,8 +149,8 @@ setInAppMessageLifecycleHandler(handlerObject: InAppMessageLifecycleHandlerObjec
 };
 
 getDeviceState(handler: (response: DeviceState) => void): void {
-    const deviceStateCallback = (json) => {
-        deviceStateReceivedCallBack(new OSDeviceState(json));
+    const deviceStateCallback = (json: DeviceState) => {
+        handler(new DeviceState(json));
     };
     window.cordova.exec(deviceStateCallback, function(){}, "OneSignalPush", "getDeviceState", []);
 };
@@ -165,32 +167,32 @@ setLanguage(language: string, onSuccess?: (success: object) => void, onFailure?:
 
 addSubscriptionObserver(observer: (event: ChangeEvent<SubscriptionChange>) => void): void {
     this._subscriptionObserverList.push(observer);
-    const subscriptionCallBackProcessor = (state) => {
-        this._processFunctionList(this._subscriptionObserverList, new OSSubscriptionStateChanges(state));
+    const subscriptionCallBackProcessor = (state: ChangeEvent<SubscriptionChange>) => {
+        this._processFunctionList(this._subscriptionObserverList, state);
     };
     window.cordova.exec(subscriptionCallBackProcessor, function(){}, "OneSignalPush", "addSubscriptionObserver", []);
 };
 
 addEmailSubscriptionObserver(observer: (event: ChangeEvent<EmailSubscriptionChange>) => void): void {
     this._emailSubscriptionObserverList.push(observer);
-    const emailSubscriptionCallbackProcessor = (state) => {
-        this._processFunctionList(this._emailSubscriptionObserverList, new OSEmailSubscriptionStateChanges(state));
+    const emailSubscriptionCallbackProcessor = (state: ChangeEvent<EmailSubscriptionChange>) => {
+        this._processFunctionList(this._emailSubscriptionObserverList, state);
     };
     window.cordova.exec(emailSubscriptionCallbackProcessor, function(){}, "OneSignalPush", "addEmailSubscriptionObserver", []);
 };
 
 addSMSSubscriptionObserver(observer: (event: ChangeEvent<SMSSubscriptionChange>) => void): void {
     this._smsSubscriptionObserverList.push(observer);
-    const smsSubscriptionCallbackProcessor = (state) => {
-        this._processFunctionList(this._smsSubscriptionObserverList, new OSSMSSubscriptionStateChanges(state));
+    const smsSubscriptionCallbackProcessor = (state: ChangeEvent<SMSSubscriptionChange>) => {
+        this._processFunctionList(this._smsSubscriptionObserverList, state);
     };
     window.cordova.exec(smsSubscriptionCallbackProcessor, function(){}, "OneSignalPush", "addSMSSubscriptionObserver", []);
 };
 
 addPermissionObserver(observer: (event: ChangeEvent<PermissionChange>) => void): void {
     this._permissionObserverList.push(observer);
-    const permissionCallBackProcessor = (state) => {
-        this._processFunctionList(this._permissionObserverList, new OSPermissionStateChanges(state));
+    const permissionCallBackProcessor = (state: ChangeEvent<PermissionChange>) => {
+        this._processFunctionList(this._permissionObserverList, state);
     };
     window.cordova.exec(permissionCallBackProcessor, function(){}, "OneSignalPush", "addPermissionObserver", []);
 };
@@ -200,8 +202,7 @@ getTags(handler: (tags: object) => void): void {
 };
 
 sendTag(key: string, value: string): void {
-    const jsonKeyValue = {};
-    jsonKeyValue[key] = value;
+    const jsonKeyValue = {[key]: value};
     window.cordova.exec(function(){}, function(){}, "OneSignalPush", "sendTags", [jsonKeyValue]);
 };
 
@@ -225,7 +226,7 @@ registerForProvisionalAuthorization(handler?: (response: boolean) => void): void
 
 // Only applies to iOS (does nothing on Android as it always silently registers without user permission)
 promptForPushNotificationsWithUserResponse(handler?: (response: boolean) => void): void {
-    const internalCallback = (data) => {
+    const internalCallback = (data: any) => {
         handler(data.accepted === "true");
     };
     window.cordova.exec(internalCallback, function(){}, "OneSignalPush", "promptForPushNotificationsWithUserResponse", []);
@@ -249,7 +250,7 @@ removeNotification(id: number): void {
 
 // Only applies to Android. Cancels a single OneSignal notification based on its Android notification group ID
 removeGroupedNotifications(id: string): void {
-    window.cordova.exec(function(){}, function(){}, "OneSignalPush", "removeGroupedNotifications", [groupId]);
+    window.cordova.exec(function(){}, function(){}, "OneSignalPush", "removeGroupedNotifications", [id]);
 };
 
 disablePush(disable: boolean): void {
@@ -263,7 +264,7 @@ postNotification(notificationObjectString: string, onSuccess?: (success: object)
     if (onFailure == null)
         onFailure = function() {};
 
-    window.cordova.exec(onSuccess, onFailure, "OneSignalPush", "postNotification", [jsonData]);
+    window.cordova.exec(onSuccess, onFailure, "OneSignalPush", "postNotification", [notificationObjectString]);
 };
 
 // Only applies to iOS
@@ -369,7 +370,7 @@ setExternalUserId(externalId: string, handlerOrAuth?: ((results: object) => void
         externalId = null;
 
     var externalIdAuthHash = null;
-    var callback = function() {};
+    let callback = (results: object) => {};
 
     if (typeof handlerOrAuth === "function") {
         // Method was called like setExternalUserId(externalId: string?, callback: function)
@@ -418,8 +419,7 @@ addTriggers(triggers: {[key: string]: string | number | boolean}): void {
 };
 
 addTrigger(key: string, value: string): void {
-    var obj = {};
-    obj[key] = value;
+    const obj = {[key]: value};
     this.addTriggers(obj);
 };
 
@@ -435,7 +435,7 @@ removeTriggersForKeys(keys: string[]): void {
 };
 
 getTriggerValueForKey(key: string, handler: (value: string) => void): void {
-    const getTriggerValueForKeyCallback = (obj) => {
+    const getTriggerValueForKeyCallback = (obj: {value: string}) => {
         handler(obj.value);
     };
     window.cordova.exec(getTriggerValueForKeyCallback, function() {}, "OneSignalPush", "getTriggerValueForKey", [key]);
@@ -459,7 +459,7 @@ sendOutcome(name: string, handler?: (event: OutcomeEvent) => void): void {
         return;
     }
 
-    const sendOutcomeCallback = (result) => {
+    const sendOutcomeCallback = (result: OutcomeEvent) => {
         handler(result);
     };
 
@@ -476,7 +476,7 @@ sendUniqueOutcome(name: string, handler?: (event: OutcomeEvent) => void): void {
         return;
     }
 
-    const sendUniqueOutcomeCallback = (result) => {
+    const sendUniqueOutcomeCallback = (result: OutcomeEvent) => {
         handler(result);
     };
 
@@ -493,7 +493,7 @@ sendOutcomeWithValue(name: string, value: string|number, handler?: (event: Outco
         return;
     }
 
-    const sendOutcomeWithValueCallback = (result) => {
+    const sendOutcomeWithValueCallback = (result: OutcomeEvent) => {
         handler(result);
     };
 
