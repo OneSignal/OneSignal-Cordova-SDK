@@ -227,7 +227,9 @@ registerForProvisionalAuthorization(handler?: (response: boolean) => void): void
 // Only applies to iOS (does nothing on Android as it always silently registers without user permission)
 promptForPushNotificationsWithUserResponse(handler?: (response: boolean) => void): void {
     const internalCallback = (data: any) => {
-        handler(data.accepted === "true");
+        if (handler) {
+            handler(data.accepted === "true");
+        }
     };
     window.cordova.exec(internalCallback, function(){}, "OneSignalPush", "promptForPushNotificationsWithUserResponse", []);
 };
@@ -365,11 +367,11 @@ logoutSMSNumber(onSuccess?: Function, onFailure?: Function): void {
   setExternalUserId(externalId: string?, callback: function): void
   setExternalUserId(externalId: string?, externalIdAuthHash: string?, callback: function): void
 */
-setExternalUserId(externalId: string, handlerOrAuth?: ((results: object) => void) | string, handler?: (results: object) => void): void {
+setExternalUserId(externalId: string | null, handlerOrAuth?: ((results: object) => void) | string, handler?: (results: object) => void): void {
     if (externalId == undefined)
         externalId = null;
 
-    var externalIdAuthHash = null;
+    let externalIdAuthHash = null;
     let callback = (results: object) => {};
 
     if (typeof handlerOrAuth === "function") {
@@ -379,7 +381,9 @@ setExternalUserId(externalId: string, handlerOrAuth?: ((results: object) => void
     else if (typeof handlerOrAuth === "string") {
         // Method was called like setExternalUserId(externalId: string?, externalIdAuthHash: string?, callback: function)
         externalIdAuthHash = handlerOrAuth;
-        callback = handler;
+        if (handler) {
+            callback = handler;
+        }
     }
     else if (typeof handlerOrAuth === "undefined") {
         // Method was called like setExternalUserId(externalId: string?)
@@ -450,34 +454,20 @@ pauseInAppMessages(pause: boolean): void {
  */
 
 sendOutcome(name: string, handler?: (event: OutcomeEvent) => void): void {
-    if (typeof handler === "undefined") {
-        handler = function() {};
-    }
-
-    if (typeof handler !== "function") {
-        console.error("OneSignal: sendOutcome: must provide a valid callback");
-        return;
-    }
-
     const sendOutcomeCallback = (result: OutcomeEvent) => {
-        handler(result);
+        if (handler) {
+            handler(result);
+        }
     };
 
     window.cordova.exec(sendOutcomeCallback, function() {}, "OneSignalPush", "sendOutcome", [name]);
 };
 
 sendUniqueOutcome(name: string, handler?: (event: OutcomeEvent) => void): void {
-    if (typeof handler === "undefined") {
-        handler = function() {};
-    }
-
-    if (typeof handler !== "function") {
-        console.error("OneSignal: sendUniqueOutcome: must provide a valid callback");
-        return;
-    }
-
     const sendUniqueOutcomeCallback = (result: OutcomeEvent) => {
-        handler(result);
+        if (handler) {
+            handler(result);
+        }
     };
 
     window.cordova.exec(sendUniqueOutcomeCallback, function() {}, "OneSignalPush", "sendUniqueOutcome", [name]);
@@ -494,7 +484,9 @@ sendOutcomeWithValue(name: string, value: string|number, handler?: (event: Outco
     }
 
     const sendOutcomeWithValueCallback = (result: OutcomeEvent) => {
-        handler(result);
+        if (handler) {
+            handler(result);
+        }
     };
 
     window.cordova.exec(sendOutcomeWithValueCallback, function() {}, "OneSignalPush", "sendOutcomeWithValue", [name, Number(value)]);
