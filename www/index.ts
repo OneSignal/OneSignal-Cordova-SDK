@@ -29,6 +29,7 @@ import { InAppMessageAction, InAppMessageLifecycleHandlerObject, OSInAppMessage 
 import { OpenedEvent } from "./models/NotificationOpened";
 import { OutcomeEvent } from "./models/Outcomes";
 import NotificationReceivedEvent from "./NotificationReceivedEvent";
+import OSNotification from './OSNotification';
 import {
     ChangeEvent,
     DeviceState,
@@ -88,9 +89,10 @@ class OneSignalPlugin {
     setNotificationWillShowInForegroundHandler(handler: (event: NotificationReceivedEvent) => void): void {
         this._notificationWillShowInForegroundDelegate = handler;
 
-        const foregroundParsingHandler = (notificationReceived: NotificationReceivedEvent) => {
+        const foregroundParsingHandler = (notificationReceived: OSNotification) => {
+
             console.log("foregroundParsingHandler " + JSON.stringify(notificationReceived));
-            this._notificationWillShowInForegroundDelegate(notificationReceived);
+            this._notificationWillShowInForegroundDelegate(new NotificationReceivedEvent(notificationReceived));
         };
 
         window.cordova.exec(foregroundParsingHandler, function(){}, "OneSignalPush", "setNotificationWillShowInForegroundHandler", []);
