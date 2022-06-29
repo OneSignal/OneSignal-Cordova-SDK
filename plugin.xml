@@ -13,7 +13,7 @@
 
   <license>MIT</license>
 
-  <js-module src="www/OneSignalPlugin.js" name="OneSignalPlugin">
+  <js-module src="dist/index.js" name="OneSignalPlugin">
     <clobbers target="OneSignal" />
   </js-module>
 
@@ -25,10 +25,9 @@
     <engine name="apple-ios" version=">=7.0.0" />
   </engines>
 
-  <js-module src="www/NotificationReceived.js" name="NotificationReceived" />
-  <js-module src="www/NotificationOpened.js" name="NotificationOpened" />
-  <js-module src="www/InAppMessage.js" name="InAppMessage" />
-  <js-module src="www/Subscription.js" name="Subscription" />
+  <js-module src="dist/NotificationReceivedEvent.js" name="NotificationReceivedEvent" />
+  <js-module src="dist/Subscription.js" name="Subscription" />
+  <js-module src="dist/OSNotification.js" name="OSNotification" />
 
   <platform name="android">
     <framework src="com.onesignal:OneSignal:4.7.3" />
