@@ -69,37 +69,37 @@ class OneSignalPlugin {
 
 // You must call init before any other OneSignal function.
 setAppId(appId: string): void {
-    OneSignalPlugin._appID = appId;
+    this._appID = appId;
 
-    window.cordova.exec(function() {}, function(){}, "OneSignalPush", "init", [OneSignalPlugin._appID]);
+    window.cordova.exec(function() {}, function(){}, "OneSignalPush", "init", [this._appID]);
 };
 
 setNotificationWillShowInForegroundHandler(handler: (event: NotificationReceivedEvent) => void): void {
-    OneSignalPlugin._notificationWillShowInForegroundDelegate = handleNotificationWillShowInForegroundCallback;
+    this._notificationWillShowInForegroundDelegate = handleNotificationWillShowInForegroundCallback;
     
     var foregroundParsingHandler = function(notificationReceived) {
         console.log("foregroundParsingHandler " + JSON.stringify(notificationReceived));
-        OneSignalPlugin._notificationWillShowInForegroundDelegate(OSNotificationReceivedEvent.create(notificationReceived));
+        this._notificationWillShowInForegroundDelegate(OSNotificationReceivedEvent.create(notificationReceived));
     };
 
     window.cordova.exec(foregroundParsingHandler, function(){}, "OneSignalPush", "setNotificationWillShowInForegroundHandler", []);
 };
 
 setNotificationOpenedHandler(handler: (openedEvent: OpenedEvent) => void): void {
-    OneSignalPlugin._notificationOpenedDelegate = handleNotificationOpenedCallback;
+    this._notificationOpenedDelegate = handleNotificationOpenedCallback;
 
     var notificationOpenedHandler = function(json) {
-        OneSignalPlugin._notificationOpenedDelegate(new OSNotificationOpenedResult(json));
+        this._notificationOpenedDelegate(new OSNotificationOpenedResult(json));
     };
 
     window.cordova.exec(notificationOpenedHandler, function(){}, "OneSignalPush", "setNotificationOpenedHandler", []);
 };
 
 setInAppMessageClickHandler(handler: (action: InAppMessageAction) => void): void {
-    OneSignalPlugin._inAppMessageClickDelegate = handler;
+    this._inAppMessageClickDelegate = handler;
 
     var inAppMessageClickHandler = function(json) {
-        OneSignalPlugin._inAppMessageClickDelegate(new OSInAppMessageAction(json));
+        this._inAppMessageClickDelegate(new OSInAppMessageAction(json));
     };
 
     window.cordova.exec(inAppMessageClickHandler, function() {}, "OneSignalPush", "setInAppMessageClickHandler", []);
@@ -107,37 +107,37 @@ setInAppMessageClickHandler(handler: (action: InAppMessageAction) => void): void
 
 setInAppMessageLifecycleHandler(handlerObject: InAppMessageLifecycleHandlerObject) : void {
     if (handlerObject.onWillDisplayInAppMessage) {
-        OneSignalPlugin._onWillDisplayInAppMessageDelegate = handlerObject.onWillDisplayInAppMessage;
+        this._onWillDisplayInAppMessageDelegate = handlerObject.onWillDisplayInAppMessage;
 
         var onWillDisplayInAppMessageHandler = function(json) {
-            OneSignalPlugin._onWillDisplayInAppMessageDelegate(new OSInAppMessage(json));
+            this._onWillDisplayInAppMessageDelegate(new OSInAppMessage(json));
         };
 
         window.cordova.exec(onWillDisplayInAppMessageHandler, function() {}, "OneSignalPush", "setOnWillDisplayInAppMessageHandler", []);
     }
     if (handlerObject.onDidDisplayInAppMessage) {
-        OneSignalPlugin._onDidDisplayInAppMessageDelegate = handlerObject.onDidDisplayInAppMessage;
+        this._onDidDisplayInAppMessageDelegate = handlerObject.onDidDisplayInAppMessage;
 
         var onDidDisplayInAppMessageHandler = function(json) {
-            OneSignalPlugin._onDidDisplayInAppMessageDelegate(new OSInAppMessage(json));
+            this._onDidDisplayInAppMessageDelegate(new OSInAppMessage(json));
         };
 
         window.cordova.exec(onDidDisplayInAppMessageHandler, function() {}, "OneSignalPush", "setOnDidDisplayInAppMessageHandler", []);
     }
     if (handlerObject.onWillDismissInAppMessage) {
-        OneSignalPlugin._onWillDismissInAppMessageDelegate = handlerObject.onWillDismissInAppMessage;
+        this._onWillDismissInAppMessageDelegate = handlerObject.onWillDismissInAppMessage;
 
         var onWillDismissInAppMessageHandler = function(json) {
-            OneSignalPlugin._onWillDismissInAppMessageDelegate(new OSInAppMessage(json));
+            this._onWillDismissInAppMessageDelegate(new OSInAppMessage(json));
         };
 
         window.cordova.exec(onWillDismissInAppMessageHandler, function() {}, "OneSignalPush", "setOnWillDismissInAppMessageHandler", []);
     }
     if (handlerObject.onDidDismissInAppMessage) {
-        OneSignalPlugin._onDidDismissInAppMessageDelegate = handlerObject.onDidDismissInAppMessage;
+        this._onDidDismissInAppMessageDelegate = handlerObject.onDidDismissInAppMessage;
 
         var onDidDismissInAppMessageHandler = function(json) {
-            OneSignalPlugin._onDidDismissInAppMessageDelegate(new OSInAppMessage(json));
+            this._onDidDismissInAppMessageDelegate(new OSInAppMessage(json));
         };
 
         window.cordova.exec(onDidDismissInAppMessageHandler, function() {}, "OneSignalPush", "setOnDidDismissInAppMessageHandler", []);
@@ -164,33 +164,33 @@ setLanguage(language: string, onSuccess?: (success: object) => void, onFailure?:
 }
 
 addSubscriptionObserver(observer: (event: ChangeEvent<SubscriptionChange>) => void): void {
-    OneSignalPlugin._subscriptionObserverList.push(callback);
+    this._subscriptionObserverList.push(callback);
     var subscriptionCallBackProcessor = function(state) {
-        OneSignalPlugin._processFunctionList(OneSignalPlugin._subscriptionObserverList, new OSSubscriptionStateChanges(state));
+        this._processFunctionList(this._subscriptionObserverList, new OSSubscriptionStateChanges(state));
     };
     window.cordova.exec(subscriptionCallBackProcessor, function(){}, "OneSignalPush", "addSubscriptionObserver", []);
 };
 
 addEmailSubscriptionObserver(observer: (event: ChangeEvent<EmailSubscriptionChange>) => void): void {
-    OneSignalPlugin._emailSubscriptionObserverList.push(callback);
+    this._emailSubscriptionObserverList.push(callback);
     var emailSubscriptionCallbackProcessor = function(state) {
-        OneSignalPlugin._processFunctionList(OneSignalPlugin._emailSubscriptionObserverList, new OSEmailSubscriptionStateChanges(state));
+        this._processFunctionList(this._emailSubscriptionObserverList, new OSEmailSubscriptionStateChanges(state));
     };
     window.cordova.exec(emailSubscriptionCallbackProcessor, function(){}, "OneSignalPush", "addEmailSubscriptionObserver", []);
 };
 
 addSMSSubscriptionObserver(observer: (event: ChangeEvent<SMSSubscriptionChange>) => void): void {
-    OneSignalPlugin._smsSubscriptionObserverList.push(callback);
+    this._smsSubscriptionObserverList.push(callback);
     var smsSubscriptionCallbackProcessor = function(state) {
-        OneSignalPlugin._processFunctionList(OneSignalPlugin._smsSubscriptionObserverList, new OSSMSSubscriptionStateChanges(state));
+        this._processFunctionList(this._smsSubscriptionObserverList, new OSSMSSubscriptionStateChanges(state));
     };
     window.cordova.exec(smsSubscriptionCallbackProcessor, function(){}, "OneSignalPush", "addSMSSubscriptionObserver", []);
 };
 
 addPermissionObserver(observer: (event: ChangeEvent<PermissionChange>) => void): void {
-    OneSignalPlugin._permissionObserverList.push(callback);
+    this._permissionObserverList.push(callback);
     var permissionCallBackProcessor = function(state) {
-        OneSignalPlugin._processFunctionList(OneSignalPlugin._permissionObserverList, new OSPermissionStateChanges(state));
+        this._processFunctionList(this._permissionObserverList, new OSPermissionStateChanges(state));
     };
     window.cordova.exec(permissionCallBackProcessor, function(){}, "OneSignalPush", "addPermissionObserver", []);
 };
@@ -420,11 +420,11 @@ addTriggers(triggers: {[key: string]: string | number | boolean}): void {
 addTrigger(key: string, value: string): void {
     var obj = {};
     obj[key] = value;
-    OneSignalPlugin.prototype.addTriggers(obj);
+    this.addTriggers(obj);
 };
 
 removeTriggerForKey(key: string): void {
-    OneSignalPlugin.prototype.removeTriggersForKeys([key]);
+    this.removeTriggersForKeys([key]);
 };
 
 removeTriggersForKeys(keys: string[]): void {
