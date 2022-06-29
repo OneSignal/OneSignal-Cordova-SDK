@@ -77,7 +77,7 @@ setAppId(appId: string): void {
 setNotificationWillShowInForegroundHandler(handler: (event: NotificationReceivedEvent) => void): void {
     this._notificationWillShowInForegroundDelegate = handler;
     
-    var foregroundParsingHandler = function(notificationReceived) {
+    const foregroundParsingHandler = (notificationReceived) => {
         console.log("foregroundParsingHandler " + JSON.stringify(notificationReceived));
         this._notificationWillShowInForegroundDelegate(OSNotificationReceivedEvent.create(notificationReceived));
     };
@@ -88,7 +88,7 @@ setNotificationWillShowInForegroundHandler(handler: (event: NotificationReceived
 setNotificationOpenedHandler(handler: (openedEvent: OpenedEvent) => void): void {
     this._notificationOpenedDelegate = handler;
 
-    var notificationOpenedHandler = function(json) {
+    const notificationOpenedHandler = (json) => {
         this._notificationOpenedDelegate(new OSNotificationOpenedResult(json));
     };
 
@@ -98,7 +98,7 @@ setNotificationOpenedHandler(handler: (openedEvent: OpenedEvent) => void): void 
 setInAppMessageClickHandler(handler: (action: InAppMessageAction) => void): void {
     this._inAppMessageClickDelegate = handler;
 
-    var inAppMessageClickHandler = function(json) {
+    const inAppMessageClickHandler = (json) => {
         this._inAppMessageClickDelegate(new OSInAppMessageAction(json));
     };
 
@@ -109,7 +109,7 @@ setInAppMessageLifecycleHandler(handlerObject: InAppMessageLifecycleHandlerObjec
     if (handlerObject.onWillDisplayInAppMessage) {
         this._onWillDisplayInAppMessageDelegate = handlerObject.onWillDisplayInAppMessage;
 
-        var onWillDisplayInAppMessageHandler = function(json) {
+        const onWillDisplayInAppMessageHandler = (json) => {
             this._onWillDisplayInAppMessageDelegate(new OSInAppMessage(json));
         };
 
@@ -118,7 +118,7 @@ setInAppMessageLifecycleHandler(handlerObject: InAppMessageLifecycleHandlerObjec
     if (handlerObject.onDidDisplayInAppMessage) {
         this._onDidDisplayInAppMessageDelegate = handlerObject.onDidDisplayInAppMessage;
 
-        var onDidDisplayInAppMessageHandler = function(json) {
+        const onDidDisplayInAppMessageHandler = (json) => {
             this._onDidDisplayInAppMessageDelegate(new OSInAppMessage(json));
         };
 
@@ -127,7 +127,7 @@ setInAppMessageLifecycleHandler(handlerObject: InAppMessageLifecycleHandlerObjec
     if (handlerObject.onWillDismissInAppMessage) {
         this._onWillDismissInAppMessageDelegate = handlerObject.onWillDismissInAppMessage;
 
-        var onWillDismissInAppMessageHandler = function(json) {
+        const onWillDismissInAppMessageHandler = (json) => {
             this._onWillDismissInAppMessageDelegate(new OSInAppMessage(json));
         };
 
@@ -136,7 +136,7 @@ setInAppMessageLifecycleHandler(handlerObject: InAppMessageLifecycleHandlerObjec
     if (handlerObject.onDidDismissInAppMessage) {
         this._onDidDismissInAppMessageDelegate = handlerObject.onDidDismissInAppMessage;
 
-        var onDidDismissInAppMessageHandler = function(json) {
+        const onDidDismissInAppMessageHandler = (json) => {
             this._onDidDismissInAppMessageDelegate(new OSInAppMessage(json));
         };
 
@@ -147,7 +147,7 @@ setInAppMessageLifecycleHandler(handlerObject: InAppMessageLifecycleHandlerObjec
 };
 
 getDeviceState(handler: (response: DeviceState) => void): void {
-    var deviceStateCallback = function(json) {
+    const deviceStateCallback = (json) => {
         deviceStateReceivedCallBack(new OSDeviceState(json));
     };
     window.cordova.exec(deviceStateCallback, function(){}, "OneSignalPush", "getDeviceState", []);
@@ -165,7 +165,7 @@ setLanguage(language: string, onSuccess?: (success: object) => void, onFailure?:
 
 addSubscriptionObserver(observer: (event: ChangeEvent<SubscriptionChange>) => void): void {
     this._subscriptionObserverList.push(observer);
-    var subscriptionCallBackProcessor = function(state) {
+    const subscriptionCallBackProcessor = (state) => {
         this._processFunctionList(this._subscriptionObserverList, new OSSubscriptionStateChanges(state));
     };
     window.cordova.exec(subscriptionCallBackProcessor, function(){}, "OneSignalPush", "addSubscriptionObserver", []);
@@ -173,7 +173,7 @@ addSubscriptionObserver(observer: (event: ChangeEvent<SubscriptionChange>) => vo
 
 addEmailSubscriptionObserver(observer: (event: ChangeEvent<EmailSubscriptionChange>) => void): void {
     this._emailSubscriptionObserverList.push(observer);
-    var emailSubscriptionCallbackProcessor = function(state) {
+    const emailSubscriptionCallbackProcessor = (state) => {
         this._processFunctionList(this._emailSubscriptionObserverList, new OSEmailSubscriptionStateChanges(state));
     };
     window.cordova.exec(emailSubscriptionCallbackProcessor, function(){}, "OneSignalPush", "addEmailSubscriptionObserver", []);
@@ -181,7 +181,7 @@ addEmailSubscriptionObserver(observer: (event: ChangeEvent<EmailSubscriptionChan
 
 addSMSSubscriptionObserver(observer: (event: ChangeEvent<SMSSubscriptionChange>) => void): void {
     this._smsSubscriptionObserverList.push(observer);
-    var smsSubscriptionCallbackProcessor = function(state) {
+    const smsSubscriptionCallbackProcessor = (state) => {
         this._processFunctionList(this._smsSubscriptionObserverList, new OSSMSSubscriptionStateChanges(state));
     };
     window.cordova.exec(smsSubscriptionCallbackProcessor, function(){}, "OneSignalPush", "addSMSSubscriptionObserver", []);
@@ -189,7 +189,7 @@ addSMSSubscriptionObserver(observer: (event: ChangeEvent<SMSSubscriptionChange>)
 
 addPermissionObserver(observer: (event: ChangeEvent<PermissionChange>) => void): void {
     this._permissionObserverList.push(observer);
-    var permissionCallBackProcessor = function(state) {
+    const permissionCallBackProcessor = (state) => {
         this._processFunctionList(this._permissionObserverList, new OSPermissionStateChanges(state));
     };
     window.cordova.exec(permissionCallBackProcessor, function(){}, "OneSignalPush", "addPermissionObserver", []);
@@ -225,7 +225,7 @@ registerForProvisionalAuthorization(handler?: (response: boolean) => void): void
 
 // Only applies to iOS (does nothing on Android as it always silently registers without user permission)
 promptForPushNotificationsWithUserResponse(handler?: (response: boolean) => void): void {
-    var internalCallback = function(data) {
+    const internalCallback = (data) => {
         handler(data.accepted === "true");
     };
     window.cordova.exec(internalCallback, function(){}, "OneSignalPush", "promptForPushNotificationsWithUserResponse", []);
@@ -435,7 +435,7 @@ removeTriggersForKeys(keys: string[]): void {
 };
 
 getTriggerValueForKey(key: string, handler: (value: string) => void): void {
-    var getTriggerValueForKeyCallback = function(obj) {
+    const getTriggerValueForKeyCallback = (obj) => {
         handler(obj.value);
     };
     window.cordova.exec(getTriggerValueForKeyCallback, function() {}, "OneSignalPush", "getTriggerValueForKey", [key]);
@@ -459,7 +459,7 @@ sendOutcome(name: string, handler?: (event: OutcomeEvent) => void): void {
         return;
     }
 
-    const sendOutcomeCallback = function(result) {
+    const sendOutcomeCallback = (result) => {
         handler(result);
     };
 
@@ -476,7 +476,7 @@ sendUniqueOutcome(name: string, handler?: (event: OutcomeEvent) => void): void {
         return;
     }
 
-    const sendUniqueOutcomeCallback = function(result) {
+    const sendUniqueOutcomeCallback = (result) => {
         handler(result);
     };
 
@@ -493,7 +493,7 @@ sendOutcomeWithValue(name: string, value: string|number, handler?: (event: Outco
         return;
     }
 
-    const sendOutcomeWithValueCallback = function(result) {
+    const sendOutcomeWithValueCallback = (result) => {
         handler(result);
     };
 
