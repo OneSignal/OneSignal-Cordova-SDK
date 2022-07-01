@@ -69,6 +69,12 @@ void successCallback(NSString* callbackId, NSDictionary* data) {
     [pluginCommandDelegate sendPluginResult:commandResult callbackId:callbackId];
 }
 
+void successCallbackBoolean(NSString* callbackId, bool param) {
+    CDVPluginResult* commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:param];
+    commandResult.keepCallback = @1;
+    [pluginCommandDelegate sendPluginResult:commandResult callbackId:callbackId];
+}
+
 void failureCallback(NSString* callbackId, NSDictionary* data) {
     CDVPluginResult* commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:data];
     commandResult.keepCallback = @1;
@@ -301,14 +307,14 @@ static Class delegateClass = nil;
 - (void)promptForPushNotificationsWithUserResponse:(CDVInvokedUrlCommand*)command {
    promptForPushNotificationsWithUserResponseCallbackId = command.callbackId;
     [OneSignal promptForPushNotificationsWithUserResponse:^(BOOL accepted) {
-        successCallback(promptForPushNotificationsWithUserResponseCallbackId, @{@"accepted": (accepted ? @"true" : @"false")});
+        successCallbackBoolean(promptForPushNotificationsWithUserResponseCallbackId, accepted);
     }];
 }
 
 - (void)registerForProvisionalAuthorization:(CDVInvokedUrlCommand *)command {
     registerForProvisionalAuthorizationCallbackId = command.callbackId;
     [OneSignal registerForProvisionalAuthorization:^(BOOL accepted) {
-        successCallback(registerForProvisionalAuthorizationCallbackId, @{@"accepted": (accepted ? @"true" : @"false")});
+        successCallbackBoolean(registerForProvisionalAuthorizationCallbackId, accepted);
     }];
 }
 
@@ -343,17 +349,13 @@ static Class delegateClass = nil;
 // Finish Android only
 
 - (void)userProvidedPrivacyConsent:(CDVInvokedUrlCommand *)command {
-    CDVPluginResult* commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:!OneSignal.requiresUserPrivacyConsent];
-    commandResult.keepCallback = @1;
-    [pluginCommandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
+    bool userProvidedPrivacyConsent = !OneSignal.requiresUserPrivacyConsent;
+    successCallbackBoolean(command.callbackId, userProvidedPrivacyConsent);
 }
     
 - (void)requiresUserPrivacyConsent:(CDVInvokedUrlCommand *)command {
     BOOL requiresUserPrivacyConsent = [OneSignal requiresUserPrivacyConsent];
-    NSDictionary *result = @{
-        @"value" : @(requiresUserPrivacyConsent)
-    };
-    successCallback(command.callbackId, result);
+    successCallbackBoolean(command.callbackId, requiresUserPrivacyConsent);
 }
 
 - (void)setRequiresUserPrivacyConsent:(CDVInvokedUrlCommand *)command {
@@ -593,10 +595,7 @@ static Class delegateClass = nil;
 
 - (void)isLocationShared:(CDVInvokedUrlCommand *)command {
     BOOL locationShared = [OneSignal isLocationShared];
-    NSDictionary *result = @{
-        @"value" : @(locationShared)
-    };
-    successCallback(command.callbackId, result);
+    successCallbackBoolean(command.callbackId, locationShared);
 }
 
 @end

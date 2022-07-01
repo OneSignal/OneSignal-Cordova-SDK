@@ -322,9 +322,9 @@ class OneSignalPlugin {
      * @returns void
      */
     promptForPushNotificationsWithUserResponse(handler?: (response: boolean) => void): void {
-        const internalCallback = (data: any) => {
+        const internalCallback = (response: boolean) => {
             if (handler) {
-                handler(data.accepted === "true");
+                handler(response);
             }
         };
         window.cordova.exec(internalCallback, function(){}, "OneSignalPush", "promptForPushNotificationsWithUserResponse", []);
