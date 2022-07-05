@@ -376,19 +376,19 @@ class OneSignalPlugin {
 
     /**
      * Send a notification
-     * @param  {string} notificationObjectString - JSON string payload (see REST API reference)
+     * @param  {object} notificationObject - JSON payload (see REST API reference)
      * @param  {(success:object)=>void} onSuccess
      * @param  {(failure:object)=>void} onFailure
      * @returns void
      */
-    postNotification(notificationObjectString: string, onSuccess?: (success: object) => void, onFailure?: (failure: object) => void): void {
+    postNotification(notificationObject: object, onSuccess?: (success: object) => void, onFailure?: (failure: object) => void): void {
         if (onSuccess == null)
             onSuccess = function() {};
 
         if (onFailure == null)
             onFailure = function() {};
 
-        window.cordova.exec(onSuccess, onFailure, "OneSignalPush", "postNotification", [notificationObjectString]);
+        window.cordova.exec(onSuccess, onFailure, "OneSignalPush", "postNotification", [notificationObject]);
     };
 
     /**

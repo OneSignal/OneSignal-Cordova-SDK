@@ -325,7 +325,7 @@ static Class delegateClass = nil;
 - (void)postNotification:(CDVInvokedUrlCommand*)command {
     postNotificationCallbackId = command.callbackId;
 
-    [OneSignal postNotificationWithJsonString:command.arguments[0]
+    [OneSignal postNotification:command.arguments[0]
         onSuccess:^(NSDictionary* results) {
             successCallback(postNotificationCallbackId, results);
         }
