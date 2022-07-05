@@ -66,8 +66,9 @@ class OneSignalPlugin {
     private _smsSubscriptionObserverList: ((event:ChangeEvent<SMSSubscriptionChange>)=>void)[] = [];
 
     private _processFunctionList<ObserverChangeEvent>(array: ((event:ChangeEvent<ObserverChangeEvent>)=>void)[], param: ChangeEvent<ObserverChangeEvent>): void {
-        for (let i = 0; i < array.length; i++)
+        for (let i = 0; i < array.length; i++) {
             array[i](param);
+        }
     }
 
     /**
@@ -194,11 +195,13 @@ class OneSignalPlugin {
      * @returns void
      */
     setLanguage(language: string, onSuccess?: (success: object) => void, onFailure?: (failure: object) => void): void {
-        if (onSuccess == null)
+        if (onSuccess == null) {
             onSuccess = function() {};
+        }
 
-        if (onFailure == null)
+        if (onFailure == null) {
             onFailure = function() {};
+        }
 
         window.cordova.exec(onSuccess, onFailure, "OneSignalPush", "setLanguage", [language]);
     }
@@ -317,6 +320,7 @@ class OneSignalPlugin {
     };
 
     /**
+     * Only applies to iOS (does nothing on Android).
      * Prompts the iOS user for push notifications.
      * @param  {(response:boolean)=>void} handler
      * @returns void
@@ -382,11 +386,13 @@ class OneSignalPlugin {
      * @returns void
      */
     postNotification(notificationObject: object, onSuccess?: (success: object) => void, onFailure?: (failure: object) => void): void {
-        if (onSuccess == null)
+        if (onSuccess == null) {
             onSuccess = function() {};
+        }
 
-        if (onFailure == null)
+        if (onFailure == null) {
             onFailure = function() {};
+        }
 
         window.cordova.exec(onSuccess, onFailure, "OneSignalPush", "postNotification", [notificationObject]);
     };
@@ -460,11 +466,13 @@ class OneSignalPlugin {
      * @returns void
      */
     setEmail(email: string, authCode?: string, onSuccess?: Function, onFailure?: Function): void {
-        if (onSuccess == null)
+        if (onSuccess == null) {
             onSuccess = function() {};
+        }
 
-        if (onFailure == null)
+        if (onFailure == null) {
             onFailure = function() {};
+        }
 
         if (typeof authCode == 'function') {
             onFailure = onSuccess;
@@ -485,12 +493,13 @@ class OneSignalPlugin {
      * @returns void
      */
     logoutEmail(onSuccess?: Function, onFailure?: Function): void {
-        if (onSuccess == null)
+        if (onSuccess == null) {
             onSuccess = function() {};
+        }
 
-
-        if (onFailure == null)
+        if (onFailure == null) {
             onFailure = function() {};
+        }
 
         window.cordova.exec(onSuccess, onFailure, "OneSignalPush", "logoutEmail", []);
     };
@@ -508,11 +517,13 @@ class OneSignalPlugin {
      * @returns void
      */
     setSMSNumber(smsNumber: string, authCode?: string, onSuccess?: Function, onFailure?: Function): void {
-        if (onSuccess == null)
+        if (onSuccess == null) {
             onSuccess = function() {};
+        }
 
-        if (onFailure == null)
+        if (onFailure == null) {
             onFailure = function() {};
+        }
 
         if (typeof authCode == 'function') {
             onFailure = onSuccess;
@@ -533,12 +544,13 @@ class OneSignalPlugin {
      * @returns void
      */
     logoutSMSNumber(onSuccess?: Function, onFailure?: Function): void {
-        if (onSuccess == null)
+        if (onSuccess == null) {
             onSuccess = function() {};
+        }
 
-
-        if (onFailure == null)
+        if (onFailure == null) {
             onFailure = function() {};
+        }
 
         window.cordova.exec(onSuccess, onFailure, "OneSignalPush", "logoutSMSNumber", []);
     };
@@ -557,8 +569,9 @@ class OneSignalPlugin {
      * @returns void
      */
     setExternalUserId(externalId: string | null, handlerOrAuth?: ((results: object) => void) | string, handler?: (results: object) => void): void {
-        if (externalId == undefined)
+        if (externalId == undefined) {
             externalId = null;
+        }
 
         let externalIdAuthHash = null;
         let callback = (results: object) => {};
@@ -579,14 +592,15 @@ class OneSignalPlugin {
             // Defaults defined above for externalIdAuthHash and callback
         }
         else {
-        // This does not catch all possible wrongly typed params but prevents a good number of them
-        console.error("Invalid param types passed to OneSignalPlugin.setExternalUserId(). Definition is setExternalUserId(externalId: string?, externalIdAuthHash: string?, callback?: function): void")
-        return;
+            // This does not catch all possible wrongly typed params but prevents a good number of them
+            console.error("Invalid param types passed to OneSignalPlugin.setExternalUserId(). Definition is setExternalUserId(externalId: string?, externalIdAuthHash: string?, callback?: function): void")
+            return;
         }
 
         var passToNativeParams = [externalId];
-        if (externalIdAuthHash !== null)
+        if (externalIdAuthHash !== null) {
             passToNativeParams.push(externalIdAuthHash)
+        }
         window.cordova.exec(callback, function() {}, "OneSignalPush", "setExternalUserId", passToNativeParams);
     };
 
@@ -647,7 +661,7 @@ class OneSignalPlugin {
      * @returns void
      */
     removeTriggersForKeys(keys: string[]): void {
-        if (!Array.isArray(keys)){
+        if (!Array.isArray(keys)) {
             console.error("OneSignal: removeTriggersForKeys: argument must be of type Array")
         }
         window.cordova.exec(function() {}, function() {}, "OneSignalPush", "removeTriggersForKeys", [keys]);

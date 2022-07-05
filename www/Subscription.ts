@@ -24,7 +24,7 @@ export class DeviceState {
         this.emailAddress = deviceState.emailAddress;
         this.smsUserId = deviceState.smsUserId;
         this.smsNumber = deviceState.smsNumber;
-        // rename the subscrbied properties to align with existing type definition
+        // rename the subscribed properties to align with existing type definition
         this.pushDisabled = deviceState.isPushDisabled;
         this.subscribed = deviceState.isSubscribed;
         this.emailSubscribed = deviceState.isEmailSubscribed;
@@ -46,7 +46,7 @@ export interface ChangeEvent<ObserverChangeEvent> {
 export type ObserverChangeEvent = PermissionChange | SubscriptionChange | EmailSubscriptionChange | SMSSubscriptionChange
 
 export interface PermissionChange {
-    status                  : PermissionStatus; 
+    status                  : PermissionStatus;
     hasPrompted             ?: boolean;   // ios
     provisional             ?: boolean;   // ios
 }

@@ -4,7 +4,7 @@ declare let cordova: any;
 export default class NotificationReceivedEvent {
     private notification: OSNotification;
 
-    constructor(receivedEvent: OSNotification){
+    constructor(receivedEvent: OSNotification) {
         this.notification = new OSNotification(receivedEvent);
     }
 
