@@ -475,11 +475,14 @@ static Class delegateClass = nil;
 
 - (void)setInAppMessageClickHandler:(CDVInvokedUrlCommand*)command {
     [OneSignal setInAppMessageClickHandler:^(OSInAppMessageAction* action) {
+            NSDictionary *actionDict = [action jsonRepresentation];
             NSDictionary *result = @{
                 @"clickName": action.clickName ?: [NSNull null],
                 @"clickUrl" : action.clickUrl.absoluteString ?: [NSNull null],
                 @"firstClick" : @(action.firstClick),
-                @"closesMessage" : @(action.closesMessage)
+                @"closesMessage" : @(action.closesMessage),
+                @"outcomes" : actionDict[@"outcomes"] ?: [NSNull null],
+                @"tags" : actionDict[@"tags"] ?: [NSNull null]
             };
             successCallback(command.callbackId, result);
         }

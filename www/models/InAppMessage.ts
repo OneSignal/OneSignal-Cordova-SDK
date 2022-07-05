@@ -3,6 +3,8 @@ export interface InAppMessageAction {
     firstClick     : boolean;
     clickName      ?: string;
     clickUrl       ?: string;
+    outcomes       ?: object[];
+    tags           ?: object;
 }
 
 export interface OSInAppMessage {

@@ -519,6 +519,8 @@ public class OneSignalPush extends CordovaPlugin {
         }
         actionJSON.put("clickName", resultJSON.optString("click_name", null));
         actionJSON.put("clickUrl", resultJSON.optString("click_url", null));
+        actionJSON.put("outcomes", resultJSON.optJSONArray("outcomes"));
+        actionJSON.put("tags", resultJSON.optJSONObject("tags"));
 
         CallbackHelper.callbackSuccess(jsInAppMessageClickedCallback, actionJSON);
       }
