@@ -91,8 +91,6 @@ class OneSignalPlugin {
         this._notificationWillShowInForegroundDelegate = handler;
 
         const foregroundParsingHandler = (notificationReceived: OSNotification) => {
-
-            console.log("foregroundParsingHandler " + JSON.stringify(notificationReceived));
             this._notificationWillShowInForegroundDelegate(new NotificationReceivedEvent(notificationReceived));
         };
 
@@ -560,8 +558,8 @@ class OneSignalPlugin {
      *
      * Possible function usages:
      * setExternalUserId(externalId: string?): void
-     * setExternalUserId(externalId: string?, callback: function): void
-     * setExternalUserId(externalId: string?, externalIdAuthHash: string?, callback: function): void
+     * setExternalUserId(externalId: string?, handler: function?): void
+     * setExternalUserId(externalId: string?, externalIdAuthCode: string?, handler: function?): void
      *
      * @param  {string} externalId
      * @param  {string} externalIdAuthCode
@@ -577,11 +575,11 @@ class OneSignalPlugin {
         let callback = (results: object) => {};
 
         if (typeof handlerOrAuth === "function") {
-            // Method was called like setExternalUserId(externalId: string?, callback: function)
+            // Method was called like setExternalUserId(externalId: string?, handler: function)
             callback = handlerOrAuth;
         }
         else if (typeof handlerOrAuth === "string") {
-            // Method was called like setExternalUserId(externalId: string?, externalIdAuthHash: string?, callback: function)
+            // Method was called like setExternalUserId(externalId: string?, externalIdAuthCode: string?, handler: function)
             externalIdAuthHash = handlerOrAuth;
             if (handler) {
                 callback = handler;
@@ -593,11 +591,11 @@ class OneSignalPlugin {
         }
         else {
             // This does not catch all possible wrongly typed params but prevents a good number of them
-            console.error("Invalid param types passed to OneSignalPlugin.setExternalUserId(). Definition is setExternalUserId(externalId: string?, externalIdAuthHash: string?, callback?: function): void")
+            console.error("OneSignal: setExternalUserId: Invalid param types. Definition is setExternalUserId(externalId: string?, externalIdAuthCode: string?, handler: function?): void")
             return;
         }
 
-        var passToNativeParams = [externalId];
+        const passToNativeParams = [externalId];
         if (externalIdAuthHash !== null) {
             passToNativeParams.push(externalIdAuthHash)
         }
