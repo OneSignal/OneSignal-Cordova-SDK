@@ -81,6 +81,20 @@ void failureCallback(NSString* callbackId, NSDictionary* data) {
     [pluginCommandDelegate sendPluginResult:commandResult callbackId:callbackId];
 }
 
+// Helper method to rename a property of subscription state changes.
+// Currently used by email and SMS state changes to rename the `isSubscribed` key.
+NSDictionary* renameStateChangesKey(NSDictionary* oldFrom, NSDictionary* oldTo, NSString* oldKey, NSString* newKey) {
+    NSMutableDictionary *from = [oldFrom mutableCopy];
+    [from setObject: [from objectForKey: oldKey] forKey: newKey];
+    [from removeObjectForKey: oldKey];
+
+    NSMutableDictionary *to = [oldTo mutableCopy];
+    [to setObject: [to objectForKey: oldKey] forKey: newKey];
+    [to removeObjectForKey: oldKey];
+
+    return @{@"from": from, @"to": to};
+}
+
 void processNotificationWillShowInForeground(OSNotification* _notif) {
     NSString * data = [_notif stringify];
     NSError *jsonError;
@@ -177,11 +191,23 @@ static Class delegateClass = nil;
 }
 
 - (void)onOSEmailSubscriptionChanged:(OSEmailSubscriptionStateChanges *)stateChanges {
-    successCallback(emailSubscriptionCallbackId, [stateChanges toDictionary]);
+    NSDictionary *result = renameStateChangesKey(
+        [stateChanges.from toDictionary],
+        [stateChanges.to toDictionary],
+        @"isSubscribed",
+        @"isEmailSubscribed"
+    );
+    successCallback(emailSubscriptionCallbackId, result);
 }
 
 - (void)onOSSMSSubscriptionChanged:(OSSMSSubscriptionStateChanges *)stateChanges {
-    successCallback(smsSubscriptionCallbackId, [stateChanges toDictionary]);
+    NSDictionary *result = renameStateChangesKey(
+        [stateChanges.from toDictionary],
+        [stateChanges.to toDictionary],
+        @"isSubscribed",
+        @"isSMSSubscribed"
+    );
+    successCallback(smsSubscriptionCallbackId, result);
 }
 
 - (void)setProvidesNotificationSettingsView:(CDVInvokedUrlCommand *)command {
