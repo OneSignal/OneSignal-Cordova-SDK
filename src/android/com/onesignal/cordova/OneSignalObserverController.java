@@ -39,6 +39,23 @@ public class OneSignalObserverController {
     callbackContext.sendPluginResult(pluginResult);
   }
 
+  // Helper method to rename a property of subscription state changes.
+  // Currently used by email and SMS state changes to rename the `isSubscribed` key.
+  private static JSONObject renameStateChangesKey(JSONObject fromJSON, JSONObject toJSON, String oldKey, String newKey) {
+    JSONObject modifiedObj = new JSONObject();
+    try {
+      fromJSON.put(newKey, fromJSON.getBoolean(oldKey));
+      fromJSON.remove(oldKey);
+      toJSON.put(newKey, toJSON.getBoolean(oldKey));
+      toJSON.remove(oldKey);
+      modifiedObj.put("from", fromJSON);
+      modifiedObj.put("to", toJSON);
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return modifiedObj;
+  }
+
   public static boolean addPermissionObserver(CallbackContext callbackContext) {
     jsPermissionObserverCallBack = callbackContext;
     if (permissionObserver == null) {
@@ -89,7 +106,13 @@ public class OneSignalObserverController {
         emailSubscriptionObserver = new OSEmailSubscriptionObserver() {
           @Override
           public void onOSEmailSubscriptionChanged(OSEmailSubscriptionStateChanges stateChanges) {
-            callbackSuccess(jsEmailSubscriptionObserverCallBack, stateChanges.toJSONObject());
+            JSONObject fromJSON = stateChanges.getFrom().toJSONObject();
+            JSONObject toJSON = stateChanges.getTo().toJSONObject();
+
+            // rename the isSubscribed property to isEmailSubscribed
+            JSONObject modifiedObj = renameStateChangesKey(fromJSON, toJSON, "isSubscribed", "isEmailSubscribed");
+
+            callbackSuccess(jsEmailSubscriptionObserverCallBack, modifiedObj);
           }
         };
         OneSignal.addEmailSubscriptionObserver(emailSubscriptionObserver);
@@ -103,7 +126,13 @@ public class OneSignalObserverController {
         smsSubscriptionObserver = new OSSMSSubscriptionObserver() {
           @Override
           public void onSMSSubscriptionChanged(OSSMSSubscriptionStateChanges stateChanges) {
-            callbackSuccess(jsSMSSubscriptionObserverCallBack, stateChanges.toJSONObject());
+            JSONObject fromJSON = stateChanges.getFrom().toJSONObject();
+            JSONObject toJSON = stateChanges.getTo().toJSONObject();
+
+            // rename the isSubscribed property to isSMSSubscribed
+            JSONObject modifiedObj = renameStateChangesKey(fromJSON, toJSON, "isSubscribed", "isSMSSubscribed");
+
+            callbackSuccess(jsSMSSubscriptionObserverCallBack, modifiedObj);
           }
         };
         OneSignal.addSMSSubscriptionObserver(smsSubscriptionObserver);
