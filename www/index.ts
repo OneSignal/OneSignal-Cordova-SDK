@@ -636,10 +636,10 @@ class OneSignalPlugin {
     /**
      * Add an In-App Message Trigger.
      * @param  {string} key
-     * @param  {string} value
+     * @param  {string | number | boolean} value
      * @returns void
      */
-    addTrigger(key: string, value: string): void {
+    addTrigger(key: string, value: string | number | boolean): void {
         const obj = {[key]: value};
         this.addTriggers(obj);
     };

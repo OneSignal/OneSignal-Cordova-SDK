@@ -199,6 +199,12 @@ export default class OSNotification {
         }
 
         /// (iOS Only)
+        /// iOS 10+ : Groups notifications into threads
+        if (receivedEvent.threadId) {
+            this.threadId = receivedEvent.threadId;
+        }
+
+        /// (iOS Only)
         /// The subtitle of the notification
         if (receivedEvent.subtitle) {
             this.subtitle = receivedEvent.subtitle;
