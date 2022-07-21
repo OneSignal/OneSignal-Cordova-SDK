@@ -310,10 +310,11 @@ class OneSignalPlugin {
      *
      * For more information: https://documentation.onesignal.com/docs/ios-customizations#provisional-push-notifications
      *
-     * @param  {(response:boolean)=>void} handler
+     * @param  {(response:{accepted:boolean})=>void} handler
      * @returns void
      */
-    registerForProvisionalAuthorization(handler?: (response: boolean) => void): void {
+    registerForProvisionalAuthorization(handler?: (response: { accepted: boolean }) => void): void {
+        // TODO: Update the response in next major release to just boolean
         window.cordova.exec(handler, function(){}, "OneSignalPush", "registerForProvisionalAuthorization", []);
     };
 
@@ -426,10 +427,13 @@ class OneSignalPlugin {
 
     /**
      * True if the application requires user privacy consent, false otherwise
-     * @param  {(response: boolean) => void} handler
+     * Passes a boolean on Android and passes an object on iOS to the handler.
+     *
+     * @param  {(response: boolean | {value: boolean}) => void} handler
      * @returns void
      */
-    requiresUserPrivacyConsent(handler: (response: boolean) => void): void {
+    requiresUserPrivacyConsent(handler: (response: boolean | { value: boolean }) => void): void {
+        // TODO: Update the response in next major release to just boolean
         window.cordova.exec(handler, function(){}, "OneSignalPush", "requiresUserPrivacyConsent", []);
     };
 
@@ -773,10 +777,13 @@ class OneSignalPlugin {
 
     /**
      * True if the application has location share activated, false otherwise
-     * @param  {(response: boolean) => void} handler
+     * Passes a boolean on Android and passes an object on iOS to the handler.
+     *
+     * @param  {(response: boolean | {value: boolean}) => void} handler
      * @returns void
      */
-    isLocationShared(handler: (response: boolean) => void): void {
+    isLocationShared(handler: (response: boolean | { value: boolean }) => void): void {
+        // TODO: Update the response in next major release to just boolean
         window.cordova.exec(handler, function() {}, "OneSignalPush", "isLocationShared", []);
     };
 }

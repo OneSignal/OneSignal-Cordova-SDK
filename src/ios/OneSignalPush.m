@@ -314,7 +314,8 @@ static Class delegateClass = nil;
 - (void)registerForProvisionalAuthorization:(CDVInvokedUrlCommand *)command {
     registerForProvisionalAuthorizationCallbackId = command.callbackId;
     [OneSignal registerForProvisionalAuthorization:^(BOOL accepted) {
-        successCallbackBoolean(registerForProvisionalAuthorizationCallbackId, accepted);
+        // TODO: Update the response in next major release to just boolean
+        successCallback(registerForProvisionalAuthorizationCallbackId, @{@"accepted": (accepted ? @"true" : @"false")});
     }];
 }
 
@@ -356,7 +357,8 @@ static Class delegateClass = nil;
 
 - (void)requiresUserPrivacyConsent:(CDVInvokedUrlCommand *)command {
     BOOL requiresUserPrivacyConsent = [OneSignal requiresUserPrivacyConsent];
-    successCallbackBoolean(command.callbackId, requiresUserPrivacyConsent);
+    // TODO: Update the response in next major release to just boolean
+    successCallback(command.callbackId, @{@"value" : @(requiresUserPrivacyConsent)});
 }
 
 - (void)setRequiresUserPrivacyConsent:(CDVInvokedUrlCommand *)command {
@@ -599,7 +601,8 @@ static Class delegateClass = nil;
 
 - (void)isLocationShared:(CDVInvokedUrlCommand *)command {
     BOOL locationShared = [OneSignal isLocationShared];
-    successCallbackBoolean(command.callbackId, locationShared);
+    // TODO: Update the response in next major release to just boolean
+    successCallback(command.callbackId, @{@"value" : @(locationShared)});
 }
 
 @end
