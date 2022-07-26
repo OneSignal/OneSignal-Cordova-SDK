@@ -334,7 +334,7 @@ static Class delegateClass = nil;
    promptForPushNotificationsWithUserResponseCallbackId = command.callbackId;
     [OneSignal promptForPushNotificationsWithUserResponse:^(BOOL accepted) {
         successCallbackBoolean(promptForPushNotificationsWithUserResponseCallbackId, accepted);
-    }];
+    } fallbackToSettings:[command.arguments[0] boolValue]];
 }
 
 - (void)registerForProvisionalAuthorization:(CDVInvokedUrlCommand *)command {
