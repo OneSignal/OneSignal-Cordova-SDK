@@ -319,7 +319,8 @@ class OneSignalPlugin {
 
     /**
      * Prompts the user for push notifications permission in iOS and Android 13+.
-     * In lower Android versions, it will return false, since notification permission is by default given.
+     * Use the fallbackToSettings parameter to prompt to open the settings app if a user has already declined push permissions.
+     *
      * Call with promptForPushNotificationsWithUserResponse(fallbackToSettings?, handler?)
      *
      * @param  {boolean} fallbackToSettings
