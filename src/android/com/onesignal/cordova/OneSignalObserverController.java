@@ -4,6 +4,7 @@ import org.apache.cordova.CallbackContext;
 
 import org.apache.cordova.PluginResult;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.onesignal.OneSignal;
@@ -44,7 +45,23 @@ public class OneSignalObserverController {
       permissionObserver = new OSPermissionObserver() {
         @Override
         public void onOSPermissionChanged(OSPermissionStateChanges stateChanges) {
-          callbackSuccess(jsPermissionObserverCallBack, stateChanges.toJSONObject());
+          JSONObject fromJSON = stateChanges.getFrom().toJSONObject();
+          JSONObject toJSON = stateChanges.getTo().toJSONObject();
+          JSONObject modifiedObj = new JSONObject();
+
+          try {
+            // convert areNotificationsEnabled to status of type PermissionStatus
+            fromJSON.put("status", fromJSON.getBoolean("areNotificationsEnabled") ? 2 : 1);
+            fromJSON.remove("areNotificationsEnabled");
+            toJSON.put("status", toJSON.getBoolean("areNotificationsEnabled") ? 2 : 1);
+            toJSON.remove("areNotificationsEnabled");
+
+            modifiedObj.put("from", fromJSON);
+            modifiedObj.put("to", toJSON);
+          } catch (JSONException e) {
+            e.printStackTrace();
+          }
+          callbackSuccess(jsPermissionObserverCallBack, modifiedObj);
         }
       };
       OneSignal.addPermissionObserver(permissionObserver);

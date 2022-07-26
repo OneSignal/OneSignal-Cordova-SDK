@@ -1,6 +1,6 @@
 /**
  * Modified MIT License
- * 
+ *
  * Copyright 2021 OneSignal
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -9,13 +9,13 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * 1. The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * 2. All copies of substantial portions of the Software may only be used in connection
  * with services provided by OneSignal.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -69,6 +69,12 @@ void successCallback(NSString* callbackId, NSDictionary* data) {
     [pluginCommandDelegate sendPluginResult:commandResult callbackId:callbackId];
 }
 
+void successCallbackBoolean(NSString* callbackId, bool param) {
+    CDVPluginResult* commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:param];
+    commandResult.keepCallback = @1;
+    [pluginCommandDelegate sendPluginResult:commandResult callbackId:callbackId];
+}
+
 void failureCallback(NSString* callbackId, NSDictionary* data) {
     CDVPluginResult* commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:data];
     commandResult.keepCallback = @1;
@@ -115,14 +121,14 @@ static void injectSelector(Class newClass, SEL newSel, Class addToClass, SEL mak
     Method newMeth = class_getInstanceMethod(newClass, newSel);
     IMP imp = method_getImplementation(newMeth);
     const char* methodTypeEncoding = method_getTypeEncoding(newMeth);
-    
+
     BOOL successful = class_addMethod(addToClass, makeLikeSel, imp, methodTypeEncoding);
     if (!successful) {
         class_addMethod(addToClass, newSel, imp, methodTypeEncoding);
         newMeth = class_getInstanceMethod(addToClass, newSel);
-        
+
         Method orgMeth = class_getInstanceMethod(addToClass, makeLikeSel);
-        
+
         method_exchangeImplementations(orgMeth, newMeth);
     }
 }
@@ -137,7 +143,7 @@ static Class delegateClass = nil;
     if(delegateClass != nil)
         return;
     delegateClass = [delegate class];
-    
+
     injectSelector(self.class, @selector(oneSignalApplication:didFinishLaunchingWithOptions:),
                    delegateClass, @selector(application:didFinishLaunchingWithOptions:));
     [self setOneSignalCordovaDelegate:delegate];
@@ -145,7 +151,7 @@ static Class delegateClass = nil;
 
 - (BOOL)oneSignalApplication:(UIApplication*)application didFinishLaunchingWithOptions:(NSDictionary*)launchOptions {
     initOneSignalObject(launchOptions, nil);
-    
+
     if ([self respondsToSelector:@selector(oneSignalApplication:didFinishLaunchingWithOptions:)])
         return [self oneSignalApplication:application didFinishLaunchingWithOptions:launchOptions];
     return YES;
@@ -185,7 +191,7 @@ static Class delegateClass = nil;
 
 - (void)setNotificationWillShowInForegroundHandler:(CDVInvokedUrlCommand*)command {
     notificationWillShowInForegoundCallbackId = command.callbackId;
-    
+
     [OneSignal setNotificationWillShowInForegroundHandler:^(OSNotification *notification, OSNotificationDisplayResponse completion) {
         self.receivedNotificationCache[notification.notificationId] = notification;
         self.notificationCompletionCache[notification.notificationId] = completion;
@@ -195,7 +201,7 @@ static Class delegateClass = nil;
 
 - (void)setNotificationOpenedHandler:(CDVInvokedUrlCommand*)command {
     notificationOpenedCallbackId = command.callbackId;
-    
+
     [OneSignal setNotificationOpenedHandler:^(OSNotificationOpenedResult * _Nonnull result) {
         actionNotification = result;
         if (pluginCommandDelegate)
@@ -207,7 +213,7 @@ static Class delegateClass = nil;
     NSString *notificationId = command.arguments[0];
     BOOL shouldDisplay = [command.arguments[1] boolValue];
     OSNotificationDisplayResponse completion = self.notificationCompletionCache[notificationId];
-    
+
     if (!completion) {
         [OneSignal onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"OneSignal (objc): could not find notification completion block with id: %@", notificationId]];
         return;
@@ -232,7 +238,7 @@ static Class delegateClass = nil;
 
     NSString* appId = (NSString*)command.arguments[0];
     initOneSignalObject(nil, [appId UTF8String]);
-    
+
     if (actionNotification)
         processNotificationOpened(actionNotification);
 }
@@ -243,7 +249,7 @@ static Class delegateClass = nil;
 
 - (void)setLanguage:(CDVInvokedUrlCommand*)command {
     setLanguageCallbackId = command.callbackId;
-    
+
     [OneSignal setLanguage:command.arguments[0] withSuccess:^{
         successCallback(setLanguageCallbackId, nil);
     } withFailure:^(NSError *error) {
@@ -296,18 +302,19 @@ static Class delegateClass = nil;
 
 - (void)deleteTags:(CDVInvokedUrlCommand*)command {
     [OneSignal deleteTags:command.arguments];
-}   
+}
 
 - (void)promptForPushNotificationsWithUserResponse:(CDVInvokedUrlCommand*)command {
    promptForPushNotificationsWithUserResponseCallbackId = command.callbackId;
     [OneSignal promptForPushNotificationsWithUserResponse:^(BOOL accepted) {
-        successCallback(promptForPushNotificationsWithUserResponseCallbackId, @{@"accepted": (accepted ? @"true" : @"false")});
+        successCallbackBoolean(promptForPushNotificationsWithUserResponseCallbackId, accepted);
     }];
 }
 
 - (void)registerForProvisionalAuthorization:(CDVInvokedUrlCommand *)command {
     registerForProvisionalAuthorizationCallbackId = command.callbackId;
     [OneSignal registerForProvisionalAuthorization:^(BOOL accepted) {
+        // TODO: Update the response in next major release to just boolean
         successCallback(registerForProvisionalAuthorizationCallbackId, @{@"accepted": (accepted ? @"true" : @"false")});
     }];
 }
@@ -342,18 +349,16 @@ static Class delegateClass = nil;
 - (void)removeGroupedNotifications:(CDVInvokedUrlCommand *)command {}
 // Finish Android only
 
+// Note: This implementation may not be accurate, as this method doesn't seem to exist in iOS
 - (void)userProvidedPrivacyConsent:(CDVInvokedUrlCommand *)command {
-    CDVPluginResult* commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:!OneSignal.requiresUserPrivacyConsent];
-    commandResult.keepCallback = @1;
-    [pluginCommandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
+    bool userProvidedPrivacyConsent = !OneSignal.requiresUserPrivacyConsent;
+    successCallbackBoolean(command.callbackId, userProvidedPrivacyConsent);
 }
-    
+
 - (void)requiresUserPrivacyConsent:(CDVInvokedUrlCommand *)command {
     BOOL requiresUserPrivacyConsent = [OneSignal requiresUserPrivacyConsent];
-    NSDictionary *result = @{
-        @"value" : @(requiresUserPrivacyConsent)
-    };
-    successCallback(command.callbackId, result);
+    // TODO: Update the response in next major release to just boolean
+    successCallback(command.callbackId, @{@"value" : @(requiresUserPrivacyConsent)});
 }
 
 - (void)setRequiresUserPrivacyConsent:(CDVInvokedUrlCommand *)command {
@@ -368,10 +373,10 @@ static Class delegateClass = nil;
 
 - (void)setEmail:(CDVInvokedUrlCommand *)command {
     setEmailCallbackId = command.callbackId;
-    
+
     NSString *email = command.arguments[0];
     NSString *emailAuthToken = command.arguments[1];
-    
+
     [OneSignal setEmail:email withEmailAuthHashToken:emailAuthToken withSuccess:^{
         successCallback(setEmailCallbackId, nil);
     } withFailure:^(NSError *error) {
@@ -381,9 +386,9 @@ static Class delegateClass = nil;
 
 - (void)setUnauthenticatedEmail:(CDVInvokedUrlCommand *)command {
     setUnauthenticatedEmailCallbackId = command.callbackId;
-    
+
     NSString *email = command.arguments[0];
-    
+
     [OneSignal setEmail:email withSuccess:^{
         successCallback(setUnauthenticatedEmailCallbackId, nil);
     } withFailure:^(NSError *error) {
@@ -393,7 +398,7 @@ static Class delegateClass = nil;
 
 - (void)logoutEmail:(CDVInvokedUrlCommand *)command {
     logoutEmailCallbackId = command.callbackId;
-    
+
     [OneSignal logoutEmailWithSuccess:^{
         successCallback(logoutEmailCallbackId, nil);
     } withFailure:^(NSError *error) {
@@ -403,7 +408,7 @@ static Class delegateClass = nil;
 
 - (void)setSMSNumber:(CDVInvokedUrlCommand *)command {
     setSMSNumberCallbackId = command.callbackId;
-    
+
     NSString *smsNumber = command.arguments[0];
     NSString *smsAuthHashToken = command.arguments[1];
 
@@ -416,9 +421,9 @@ static Class delegateClass = nil;
 
 - (void)setUnauthenticatedSMSNumber:(CDVInvokedUrlCommand *)command {
     setUnauthenticatedSMSNumberCallbackId = command.callbackId;
-    
+
     NSString *smsNumber = command.arguments[0];
-    
+
     [OneSignal setSMSNumber:smsNumber withSuccess:^(NSDictionary *results){
         successCallback(setUnauthenticatedSMSNumberCallbackId, results);
     } withFailure:^(NSError *error) {
@@ -473,11 +478,14 @@ static Class delegateClass = nil;
 
 - (void)setInAppMessageClickHandler:(CDVInvokedUrlCommand*)command {
     [OneSignal setInAppMessageClickHandler:^(OSInAppMessageAction* action) {
+            NSDictionary *actionDict = [action jsonRepresentation];
             NSDictionary *result = @{
-                @"click_name": action.clickName ?: [NSNull null],
-                @"click_url" : action.clickUrl.absoluteString ?: [NSNull null],
-                @"first_click" : @(action.firstClick),
-                @"closes_message" : @(action.closesMessage)
+                @"clickName": action.clickName ?: [NSNull null],
+                @"clickUrl" : action.clickUrl.absoluteString ?: [NSNull null],
+                @"firstClick" : @(action.firstClick),
+                @"closesMessage" : @(action.closesMessage),
+                @"outcomes" : actionDict[@"outcomes"] ?: [NSNull null],
+                @"tags" : actionDict[@"tags"] ?: [NSNull null]
             };
             successCallback(command.callbackId, result);
         }
@@ -593,10 +601,8 @@ static Class delegateClass = nil;
 
 - (void)isLocationShared:(CDVInvokedUrlCommand *)command {
     BOOL locationShared = [OneSignal isLocationShared];
-    NSDictionary *result = @{
-        @"value" : @(locationShared)
-    };
-    successCallback(command.callbackId, result);
+    // TODO: Update the response in next major release to just boolean
+    successCallback(command.callbackId, @{@"value" : @(locationShared)});
 }
 
 @end

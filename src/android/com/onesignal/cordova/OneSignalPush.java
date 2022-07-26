@@ -39,6 +39,7 @@ import com.onesignal.OneSignal;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
+import org.json.JSONObject;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -469,7 +470,7 @@ public class OneSignalPush extends CordovaPlugin {
         OSNotification notification = notificationReceivedEvent.getNotification();
         notificationReceivedEventCache.put(notification.getNotificationId(), notificationReceivedEvent);
 
-        CallbackHelper.callbackSuccess(jsNotificationInForegroundCallBack, notificationReceivedEvent.toJSONObject());
+        CallbackHelper.callbackSuccess(jsNotificationInForegroundCallBack, notification.toJSONObject());
       } catch (Throwable t) {
         t.printStackTrace();
       }
@@ -506,10 +507,25 @@ public class OneSignalPush extends CordovaPlugin {
     @Override
     public void inAppMessageClicked(OSInAppMessageAction result) {
       try {
-        CallbackHelper.callbackSuccess(jsInAppMessageClickedCallback, result.toJSONObject());
+        JSONObject resultJSON = result.toJSONObject();
+        JSONObject actionJSON = new JSONObject();
+
+        // Convert key names to camelCase, which is the expected type
+        if (resultJSON.has("first_click")) {
+          actionJSON.put("firstClick", resultJSON.getBoolean("first_click"));
+        }
+        if (resultJSON.has("closes_message")) {
+          actionJSON.put("closesMessage", resultJSON.getBoolean("closes_message"));
+        }
+        actionJSON.put("clickName", resultJSON.optString("click_name", null));
+        actionJSON.put("clickUrl", resultJSON.optString("click_url", null));
+        actionJSON.put("outcomes", resultJSON.optJSONArray("outcomes"));
+        actionJSON.put("tags", resultJSON.optJSONObject("tags"));
+
+        CallbackHelper.callbackSuccess(jsInAppMessageClickedCallback, actionJSON);
       }
-      catch (Throwable t) {
-        t.printStackTrace();
+      catch (JSONException e) {
+        e.printStackTrace();
       }
     }
   }
