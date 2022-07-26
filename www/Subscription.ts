@@ -62,12 +62,12 @@ export interface SubscriptionChange {
 export interface EmailSubscriptionChange {
     emailAddress        ?: string;
     emailUserId         ?: string;
-    isSubscribed        : boolean; // don't rename to isEmailSubscribed
+    isEmailSubscribed   : boolean; // renamed from isSubscribed
 }
 
 /// Represents the user's OneSignal SMS subscription state,
 export interface SMSSubscriptionChange {
     smsNumber         ?: string;
     smsUserId         ?: string;
-    isSubscribed      : boolean; // don't rename to isSMSSubscribed
+    isSMSSubscribed   : boolean; // renamed from isSubscribed
 }
