@@ -30,7 +30,7 @@
   <js-module src="dist/OSNotification.js" name="OSNotification" />
 
   <platform name="android">
-    <framework src="com.onesignal:OneSignal:4.7.3" />
+    <framework src="com.onesignal:OneSignal:4.8.1" />
     <framework src="build-extras-onesignal.gradle" custom="true" type="gradleReference" />
 
     <config-file target="res/xml/config.xml" parent="/*">
