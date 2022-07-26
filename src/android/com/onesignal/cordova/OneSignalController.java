@@ -182,8 +182,21 @@ public class OneSignalController {
     return true;
   }
 
-  public static boolean promptForPushNotificationsWithUserResponse() {
-    // doesn't apply to Android
+  public static boolean promptForPushNotificationsWithUserResponse(CallbackContext callbackContext, JSONArray data) {
+    final CallbackContext jsPromptForPushNotificationsCallback = callbackContext;
+    boolean fallbackToSettings = false;
+    try {
+      fallbackToSettings = data.getBoolean(0);
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+
+    OneSignal.promptForPushNotifications(fallbackToSettings, new OneSignal.PromptForPushNotificationPermissionResponseHandler() {
+      @Override
+      public void response(boolean accepted) {
+        CallbackHelper.callbackSuccessBoolean(callbackContext, accepted);
+      }
+    });
     return true;
   }
 
