@@ -293,7 +293,7 @@ public class OneSignalPush extends CordovaPlugin {
         break;
 
       case PROMPT_FOR_PUSH_NOTIFICATIONS_WITH_USER_RESPONSE:
-        result = OneSignalController.promptForPushNotificationsWithUserResponse();
+        result = OneSignalController.promptForPushNotificationsWithUserResponse(callbackContext, data);
         break;
 
       case UNSUBSCRIBE_WHEN_NOTIFICATIONS_DISABLED:

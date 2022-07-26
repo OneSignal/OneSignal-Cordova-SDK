@@ -318,18 +318,33 @@ class OneSignalPlugin {
     };
 
     /**
-     * Only applies to iOS (does nothing on Android).
-     * Prompts the iOS user for push notifications.
+     * Prompts the user for push notifications permission in iOS and Android 13+.
+     * In lower Android versions, it will return false, since notification permission is by default given.
+     * Call with promptForPushNotificationsWithUserResponse(fallbackToSettings?, handler?)
+     *
+     * @param  {boolean} fallbackToSettings
      * @param  {(response:boolean)=>void} handler
      * @returns void
      */
-    promptForPushNotificationsWithUserResponse(handler?: (response: boolean) => void): void {
+    promptForPushNotificationsWithUserResponse(fallbackToSettingsOrHandler?: boolean | ((response: boolean) => void), handler?: (response: boolean) => void): void {
+        var fallbackToSettings = false;
+
+        if (typeof fallbackToSettingsOrHandler === "function") {
+            // Method was called like promptForPushNotificationsWithUserResponse(handler: function)
+            handler = fallbackToSettingsOrHandler;
+        }
+        else if (typeof fallbackToSettingsOrHandler === "boolean") {
+            // Method was called like promptForPushNotificationsWithUserResponse(fallbackToSettings: boolean, handler?: function)
+            fallbackToSettings = fallbackToSettingsOrHandler;
+        }
+        // Else method was called like promptForPushNotificationsWithUserResponse(), no need to modify
+
         const internalCallback = (response: boolean) => {
             if (handler) {
                 handler(response);
             }
         };
-        window.cordova.exec(internalCallback, function(){}, "OneSignalPush", "promptForPushNotificationsWithUserResponse", []);
+        window.cordova.exec(internalCallback, function(){}, "OneSignalPush", "promptForPushNotificationsWithUserResponse", [fallbackToSettings]);
     };
 
     /**
