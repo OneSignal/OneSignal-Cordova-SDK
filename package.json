@@ -9,7 +9,7 @@
   "scripts": {
     "prepare": "install-peers && yarn run build",
     "build": "tsc",
-    "lint": "eslint src --ext .js,.jsx,.ts,.tsx; prettier --check src",
+    "lint": "eslint src www --ext .js,.jsx,.ts,.tsx; prettier --check src www",
     "test": "tsc && jest --coverage"
   },
   "devDependencies": {
