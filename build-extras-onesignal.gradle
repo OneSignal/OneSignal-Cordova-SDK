@@ -12,19 +12,6 @@ repositories {
   maven { url 'https://maven.google.com' }
 }
 
-// Adding Onesignal-Gradle-Plugin to align gms, android support library, and firebase
-//   dependencies between other plugins.
-// Source for Onesignal-Gradle-Plugin: https://github.com/OneSignal/OneSignal-Gradle-Plugin
-buildscript {
-  repositories {
-    maven { url 'https://plugins.gradle.org/m2/'}
-  }
-  dependencies {
-    classpath 'gradle.plugin.com.onesignal:onesignal-gradle-plugin:[0.12.3, 0.99.99]'
-  }
-}
-apply plugin: com.onesignal.androidsdk.GradleProjectPlugin
-
 gradle.afterProject { project ->
    def androidManifest = new File("${project.rootDir}/app/src/main/AndroidManifest.xml")
    String fileContentsReplaced = androidManifest.text.replaceFirst('<service .*android:name="com.huawei.hms.cordova.push.remote.HmsPushMessageService"(>[\\s]*<intent-filter>[\\s]*.*[\\s]*<\\/intent-filter>[\\s]*<\\/service>|.*[\\s]\\/>){1}', "")
