@@ -30,8 +30,8 @@ import {
   InAppMessageLifecycleHandlerObject,
   OSInAppMessage,
 } from './models/InAppMessage';
-import {OpenedEvent} from './models/NotificationOpened';
-import {OutcomeEvent} from './models/Outcomes';
+import { OpenedEvent } from './models/NotificationOpened';
+import { OutcomeEvent } from './models/Outcomes';
 import NotificationReceivedEvent from './NotificationReceivedEvent';
 import OSNotification from './OSNotification';
 import {
@@ -427,7 +427,7 @@ export class OneSignalPlugin {
    * @returns void
    */
   sendTag(key: string, value: string): void {
-    const jsonKeyValue = {[key]: value};
+    const jsonKeyValue = { [key]: value };
     window.cordova.exec(
       function () {},
       function () {},
@@ -493,7 +493,7 @@ export class OneSignalPlugin {
    * @returns void
    */
   registerForProvisionalAuthorization(
-    handler?: (response: {accepted: boolean}) => void,
+    handler?: (response: { accepted: boolean }) => void,
   ): void {
     // TODO: Update the response in next major release to just boolean
     window.cordova.exec(
@@ -702,7 +702,7 @@ export class OneSignalPlugin {
    * @returns void
    */
   requiresUserPrivacyConsent(
-    handler: (response: boolean | {value: boolean}) => void,
+    handler: (response: boolean | { value: boolean }) => void,
   ): void {
     // TODO: Update the response in next major release to just boolean
     window.cordova.exec(
@@ -986,7 +986,7 @@ export class OneSignalPlugin {
    * @param  {[key: string]: string | number | boolean} triggers
    * @returns void
    */
-  addTriggers(triggers: {[key: string]: string | number | boolean}): void {
+  addTriggers(triggers: { [key: string]: string | number | boolean }): void {
     Object.keys(triggers).forEach(function (key) {
       // forces values to be string types
       if (typeof triggers[key] !== 'string') {
@@ -1009,7 +1009,7 @@ export class OneSignalPlugin {
    * @returns void
    */
   addTrigger(key: string, value: string | number | boolean): void {
-    const obj = {[key]: value};
+    const obj = { [key]: value };
     this.addTriggers(obj);
   }
 
@@ -1049,7 +1049,7 @@ export class OneSignalPlugin {
    * @returns void
    */
   getTriggerValueForKey(key: string, handler: (value: string) => void): void {
-    const getTriggerValueForKeyCallback = (obj: {value: string}) => {
+    const getTriggerValueForKeyCallback = (obj: { value: string }) => {
       handler(obj.value);
     };
     window.cordova.exec(
@@ -1207,7 +1207,7 @@ export class OneSignalPlugin {
    * @returns void
    */
   isLocationShared(
-    handler: (response: boolean | {value: boolean}) => void,
+    handler: (response: boolean | { value: boolean }) => void,
   ): void {
     // TODO: Update the response in next major release to just boolean
     window.cordova.exec(

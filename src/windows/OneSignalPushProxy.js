@@ -40,7 +40,7 @@ module.exports = {
         additionalData: additionalData,
         isActive: e.isActive,
       };
-      OneSignal_opened_callback(newData, {keepCallback: true});
+      OneSignal_opened_callback(newData, { keepCallback: true });
     });
 
     OneSignal_JSBridge.init(OneSignal_app_id, OneSignal_launchString);
@@ -59,7 +59,7 @@ module.exports = {
 
   getIds: function (successCallback, errorCallback, params) {
     OneSignal_JSBridge.addEventListener('idsavailableevent', function (e) {
-      successCallback({userId: e.userId, pushToken: e.pushToken});
+      successCallback({ userId: e.userId, pushToken: e.pushToken });
     });
 
     OneSignal_JSBridge.getids();
