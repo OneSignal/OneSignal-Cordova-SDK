@@ -797,6 +797,49 @@ export class OneSignalPlugin {
         // TODO: Update the response in next major release to just boolean
         window.cordova.exec(handler, function() {}, "OneSignalPush", "isLocationShared", []);
     };
+
+    /**
+     * Live Activities
+     */
+
+    /**
+     * Enter a live activity
+     * @param  {string} activityId
+     * @param  {string} token
+     * @param  {Function} onSuccess
+     * @param  {Function} onFailure
+     * @returns void
+     */
+    enterLiveActivity(activityId: string, token: string, onSuccess?: Function, onFailure?: Function): void {
+        if (onSuccess == null) {
+            onSuccess = function() {};
+        }
+    
+        if (onFailure == null) {
+            onFailure = function() {};
+        }
+
+        window.cordova.exec(onSuccess, onFailure, "OneSignalPush", "enterLiveActivity", [activityId, token]);
+    };
+
+    /**
+     * Exit a live activity
+     * @param  {string} activityId
+     * @param  {Function} onSuccess
+     * @param  {Function} onFailure
+     * @returns void
+     */
+     exitLiveActivity(activityId: string, onSuccess?: Function, onFailure?: Function): void {
+        if (onSuccess == null) {
+            onSuccess = function() {};
+        }
+
+        if (onFailure == null) {
+            onFailure = function() {};
+        }
+
+        window.cordova.exec(onSuccess, onFailure, "OneSignalPush", "exitLiveActivity", [activityId]);
+    };
 }
 
 //-------------------------------------------------------------------
