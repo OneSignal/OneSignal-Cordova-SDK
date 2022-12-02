@@ -107,4 +107,8 @@
 
 - (void)setLanguage:(CDVInvokedUrlCommand* _Nonnull)command;
 
+// Live Activity
+- (void)enterLiveActivity:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)exitLiveActivity:(CDVInvokedUrlCommand* _Nonnull)command;
+
 @end
