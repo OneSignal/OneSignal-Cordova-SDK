@@ -314,7 +314,11 @@ static Class delegateClass = nil;
 }
 
 - (void)setLogLevel:(CDVInvokedUrlCommand*)command {
-    [OneSignal setLogLevel:[command.arguments[0] intValue] visualLevel:[command.arguments[1] intValue]];
+    [OneSignal.Debug setLogLevel:[command.arguments[0] intValue]];
+}
+
+- (void)setAlertLevel:(CDVInvokedUrlCommand*)command {
+    [OneSignal.Debug setVisualLevel:[command.arguments[0] intValue]];
 }
 
 - (void)getTags:(CDVInvokedUrlCommand*)command {

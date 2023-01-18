@@ -39,13 +39,14 @@ import {
     SubscriptionChange
 } from "./Subscription";
 
+import Debug from "./DebugNamespace";
+
 // Suppress TS warnings about window.cordova
 declare let window: any; // turn off type checking
 
-// 0 = None, 1 = Fatal, 2 = Errors, 3 = Warnings, 4 = Info, 5 = Debug, 6 = Verbose
-export type LogLevel = 0 | 1 | 2 | 3 | 4 | 5 | 6;
-
 export class OneSignalPlugin {
+    Debug: Debug = new Debug();
+
     private _appID = "";
     private _notificationWillShowInForegroundDelegate = function(notificationReceived: NotificationReceivedEvent) {};
     private _notificationOpenedDelegate = function(notificationOpened: OpenedEvent) {};
@@ -415,16 +416,6 @@ export class OneSignalPlugin {
      */
     setLaunchURLsInApp(isEnabled: boolean): void {
         window.cordova.exec(function(){}, function(){}, "OneSignalPush", "setLaunchURLsInApp", [isEnabled]);
-    };
-
-    /**
-     * Enable logging to help debug if you run into an issue setting up OneSignal.
-     * @param  {LogLevel} nsLogLevel - Sets the logging level to print to the Android LogCat log or Xcode log.
-     * @param  {LogLevel} visualLogLevel - Sets the logging level to show as alert dialogs.
-     * @returns void
-     */
-    setLogLevel(nsLogLevel: LogLevel, visualLogLevel: LogLevel): void {
-        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "setLogLevel", [nsLogLevel, visualLogLevel]);
     };
 
     /**

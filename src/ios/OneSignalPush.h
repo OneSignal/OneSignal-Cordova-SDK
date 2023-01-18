@@ -47,6 +47,7 @@
 - (void)addSMSSubscriptionObserver:(CDVInvokedUrlCommand* _Nonnull)command;
 
 - (void)setLogLevel:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)setAlertLevel:(CDVInvokedUrlCommand* _Nonnull)command;
 
 - (void)getTags:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)sendTags:(CDVInvokedUrlCommand* _Nonnull)command;
