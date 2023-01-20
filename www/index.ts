@@ -27,7 +27,6 @@
 
 import { InAppMessageAction, InAppMessageLifecycleHandlerObject, OSInAppMessage } from "./models/InAppMessage";
 import { OpenedEvent } from "./models/NotificationOpened";
-import { OutcomeEvent } from "./models/Outcomes";
 import NotificationReceivedEvent from "./NotificationReceivedEvent";
 import OSNotification from './OSNotification';
 import {
@@ -40,12 +39,14 @@ import {
 } from "./Subscription";
 
 import Debug from "./DebugNamespace";
+import Session from "./SessionNamespace";
 
 // Suppress TS warnings about window.cordova
 declare let window: any; // turn off type checking
 
 export class OneSignalPlugin {
     Debug: Debug = new Debug();
+    Session: Session = new Session();
 
     private _appID = "";
     private _notificationWillShowInForegroundDelegate = function(notificationReceived: NotificationReceivedEvent) {};
@@ -691,69 +692,6 @@ export class OneSignalPlugin {
      */
     pauseInAppMessages(pause: boolean): void {
         window.cordova.exec(function() {}, function() {}, "OneSignalPush", "pauseInAppMessages", [pause]);
-    };
-
-    /**
-     * Outcomes
-     */
-
-    /**
-     * Increases the "Count" of this Outcome by 1 and will be counted each time sent.
-     * @param  {string} name
-     * @param  {(event:OutcomeEvent)=>void} handler
-     * @returns void
-     */
-    sendOutcome(name: string, handler?: (event: OutcomeEvent) => void): void {
-        const sendOutcomeCallback = (result: OutcomeEvent) => {
-            if (handler) {
-                handler(result);
-            }
-        };
-
-        window.cordova.exec(sendOutcomeCallback, function() {}, "OneSignalPush", "sendOutcome", [name]);
-    };
-
-    /**
-     * Increases "Count" by 1 only once. This can only be attributed to a single notification.
-     * @param  {string} name
-     * @param  {(event:OutcomeEvent)=>void} handler
-     * @returns void
-     */
-    sendUniqueOutcome(name: string, handler?: (event: OutcomeEvent) => void): void {
-        const sendUniqueOutcomeCallback = (result: OutcomeEvent) => {
-            if (handler) {
-                handler(result);
-            }
-        };
-
-        window.cordova.exec(sendUniqueOutcomeCallback, function() {}, "OneSignalPush", "sendUniqueOutcome", [name]);
-    };
-
-    /**
-     * Increases the "Count" of this Outcome by 1 and the "Sum" by the value. Will be counted each time sent.
-     * If the method is called outside of an attribution window, it will be unattributed until a new session occurs.
-     * @param  {string} name
-     * @param  {string|number} value
-     * @param  {(event:OutcomeEvent)=>void} handler
-     * @returns void
-     */
-    sendOutcomeWithValue(name: string, value: string|number, handler?: (event: OutcomeEvent) => void): void {
-        if (typeof handler === "undefined") {
-            handler = function() {};
-        }
-
-        if (typeof handler !== "function") {
-            console.error("OneSignal: sendOutcomeWithValue: must provide a valid callback");
-            return;
-        }
-
-        const sendOutcomeWithValueCallback = (result: OutcomeEvent) => {
-            if (handler) {
-                handler(result);
-            }
-        };
-
-        window.cordova.exec(sendOutcomeWithValueCallback, function() {}, "OneSignalPush", "sendOutcomeWithValue", [name, Number(value)]);
     };
 
     /**
