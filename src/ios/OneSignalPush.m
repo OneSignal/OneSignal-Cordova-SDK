@@ -617,18 +617,20 @@ static Class delegateClass = nil;
  * Location
  */
 
-- (void)promptLocation:(CDVInvokedUrlCommand*)command {
-    [OneSignal promptLocation];
+- (void)requestLocationPermission:(CDVInvokedUrlCommand*)command {
+    [OneSignal.Location requestPermission];
 }
 
 - (void)setLocationShared:(CDVInvokedUrlCommand *)command {
-    [OneSignal setLocationShared:[command.arguments[0] boolValue]];
+    [OneSignal.Location setShared:[command.arguments[0] boolValue]];
 }
 
 - (void)isLocationShared:(CDVInvokedUrlCommand *)command {
-    BOOL locationShared = [OneSignal isLocationShared];
-    // TODO: Update the response in next major release to just boolean
-    successCallback(command.callbackId, @{@"value" : @(locationShared)});
+    bool isShared = [OneSignal.Location isShared];
+    NSDictionary *result = @{
+            @"value" : @(isShared)
+    };
+    successCallback(command.callbackId, result);
 }
 
 /**

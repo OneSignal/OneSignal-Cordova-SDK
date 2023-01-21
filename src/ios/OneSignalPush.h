@@ -102,7 +102,7 @@
 - (void)addOutcomeWithValue:(CDVInvokedUrlCommand* _Nonnull)command;
 
 // Location
-- (void)promptLocation:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)requestLocationPermission:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)setLocationShared:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)isLocationShared:(CDVInvokedUrlCommand* _Nonnull)command;
 
