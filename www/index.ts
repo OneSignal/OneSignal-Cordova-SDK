@@ -40,6 +40,7 @@ import {
 
 import Debug from "./DebugNamespace";
 import Session from "./SessionNamespace";
+import Location from "./LocationNamespace";
 
 // Suppress TS warnings about window.cordova
 declare let window: any; // turn off type checking
@@ -47,6 +48,7 @@ declare let window: any; // turn off type checking
 export class OneSignalPlugin {
     Debug: Debug = new Debug();
     Session: Session = new Session();
+    Location: Location = new Location();
 
     private _appID = "";
     private _notificationWillShowInForegroundDelegate = function(notificationReceived: NotificationReceivedEvent) {};
@@ -692,39 +694,6 @@ export class OneSignalPlugin {
      */
     pauseInAppMessages(pause: boolean): void {
         window.cordova.exec(function() {}, function() {}, "OneSignalPush", "pauseInAppMessages", [pause]);
-    };
-
-    /**
-     * Location
-     */
-
-    /**
-     * Prompts the user for location permissions to allow geotagging from the OneSignal dashboard.
-     * @returns void
-     */
-    promptLocation(): void {
-        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "promptLocation", []);
-    };
-
-    /**
-     * Disable or enable location collection (defaults to enabled if your app has location permission).
-     * @param  {boolean} shared
-     * @returns void
-     */
-    setLocationShared(shared: boolean): void {
-        window.cordova.exec(function() {}, function() {}, "OneSignalPush", "setLocationShared", [shared]);
-    };
-
-    /**
-     * True if the application has location share activated, false otherwise
-     * Passes a boolean on Android and passes an object on iOS to the handler.
-     *
-     * @param  {(response: boolean | {value: boolean}) => void} handler
-     * @returns void
-     */
-    isLocationShared(handler: (response: boolean | { value: boolean }) => void): void {
-        // TODO: Update the response in next major release to just boolean
-        window.cordova.exec(handler, function() {}, "OneSignalPush", "isLocationShared", []);
     };
 
     /**
