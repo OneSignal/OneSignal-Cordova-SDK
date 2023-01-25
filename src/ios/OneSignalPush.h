@@ -47,6 +47,7 @@
 - (void)addSMSSubscriptionObserver:(CDVInvokedUrlCommand* _Nonnull)command;
 
 - (void)setLogLevel:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)setAlertLevel:(CDVInvokedUrlCommand* _Nonnull)command;
 
 - (void)getTags:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)sendTags:(CDVInvokedUrlCommand* _Nonnull)command;
@@ -96,12 +97,12 @@
 - (void)pauseInAppMessages:(CDVInvokedUrlCommand* _Nonnull)command;
 
 // Outcomes
-- (void)sendOutcome:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)sendUniqueOutcome:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)sendOutcomeWithValue:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)addOutcome:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)addUniqueOutcome:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)addOutcomeWithValue:(CDVInvokedUrlCommand* _Nonnull)command;
 
 // Location
-- (void)promptLocation:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)requestLocationPermission:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)setLocationShared:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)isLocationShared:(CDVInvokedUrlCommand* _Nonnull)command;
 

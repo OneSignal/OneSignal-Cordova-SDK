@@ -27,7 +27,6 @@
 
 import { InAppMessageAction, InAppMessageLifecycleHandlerObject, OSInAppMessage } from "./models/InAppMessage";
 import { OpenedEvent } from "./models/NotificationOpened";
-import { OutcomeEvent } from "./models/Outcomes";
 import NotificationReceivedEvent from "./NotificationReceivedEvent";
 import OSNotification from './OSNotification';
 import {
@@ -39,13 +38,18 @@ import {
     SubscriptionChange
 } from "./Subscription";
 
+import Debug from "./DebugNamespace";
+import Session from "./SessionNamespace";
+import Location from "./LocationNamespace";
+
 // Suppress TS warnings about window.cordova
 declare let window: any; // turn off type checking
 
-// 0 = None, 1 = Fatal, 2 = Errors, 3 = Warnings, 4 = Info, 5 = Debug, 6 = Verbose
-export type LogLevel = 0 | 1 | 2 | 3 | 4 | 5 | 6;
-
 export class OneSignalPlugin {
+    Debug: Debug = new Debug();
+    Session: Session = new Session();
+    Location: Location = new Location();
+
     private _appID = "";
     private _notificationWillShowInForegroundDelegate = function(notificationReceived: NotificationReceivedEvent) {};
     private _notificationOpenedDelegate = function(notificationOpened: OpenedEvent) {};
@@ -418,16 +422,6 @@ export class OneSignalPlugin {
     };
 
     /**
-     * Enable logging to help debug if you run into an issue setting up OneSignal.
-     * @param  {LogLevel} nsLogLevel - Sets the logging level to print to the Android LogCat log or Xcode log.
-     * @param  {LogLevel} visualLogLevel - Sets the logging level to show as alert dialogs.
-     * @returns void
-     */
-    setLogLevel(nsLogLevel: LogLevel, visualLogLevel: LogLevel): void {
-        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "setLogLevel", [nsLogLevel, visualLogLevel]);
-    };
-
-    /**
      * Did the user provide privacy consent for GDPR purposes.
      * @param  {(response: boolean) => void} handler
      * @returns void
@@ -700,102 +694,6 @@ export class OneSignalPlugin {
      */
     pauseInAppMessages(pause: boolean): void {
         window.cordova.exec(function() {}, function() {}, "OneSignalPush", "pauseInAppMessages", [pause]);
-    };
-
-    /**
-     * Outcomes
-     */
-
-    /**
-     * Increases the "Count" of this Outcome by 1 and will be counted each time sent.
-     * @param  {string} name
-     * @param  {(event:OutcomeEvent)=>void} handler
-     * @returns void
-     */
-    sendOutcome(name: string, handler?: (event: OutcomeEvent) => void): void {
-        const sendOutcomeCallback = (result: OutcomeEvent) => {
-            if (handler) {
-                handler(result);
-            }
-        };
-
-        window.cordova.exec(sendOutcomeCallback, function() {}, "OneSignalPush", "sendOutcome", [name]);
-    };
-
-    /**
-     * Increases "Count" by 1 only once. This can only be attributed to a single notification.
-     * @param  {string} name
-     * @param  {(event:OutcomeEvent)=>void} handler
-     * @returns void
-     */
-    sendUniqueOutcome(name: string, handler?: (event: OutcomeEvent) => void): void {
-        const sendUniqueOutcomeCallback = (result: OutcomeEvent) => {
-            if (handler) {
-                handler(result);
-            }
-        };
-
-        window.cordova.exec(sendUniqueOutcomeCallback, function() {}, "OneSignalPush", "sendUniqueOutcome", [name]);
-    };
-
-    /**
-     * Increases the "Count" of this Outcome by 1 and the "Sum" by the value. Will be counted each time sent.
-     * If the method is called outside of an attribution window, it will be unattributed until a new session occurs.
-     * @param  {string} name
-     * @param  {string|number} value
-     * @param  {(event:OutcomeEvent)=>void} handler
-     * @returns void
-     */
-    sendOutcomeWithValue(name: string, value: string|number, handler?: (event: OutcomeEvent) => void): void {
-        if (typeof handler === "undefined") {
-            handler = function() {};
-        }
-
-        if (typeof handler !== "function") {
-            console.error("OneSignal: sendOutcomeWithValue: must provide a valid callback");
-            return;
-        }
-
-        const sendOutcomeWithValueCallback = (result: OutcomeEvent) => {
-            if (handler) {
-                handler(result);
-            }
-        };
-
-        window.cordova.exec(sendOutcomeWithValueCallback, function() {}, "OneSignalPush", "sendOutcomeWithValue", [name, Number(value)]);
-    };
-
-    /**
-     * Location
-     */
-
-    /**
-     * Prompts the user for location permissions to allow geotagging from the OneSignal dashboard.
-     * @returns void
-     */
-    promptLocation(): void {
-        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "promptLocation", []);
-    };
-
-    /**
-     * Disable or enable location collection (defaults to enabled if your app has location permission).
-     * @param  {boolean} shared
-     * @returns void
-     */
-    setLocationShared(shared: boolean): void {
-        window.cordova.exec(function() {}, function() {}, "OneSignalPush", "setLocationShared", [shared]);
-    };
-
-    /**
-     * True if the application has location share activated, false otherwise
-     * Passes a boolean on Android and passes an object on iOS to the handler.
-     *
-     * @param  {(response: boolean | {value: boolean}) => void} handler
-     * @returns void
-     */
-    isLocationShared(handler: (response: boolean | { value: boolean }) => void): void {
-        // TODO: Update the response in next major release to just boolean
-        window.cordova.exec(handler, function() {}, "OneSignalPush", "isLocationShared", []);
     };
 
     /**
