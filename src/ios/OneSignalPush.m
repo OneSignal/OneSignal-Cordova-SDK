@@ -594,47 +594,43 @@ static Class delegateClass = nil;
  * Outcomes
  */
 
-- (void)sendOutcome:(CDVInvokedUrlCommand*)command {
+- (void)addOutcome:(CDVInvokedUrlCommand*)command {
     NSString *name = command.arguments[0];
 
-    [OneSignal sendOutcome:name onSuccess:^(OSOutcomeEvent *outcome){
-        successCallback(command.callbackId, [outcome jsonRepresentation]);
-    }];
+    [OneSignal.Session addOutcome:name];
 }
 
-- (void)sendUniqueOutcome:(CDVInvokedUrlCommand*)command {
+- (void)addUniqueOutcome:(CDVInvokedUrlCommand*)command {
     NSString *name = command.arguments[0];
 
-    [OneSignal sendUniqueOutcome:name onSuccess:^(OSOutcomeEvent *outcome){
-        successCallback(command.callbackId, [outcome jsonRepresentation]);
-    }];
+    [OneSignal.Session addUniqueOutcome:name];
 }
 
-- (void)sendOutcomeWithValue:(CDVInvokedUrlCommand*)command {
+- (void)addOutcomeWithValue:(CDVInvokedUrlCommand*)command {
     NSString *name = command.arguments[0];
     NSNumber *value = command.arguments[1];
-
-    [OneSignal sendOutcomeWithValue:name value:value onSuccess:^(OSOutcomeEvent *outcome){
-        successCallback(command.callbackId, [outcome jsonRepresentation]);
-    }];
+    
+    [OneSignal.Session addOutcomeWithValue:name value:value];
 }
 
 /**
  * Location
  */
 
-- (void)promptLocation:(CDVInvokedUrlCommand*)command {
-    [OneSignal promptLocation];
+- (void)requestLocationPermission:(CDVInvokedUrlCommand*)command {
+    [OneSignal.Location requestPermission];
 }
 
 - (void)setLocationShared:(CDVInvokedUrlCommand *)command {
-    [OneSignal setLocationShared:[command.arguments[0] boolValue]];
+    [OneSignal.Location setShared:[command.arguments[0] boolValue]];
 }
 
 - (void)isLocationShared:(CDVInvokedUrlCommand *)command {
-    BOOL locationShared = [OneSignal isLocationShared];
-    // TODO: Update the response in next major release to just boolean
-    successCallback(command.callbackId, @{@"value" : @(locationShared)});
+    bool isShared = [OneSignal.Location isShared];
+    NSDictionary *result = @{
+            @"value" : @(isShared)
+    };
+    successCallback(command.callbackId, result);
 }
 
 /**
