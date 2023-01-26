@@ -83,18 +83,20 @@
 - (void)setUnauthenticatedSMSNumber:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)logoutSMSNumber:(CDVInvokedUrlCommand* _Nonnull)command;
     
-// In App Message
 - (void)setLaunchURLsInApp:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)setInAppMessageClickHandler:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)setInAppMessageLifecycleHandler:(CDVInvokedUrlCommand* _Nonnull)command;
+
+// In-App Messages
+- (void)setClickHandler:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)setLifecycleHandler:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)setOnWillDisplayInAppMessageHandler:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)setOnDidDisplayInAppMessageHandler:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)setOnWillDismissInAppMessageHandler:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)setOnDidDismissInAppMessageHandler:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)addTriggers:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)removeTriggersForKeys:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)getTriggerValueForKey:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)pauseInAppMessages:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)removeTriggers:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)clearTriggers:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)setPaused:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)isPaused:(CDVInvokedUrlCommand* _Nonnull)command;
 
 // Outcomes
 - (void)addOutcome:(CDVInvokedUrlCommand* _Nonnull)command;
