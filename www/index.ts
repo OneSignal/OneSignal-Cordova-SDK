@@ -25,7 +25,6 @@
  * THE SOFTWARE.
  */
 
-import { InAppMessageAction, InAppMessageLifecycleHandlerObject, OSInAppMessage } from "./models/InAppMessage";
 import { OpenedEvent } from "./models/NotificationOpened";
 import NotificationReceivedEvent from "./NotificationReceivedEvent";
 import OSNotification from './OSNotification';
@@ -41,6 +40,7 @@ import {
 import Debug from "./DebugNamespace";
 import Session from "./SessionNamespace";
 import Location from "./LocationNamespace";
+import InAppMessages from "./InAppMessagesNamespace";
 
 // Suppress TS warnings about window.cordova
 declare let window: any; // turn off type checking
@@ -49,15 +49,11 @@ export class OneSignalPlugin {
     Debug: Debug = new Debug();
     Session: Session = new Session();
     Location: Location = new Location();
+    InAppMessages: InAppMessages = new InAppMessages();
 
     private _appID = "";
     private _notificationWillShowInForegroundDelegate = function(notificationReceived: NotificationReceivedEvent) {};
     private _notificationOpenedDelegate = function(notificationOpened: OpenedEvent) {};
-    private _inAppMessageClickDelegate = function (action: InAppMessageAction) {};
-    private _onWillDisplayInAppMessageDelegate = function(message: OSInAppMessage) {};
-    private _onDidDisplayInAppMessageDelegate = function(message: OSInAppMessage) {};
-    private _onWillDismissInAppMessageDelegate = function(message: OSInAppMessage) {};
-    private _onDidDismissInAppMessageDelegate = function(message: OSInAppMessage) {};
 
     private _permissionObserverList: ((event:ChangeEvent<PermissionChange>)=>void)[] = [];
     private _subscriptionObserverList: ((event:ChangeEvent<SubscriptionChange>)=>void)[] = [];
@@ -109,67 +105,6 @@ export class OneSignalPlugin {
         };
 
         window.cordova.exec(notificationOpenedHandler, function(){}, "OneSignalPush", "setNotificationOpenedHandler", []);
-    };
-
-    /**
-     * Sets an In-App Message click event handler.
-     * @param  {(action:InAppMessageAction)=>void} handler
-     * @returns void
-     */
-    setInAppMessageClickHandler(handler: (action: InAppMessageAction) => void): void {
-        this._inAppMessageClickDelegate = handler;
-
-        const inAppMessageClickHandler = (json: InAppMessageAction) => {
-            this._inAppMessageClickDelegate(json);
-        };
-
-        window.cordova.exec(inAppMessageClickHandler, function() {}, "OneSignalPush", "setInAppMessageClickHandler", []);
-    };
-
-    /**
-     * Sets the In-App Message lifecycle handler object to run on displaying and/or dismissing an In-App Message.
-     * @param  {InAppMessageLifecycleHandlerObject} handlerObject
-     * @returns void
-     */
-    setInAppMessageLifecycleHandler(handlerObject: InAppMessageLifecycleHandlerObject) : void {
-        if (handlerObject.onWillDisplayInAppMessage) {
-            this._onWillDisplayInAppMessageDelegate = handlerObject.onWillDisplayInAppMessage;
-
-            const onWillDisplayInAppMessageHandler = (json: OSInAppMessage) => {
-                this._onWillDisplayInAppMessageDelegate(json);
-            };
-
-            window.cordova.exec(onWillDisplayInAppMessageHandler, function() {}, "OneSignalPush", "setOnWillDisplayInAppMessageHandler", []);
-        }
-        if (handlerObject.onDidDisplayInAppMessage) {
-            this._onDidDisplayInAppMessageDelegate = handlerObject.onDidDisplayInAppMessage;
-
-            const onDidDisplayInAppMessageHandler = (json: OSInAppMessage) => {
-                this._onDidDisplayInAppMessageDelegate(json);
-            };
-
-            window.cordova.exec(onDidDisplayInAppMessageHandler, function() {}, "OneSignalPush", "setOnDidDisplayInAppMessageHandler", []);
-        }
-        if (handlerObject.onWillDismissInAppMessage) {
-            this._onWillDismissInAppMessageDelegate = handlerObject.onWillDismissInAppMessage;
-
-            const onWillDismissInAppMessageHandler = (json: OSInAppMessage) => {
-                this._onWillDismissInAppMessageDelegate(json);
-            };
-
-            window.cordova.exec(onWillDismissInAppMessageHandler, function() {}, "OneSignalPush", "setOnWillDismissInAppMessageHandler", []);
-        }
-        if (handlerObject.onDidDismissInAppMessage) {
-            this._onDidDismissInAppMessageDelegate = handlerObject.onDidDismissInAppMessage;
-
-            const onDidDismissInAppMessageHandler = (json: OSInAppMessage) => {
-                this._onDidDismissInAppMessageDelegate(json);
-            };
-
-            window.cordova.exec(onDidDismissInAppMessageHandler, function() {}, "OneSignalPush", "setOnDidDismissInAppMessageHandler", []);
-        }
-
-        window.cordova.exec(function() {}, function() {}, "OneSignalPush", "setInAppMessageLifecycleHandler", []);
     };
 
     /**
@@ -621,79 +556,6 @@ export class OneSignalPlugin {
             handler = function() {};
         }
         window.cordova.exec(handler, function() {}, "OneSignalPush", "removeExternalUserId", []);
-    };
-
-    /**
-     * In app messaging
-     */
-
-    /**
-     * Adds Multiple In-App Message Triggers.
-     * @param  {[key: string]: string | number | boolean} triggers
-     * @returns void
-     */
-    addTriggers(triggers: {[key: string]: string | number | boolean}): void {
-        Object.keys(triggers).forEach(function(key){
-            // forces values to be string types
-            if (typeof triggers[key] !== "string") {
-                triggers[key] = JSON.stringify(triggers[key]);
-            }
-        });
-        window.cordova.exec(function() {}, function() {}, "OneSignalPush", "addTriggers", [triggers]);
-    };
-
-    /**
-     * Add an In-App Message Trigger.
-     * @param  {string} key
-     * @param  {string | number | boolean} value
-     * @returns void
-     */
-    addTrigger(key: string, value: string | number | boolean): void {
-        const obj = {[key]: value};
-        this.addTriggers(obj);
-    };
-
-    /**
-     * Removes a list of triggers based on a key.
-     * @param  {string} key
-     * @returns void
-     */
-    removeTriggerForKey(key: string): void {
-        this.removeTriggersForKeys([key]);
-    };
-
-    /**
-     * Removes a list of triggers based on a collection of keys.
-     * @param  {string[]} keys
-     * @returns void
-     */
-    removeTriggersForKeys(keys: string[]): void {
-        if (!Array.isArray(keys)) {
-            console.error("OneSignal: removeTriggersForKeys: argument must be of type Array")
-        }
-        window.cordova.exec(function() {}, function() {}, "OneSignalPush", "removeTriggersForKeys", [keys]);
-    };
-
-    /**
-     * Gets a trigger value for a provided trigger key.
-     * @param  {string} key
-     * @param  {(value: string) => void} handler
-     * @returns void
-     */
-    getTriggerValueForKey(key: string, handler: (value: string) => void): void {
-        const getTriggerValueForKeyCallback = (obj: {value: string}) => {
-            handler(obj.value);
-        };
-        window.cordova.exec(getTriggerValueForKeyCallback, function() {}, "OneSignalPush", "getTriggerValueForKey", [key]);
-    };
-
-    /**
-     * Pause & unpause In-App Messages
-     * @param  {boolean} pause
-     * @returns void
-     */
-    pauseInAppMessages(pause: boolean): void {
-        window.cordova.exec(function() {}, function() {}, "OneSignalPush", "pauseInAppMessages", [pause]);
     };
 
     /**

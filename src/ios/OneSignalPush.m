@@ -499,17 +499,17 @@ static Class delegateClass = nil;
     }];
 }
 
-/**
- * In-App Messaging
- */
-
 - (void)setLaunchURLsInApp:(CDVInvokedUrlCommand *)command {
     BOOL launchInApp = [command.arguments[0] boolValue];
     [OneSignal setLaunchURLsInApp:launchInApp];
 }
 
-- (void)setInAppMessageClickHandler:(CDVInvokedUrlCommand*)command {
-    [OneSignal setInAppMessageClickHandler:^(OSInAppMessageAction* action) {
+/**
+ * In-App Messages
+ */
+
+- (void)setClickHandler:(CDVInvokedUrlCommand*)command {
+    [OneSignal.InAppMessages setClickHandler:^(OSInAppMessageAction* action) {
             NSDictionary *actionDict = [action jsonRepresentation];
             NSDictionary *result = @{
                 @"clickName": action.clickName ?: [NSNull null],
@@ -524,8 +524,8 @@ static Class delegateClass = nil;
     ];
 }
 
-- (void)setInAppMessageLifecycleHandler:(CDVInvokedUrlCommand *)command {
-    [OneSignal setInAppMessageLifecycleHandler:self];
+- (void)setLifecycleHandler:(CDVInvokedUrlCommand *)command {
+    [OneSignal.InAppMessages setLifecycleHandler:self];
 }
 
 - (void)setOnWillDisplayInAppMessageHandler:(CDVInvokedUrlCommand*)command {
@@ -569,26 +569,32 @@ static Class delegateClass = nil;
 }
 
 - (void)addTriggers:(CDVInvokedUrlCommand*)command {
-   [OneSignal addTriggers:command.arguments[0]]; 
+   [OneSignal.InAppMessages addTriggers:command.arguments[0]]; 
 }
 
-- (void)removeTriggersForKeys:(CDVInvokedUrlCommand*)command {
-   [OneSignal removeTriggersForKeys:command.arguments[0]];
+- (void)removeTriggers:(CDVInvokedUrlCommand*)command {
+   [OneSignal.InAppMessages removeTriggers:command.arguments[0]];
 }
 
-- (void)getTriggerValueForKey:(CDVInvokedUrlCommand*)command {
-    NSString *key = command.arguments[0];
-    NSString *val = [OneSignal getTriggerValueForKey:key];
+- (void)clearTriggers:(CDVInvokedUrlCommand*)command {
+    [OneSignal.InAppMessages clearTriggers];
+}
+
+- (void)setPaused:(CDVInvokedUrlCommand*)command {
+    bool pause = [command.arguments[0] boolValue];
+    
+    [OneSignal.InAppMessages paused:pause];
+}
+
+- (void)isPaused:(CDVInvokedUrlCommand*)command {
+    bool paused = [OneSignal.InAppMessages paused];
     NSDictionary *result = @{
-            @"value" : val ?: [NSNull null]
+            @"value" : @(paused)
     };
     successCallback(command.callbackId, result);
 }
 
-- (void)pauseInAppMessages:(CDVInvokedUrlCommand*)command {
-   bool pause = [command.arguments[0] boolValue];
-   [OneSignal pauseInAppMessages:pause];
-}
+
 
 /**
  * Outcomes
