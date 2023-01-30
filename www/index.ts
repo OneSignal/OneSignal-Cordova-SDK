@@ -37,6 +37,7 @@ import {
     SubscriptionChange
 } from "./Subscription";
 
+import User from "./UserNamespace";
 import Debug from "./DebugNamespace";
 import Session from "./SessionNamespace";
 import Location from "./LocationNamespace";
@@ -46,6 +47,7 @@ import InAppMessages from "./InAppMessagesNamespace";
 declare let window: any; // turn off type checking
 
 export class OneSignalPlugin {
+    User: User = new User();
     Debug: Debug = new Debug();
     Session: Session = new Session();
     Location: Location = new Location();
@@ -120,25 +122,6 @@ export class OneSignalPlugin {
     };
 
     /**
-     * Allows you to set the app defined language with the OneSignal SDK.
-     * @param  {string} language
-     * @param  {(success:object)=>void} onSuccess
-     * @param  {(failure:object)=>void} onFailure
-     * @returns void
-     */
-    setLanguage(language: string, onSuccess?: (success: object) => void, onFailure?: (failure: object) => void): void {
-        if (onSuccess == null) {
-            onSuccess = function() {};
-        }
-
-        if (onFailure == null) {
-            onFailure = function() {};
-        }
-
-        window.cordova.exec(onSuccess, onFailure, "OneSignalPush", "setLanguage", [language]);
-    }
-
-    /**
      * Add a callback that fires when the OneSignal subscription state changes.
      * @param  {(event:ChangeEvent<SubscriptionChange>)=>void} observer
      * @returns void
@@ -188,53 +171,6 @@ export class OneSignalPlugin {
             this._processFunctionList(this._permissionObserverList, state);
         };
         window.cordova.exec(permissionCallBackProcessor, function(){}, "OneSignalPush", "addPermissionObserver", []);
-    };
-
-    /**
-     * Retrieve a list of tags that have been set on the user from the OneSignal server.
-     * @param  {(tags:object)=>void} handler
-     * @returns void
-     */
-    getTags(handler: (tags: object) => void): void {
-        window.cordova.exec(handler, function(){}, "OneSignalPush", "getTags", []);
-    };
-
-    /**
-     * Tag a user based on an app event of your choosing so they can be targeted later via segments.
-     * @param  {string} key
-     * @param  {string} value
-     * @returns void
-     */
-    sendTag(key: string, value: string): void {
-        const jsonKeyValue = {[key]: value};
-        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "sendTags", [jsonKeyValue]);
-    };
-
-    /**
-     * Tag a user wiht multiple tags based on an app event of your choosing so they can be targeted later via segments.
-     * @param  {object} tags
-     * @returns void
-     */
-    sendTags(tags: object): void {
-        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "sendTags", [tags]);
-    };
-
-    /**
-     * Deletes a single tag that was previously set on a user.
-     * @param  {string} key
-     * @returns void
-     */
-    deleteTag(key: string): void {
-        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "deleteTags", [key]);
-    };
-
-    /**
-     * Deletes multiple tags that were previously set on a user.
-     * @param  {string[]} keys
-     * @returns void
-     */
-    deleteTags(keys: string[]): void {
-        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "deleteTags", keys);
     };
 
     /**
@@ -393,169 +329,6 @@ export class OneSignalPlugin {
      */
     provideUserConsent(granted: boolean): void {
         window.cordova.exec(function() {}, function() {}, "OneSignalPush", "provideUserConsent", [granted]);
-    };
-
-    /**
-     * Email
-     */
-
-    /**
-     * Allows you to set the user's email address with the OneSignal SDK.
-     * @param  {string} email
-     * @param  {string} authCode
-     * @param  {Function} onSuccess
-     * @param  {Function} onFailure
-     * @returns void
-     */
-    setEmail(email: string, authCode?: string, onSuccess?: Function, onFailure?: Function): void {
-        if (onSuccess == null) {
-            onSuccess = function() {};
-        }
-
-        if (onFailure == null) {
-            onFailure = function() {};
-        }
-
-        if (typeof authCode == 'function') {
-            onFailure = onSuccess;
-            onSuccess = authCode;
-
-            window.cordova.exec(onSuccess, onFailure, "OneSignalPush", "setUnauthenticatedEmail", [email]);
-        } else if (authCode == undefined) {
-            window.cordova.exec(onSuccess, onFailure, "OneSignalPush", "setUnauthenticatedEmail", [email]);
-        } else {
-            window.cordova.exec(onSuccess, onFailure, "OneSignalPush", "setEmail", [email, authCode]);
-        }
-    };
-
-    /**
-     * If your app implements logout functionality, you can call logoutEmail to dissociate the email from the device.
-     * @param  {Function} onSuccess
-     * @param  {Function} onFailure
-     * @returns void
-     */
-    logoutEmail(onSuccess?: Function, onFailure?: Function): void {
-        if (onSuccess == null) {
-            onSuccess = function() {};
-        }
-
-        if (onFailure == null) {
-            onFailure = function() {};
-        }
-
-        window.cordova.exec(onSuccess, onFailure, "OneSignalPush", "logoutEmail", []);
-    };
-
-    /**
-     * SMS
-     */
-
-    /**
-     * Allows you to set the user's SMS number with the OneSignal SDK.
-     * @param  {string} smsNumber
-     * @param  {string} authCode
-     * @param  {Function} onSuccess
-     * @param  {Function} onFailure
-     * @returns void
-     */
-    setSMSNumber(smsNumber: string, authCode?: string, onSuccess?: Function, onFailure?: Function): void {
-        if (onSuccess == null) {
-            onSuccess = function() {};
-        }
-
-        if (onFailure == null) {
-            onFailure = function() {};
-        }
-
-        if (typeof authCode == 'function') {
-            onFailure = onSuccess;
-            onSuccess = authCode;
-
-            window.cordova.exec(onSuccess, onFailure, "OneSignalPush", "setUnauthenticatedSMSNumber", [smsNumber]);
-        } else if (authCode == undefined) {
-            window.cordova.exec(onSuccess, onFailure, "OneSignalPush", "setUnauthenticatedSMSNumber", [smsNumber]);
-        } else {
-            window.cordova.exec(onSuccess, onFailure, "OneSignalPush", "setSMSNumber", [smsNumber, authCode]);
-        }
-    };
-
-    /**
-     * If your app implements logout functionality, you can call logoutSMSNumber to dissociate the SMS number from the device.
-     * @param  {Function} onSuccess
-     * @param  {Function} onFailure
-     * @returns void
-     */
-    logoutSMSNumber(onSuccess?: Function, onFailure?: Function): void {
-        if (onSuccess == null) {
-            onSuccess = function() {};
-        }
-
-        if (onFailure == null) {
-            onFailure = function() {};
-        }
-
-        window.cordova.exec(onSuccess, onFailure, "OneSignalPush", "logoutSMSNumber", []);
-    };
-
-    /**
-     * Allows you to use your own system's user ID's to send push notifications to your users.
-     *
-     * Possible function usages:
-     * setExternalUserId(externalId: string?): void
-     * setExternalUserId(externalId: string?, handler: function?): void
-     * setExternalUserId(externalId: string?, externalIdAuthCode: string?, handler: function?): void
-     *
-     * @param  {string} externalId
-     * @param  {string} externalIdAuthCode
-     * @param  {(results:object) => void} handler
-     * @returns void
-     */
-    setExternalUserId(externalId: string | null, handlerOrAuth?: ((results: object) => void) | string, handler?: (results: object) => void): void {
-        if (externalId == undefined) {
-            externalId = null;
-        }
-
-        let externalIdAuthHash = null;
-        let callback = (results: object) => {};
-
-        if (typeof handlerOrAuth === "function") {
-            // Method was called like setExternalUserId(externalId: string?, handler: function)
-            callback = handlerOrAuth;
-        }
-        else if (typeof handlerOrAuth === "string") {
-            // Method was called like setExternalUserId(externalId: string?, externalIdAuthCode: string?, handler: function)
-            externalIdAuthHash = handlerOrAuth;
-            if (handler) {
-                callback = handler;
-            }
-        }
-        else if (typeof handlerOrAuth === "undefined") {
-            // Method was called like setExternalUserId(externalId: string?)
-            // Defaults defined above for externalIdAuthHash and callback
-        }
-        else {
-            // This does not catch all possible wrongly typed params but prevents a good number of them
-            console.error("OneSignal: setExternalUserId: Invalid param types. Definition is setExternalUserId(externalId: string?, externalIdAuthCode: string?, handler: function?): void")
-            return;
-        }
-
-        const passToNativeParams = [externalId];
-        if (externalIdAuthHash !== null) {
-            passToNativeParams.push(externalIdAuthHash)
-        }
-        window.cordova.exec(callback, function() {}, "OneSignalPush", "setExternalUserId", passToNativeParams);
-    };
-
-    /**
-     * Removes whatever was set as the current user's external user ID.
-     * @param  {(results:object)=>void} handler
-     * @returns void
-     */
-    removeExternalUserId(handler?: (results: object) => void): void {
-        if (handler == undefined) {
-            handler = function() {};
-        }
-        window.cordova.exec(handler, function() {}, "OneSignalPush", "removeExternalUserId", []);
     };
 
     /**

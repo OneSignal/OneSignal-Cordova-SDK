@@ -49,9 +49,8 @@
 - (void)setLogLevel:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)setAlertLevel:(CDVInvokedUrlCommand* _Nonnull)command;
 
-- (void)getTags:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)sendTags:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)deleteTags:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)addTags:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)removeTags:(CDVInvokedUrlCommand* _Nonnull)command;
 
 - (void)promptForPushNotificationsWithUserResponse:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)registerForProvisionalAuthorization:(CDVInvokedUrlCommand* _Nonnull)command;
@@ -70,18 +69,17 @@
 - (void)setRequiresUserPrivacyConsent:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)provideUserConsent:(CDVInvokedUrlCommand* _Nonnull)command;
 
-- (void)setExternalUserId:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)removeExternalUserId:(CDVInvokedUrlCommand* _Nonnull)command;
+// Aliases
+- (void)addAliases:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)removeAliases:(CDVInvokedUrlCommand* _Nonnull)command;
 
 // Email
-- (void)setEmail:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)setUnauthenticatedEmail:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)logoutEmail:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)addEmail:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)removeEmail:(CDVInvokedUrlCommand* _Nonnull)command;
 
 // SMS
-- (void)setSMSNumber:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)setUnauthenticatedSMSNumber:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)logoutSMSNumber:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)addSmsNumber:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)removeSmsNumber:(CDVInvokedUrlCommand* _Nonnull)command;
     
 - (void)setLaunchURLsInApp:(CDVInvokedUrlCommand* _Nonnull)command;
 
