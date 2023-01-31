@@ -29,7 +29,7 @@
 #import <objc/runtime.h>
 
 #import "OneSignalPush.h"
-#import <OneSignal/OneSignal.h>
+#import <OneSignalFramework/OneSignalFramework.h>
 
 NSString* notificationWillShowInForegoundCallbackId;
 NSString* notificationOpenedCallbackId;
@@ -112,17 +112,20 @@ void processNotificationOpened(OSNotificationOpenedResult* result) {
     }
 }
 
-void initOneSignalObject(NSDictionary* launchOptions, const char* appId) {
-    NSString* appIdStr = (appId ? [NSString stringWithUTF8String: appId] : nil);
+void initOneSignalObject(NSDictionary* launchOptions) {
     [OneSignal setMSDKType:@"cordova"];
-    [OneSignal setAppId:appIdStr];
-    [OneSignal initWithLaunchOptions:launchOptions];
+    [OneSignal setLaunchOptions:launchOptions];
     initialLaunchFired = true;
+}
+
+void setAppId(const char* appId) {
+    NSString* appIdStr = (appId ? [NSString stringWithUTF8String: appId] : nil);
+    [OneSignal initialize:appIdStr withLaunchOptions:nil];
 }
 
 @implementation UIApplication(OneSignalCordovaPush)
 
-static void injectSelector(Class newClass, SEL newSel, Class addToClass, SEL makeLikeSel) {
+static void injectSelectorCordova(Class newClass, SEL newSel, Class addToClass, SEL makeLikeSel) {
     Method newMeth = class_getInstanceMethod(newClass, newSel);
     IMP imp = method_getImplementation(newMeth);
     const char* methodTypeEncoding = method_getTypeEncoding(newMeth);
@@ -149,13 +152,13 @@ static Class delegateClass = nil;
         return;
     delegateClass = [delegate class];
 
-    injectSelector(self.class, @selector(oneSignalApplication:didFinishLaunchingWithOptions:),
+    injectSelectorCordova(self.class, @selector(oneSignalApplication:didFinishLaunchingWithOptions:),
                    delegateClass, @selector(application:didFinishLaunchingWithOptions:));
     [self setOneSignalCordovaDelegate:delegate];
 }
 
 - (BOOL)oneSignalApplication:(UIApplication*)application didFinishLaunchingWithOptions:(NSDictionary*)launchOptions {
-    initOneSignalObject(launchOptions, nil);
+    initOneSignalObject(launchOptions);
 
     if ([self respondsToSelector:@selector(oneSignalApplication:didFinishLaunchingWithOptions:)])
         return [self oneSignalApplication:application didFinishLaunchingWithOptions:launchOptions];
@@ -254,7 +257,7 @@ static Class delegateClass = nil;
     pluginCommandDelegate = self.commandDelegate;
 
     NSString* appId = (NSString*)command.arguments[0];
-    initOneSignalObject(nil, [appId UTF8String]);
+    setAppId([appId UTF8String]);
 
     if (actionNotification)
         processNotificationOpened(actionNotification);

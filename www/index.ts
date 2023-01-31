@@ -69,11 +69,11 @@ export class OneSignalPlugin {
     }
 
     /**
-     * Completes OneSignal initialization by setting the OneSignal Application ID.
+     * Initializes the OneSignal SDK. This should be called during startup of the application.
      * @param  {string} appId
      * @returns void
      */
-    setAppId(appId: string): void {
+    init(appId: string): void {
         this._appID = appId;
 
         window.cordova.exec(function() {}, function(){}, "OneSignalPush", "init", [this._appID]);

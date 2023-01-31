@@ -28,6 +28,11 @@
   <js-module src="dist/NotificationReceivedEvent.js" name="NotificationReceivedEvent" />
   <js-module src="dist/Subscription.js" name="Subscription" />
   <js-module src="dist/OSNotification.js" name="OSNotification" />
+  <js-module src="dist/UserNamespace.js" name="UserNamespace" />
+  <js-module src="dist/DebugNamespace.js" name="DebugNamespace" />
+  <js-module src="dist/InAppMessagesNamespace.js" name="InAppMessagesNamespace" />
+  <js-module src="dist/SessionNamespace.js" name="SessionNamespace" />
+  <js-module src="dist/LocationNamespace.js" name="LocationNamespace" />
 
   <platform name="android">
     <framework src="com.onesignal:OneSignal:4.8.2" />
@@ -76,7 +81,7 @@
             <source url="https://cdn.cocoapods.org/"/>
         </config>
         <pods use-frameworks="true">
-            <pod name="OneSignalXCFramework" spec="3.12.3" />
+            <pod name="OneSignalXCFramework" spec="5.0.0-alpha-02" />
         </pods>
     </podspec>
 
