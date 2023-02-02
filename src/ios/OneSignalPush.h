@@ -52,6 +52,15 @@
 - (void)addTags:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)removeTags:(CDVInvokedUrlCommand* _Nonnull)command;
 
+// Push Subscription
+- (void)addPushSubscriptionObserver:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)removePushSubscriptionObserver:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)getId:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)getToken:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)getOptedIn:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)optIn:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)optOut:(CDVInvokedUrlCommand* _Nonnull)command;
+
 - (void)promptForPushNotificationsWithUserResponse:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)registerForProvisionalAuthorization:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)disablePush:(CDVInvokedUrlCommand* _Nonnull)command;
