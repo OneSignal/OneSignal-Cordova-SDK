@@ -71,9 +71,11 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String ADD_EMAIL_SUBSCRIPTION_OBSERVER = "addEmailSubscriptionObserver";
   private static final String ADD_SMS_SUBSCRIPTION_OBSERVER = "addSMSSubscriptionObserver";
 
-  private static final String GET_TAGS = "getTags";
-  private static final String DELETE_TAGS = "deleteTags";
-  private static final String SEND_TAGS = "sendTags";
+  private static final String ADD_ALIASES = "addAliases";
+  private static final String REMOVE_ALIASES = "removeAliases";
+
+  private static final String REMOVE_TAGS = "removeTags";
+  private static final String ADD_TAGS = "addTags";
 
   private static final String REGISTER_FOR_PROVISIONAL_AUTHORIZATION = "registerForProvisionalAuthorization";
   private static final String PROMPT_FOR_PUSH_NOTIFICATIONS_WITH_USER_RESPONSE = "promptForPushNotificationsWithUserResponse";
@@ -87,15 +89,14 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String POST_NOTIFICATION = "postNotification";
   private static final String SET_LAUNCH_URLS_IN_APP = "setLaunchURLsInApp";
 
-  private static final String SET_EMAIL = "setEmail";
-  private static final String SET_UNAUTHENTICATED_EMAIL = "setUnauthenticatedEmail";
-  private static final String LOGOUT_EMAIL = "logoutEmail";
+  private static final String ADD_EMAIL = "addEmail";
+  private static final String REMOVE_EMAIL = "removeEmail";
 
-  private static final String SET_SMS_NUMBER = "setSMSNumber";
-  private static final String SET_UNAUTHENTICATED_SMS_NUMBER = "setUnauthenticatedSMSNumber";
-  private static final String LOGOUT_SMS_NUMBER = "logoutSMSNumber";
+  private static final String ADD_SMS_NUMBER = "addSmsNumber";
+  private static final String REMOVE_SMS_NUMBER = "removeSmsNumber";
 
   private static final String SET_LOG_LEVEL = "setLogLevel";
+  private static final String SET_ALERT_LEVEL = "setAlertLevel";
 
   private static final String SET_LOCATION_SHARED = "setLocationShared";
   private static final String IS_LOCATION_SHARED = "isLocationShared";
@@ -105,9 +106,6 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String REQUIRES_CONSENT = "requiresUserPrivacyConsent";
   private static final String SET_REQUIRES_CONSENT = "setRequiresUserPrivacyConsent";
   private static final String PROVIDE_USER_CONSENT = "provideUserConsent";
-
-  private static final String SET_EXTERNAL_USER_ID = "setExternalUserId";
-  private static final String REMOVE_EXTERNAL_USER_ID = "removeExternalUserId";
 
   private static final String ADD_TRIGGERS = "addTriggers";
   private static final String REMOVE_TRIGGERS_FOR_KEYS = "removeTriggersForKeys";
@@ -257,7 +255,7 @@ public class OneSignalPush extends CordovaPlugin {
         break;
 
       case SET_LANGUAGE:
-        result = OneSignalController.setLanguage(callbackContext, data);
+        result = OneSignalController.setLanguage(data);
         break;
 
       case ADD_PERMISSION_OBSERVER:
@@ -276,16 +274,20 @@ public class OneSignalPush extends CordovaPlugin {
         result = OneSignalObserverController.addSMSSubscriptionObserver(callbackContext);
         break;
 
-      case GET_TAGS:
-        result = OneSignalController.getTags(callbackContext);
+      case ADD_ALIASES:
+        result = OneSignalController.addAliases(data);
         break;
 
-      case SEND_TAGS:
-        result = OneSignalController.sendTags(data);
+      case REMOVE_ALIASES:
+        result = OneSignalController.removeAlias(data);
         break;
 
-      case DELETE_TAGS:
-        result = OneSignalController.deleteTags(data);
+      case ADD_TAGS:
+        result = OneSignalController.addTags(data);
+        break;
+
+      case REMOVE_TAGS:
+        result = OneSignalController.removeTags(data);
         break;
 
       case REGISTER_FOR_PROVISIONAL_AUTHORIZATION:
@@ -325,31 +327,23 @@ public class OneSignalPush extends CordovaPlugin {
         break;
 
       case SET_LOG_LEVEL:
-        OneSignalController.setLogLevel(data);
+        OneSignalController.setLogLevel(callbackContext,data);
         break;
 
-      case SET_EMAIL:
-        result = OneSignalEmailController.setEmail(callbackContext, data);
+      case ADD_EMAIL:
+        result = OneSignalEmailController.addEmail(data);
         break;
 
-      case SET_UNAUTHENTICATED_EMAIL:
-        result = OneSignalEmailController.setUnauthenticatedEmail(callbackContext, data);
+      case REMOVE_EMAIL:
+        result = OneSignalEmailController.removeEmail(data);
         break;
 
-      case LOGOUT_EMAIL:
-        result = OneSignalEmailController.logoutEmail(callbackContext);
+      case ADD_SMS_NUMBER:
+        result = OneSignalSMSController.addSmsNumber(data);
         break;
 
-      case SET_SMS_NUMBER:
-        result = OneSignalSMSController.setSMSNumber(callbackContext, data);
-        break;
-
-      case SET_UNAUTHENTICATED_SMS_NUMBER:
-        result = OneSignalSMSController.setUnauthenticatedEmail(callbackContext, data);
-        break;
-
-      case LOGOUT_SMS_NUMBER:
-        result = OneSignalSMSController.logoutSMSNumber(callbackContext);
+      case REMOVE_SMS_NUMBER:
+        result = OneSignalSMSController.removeSmsNumber(data);
         break;
 
       case PROMPT_LOCATION:
@@ -378,14 +372,6 @@ public class OneSignalPush extends CordovaPlugin {
 
       case PROVIDE_USER_CONSENT:
         result = OneSignalController.provideUserConsent(data);
-        break;
-
-      case SET_EXTERNAL_USER_ID:
-        result = OneSignalController.setExternalUserId(callbackContext, data);
-        break;
-
-      case REMOVE_EXTERNAL_USER_ID:
-        result = OneSignalController.removeExternalUserId(callbackContext);
         break;
 
       case ADD_TRIGGERS:
