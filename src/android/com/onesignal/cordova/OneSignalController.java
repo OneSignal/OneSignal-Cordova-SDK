@@ -85,25 +85,25 @@ public class OneSignalController {
     }
   }
 
-  Will be added in next update
-   public static boolean removeAliases(JSONArray data) {
-    try{
-      JSONObject aliasObject = data.getJSONObject(0);
-      Map<String, String> aliasesToRemove = new HashMap<>();
-      Iterator<String> labels = aliasObject.keys();
+  // Will be added in next update
+  //  public static boolean removeAliases(JSONArray data) {
+  //   try{
+  //     JSONObject aliasObject = data.getJSONObject(0);
+  //     Map<String, String> aliasesToRemove = new HashMap<>();
+  //     Iterator<String> labels = aliasObject.keys();
 
-      while (labels.hasNext()) {
-          String label = labels.next();
-          aliasesToRemove.put(label, aliasObject.get(label).toString());
-      }
+  //     while (labels.hasNext()) {
+  //         String label = labels.next();
+  //         aliasesToRemove.put(label, aliasObject.get(label).toString());
+  //     }
       
-      OneSignal.getUser().removeAliases(aliasesToRemove);
-      return true;
-    } catch (Throwable t) {
-      t.printStackTrace();
-      return false;
-    }
-  }
+  //     OneSignal.getUser().removeAliases(aliasesToRemove);
+  //     return true;
+  //   } catch (Throwable t) {
+  //     t.printStackTrace();
+  //     return false;
+  //   }
+  // }
 
   public static boolean removeAlias(JSONArray data) {
     try {
