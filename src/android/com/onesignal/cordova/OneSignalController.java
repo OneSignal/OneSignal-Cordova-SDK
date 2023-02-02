@@ -2,6 +2,7 @@ package com.onesignal.cordova;
 
 import com.onesignal.OSDeviceState;
 import com.onesignal.OneSignal;
+import com.onesignal.debug.LogLevel;
 import com.onesignal.OneSignal.PostNotificationResponseHandler;
 
 import org.apache.cordova.CallbackContext;
