@@ -36,6 +36,7 @@ import com.onesignal.OSNotification;
 import com.onesignal.OSNotificationOpenedResult;
 import com.onesignal.OSNotificationReceivedEvent;
 import com.onesignal.OneSignal;
+import com.onesignal.common.OneSignalUtils;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -195,10 +196,9 @@ public class OneSignalPush extends CordovaPlugin {
     try {
       String appId = data.getString(0);
 
-      OneSignal.sdkType = "cordova";
+      OneSignalUtils.INSTANCE.setSdkType("cordova");
 
-      OneSignal.setAppId(appId);
-      OneSignal.initWithContext(this.cordova.getActivity());
+      OneSignal.initWithContext(this.cordova.getActivity(), appId);
 
       return true;
     } catch (JSONException e) {
