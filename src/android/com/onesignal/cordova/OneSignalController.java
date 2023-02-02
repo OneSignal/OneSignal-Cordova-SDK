@@ -44,8 +44,18 @@ public class OneSignalController {
   public static void setLogLevel(JSONArray data) {
     try {
       int logLevel = data.getInt(0);
-      int visualLevel = data.getInt(1);
-      OneSignal.setLogLevel(logLevel, visualLevel);
+      LogLevel level = LogLevel.fromInt(logLevel);
+      OneSignal.getDebug().setLogLevel(level);
+    } catch (Throwable t) {
+      t.printStackTrace();
+    }
+  }
+
+  public static void setAlertLevel(JSONArray data) {
+    try {
+      int alertLevel = data.getInt(0);
+      LogLevel visuallevel = LogLevel.fromInt(alertLevel);
+      OneSignal.getDebug().setLogLevel(visuallevel);
     } catch (Throwable t) {
       t.printStackTrace();
     }

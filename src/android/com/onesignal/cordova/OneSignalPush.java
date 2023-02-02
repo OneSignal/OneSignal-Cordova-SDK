@@ -327,7 +327,11 @@ public class OneSignalPush extends CordovaPlugin {
         break;
 
       case SET_LOG_LEVEL:
-        OneSignalController.setLogLevel(callbackContext,data);
+        OneSignalController.setLogLevel(data);
+        break;
+
+      case SET_ALERT_LEVEL:
+        OneSignalController.setAlertLevel(data);
         break;
 
       case ADD_EMAIL:
