@@ -33,23 +33,12 @@
 
 NSString* notificationWillShowInForegoundCallbackId;
 NSString* notificationOpenedCallbackId;
-NSString* setLanguageCallbackId;
-NSString* getTagsCallbackId;
 NSString* getIdsCallbackId;
 NSString* postNotificationCallbackId;
 NSString* permissionObserverCallbackId;
 NSString* subscriptionObserverCallbackId;
 NSString* promptForPushNotificationsWithUserResponseCallbackId;
 NSString* registerForProvisionalAuthorizationCallbackId;
-NSString* setEmailCallbackId;
-NSString* setUnauthenticatedEmailCallbackId;
-NSString* setSMSNumberCallbackId;
-NSString* setUnauthenticatedSMSNumberCallbackId;
-NSString* setExternalIdCallbackId;
-NSString* logoutEmailCallbackId;
-NSString* logoutSMSNumberCallbackId;
-NSString* emailSubscriptionCallbackId;
-NSString* smsSubscriptionCallbackId;
 NSString* enterLiveActivityCallbackId;
 NSString* exitLiveActivityCallbackId;
 
@@ -276,13 +265,7 @@ static Class delegateClass = nil;
 }
 
 - (void)setLanguage:(CDVInvokedUrlCommand*)command {
-    setLanguageCallbackId = command.callbackId;
-
-    [OneSignal setLanguage:command.arguments[0] withSuccess:^{
-        successCallback(setLanguageCallbackId, nil);
-    } withFailure:^(NSError *error) {
-        failureCallback(setLanguageCallbackId, error.userInfo);
-    }];
+    [OneSignal.User setLanguage:command.arguments[0]];
 }
 
 - (void)addPermissionObserver:(CDVInvokedUrlCommand*)command {
@@ -321,19 +304,12 @@ static Class delegateClass = nil;
     [OneSignal.Debug setVisualLevel:[command.arguments[0] intValue]];
 }
 
-- (void)getTags:(CDVInvokedUrlCommand*)command {
-    getTagsCallbackId = command.callbackId;
-    [OneSignal getTags:^(NSDictionary* result) {
-        successCallback(getTagsCallbackId, result);
-    }];
+- (void)addTags:(CDVInvokedUrlCommand*)command {
+    [OneSignal.User addTags:command.arguments[0]];
 }
 
-- (void)sendTags:(CDVInvokedUrlCommand*)command {
-    [OneSignal sendTags:command.arguments[0]];
-}
-
-- (void)deleteTags:(CDVInvokedUrlCommand*)command {
-    [OneSignal deleteTags:command.arguments];
+- (void)removeTags:(CDVInvokedUrlCommand*)command {
+    [OneSignal.User removeTags:command.arguments];
 }
 
 - (void)promptForPushNotificationsWithUserResponse:(CDVInvokedUrlCommand*)command {
@@ -403,100 +379,32 @@ static Class delegateClass = nil;
         [OneSignal consentGranted:[command.arguments[0] boolValue]];
 }
 
-- (void)setEmail:(CDVInvokedUrlCommand *)command {
-    setEmailCallbackId = command.callbackId;
+- (void)addAliases:(CDVInvokedUrlCommand *)command {
+    [OneSignal.User addAliases:command.arguments[0]];
+}
 
+- (void)removeAliases:(CDVInvokedUrlCommand *)command {
+    [OneSignal.User removeAliases:command.arguments];
+}
+
+- (void)addEmail:(CDVInvokedUrlCommand *)command {
     NSString *email = command.arguments[0];
-    NSString *emailAuthToken = command.arguments[1];
-
-    [OneSignal setEmail:email withEmailAuthHashToken:emailAuthToken withSuccess:^{
-        successCallback(setEmailCallbackId, nil);
-    } withFailure:^(NSError *error) {
-        failureCallback(setEmailCallbackId, error.userInfo);
-    }];
+    [OneSignal.User addEmail:email];
 }
 
-- (void)setUnauthenticatedEmail:(CDVInvokedUrlCommand *)command {
-    setUnauthenticatedEmailCallbackId = command.callbackId;
-
+- (void)removeEmail:(CDVInvokedUrlCommand *)command {
     NSString *email = command.arguments[0];
-
-    [OneSignal setEmail:email withSuccess:^{
-        successCallback(setUnauthenticatedEmailCallbackId, nil);
-    } withFailure:^(NSError *error) {
-        failureCallback(setUnauthenticatedEmailCallbackId, error.userInfo);
-    }];
+    [OneSignal.User removeEmail:email];
 }
 
-- (void)logoutEmail:(CDVInvokedUrlCommand *)command {
-    logoutEmailCallbackId = command.callbackId;
-
-    [OneSignal logoutEmailWithSuccess:^{
-        successCallback(logoutEmailCallbackId, nil);
-    } withFailure:^(NSError *error) {
-        failureCallback(logoutEmailCallbackId, error.userInfo);
-    }];
-}
-
-- (void)setSMSNumber:(CDVInvokedUrlCommand *)command {
-    setSMSNumberCallbackId = command.callbackId;
-
+- (void)addSms:(CDVInvokedUrlCommand *)command {
     NSString *smsNumber = command.arguments[0];
-    NSString *smsAuthHashToken = command.arguments[1];
-
-    [OneSignal setSMSNumber:smsNumber withSMSAuthHashToken:smsAuthHashToken withSuccess:^(NSDictionary *results){
-        successCallback(setSMSNumberCallbackId, results);
-    } withFailure:^(NSError *error) {
-        failureCallback(setSMSNumberCallbackId, error.userInfo);
-    }];
+    [OneSignal.User addSmsNumber:smsNumber];
 }
 
-- (void)setUnauthenticatedSMSNumber:(CDVInvokedUrlCommand *)command {
-    setUnauthenticatedSMSNumberCallbackId = command.callbackId;
-
+- (void)removeSms:(CDVInvokedUrlCommand *)command {
     NSString *smsNumber = command.arguments[0];
-
-    [OneSignal setSMSNumber:smsNumber withSuccess:^(NSDictionary *results){
-        successCallback(setUnauthenticatedSMSNumberCallbackId, results);
-    } withFailure:^(NSError *error) {
-        failureCallback(setUnauthenticatedSMSNumberCallbackId, error.userInfo);
-    }];
-}
-
-- (void)logoutSMSNumber:(CDVInvokedUrlCommand *)command {
-    logoutSMSNumberCallbackId = command.callbackId;
-
-    [OneSignal logoutSMSNumberWithSuccess:^(NSDictionary *results){
-        successCallback(logoutSMSNumberCallbackId, results);
-    } withFailure:^(NSError *error) {
-        failureCallback(logoutSMSNumberCallbackId, error.userInfo);
-    }];
-}
-
-- (void)setExternalUserId:(CDVInvokedUrlCommand *)command {
-    setExternalIdCallbackId = command.callbackId;
-
-    NSString *externalId = command.arguments[0];
-    NSString *authHashToken = nil;
-
-    if (command.arguments.count > 1)
-        authHashToken = command.arguments[1];
-
-    [OneSignal setExternalUserId:externalId withExternalIdAuthHashToken:authHashToken withSuccess:^(NSDictionary *results) {
-        successCallback(setExternalIdCallbackId, results);
-    } withFailure: ^(NSError* error) {
-        [OneSignal onesignalLog:ONE_S_LL_VERBOSE message:[NSString stringWithFormat:@"Set external user id Failure with error: %@", error]];
-        failureCallback(setExternalIdCallbackId, error.userInfo);
-    }];
-}
-
-- (void)removeExternalUserId:(CDVInvokedUrlCommand *)command {
-    [OneSignal removeExternalUserId:^(NSDictionary *results) {
-        successCallback(command.callbackId, results);
-    } withFailure:^(NSError* error) {
-        [OneSignal onesignalLog:ONE_S_LL_VERBOSE message:[NSString stringWithFormat:@"Remove external user id Failure with error: %@", error]];
-        failureCallback(command.callbackId, error.userInfo);
-    }];
+    [OneSignal.User removeSmsNumber:smsNumber];
 }
 
 - (void)setLaunchURLsInApp:(CDVInvokedUrlCommand *)command {
