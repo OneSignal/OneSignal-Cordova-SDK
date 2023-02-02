@@ -78,8 +78,8 @@
 - (void)removeEmail:(CDVInvokedUrlCommand* _Nonnull)command;
 
 // SMS
-- (void)addSmsNumber:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)removeSmsNumber:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)addSms:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)removeSms:(CDVInvokedUrlCommand* _Nonnull)command;
     
 - (void)setLaunchURLsInApp:(CDVInvokedUrlCommand* _Nonnull)command;
 

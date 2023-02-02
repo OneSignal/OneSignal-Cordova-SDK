@@ -397,12 +397,12 @@ static Class delegateClass = nil;
     [OneSignal.User removeEmail:email];
 }
 
-- (void)addSmsNumber:(CDVInvokedUrlCommand *)command {
+- (void)addSms:(CDVInvokedUrlCommand *)command {
     NSString *smsNumber = command.arguments[0];
     [OneSignal.User addSmsNumber:smsNumber];
 }
 
-- (void)removeSmsNumber:(CDVInvokedUrlCommand *)command {
+- (void)removeSms:(CDVInvokedUrlCommand *)command {
     NSString *smsNumber = command.arguments[0];
     [OneSignal.User removeSmsNumber:smsNumber];
 }

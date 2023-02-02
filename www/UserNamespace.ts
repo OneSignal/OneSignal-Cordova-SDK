@@ -90,7 +90,7 @@ export default class User {
      * @returns void
      */
     addSms(smsNumber: string): void {
-        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "addSmsNumber", [smsNumber]);        
+        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "addSms", [smsNumber]);        
     };
 
     /**
@@ -99,7 +99,7 @@ export default class User {
      * @returns void
      */
     removeSms(smsNumber: string): void {
-        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "removeSmsNumber", [smsNumber]);
+        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "removeSms", [smsNumber]);
     };
 
     /**
