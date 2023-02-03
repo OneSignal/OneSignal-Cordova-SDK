@@ -307,6 +307,14 @@ static Class delegateClass = nil;
     [OneSignal.Debug setVisualLevel:[command.arguments[0] intValue]];
 }
 
+- (void)login:(CDVInvokedUrlCommand*)command {
+    [OneSignal login:command.arguments[0]];
+}
+
+- (void)logout:(CDVInvokedUrlCommand*)command {
+    [OneSignal logout];
+}
+
 - (void)addTags:(CDVInvokedUrlCommand*)command {
     [OneSignal.User addTags:command.arguments[0]];
 }
@@ -361,25 +369,24 @@ static Class delegateClass = nil;
 // Finish Android only
 
 // Note: This implementation may not be accurate, as this method doesn't seem to exist in iOS
-- (void)userProvidedPrivacyConsent:(CDVInvokedUrlCommand *)command {
-    bool userProvidedPrivacyConsent = !OneSignal.requiresUserPrivacyConsent;
+- (void)getPrivacyConsent:(CDVInvokedUrlCommand *)command {
+    bool userProvidedPrivacyConsent = OneSignal.getPrivacyConsent;
     successCallbackBoolean(command.callbackId, userProvidedPrivacyConsent);
 }
 
-- (void)requiresUserPrivacyConsent:(CDVInvokedUrlCommand *)command {
-    BOOL requiresUserPrivacyConsent = [OneSignal requiresUserPrivacyConsent];
-    // TODO: Update the response in next major release to just boolean
-    successCallback(command.callbackId, @{@"value" : @(requiresUserPrivacyConsent)});
+- (void)getRequiresPrivacyConsent:(CDVInvokedUrlCommand *)command {
+    BOOL requiresUserPrivacyConsent = [OneSignal requiresPrivacyConsent];
+    successCallbackBoolean(command.callbackId, requiresUserPrivacyConsent);
 }
 
-- (void)setRequiresUserPrivacyConsent:(CDVInvokedUrlCommand *)command {
+- (void)setRequiresPrivacyConsent:(CDVInvokedUrlCommand *)command {
     if (command.arguments.count >= 1)
-        [OneSignal setRequiresUserPrivacyConsent:[command.arguments[0] boolValue]];
+        [OneSignal setRequiresPrivacyConsent:[command.arguments[0] boolValue]];
 }
 
-- (void)provideUserConsent:(CDVInvokedUrlCommand *)command {
+- (void)setPrivacyConsentConsent:(CDVInvokedUrlCommand *)command {
     if (command.arguments.count >= 1)
-        [OneSignal consentGranted:[command.arguments[0] boolValue]];
+        [OneSignal setPrivacyConsent:[command.arguments[0] boolValue]];
 }
 
 - (void)addAliases:(CDVInvokedUrlCommand *)command {
@@ -504,8 +511,6 @@ static Class delegateClass = nil;
     };
     successCallback(command.callbackId, result);
 }
-
-
 
 /**
  * Outcomes
