@@ -68,21 +68,15 @@ public class OneSignalController {
       OneSignal.login(externalId);
       return true;
     }
-    catch (Throwable t) {
-      t.printStackTrace();
+    catch (JSONException e) {
+      e.printStackTrace();
       return false;
     }
   }
 
   public static boolean logout() {
-    try {
-      OneSignal.logout();
-      return true;
-    }
-    catch (Throwable t) {
-      t.printStackTrace();
-      return false;
-    }
+    OneSignal.logout();
+    return true;
   }
   
   /** 
@@ -335,12 +329,12 @@ public class OneSignalController {
   }
 
   public static boolean enterLiveActivity() {
-  // doesn't apply to Android
-  return true;
+    // doesn't apply to Android
+    return true;
   }
 
   public static boolean exitLiveActivity() {
-  // doesn't apply to Android
-  return true;
+    // doesn't apply to Android
+    return true;
   }
 }

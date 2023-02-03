@@ -420,12 +420,12 @@ public class OneSignalPush extends CordovaPlugin {
         break;
 
       case ENTER_LIVE_ACTIVITY:
-      result = OneSignalController.enterLiveActivity();
-      break;
+        result = OneSignalController.enterLiveActivity();
+        break;
 
       case EXIT_LIVE_ACTIVITY:
-      result = OneSignalController.exitLiveActivity();
-      break;
+        result = OneSignalController.exitLiveActivity();
+        break;
 
       default:
         Log.e(TAG, "Invalid action : " + action);
