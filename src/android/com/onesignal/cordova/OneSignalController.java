@@ -68,15 +68,21 @@ public class OneSignalController {
       OneSignal.login(externalId);
       return true;
     }
-    catch (JSONException e) {
-      e.printStackTrace();
+    catch (Throwable t) {
+      t.printStackTrace();
       return false;
     }
   }
 
   public static boolean logout() {
-    OneSignal.logout();
-    return true;
+    try {
+      OneSignal.logout();
+      return true;
+    }
+    catch (Throwable t) {
+      t.printStackTrace();
+      return false;
+    }
   }
   
   /** 
@@ -102,13 +108,30 @@ public class OneSignalController {
     }
   }
 
-   public static boolean removeAliases(JSONArray data) {
-    try{
-      Collection<String> aliasesToRemove = new ArrayList<String>();
-      for (int i = 0; i < data.length(); i++)
-        aliasesToRemove.add(data.get(i).toString());
+  // Will be added in next update
+  //  public static boolean removeAliases(JSONArray data) {
+  //   try{
+  //     JSONObject aliasObject = data.getJSONObject(0);
+  //     Map<String, String> aliasesToRemove = new HashMap<>();
+  //     Iterator<String> labels = aliasObject.keys();
+
+  //     while (labels.hasNext()) {
+  //         String label = labels.next();
+  //         aliasesToRemove.put(label, aliasObject.get(label).toString());
+  //     }
       
-      OneSignal.getUser().removeAliases(aliasesToRemove);
+  //     OneSignal.getUser().removeAliases(aliasesToRemove);
+  //     return true;
+  //   } catch (Throwable t) {
+  //     t.printStackTrace();
+  //     return false;
+  //   }
+  // }
+
+  public static boolean removeAlias(JSONArray data) {
+    try {
+      String aliasToRemove = data.getString(0);
+      OneSignal.getUser().removeAlias(aliasToRemove);
       return true;
     } catch (Throwable t) {
       t.printStackTrace();
@@ -312,12 +335,12 @@ public class OneSignalController {
   }
 
   public static boolean enterLiveActivity() {
-    // doesn't apply to Android
-    return true;
+  // doesn't apply to Android
+  return true;
   }
 
   public static boolean exitLiveActivity() {
-    // doesn't apply to Android
-    return true;
+  // doesn't apply to Android
+  return true;
   }
 }
