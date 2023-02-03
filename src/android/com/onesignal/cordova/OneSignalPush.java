@@ -92,8 +92,8 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String ADD_EMAIL = "addEmail";
   private static final String REMOVE_EMAIL = "removeEmail";
 
-  private static final String ADD_SMS_NUMBER = "addSmsNumber";
-  private static final String REMOVE_SMS_NUMBER = "removeSmsNumber";
+  private static final String ADD_SMS = "addSms";
+  private static final String REMOVE_SMS = "removeSms";
 
   private static final String SET_LOG_LEVEL = "setLogLevel";
   private static final String SET_ALERT_LEVEL = "setAlertLevel";
@@ -338,12 +338,12 @@ public class OneSignalPush extends CordovaPlugin {
         result = OneSignalEmailController.removeEmail(data);
         break;
 
-      case ADD_SMS_NUMBER:
-        result = OneSignalSMSController.addSmsNumber(data);
+      case ADD_SMS:
+        result = OneSignalSMSController.addSms(data);
         break;
 
-      case REMOVE_SMS_NUMBER:
-        result = OneSignalSMSController.removeSmsNumber(data);
+      case REMOVE_SMS:
+        result = OneSignalSMSController.removeSms(data);
         break;
 
       case PROMPT_LOCATION:

@@ -10,7 +10,7 @@ import org.json.JSONObject;
 public class OneSignalEmailController {
     public static boolean addEmail(JSONArray data) {
         try {
-            OneSignal.getUser().addEmailSubscription(data.getString(0));
+            OneSignal.getUser().addEmail(data.getString(0));
             return true;
         } catch (Throwable t) {
             t.printStackTrace();
@@ -20,7 +20,7 @@ public class OneSignalEmailController {
 
     public static boolean removeEmail(JSONArray data) {
         try {
-            OneSignal.getUser().removeEmailSubscription(data.getString(0));
+            OneSignal.getUser().removeEmail(data.getString(0));
             return true;
         } catch (Throwable t) {
             t.printStackTrace();
