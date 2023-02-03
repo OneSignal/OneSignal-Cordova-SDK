@@ -291,8 +291,8 @@ static Class delegateClass = nil;
     if (pushId) {
         NSDictionary *result = @{
             @"value" : pushId
-        };
-        successCallback(command.callbackId, result);
+    };
+    successCallback(command.callbackId, result);
     }
 }
 
