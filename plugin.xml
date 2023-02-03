@@ -35,7 +35,7 @@
   <js-module src="dist/LocationNamespace.js" name="LocationNamespace" />
 
   <platform name="android">
-    <framework src="com.onesignal:OneSignal:5.0.0-alpha1" />
+    <framework src="com.onesignal:OneSignal:5.0.0-beta1" />
     <framework src="build-extras-onesignal.gradle" custom="true" type="gradleReference" />
 
     <config-file target="res/xml/config.xml" parent="/*">
