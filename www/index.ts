@@ -76,7 +76,11 @@ export class OneSignalPlugin {
     setAppId(appId: string): void {
         this._appID = appId;
 
-        window.cordova.exec(function() {}, function(){}, "OneSignalPush", "init", [this._appID]);
+        const observerCallback = () => {
+            this.User.pushSubscription.setPropertiesAndObserver();
+        }
+
+        window.cordova.exec(observerCallback, function(){}, "OneSignalPush", "init", [this._appID]);
     };
 
     /**
