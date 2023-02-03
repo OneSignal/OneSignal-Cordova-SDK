@@ -66,6 +66,9 @@ public class OneSignalPush extends CordovaPlugin {
 
   private static final String SET_LANGUAGE = "setLanguage";
 
+  private static final String LOGIN = "login";
+  private static final String LOGOUT = "logout";
+
   private static final String ADD_PERMISSION_OBSERVER = "addPermissionObserver";
   private static final String ADD_SUBSCRIPTION_OBSERVER = "addSubscriptionObserver";
   private static final String ADD_EMAIL_SUBSCRIPTION_OBSERVER = "addEmailSubscriptionObserver";
@@ -102,10 +105,10 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String IS_LOCATION_SHARED = "isLocationShared";
   private static final String PROMPT_LOCATION = "promptLocation";
 
-  private static final String USER_PROVIDED_CONSENT = "userProvidedPrivacyConsent";
-  private static final String REQUIRES_CONSENT = "requiresUserPrivacyConsent";
-  private static final String SET_REQUIRES_CONSENT = "setRequiresUserPrivacyConsent";
-  private static final String PROVIDE_USER_CONSENT = "provideUserConsent";
+  private static final String GET_PRIVACY_CONSENT = "getPrivacyConsent";
+  private static final String GET_REQUIRES_PRIVACY_CONSENT = "getRequiresPrivacyConsent";
+  private static final String SET_REQUIRES_PRIVACY_CONSENT = "setRequiresPrivacyConsent";
+  private static final String SET_PRIVACY_CONSENT = "setPrivacyConsent";
 
   private static final String ADD_TRIGGERS = "addTriggers";
   private static final String REMOVE_TRIGGERS_FOR_KEYS = "removeTriggersForKeys";
@@ -117,6 +120,9 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String SEND_OUTCOME = "sendOutcome";
   private static final String SEND_UNIQUE_OUTCOME = "sendUniqueOutcome";
   private static final String SEND_OUTCOME_WITH_VALUE = "sendOutcomeWithValue";
+
+  private static final String ENTER_LIVE_ACTIVITY = "enterLiveActivity";
+  private static final String EXIT_LIVE_ACTIVITY = "exitLiveActivity";
 
   private static final HashMap<String, OSNotificationReceivedEvent> notificationReceivedEventCache = new HashMap<>();
 
@@ -258,6 +264,13 @@ public class OneSignalPush extends CordovaPlugin {
         result = OneSignalController.setLanguage(data);
         break;
 
+      case LOGIN:
+        result = OneSignalController.login(data);
+        break;
+      
+      case LOGOUT:
+        result = OneSignalController.logout();
+
       case ADD_PERMISSION_OBSERVER:
         result = OneSignalObserverController.addPermissionObserver(callbackContext);
         break;
@@ -358,20 +371,20 @@ public class OneSignalPush extends CordovaPlugin {
         result = OneSignalController.isLocationShared(callbackContext);
         break;
 
-      case USER_PROVIDED_CONSENT:
-        result = OneSignalController.userProvidedConsent(callbackContext);
+      case GET_PRIVACY_CONSENT:
+        result = OneSignalController.getPrivacyConsent(callbackContext);
         break;
 
-      case REQUIRES_CONSENT:
-        result = OneSignalController.requiresUserPrivacyConsent(callbackContext);
+      case GET_REQUIRES_PRIVACY_CONSENT:
+        result = OneSignalController.getRequiresPrivacyConsent(callbackContext);
         break;
 
-      case SET_REQUIRES_CONSENT:
-        result = OneSignalController.setRequiresConsent(callbackContext, data);
+      case SET_REQUIRES_PRIVACY_CONSENT:
+        result = OneSignalController.setRequiresPrivacyConsent(data);
         break;
 
-      case PROVIDE_USER_CONSENT:
-        result = OneSignalController.provideUserConsent(data);
+      case SET_PRIVACY_CONSENT:
+        result = OneSignalController.setPrivacyConsent(data);
         break;
 
       case ADD_TRIGGERS:
@@ -405,6 +418,14 @@ public class OneSignalPush extends CordovaPlugin {
       case SEND_OUTCOME_WITH_VALUE:
         result = OneSignalOutcomeController.sendOutcomeWithValue(callbackContext, data);
         break;
+
+      case ENTER_LIVE_ACTIVITY:
+      result = OneSignalController.enterLiveActivity();
+      break;
+
+      case EXIT_LIVE_ACTIVITY:
+      result = OneSignalController.exitLiveActivity();
+      break;
 
       default:
         Log.e(TAG, "Invalid action : " + action);

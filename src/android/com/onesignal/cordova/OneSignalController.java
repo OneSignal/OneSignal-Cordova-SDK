@@ -61,6 +61,29 @@ public class OneSignalController {
       return false;
     }
   }
+
+  public static boolean login(JSONArray data) {
+    try {
+      String externalId = data.getString(0);
+      OneSignal.login(externalId);
+      return true;
+    }
+    catch (Throwable t) {
+      t.printStackTrace();
+      return false;
+    }
+  }
+
+  public static boolean logout() {
+    try {
+      OneSignal.logout();
+      return true;
+    }
+    catch (Throwable t) {
+      t.printStackTrace();
+      return false;
+    }
+  }
   
   /** 
   * Aliases
@@ -258,15 +281,21 @@ public class OneSignalController {
     return true;
   }
 
-  public static boolean requiresUserPrivacyConsent(CallbackContext callbackContext) {
-    boolean requiresUserPrivacyConsent = OneSignal.requiresUserPrivacyConsent();
-    CallbackHelper.callbackSuccessBoolean(callbackContext, requiresUserPrivacyConsent);
+  public static boolean getRequiresPrivacyConsent(CallbackContext callbackContext) {
+    boolean requiresUserConsent = OneSignal.getRequiresPrivacyConsent();
+    CallbackHelper.callbackSuccessBoolean(callbackContext, requiresUserConsent);
     return true;
   }
 
-  public static boolean setRequiresConsent(CallbackContext callbackContext, JSONArray data) {
+   public static boolean getPrivacyConsent(CallbackContext callbackContext) {
+    boolean getPrivacyConsent = OneSignal.getPrivacyConsent();
+    CallbackHelper.callbackSuccessBoolean(callbackContext, getPrivacyConsent);
+    return true;
+  }
+
+  public static boolean setRequiresPrivacyConsent(JSONArray data) {
     try {
-      OneSignal.setRequiresUserPrivacyConsent(data.getBoolean(0));
+      OneSignal.setRequiresPrivacyConsent(data.getBoolean(0));
       return true;
     } catch (JSONException e) {
       e.printStackTrace();
@@ -274,9 +303,9 @@ public class OneSignalController {
     }
   }
 
-  public static boolean provideUserConsent(JSONArray data) {
+  public static boolean setPrivacyConsent(JSONArray data) {
     try {
-      OneSignal.provideUserConsent(data.getBoolean(0));
+      OneSignal.setPrivacyConsent(data.getBoolean(0));
       return true;
     } catch (JSONException e) {
       e.printStackTrace();
@@ -303,5 +332,15 @@ public class OneSignalController {
     // Need to be implemented in Android
     CallbackHelper.callbackSuccessBoolean(callbackContext, false);
     return true;
+  }
+
+  public static boolean enterLiveActivity() {
+  // doesn't apply to Android
+  return true;
+  }
+
+  public static boolean exitLiveActivity() {
+  // doesn't apply to Android
+  return true;
   }
 }
