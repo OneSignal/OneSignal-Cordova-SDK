@@ -74,7 +74,7 @@ public class OneSignalController {
 
       while (labels.hasNext()) {
           String label = labels.next();
-          aliasesToAdd.put(label, aliasObject.get(label).toString());
+          aliasesToAdd.put(label, aliasObject.getString(label));
       }
       
       OneSignal.getUser().addAliases(aliasesToAdd);
@@ -85,18 +85,12 @@ public class OneSignalController {
     }
   }
 
-  // Will be added in next update
-  //  public static boolean removeAliases(JSONArray data) {
-  //   try{
-  //     JSONObject aliasObject = data.getJSONObject(0);
-  //     Map<String, String> aliasesToRemove = new HashMap<>();
-  //     Iterator<String> labels = aliasObject.keys();
-
-  //     while (labels.hasNext()) {
-  //         String label = labels.next();
-  //         aliasesToRemove.put(label, aliasObject.get(label).toString());
-  //     }
-      
+  // Willl be added in next update
+  // public static boolean removeAliases(JSONArray data) {
+  //   try {
+  //     Collection<String> aliasesToRemove = new ArrayList<String>();
+  //     for (int i = 0; i < data.length(); i++)
+  //       aliasesToRemove.add(data.get(i).toString());
   //     OneSignal.getUser().removeAliases(aliasesToRemove);
   //     return true;
   //   } catch (Throwable t) {
