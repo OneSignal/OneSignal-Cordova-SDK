@@ -80,6 +80,24 @@ export class OneSignalPlugin {
     };
 
     /**
+     * Login to OneSignal under the user identified by the [externalId] provided. The act of logging a user into the OneSignal SDK will switch the [user] context to that specific user.
+     * @param  {string} externalId
+     * @returns void
+     */
+    login(externalId: string): void {
+        window.cordova.exec(function () { }, function () { }, "OneSignalPush", "login", [externalId]);
+    }
+
+    /**
+     * Logout the user previously logged in via [login]. The [user] property now references a new device-scoped user.
+     * @param  {string} externalId
+     * @returns void
+     */
+    logout(): void {
+        window.cordova.exec(function () { }, function () { }, "OneSignalPush", "logout");
+    }
+
+    /**
      * Set the callback to run just before displaying a notification while the app is in focus.
      * @param  {(event:NotificationReceivedEvent)=>void} handler
      * @returns void
@@ -292,43 +310,40 @@ export class OneSignalPlugin {
         window.cordova.exec(function(){}, function(){}, "OneSignalPush", "setLaunchURLsInApp", [isEnabled]);
     };
 
-    /**
-     * Did the user provide privacy consent for GDPR purposes.
-     * @param  {(response: boolean) => void} handler
-     * @returns void
-     */
-    userProvidedPrivacyConsent(handler: (response: boolean) => void): void {
-        window.cordova.exec(handler, function(){}, "OneSignalPush", "userProvidedPrivacyConsent", []);
-    };
-
-    /**
-     * True if the application requires user privacy consent, false otherwise
-     * Passes a boolean on Android and passes an object on iOS to the handler.
-     *
-     * @param  {(response: boolean | {value: boolean}) => void} handler
-     * @returns void
-     */
-    requiresUserPrivacyConsent(handler: (response: boolean | { value: boolean }) => void): void {
-        // TODO: Update the response in next major release to just boolean
-        window.cordova.exec(handler, function(){}, "OneSignalPush", "requiresUserPrivacyConsent", []);
-    };
-
-    /**
-     * For GDPR users, your application should call this method before setting the App ID.
+   /**
+     * Determines whether a user must consent to privacy prior to their user data being sent up to OneSignal. This should be set to true prior to the invocation of initialization to ensure compliance.
      * @param  {boolean} required
      * @returns void
      */
-    setRequiresUserPrivacyConsent(required: boolean): void {
-        window.cordova.exec(function() {}, function() {}, "OneSignalPush", "setRequiresUserPrivacyConsent", [required]);
+    setRequiresPrivacyConsent(required: boolean): void {
+        window.cordova.exec(function () { }, function () { }, "OneSignalPush", "setRequiresPrivacyConsent", [required]);
     };
 
     /**
-     * If your application is set to require the user's privacy consent, you can provide this consent using this method.
+     * Determines whether a user must consent to privacy prior to their user data being sent up to OneSignal. This should be set to true prior to the invocation of initialization to ensure compliance.
+     * @param  {(response: boolean) => void} handler
+     * @returns void
+     */
+    getRequiresPrivacyConsent(handler: (value: boolean) => void): void {
+        window.cordova.exec(handler, function () { }, "OneSignalPush", "getRequiresPrivacyConsent", []);
+    };
+
+    /**
+     * Indicates whether privacy consent has been granted. This field is only relevant when the application has opted into data privacy protections.
      * @param  {boolean} granted
      * @returns void
      */
-    provideUserConsent(granted: boolean): void {
-        window.cordova.exec(function() {}, function() {}, "OneSignalPush", "provideUserConsent", [granted]);
+    setPrivacyConsent(granted: boolean): void {
+        window.cordova.exec(function () { }, function () { }, "OneSignalPush", "setPrivacyConsent", [granted]);
+    };
+
+    /**
+     * Whether privacy consent has been granted. This field is only relevant when the application has opted into data privacy protections.
+     * @param {(value: boolean) => void} handler
+     * @returns void
+     */
+    getPrivacyConsent(handler: (value: boolean) => void): void {
+        window.cordova.exec(handler, function () { }, "OneSignalPush", "getPrivacyConsent", []);
     };
 
     /**
