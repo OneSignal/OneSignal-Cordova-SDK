@@ -193,13 +193,14 @@ public class OneSignalPush extends CordovaPlugin {
   }
 
   public boolean init(JSONArray data) {
+    OneSignalWrapper.setSdkType("cordova");  
+    // For 5.0.0-beta, hard code to reflect Cordova SDK version found in plugin.xml
+    OneSignalWrapper.setSdkVersion("3.3.0");
     try {
       String appId = data.getString(0);
 
-      OneSignalWrapper.setSdkType("cordova");
-
       OneSignal.initWithContext(this.cordova.getActivity(), appId);
-
+      
       return true;
     } catch (JSONException e) {
       Log.e(TAG, "execute: Got JSON Exception " + e.getMessage());
