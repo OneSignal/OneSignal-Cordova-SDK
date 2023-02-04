@@ -279,7 +279,7 @@ public class OneSignalPush extends CordovaPlugin {
         break;
 
       case REMOVE_ALIASES:
-        result = OneSignalController.removeAlias(data);
+        result = OneSignalController.removeAliases(data);
         break;
 
       case ADD_TAGS:
