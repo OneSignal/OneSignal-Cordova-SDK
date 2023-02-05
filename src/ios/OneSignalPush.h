@@ -29,7 +29,7 @@
 #import <Cordova/CDV.h>
 #import <Cordova/CDVPlugin.h>
 
-#import <OneSignal/OneSignal.h>
+#import <OneSignalFramework/OneSignalFramework.h>
 
 @interface OneSignalPush : CDVPlugin <OSPermissionObserver, OSSubscriptionObserver, OSEmailSubscriptionObserver, OSSMSSubscriptionObserver, OSInAppMessageLifecycleHandler>
 
@@ -48,6 +48,9 @@
 
 - (void)setLogLevel:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)setAlertLevel:(CDVInvokedUrlCommand* _Nonnull)command;
+
+- (void)login:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)logout:(CDVInvokedUrlCommand* _Nonnull)command;
 
 - (void)addTags:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)removeTags:(CDVInvokedUrlCommand* _Nonnull)command;
@@ -73,10 +76,10 @@
 - (void)removeGroupedNotifications:(CDVInvokedUrlCommand* _Nonnull)command;
 // End Android Only
 
-- (void)userProvidedPrivacyConsent:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)requiresUserPrivacyConsent:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)setRequiresUserPrivacyConsent:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)provideUserConsent:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)getPrivacyConsent:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)getRequiresPrivacyConsent:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)setRequiresPrivacyConsent:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)setPrivacyConsent:(CDVInvokedUrlCommand* _Nonnull)command;
 
 // Aliases
 - (void)addAliases:(CDVInvokedUrlCommand* _Nonnull)command;

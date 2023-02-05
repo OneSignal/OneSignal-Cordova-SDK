@@ -3,8 +3,6 @@ package com.onesignal.cordova;
 import com.onesignal.OSDeviceState;
 import com.onesignal.OneSignal;
 import com.onesignal.OneSignal.PostNotificationResponseHandler;
-import com.onesignal.OneSignal.OSSetLanguageCompletionHandler;
-import com.onesignal.OneSignal.OSLanguageError;
 
 import org.apache.cordova.CallbackContext;
 import org.json.JSONArray;
@@ -13,6 +11,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.HashMap;
+import java.util.Map;
 
 public class OneSignalController {
 
@@ -49,35 +50,10 @@ public class OneSignalController {
       t.printStackTrace();
     }
   }
-
-  public static boolean setLanguage(CallbackContext callbackContext, JSONArray data) {
+  
+  public static boolean setLanguage(JSONArray data) {
     try {
-      final CallbackContext jsSetLanguageCallback = callbackContext;
-      OneSignal.setLanguage(data.getString(0), new OSSetLanguageCompletionHandler() {
-        @Override
-        public void onSuccess(String response) {
-          try{
-            JSONObject responseJson = new JSONObject("{'success' : 'true'}");
-            if(response != null) {
-              responseJson = new JSONObject(response);
-            }
-            CallbackHelper.callbackSuccess(jsSetLanguageCallback, responseJson);
-          }
-          catch (JSONException e) {
-            e.printStackTrace();
-          }
-        }
-
-        @Override
-        public void onFailure(OSLanguageError error) {
-          try {
-            JSONObject errorObject = new JSONObject("{'error' : '" + error.getMessage() + "'}");
-            CallbackHelper.callbackError(jsSetLanguageCallback, errorObject);
-          } catch (JSONException e) {
-              e.printStackTrace();
-          }
-        }
-      });
+      OneSignal.getUser().setLanguage(data.getString(0));
       return true;
     }
     catch (Throwable t) {
@@ -85,32 +61,91 @@ public class OneSignalController {
       return false;
     }
   }
+
+  public static boolean login(JSONArray data) {
+    try {
+      String externalId = data.getString(0);
+      OneSignal.login(externalId);
+      return true;
+    }
+    catch (JSONException e) {
+      e.printStackTrace();
+      return false;
+    }
+  }
+
+  public static boolean logout() {
+    OneSignal.logout();
+    return true;
+  }
   
+  /** 
+  * Aliases
+  */
+
+  public static boolean addAliases(JSONArray data) {
+    try{
+      JSONObject aliasObject = data.getJSONObject(0);
+      Map<String, String> aliasesToAdd = new HashMap<>();
+      Iterator<String> labels = aliasObject.keys();
+
+      while (labels.hasNext()) {
+          String label = labels.next();
+          aliasesToAdd.put(label, aliasObject.getString(label));
+      }
+      
+      OneSignal.getUser().addAliases(aliasesToAdd);
+      return true;
+    } catch (Throwable t) {
+      t.printStackTrace();
+      return false;
+    }
+  }
+
+  public static boolean removeAliases(JSONArray data) {
+    try {
+      Collection<String> aliasesToRemove = new ArrayList<String>();
+      
+      for (int i = 0; i < data.length(); i++)
+        aliasesToRemove.add(data.get(i).toString());
+      
+      OneSignal.getUser().removeAliases(aliasesToRemove);
+      return true;
+    } catch (Throwable t) {
+      t.printStackTrace();
+      return false;
+    }
+  }
+
   /**
    * Tags
    */
-  public static boolean getTags(CallbackContext callbackContext) {
-    final CallbackContext jsTagsAvailableCallBack = callbackContext;
-    OneSignal.getTags(tags -> CallbackHelper.callbackSuccess(jsTagsAvailableCallBack, tags));
-    return true;
-  }
 
-  public static boolean sendTags(JSONArray data) {
+  public static boolean addTags(JSONArray data) {
     try {
-      OneSignal.sendTags(data.getJSONObject(0));
-    }
-    catch (Throwable t) {
+      JSONObject tagsObject = data.getJSONObject(0);
+      Map<String, String> tagsToAdd = new HashMap<>();
+      Iterator<String> keys = tagsObject.keys();
+
+      while (keys.hasNext()) {
+          String key = keys.next();
+          tagsToAdd.put(key, tagsObject.get(key).toString());
+      }
+      
+      OneSignal.getUser().addTags(tagsToAdd);
+      return true;
+    } catch (Throwable t) {
       t.printStackTrace();
+      return false;
     }
-    return true;
   }
 
-  public static boolean deleteTags(JSONArray data) {
+  public static boolean removeTags(JSONArray data) {
     try {
       Collection<String> list = new ArrayList<String>();
       for (int i = 0; i < data.length(); i++)
         list.add(data.get(i).toString());
-      OneSignal.deleteTags(list);
+      OneSignal.getUser().removeTags(list);
       return true;
     } catch (Throwable t) {
       t.printStackTrace();
@@ -224,15 +259,21 @@ public class OneSignalController {
     return true;
   }
 
-  public static boolean requiresUserPrivacyConsent(CallbackContext callbackContext) {
-    boolean requiresUserPrivacyConsent = OneSignal.requiresUserPrivacyConsent();
-    CallbackHelper.callbackSuccessBoolean(callbackContext, requiresUserPrivacyConsent);
+  public static boolean getRequiresPrivacyConsent(CallbackContext callbackContext) {
+    boolean requiresUserConsent = OneSignal.getRequiresPrivacyConsent();
+    CallbackHelper.callbackSuccessBoolean(callbackContext, requiresUserConsent);
     return true;
   }
 
-  public static boolean setRequiresConsent(CallbackContext callbackContext, JSONArray data) {
+   public static boolean getPrivacyConsent(CallbackContext callbackContext) {
+    boolean getPrivacyConsent = OneSignal.getPrivacyConsent();
+    CallbackHelper.callbackSuccessBoolean(callbackContext, getPrivacyConsent);
+    return true;
+  }
+
+  public static boolean setRequiresPrivacyConsent(JSONArray data) {
     try {
-      OneSignal.setRequiresUserPrivacyConsent(data.getBoolean(0));
+      OneSignal.setRequiresPrivacyConsent(data.getBoolean(0));
       return true;
     } catch (JSONException e) {
       e.printStackTrace();
@@ -240,56 +281,14 @@ public class OneSignalController {
     }
   }
 
-  public static boolean provideUserConsent(JSONArray data) {
+  public static boolean setPrivacyConsent(JSONArray data) {
     try {
-      OneSignal.provideUserConsent(data.getBoolean(0));
+      OneSignal.setPrivacyConsent(data.getBoolean(0));
       return true;
     } catch (JSONException e) {
       e.printStackTrace();
       return false;
     }
-  }
-
-  /**
-   * External User Is
-   */
-  public static boolean setExternalUserId(final CallbackContext callback, JSONArray data) {
-    try {
-      String authHashToken = null;
-      if (data.length() > 1)
-        authHashToken = data.getString(1);
-
-      OneSignal.setExternalUserId(data.getString(0), authHashToken, new OneSignal.OSExternalUserIdUpdateCompletionHandler() {
-        @Override
-        public void onSuccess(JSONObject results) {
-          CallbackHelper.callbackSuccess(callback, results);
-        }
-
-        @Override
-        public void onFailure(OneSignal.ExternalIdError error) {
-          CallbackHelper.callbackError(callback, error.getMessage());
-        }
-      });
-      return true;
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return false;
-  }
-
-  public static boolean removeExternalUserId(final CallbackContext callback) {
-    OneSignal.removeExternalUserId(new OneSignal.OSExternalUserIdUpdateCompletionHandler() {
-      @Override
-      public void onSuccess(JSONObject results) {
-        CallbackHelper.callbackSuccess(callback, results);
-      }
-
-      @Override
-      public void onFailure(OneSignal.ExternalIdError error) {
-        CallbackHelper.callbackError(callback, error.getMessage());
-      }
-    });
-    return true;
   }
 
   /**
@@ -310,6 +309,16 @@ public class OneSignalController {
   public static boolean isLocationShared(CallbackContext callbackContext) {
     // Need to be implemented in Android
     CallbackHelper.callbackSuccessBoolean(callbackContext, false);
+    return true;
+  }
+
+  public static boolean enterLiveActivity() {
+    // doesn't apply to Android
+    return true;
+  }
+
+  public static boolean exitLiveActivity() {
+    // doesn't apply to Android
     return true;
   }
 }
