@@ -114,9 +114,9 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String PAUSE_IN_APP_MESSAGES = "pauseInAppMessages";
   private static final String IN_APP_MESSAGING_PAUSED = "isInAppMessagingPaused";
 
-  private static final String SEND_OUTCOME = "sendOutcome";
-  private static final String SEND_UNIQUE_OUTCOME = "sendUniqueOutcome";
-  private static final String SEND_OUTCOME_WITH_VALUE = "sendOutcomeWithValue";
+  private static final String ADD_OUTCOME = "addOutcome";
+  private static final String ADD_UNIQUE_OUTCOME = "addUniqueOutcome";
+  private static final String ADD_OUTCOME_WITH_VALUE = "addOutcomeWithValue";
 
   private static final HashMap<String, OSNotificationReceivedEvent> notificationReceivedEventCache = new HashMap<>();
 
@@ -398,16 +398,16 @@ public class OneSignalPush extends CordovaPlugin {
         result = OneSignalInAppMessagingController.isInAppMessagingPaused(callbackContext);
         break;
 
-      case SEND_OUTCOME:
-        result = OneSignalOutcomeController.sendOutcome(callbackContext, data);
+      case ADD_OUTCOME:
+        result = OneSignalOutcomeController.addOutcome(data);
         break;
 
-      case SEND_UNIQUE_OUTCOME:
-        result = OneSignalOutcomeController.sendUniqueOutcome(callbackContext, data);
+      case ADD_UNIQUE_OUTCOME:
+        result = OneSignalOutcomeController.addUniqueOutcome(data);
         break;
 
-      case SEND_OUTCOME_WITH_VALUE:
-        result = OneSignalOutcomeController.sendOutcomeWithValue(callbackContext, data);
+      case ADD_OUTCOME_WITH_VALUE:
+        result = OneSignalOutcomeController.addOutcomeWithValue(data);
         break;
 
       default:
