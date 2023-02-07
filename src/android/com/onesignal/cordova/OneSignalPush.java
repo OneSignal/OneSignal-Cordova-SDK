@@ -29,9 +29,10 @@ package com.onesignal.cordova;
 
 import android.util.Log;
 
-import com.onesignal.OSInAppMessageAction;
-import com.onesignal.OSInAppMessage;
-import com.onesignal.OSInAppMessageLifecycleHandler;
+import com.onesignal.inAppMessages.IInAppMessage;
+import com.onesignal.inAppMessages.IInAppMessageClickHandler;
+import com.onesignal.inAppMessages.IInAppMessageClickResult;
+import com.onesignal.inAppMessages.IInAppMessageLifecycleHandler;
 import com.onesignal.OSNotification;
 import com.onesignal.OSNotificationOpenedResult;
 import com.onesignal.OSNotificationReceivedEvent;
@@ -51,9 +52,9 @@ public class OneSignalPush extends CordovaPlugin {
 
   private static final String SET_NOTIFICATION_WILL_SHOW_IN_FOREGROUND_HANDLER = "setNotificationWillShowInForegroundHandler";
   private static final String SET_NOTIFICATION_OPENED_HANDLER = "setNotificationOpenedHandler";
-  private static final String SET_IN_APP_MESSAGE_CLICK_HANDLER = "setInAppMessageClickHandler";
-
-  private static final String SET_IN_APP_MESSAGE_LIFECYCLE_HANDLER = "setInAppMessageLifecycleHandler";
+  
+  private static final String SET_CLICK_HANDLER = "setClickHandler";
+  private static final String SET_LIFECYCLE_HANDLER = "setLifecycleHandler";
   private static final String SET_ON_WILL_DISPLAY_IN_APP_MESSAGE_HANDLER = "setOnWillDisplayInAppMessageHandler";
   private static final String SET_ON_DID_DISPLAY_IN_APP_MESSAGE_HANDLER = "setOnDidDisplayInAppMessageHandler";
   private static final String SET_ON_WILL_DISMISS_IN_APP_MESSAGE_HANDLER = "setOnWillDismissInAppMessageHandler";
@@ -108,11 +109,10 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String PROVIDE_USER_CONSENT = "provideUserConsent";
 
   private static final String ADD_TRIGGERS = "addTriggers";
-  private static final String REMOVE_TRIGGERS_FOR_KEYS = "removeTriggersForKeys";
-  private static final String GET_TRIGGER_VALUE_FOR_KEY = "getTriggerValueForKey";
-
-  private static final String PAUSE_IN_APP_MESSAGES = "pauseInAppMessages";
-  private static final String IN_APP_MESSAGING_PAUSED = "isInAppMessagingPaused";
+  private static final String REMOVE_TRIGGERS = "removeTriggers";
+  private static final String CLEAR_TRIGGERS = "clearTriggers";
+  private static final String SET_PAUSED = "setPaused";
+  private static final String IS_PAUSED = "isPaused";
 
   private static final String ADD_OUTCOME = "addOutcome";
   private static final String ADD_UNIQUE_OUTCOME = "addUniqueOutcome";
@@ -135,35 +135,67 @@ public class OneSignalPush extends CordovaPlugin {
     return true;
   }
 
-  public boolean setInAppMessageClickHandler(CallbackContext callbackContext) {
-    OneSignal.setInAppMessageClickHandler(new CordovaInAppMessageClickHandler(callbackContext));
+  public boolean setClickHandler(CallbackContext callbackContext) {
+    OneSignal.getInAppMessages().setInAppMessageClickHandler(new CordovaInAppMessageClickHandler(callbackContext));
     return true;
   }
 
-  public boolean setInAppMessageLifecycleHandler() {
-    OneSignal.setInAppMessageLifecycleHandler(new OSInAppMessageLifecycleHandler() {
+  public boolean setLifecycleHandler() {
+    OneSignal.getInAppMessages().setInAppMessageLifecycleHandler(new IInAppMessageLifecycleHandler() {
       @Override
-      public void onWillDisplayInAppMessage(OSInAppMessage message) {
-        if (jsInAppMessageWillDisplayCallback != null) {
-          CallbackHelper.callbackSuccess(jsInAppMessageWillDisplayCallback, message.toJSONObject());
+      public void onWillDisplayInAppMessage(IInAppMessage message) {
+        try {
+          JSONObject onWillDisplayResult = new JSONObject();
+            
+          onWillDisplayResult.put("messageId", message.getMessageId());
+          
+          if (jsInAppMessageWillDisplayCallback != null) {
+            CallbackHelper.callbackSuccess(jsInAppMessageWillDisplayCallback, onWillDisplayResult);
+          }
+        } catch (JSONException e) {
+          e.printStackTrace();
         }
       }
       @Override
-      public void onDidDisplayInAppMessage(OSInAppMessage message) {
-        if (jsInAppMessageDidDisplayCallBack != null) {
-          CallbackHelper.callbackSuccess(jsInAppMessageDidDisplayCallBack, message.toJSONObject());
+      public void onDidDisplayInAppMessage(IInAppMessage message) {
+        try {
+          JSONObject onDidDisplayResult = new JSONObject();
+
+          onDidDisplayResult.put("messageId", message.getMessageId());
+          
+          if (jsInAppMessageDidDisplayCallBack != null) {
+            CallbackHelper.callbackSuccess(jsInAppMessageDidDisplayCallBack, onDidDisplayResult);
+          }
+        } catch (JSONException e) {
+          e.printStackTrace();
         }
       }
       @Override
-      public void onWillDismissInAppMessage(OSInAppMessage message) {
-        if (jsInAppMessageWillDismissCallback != null) {
-          CallbackHelper.callbackSuccess(jsInAppMessageWillDismissCallback, message.toJSONObject());
+      public void onWillDismissInAppMessage(IInAppMessage message) {
+        try {
+          JSONObject onWillDismissResult = new JSONObject();
+
+          onWillDismissResult.put("messageId", message.getMessageId());
+          
+          if (jsInAppMessageWillDismissCallback != null) {
+            CallbackHelper.callbackSuccess(jsInAppMessageWillDismissCallback, onWillDismissResult);
+          }
+        } catch (JSONException e) {
+          e.printStackTrace();
         }
       }
       @Override
-      public void onDidDismissInAppMessage(OSInAppMessage message) {
-        if (jsInAppMessageDidDismissCallBack != null) {
-          CallbackHelper.callbackSuccess(jsInAppMessageDidDismissCallBack, message.toJSONObject());
+      public void onDidDismissInAppMessage(IInAppMessage message) {
+        try {
+          JSONObject onDidDismissResult = new JSONObject();
+
+          onDidDismissResult.put("messageId", message.getMessageId());
+          
+          if (jsInAppMessageDidDismissCallBack != null) {
+            CallbackHelper.callbackSuccess(jsInAppMessageDidDismissCallBack, onDidDismissResult);
+          }
+        } catch (JSONException e) {
+          e.printStackTrace();
         }
       }
     });
@@ -218,12 +250,12 @@ public class OneSignalPush extends CordovaPlugin {
         result = setNotificationWillShowInForegroundHandler(callbackContext);
         break;
 
-      case SET_IN_APP_MESSAGE_CLICK_HANDLER:
-        result = setInAppMessageClickHandler(callbackContext);
+      case SET_CLICK_HANDLER:
+        result = setClickHandler(callbackContext);
         break;
 
-      case SET_IN_APP_MESSAGE_LIFECYCLE_HANDLER:
-        result = setInAppMessageLifecycleHandler();
+      case SET_LIFECYCLE_HANDLER:
+        result = setLifecycleHandler();
         break;
 
       case SET_ON_WILL_DISPLAY_IN_APP_MESSAGE_HANDLER:
@@ -382,20 +414,20 @@ public class OneSignalPush extends CordovaPlugin {
         result = OneSignalInAppMessagingController.addTriggers(data);
         break;
 
-      case REMOVE_TRIGGERS_FOR_KEYS:
-        result = OneSignalInAppMessagingController.removeTriggersForKeys(data);
+      case REMOVE_TRIGGERS:
+        result = OneSignalInAppMessagingController.removeTriggers(data);
         break;
 
-      case GET_TRIGGER_VALUE_FOR_KEY:
-        result = OneSignalInAppMessagingController.getTriggerValueForKey(callbackContext, data);
+      case CLEAR_TRIGGERS:
+        result = OneSignalInAppMessagingController.clearTriggers();
         break;
 
-      case PAUSE_IN_APP_MESSAGES:
-        result = OneSignalInAppMessagingController.pauseInAppMessages(data);
+      case SET_PAUSED:
+        result = OneSignalInAppMessagingController.setPaused(data);
         break;
 
-      case IN_APP_MESSAGING_PAUSED:
-        result = OneSignalInAppMessagingController.isInAppMessagingPaused(callbackContext);
+      case IS_PAUSED:
+        result = OneSignalInAppMessagingController.isPaused(callbackContext);
         break;
 
       case ADD_OUTCOME:
@@ -486,7 +518,7 @@ public class OneSignalPush extends CordovaPlugin {
     }
   }
 
-  private static class CordovaInAppMessageClickHandler implements OneSignal.OSInAppMessageClickHandler {
+  private static class CordovaInAppMessageClickHandler implements IInAppMessageClickHandler {
 
     private CallbackContext jsInAppMessageClickedCallback;
 
@@ -495,24 +527,16 @@ public class OneSignalPush extends CordovaPlugin {
     }
 
     @Override
-    public void inAppMessageClicked(OSInAppMessageAction result) {
+    public void inAppMessageClicked(IInAppMessageClickResult result) {
       try {
-        JSONObject resultJSON = result.toJSONObject();
-        JSONObject actionJSON = new JSONObject();
+        JSONObject clickResults = new JSONObject();
 
-        // Convert key names to camelCase, which is the expected type
-        if (resultJSON.has("first_click")) {
-          actionJSON.put("firstClick", resultJSON.getBoolean("first_click"));
-        }
-        if (resultJSON.has("closes_message")) {
-          actionJSON.put("closesMessage", resultJSON.getBoolean("closes_message"));
-        }
-        actionJSON.put("clickName", resultJSON.optString("click_name", null));
-        actionJSON.put("clickUrl", resultJSON.optString("click_url", null));
-        actionJSON.put("outcomes", resultJSON.optJSONArray("outcomes"));
-        actionJSON.put("tags", resultJSON.optJSONObject("tags"));
+        clickResults.put("isFirstClick", result.getAction().isFirstClick());
+        clickResults.put("closesMessage", result.getAction().getClosesMessage());
+        clickResults.put("clickName", result.getAction().getClickName());
+        clickResults.put("clickUrl", result.getAction().getClickUrl());
 
-        CallbackHelper.callbackSuccess(jsInAppMessageClickedCallback, actionJSON);
+        CallbackHelper.callbackSuccess(jsInAppMessageClickedCallback, clickResults);
       }
       catch (JSONException e) {
         e.printStackTrace();
