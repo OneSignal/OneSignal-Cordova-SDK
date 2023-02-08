@@ -2,6 +2,7 @@ package com.onesignal.cordova;
 
 import com.onesignal.OSDeviceState;
 import com.onesignal.OneSignal;
+import com.onesignal.debug.LogLevel;
 import com.onesignal.OneSignal.PostNotificationResponseHandler;
 
 import org.apache.cordova.CallbackContext;
@@ -44,8 +45,20 @@ public class OneSignalController {
   public static void setLogLevel(JSONArray data) {
     try {
       int logLevel = data.getInt(0);
-      int visualLevel = data.getInt(1);
-      OneSignal.setLogLevel(logLevel, visualLevel);
+      LogLevel convertedLogLevel = LogLevel.fromInt(logLevel);
+
+      OneSignal.getDebug().setLogLevel(convertedLogLevel);
+    } catch (Throwable t) {
+      t.printStackTrace();
+    }
+  }
+
+  public static void setAlertLevel(JSONArray data) {
+    try {
+      int alertLevel = data.getInt(0);
+      LogLevel convertedVisualLevel = LogLevel.fromInt(alertLevel);
+
+      OneSignal.getDebug().setAlertLevel(convertedVisualLevel);
     } catch (Throwable t) {
       t.printStackTrace();
     }
