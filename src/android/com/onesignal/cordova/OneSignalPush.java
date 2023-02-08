@@ -70,10 +70,15 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String LOGOUT = "logout";
 
   private static final String ADD_PERMISSION_OBSERVER = "addPermissionObserver";
-  private static final String ADD_SUBSCRIPTION_OBSERVER = "addSubscriptionObserver";
-  private static final String ADD_EMAIL_SUBSCRIPTION_OBSERVER = "addEmailSubscriptionObserver";
-  private static final String ADD_SMS_SUBSCRIPTION_OBSERVER = "addSMSSubscriptionObserver";
+  private static final String ADD_PUSH_SUBSCRIPTION_OBSERVER = "addPushSubscriptionObserver";
+  private static final String REMOVE_PUSH_SUBSCRIPTION_OBSERVER = "removePushSubscriptionObserver";
 
+  private static final String OPT_IN = "optIn";
+  private static final String OPT_OUT = "optOut";
+   private static final String GET_ID = "getId";
+  private static final String GET_TOKEN = "getToken";
+  private static final String GET_OPTED_IN = "getOptedIn";
+  
   private static final String ADD_ALIASES = "addAliases";
   private static final String REMOVE_ALIASES = "removeAliases";
 
@@ -196,7 +201,7 @@ public class OneSignalPush extends CordovaPlugin {
     return true;
   }
 
-  public boolean init(JSONArray data) {
+  public boolean init(CallbackContext callbackContext, JSONArray data) {
     OneSignalWrapper.setSdkType("cordova");  
     // For 5.0.0-beta, hard code to reflect Cordova SDK version found in plugin.xml
     OneSignalWrapper.setSdkVersion("3.3.0");
@@ -204,7 +209,8 @@ public class OneSignalPush extends CordovaPlugin {
       String appId = data.getString(0);
 
       OneSignal.initWithContext(this.cordova.getActivity(), appId);
-      
+
+      CallbackHelper.callbackSuccessBoolean(callbackContext, true);
       return true;
     } catch (JSONException e) {
       Log.e(TAG, "execute: Got JSON Exception " + e.getMessage());
@@ -254,7 +260,7 @@ public class OneSignalPush extends CordovaPlugin {
         break;
 
       case INIT:
-        result = init(data);
+        result = init(callbackContext, data);
         break;
 
       case GET_DEVICE_STATE:
@@ -276,16 +282,32 @@ public class OneSignalPush extends CordovaPlugin {
         result = OneSignalObserverController.addPermissionObserver(callbackContext);
         break;
 
-      case ADD_SUBSCRIPTION_OBSERVER:
-        result = OneSignalObserverController.addSubscriptionObserver(callbackContext);
+      case ADD_PUSH_SUBSCRIPTION_OBSERVER:
+        result = OneSignalObserverController.addPushSubscriptionObserver(callbackContext);
+        break;
+      
+      case REMOVE_PUSH_SUBSCRIPTION_OBSERVER:
+        result = OneSignalObserverController.removePushSubscriptionObserver();
         break;
 
-      case ADD_EMAIL_SUBSCRIPTION_OBSERVER:
-        result = OneSignalObserverController.addEmailSubscriptionObserver(callbackContext);
+      case OPT_IN:
+        result = OneSignalController.optIn();
         break;
 
-      case ADD_SMS_SUBSCRIPTION_OBSERVER:
-        result = OneSignalObserverController.addSMSSubscriptionObserver(callbackContext);
+      case OPT_OUT:
+        result = OneSignalController.optOut();
+        break;
+      
+      case GET_ID:
+        result = OneSignalController.getId(callbackContext);
+        break;
+
+      case GET_TOKEN:
+        result = OneSignalController.getToken(callbackContext);
+        break;
+
+      case GET_OPTED_IN:
+        result = OneSignalController.getOptedIn(callbackContext);
         break;
 
       case ADD_ALIASES:
