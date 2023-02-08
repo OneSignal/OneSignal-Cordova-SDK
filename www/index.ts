@@ -28,14 +28,6 @@
 import { OpenedEvent } from "./models/NotificationOpened";
 import NotificationReceivedEvent from "./NotificationReceivedEvent";
 import OSNotification from './OSNotification';
-import {
-    ChangeEvent,
-    DeviceState,
-    EmailSubscriptionChange,
-    PermissionChange,
-    SMSSubscriptionChange,
-    SubscriptionChange
-} from "./Subscription";
 
 import User from "./UserNamespace";
 import Debug from "./DebugNamespace";
@@ -58,15 +50,6 @@ export class OneSignalPlugin {
     private _notificationOpenedDelegate = function(notificationOpened: OpenedEvent) {};
 
     private _permissionObserverList: ((event:ChangeEvent<PermissionChange>)=>void)[] = [];
-    private _subscriptionObserverList: ((event:ChangeEvent<SubscriptionChange>)=>void)[] = [];
-    private _emailSubscriptionObserverList: ((event:ChangeEvent<EmailSubscriptionChange>)=>void)[] = [];
-    private _smsSubscriptionObserverList: ((event:ChangeEvent<SMSSubscriptionChange>)=>void)[] = [];
-
-    private _processFunctionList<ObserverChangeEvent>(array: ((event:ChangeEvent<ObserverChangeEvent>)=>void)[], param: ChangeEvent<ObserverChangeEvent>): void {
-        for (let i = 0; i < array.length; i++) {
-            array[i](param);
-        }
-    }
 
     /**
      * Initializes the OneSignal SDK. This should be called during startup of the application.
@@ -77,7 +60,7 @@ export class OneSignalPlugin {
         this._appID = appId;
 
         const observerCallback = () => {
-            this.User.pushSubscription.setPropertiesAndObserver();
+            this.User.pushSubscription._setPropertiesAndObserver();
         }
 
         window.cordova.exec(observerCallback, function(){}, "OneSignalPush", "init", [this._appID]);
@@ -141,45 +124,6 @@ export class OneSignalPlugin {
             handler(new DeviceState(json));
         };
         window.cordova.exec(deviceStateCallback, function(){}, "OneSignalPush", "getDeviceState", []);
-    };
-
-    /**
-     * Add a callback that fires when the OneSignal subscription state changes.
-     * @param  {(event:ChangeEvent<SubscriptionChange>)=>void} observer
-     * @returns void
-     */
-    addSubscriptionObserver(observer: (event: ChangeEvent<SubscriptionChange>) => void): void {
-        this._subscriptionObserverList.push(observer);
-        const subscriptionCallBackProcessor = (state: ChangeEvent<SubscriptionChange>) => {
-            this._processFunctionList(this._subscriptionObserverList, state);
-        };
-        window.cordova.exec(subscriptionCallBackProcessor, function(){}, "OneSignalPush", "addSubscriptionObserver", []);
-    };
-
-    /**
-     * Add a callback that fires when the OneSignal email subscription changes.
-     * @param  {(event:ChangeEvent<EmailSubscriptionChange>)=>void} observer
-     * @returns void
-     */
-    addEmailSubscriptionObserver(observer: (event: ChangeEvent<EmailSubscriptionChange>) => void): void {
-        this._emailSubscriptionObserverList.push(observer);
-        const emailSubscriptionCallbackProcessor = (state: ChangeEvent<EmailSubscriptionChange>) => {
-            this._processFunctionList(this._emailSubscriptionObserverList, state);
-        };
-        window.cordova.exec(emailSubscriptionCallbackProcessor, function(){}, "OneSignalPush", "addEmailSubscriptionObserver", []);
-    };
-
-    /**
-     * Add a callback that fires when the OneSignal sms subscription changes.
-     * @param  {(event:ChangeEvent<SMSSubscriptionChange>)=>void} observer
-     * @returns void
-     */
-    addSMSSubscriptionObserver(observer: (event: ChangeEvent<SMSSubscriptionChange>) => void): void {
-        this._smsSubscriptionObserverList.push(observer);
-        const smsSubscriptionCallbackProcessor = (state: ChangeEvent<SMSSubscriptionChange>) => {
-            this._processFunctionList(this._smsSubscriptionObserverList, state);
-        };
-        window.cordova.exec(smsSubscriptionCallbackProcessor, function(){}, "OneSignalPush", "addSMSSubscriptionObserver", []);
     };
 
     /**
