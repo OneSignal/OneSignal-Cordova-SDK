@@ -29,6 +29,7 @@
   <js-module src="dist/Subscription.js" name="Subscription" />
   <js-module src="dist/OSNotification.js" name="OSNotification" />
   <js-module src="dist/UserNamespace.js" name="UserNamespace" />
+  <js-module src="dist/PushSubscriptionNamespace.js" name="PushSubscriptionNamespace" />
   <js-module src="dist/DebugNamespace.js" name="DebugNamespace" />
   <js-module src="dist/InAppMessagesNamespace.js" name="InAppMessagesNamespace" />
   <js-module src="dist/SessionNamespace.js" name="SessionNamespace" />

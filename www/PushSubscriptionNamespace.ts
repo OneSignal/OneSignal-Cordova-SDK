@@ -20,7 +20,7 @@ export default class PushSubscription {
     /**
      * Sets initial Push Subscription properties and adds observer for changes
      */
-    setPropertiesAndObserver():void {
+    _setPropertiesAndObserver():void {
         /**
          * Receive push Id
          * @param obj 
