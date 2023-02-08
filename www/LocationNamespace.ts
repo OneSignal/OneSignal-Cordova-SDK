@@ -24,14 +24,10 @@ export default class Location {
     };
 
     /**
-     * @param {(value: boolean) => void} handler
+     * @param {(response: boolean | {value: boolean}) => void} handler
      * @returns void
      */
-    isShared(handler: (value: boolean) => void): void {
-        const isSharedCallback = (obj: {value: boolean}) => {
-            handler(obj.value);
-        };
-
-        window.cordova.exec(isSharedCallback, function() {}, "OneSignalPush", "isLocationShared", []);
+    isShared(handler: (response: boolean | { value: boolean }) => void): void {
+        window.cordova.exec(handler, function() {}, "OneSignalPush", "isLocationShared", []);
     }
 }

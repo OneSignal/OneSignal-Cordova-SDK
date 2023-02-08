@@ -3,6 +3,7 @@ package com.onesignal.cordova;
 import com.onesignal.OSDeviceState;
 import com.onesignal.OneSignal;
 import com.onesignal.OneSignal.PostNotificationResponseHandler;
+import com.onesignal.Continue;
 
 import org.apache.cordova.CallbackContext;
 import org.json.JSONArray;
@@ -344,21 +345,30 @@ public class OneSignalController {
   /**
    * Location
    */
-  public static void promptLocation() {
-    OneSignal.promptLocation();
+  
+  public static boolean requestLocationPermission(CallbackContext callbackContext) {
+    OneSignal.getLocation().requestPermission(Continue.with(r -> {
+      if (r.isSuccess()) {
+        if (r.getData()) {
+          Boolean didPermit = r.getData();
+          CallbackHelper.callbackSuccessBoolean(callbackContext, didPermit);
+        }
+      }
+    }));
+    return true;
   }
 
   public static void setLocationShared(JSONArray data) {
     try {
-      OneSignal.setLocationShared(data.getBoolean(0));
+      OneSignal.getLocation().setShared(data.getBoolean(0));
     } catch (JSONException e) {
       e.printStackTrace();
     }
   }
 
   public static boolean isLocationShared(CallbackContext callbackContext) {
-    // Need to be implemented in Android
-    CallbackHelper.callbackSuccessBoolean(callbackContext, false);
+    boolean isShared = OneSignal.getLocation().isShared();
+    CallbackHelper.callbackSuccessBoolean(callbackContext, isShared);
     return true;
   }
 

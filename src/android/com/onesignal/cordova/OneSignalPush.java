@@ -108,7 +108,7 @@ public class OneSignalPush extends CordovaPlugin {
 
   private static final String SET_LOCATION_SHARED = "setLocationShared";
   private static final String IS_LOCATION_SHARED = "isLocationShared";
-  private static final String PROMPT_LOCATION = "promptLocation";
+  private static final String REQUEST_LOCATION_PERMISSION = "requestLocationPermission";
 
   private static final String GET_PRIVACY_CONSENT = "getPrivacyConsent";
   private static final String GET_REQUIRES_PRIVACY_CONSENT = "getRequiresPrivacyConsent";
@@ -382,8 +382,8 @@ public class OneSignalPush extends CordovaPlugin {
         result = OneSignalSMSController.removeSms(data);
         break;
 
-      case PROMPT_LOCATION:
-        OneSignalController.promptLocation();
+      case REQUEST_LOCATION_PERMISSION:
+        OneSignalController.requestLocationPermission(callbackContext);
         break;
 
       case SET_LOCATION_SHARED:
