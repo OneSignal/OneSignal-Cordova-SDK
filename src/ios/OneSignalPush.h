@@ -57,7 +57,6 @@
 
 // Push Subscription
 - (void)addPushSubscriptionObserver:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)removePushSubscriptionObserver:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)getId:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)getToken:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)getOptedIn:(CDVInvokedUrlCommand* _Nonnull)command;

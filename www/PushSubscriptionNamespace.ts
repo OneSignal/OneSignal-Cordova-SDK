@@ -83,11 +83,15 @@ export default class PushSubscription {
 
     /**
      * Remove a push subscription observer that has been previously added.
+     * @param  {(event:ChangeEvent<PushSubscriptionChange>)=>void} observer
      * @returns void
      */
-    removeObserver(): void {
-        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "removePushSubscriptionObserver", []);
-    }
+    removeObserver(observer: (event:ChangeEvent<PushSubscriptionChange>) => void): void {
+        let index = this._subscriptionObserverList.indexOf(observer);
+        if (index !== -1) {
+            this._subscriptionObserverList.splice(index, 1);
+        }
+    };
     
     /**
      * Call this method to receive push notifications on the device or to resume receiving of push notifications after calling optOut. If needed, this method will prompt the user for push notifications permission.
