@@ -142,61 +142,35 @@ public class OneSignalPush extends CordovaPlugin {
 
   public boolean setLifecycleHandler() {
     OneSignal.getInAppMessages().setInAppMessageLifecycleHandler(new IInAppMessageLifecycleHandler() {
-      @Override
-      public void onWillDisplayInAppMessage(IInAppMessage message) {
+
+      JSONObject convertInAppMessageToJSON(IInAppMessage message, CallbackContext callbackContext) {
+        JSONObject result = new JSONObject();
         try {
-          JSONObject onWillDisplayResult = new JSONObject();
-            
-          onWillDisplayResult.put("messageId", message.getMessageId());
-          
-          if (jsInAppMessageWillDisplayCallback != null) {
-            CallbackHelper.callbackSuccess(jsInAppMessageWillDisplayCallback, onWillDisplayResult);
+          result.put("messageId", message.getMessageId());
+          if (callbackContext != null) {
+            CallbackHelper.callbackSuccess(callbackContext, result);
           }
         } catch (JSONException e) {
           e.printStackTrace();
         }
+        return result;
+      }
+          
+      @Override
+      public void onWillDisplayInAppMessage(IInAppMessage message) {
+        convertInAppMessageToJSON(message,jsInAppMessageWillDisplayCallback);
       }
       @Override
       public void onDidDisplayInAppMessage(IInAppMessage message) {
-        try {
-          JSONObject onDidDisplayResult = new JSONObject();
-
-          onDidDisplayResult.put("messageId", message.getMessageId());
-          
-          if (jsInAppMessageDidDisplayCallBack != null) {
-            CallbackHelper.callbackSuccess(jsInAppMessageDidDisplayCallBack, onDidDisplayResult);
-          }
-        } catch (JSONException e) {
-          e.printStackTrace();
-        }
+        convertInAppMessageToJSON(message, jsInAppMessageDidDisplayCallBack);
       }
       @Override
       public void onWillDismissInAppMessage(IInAppMessage message) {
-        try {
-          JSONObject onWillDismissResult = new JSONObject();
-
-          onWillDismissResult.put("messageId", message.getMessageId());
-          
-          if (jsInAppMessageWillDismissCallback != null) {
-            CallbackHelper.callbackSuccess(jsInAppMessageWillDismissCallback, onWillDismissResult);
-          }
-        } catch (JSONException e) {
-          e.printStackTrace();
-        }
+        convertInAppMessageToJSON(message, jsInAppMessageWillDismissCallback);
       }
       @Override
       public void onDidDismissInAppMessage(IInAppMessage message) {
-        try {
-          JSONObject onDidDismissResult = new JSONObject();
-
-          onDidDismissResult.put("messageId", message.getMessageId());
-          
-          if (jsInAppMessageDidDismissCallBack != null) {
-            CallbackHelper.callbackSuccess(jsInAppMessageDidDismissCallBack, onDidDismissResult);
-          }
-        } catch (JSONException e) {
-          e.printStackTrace();
-        }
+        convertInAppMessageToJSON(message, jsInAppMessageDidDismissCallBack);
       }
     });
     return true;
