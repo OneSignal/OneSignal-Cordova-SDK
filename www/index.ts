@@ -25,15 +25,12 @@
  * THE SOFTWARE.
  */
 
-import { OpenedEvent } from "./models/NotificationOpened";
-import NotificationReceivedEvent from "./NotificationReceivedEvent";
-import OSNotification from './OSNotification';
-
 import User from "./UserNamespace";
 import Debug from "./DebugNamespace";
 import Session from "./SessionNamespace";
 import Location from "./LocationNamespace";
 import InAppMessages from "./InAppMessagesNamespace";
+import Notifications from "./NotificationsNamespace";
 
 // Suppress TS warnings about window.cordova
 declare let window: any; // turn off type checking
@@ -44,12 +41,9 @@ export class OneSignalPlugin {
     Session: Session = new Session();
     Location: Location = new Location();
     InAppMessages: InAppMessages = new InAppMessages();
+    Notifications: Notifications = new Notifications();
 
     private _appID = "";
-    private _notificationWillShowInForegroundDelegate = function(notificationReceived: NotificationReceivedEvent) {};
-    private _notificationOpenedDelegate = function(notificationOpened: OpenedEvent) {};
-
-    private _permissionObserverList: ((event:ChangeEvent<PermissionChange>)=>void)[] = [];
 
     /**
      * Initializes the OneSignal SDK. This should be called during startup of the application.
@@ -61,6 +55,7 @@ export class OneSignalPlugin {
 
         const observerCallback = () => {
             this.User.pushSubscription._setPropertiesAndObserver();
+            this.Notifications._setPropertyAndObserver();
         }
 
         window.cordova.exec(observerCallback, function(){}, "OneSignalPush", "init", [this._appID]);
@@ -83,170 +78,6 @@ export class OneSignalPlugin {
     logout(): void {
         window.cordova.exec(function () { }, function () { }, "OneSignalPush", "logout");
     }
-
-    /**
-     * Set the callback to run just before displaying a notification while the app is in focus.
-     * @param  {(event:NotificationReceivedEvent)=>void} handler
-     * @returns void
-     */
-    setNotificationWillShowInForegroundHandler(handler: (event: NotificationReceivedEvent) => void): void {
-        this._notificationWillShowInForegroundDelegate = handler;
-
-        const foregroundParsingHandler = (notificationReceived: OSNotification) => {
-            this._notificationWillShowInForegroundDelegate(new NotificationReceivedEvent(notificationReceived));
-        };
-
-        window.cordova.exec(foregroundParsingHandler, function(){}, "OneSignalPush", "setNotificationWillShowInForegroundHandler", []);
-    };
-
-    /**
-     * Set the callback to run on notification open.
-     * @param  {(openedEvent:OpenedEvent) => void} handler
-     * @returns void
-     */
-    setNotificationOpenedHandler(handler: (openedEvent: OpenedEvent) => void): void {
-        this._notificationOpenedDelegate = handler;
-
-        const notificationOpenedHandler = (json: OpenedEvent) => {
-            this._notificationOpenedDelegate(json);
-        };
-
-        window.cordova.exec(notificationOpenedHandler, function(){}, "OneSignalPush", "setNotificationOpenedHandler", []);
-    };
-
-    /**
-     * This method returns a "snapshot" of the device state for when it was called.
-     * @param  {(response: DeviceState) => void} handler
-     * @returns void
-     */
-    getDeviceState(handler: (response: DeviceState) => void): void {
-        const deviceStateCallback = (json: DeviceState) => {
-            handler(new DeviceState(json));
-        };
-        window.cordova.exec(deviceStateCallback, function(){}, "OneSignalPush", "getDeviceState", []);
-    };
-
-    /**
-     * Add a callback that fires when the native push permission changes.
-     * @param  {(event:ChangeEvent<PermissionChange>)=>void} observer
-     * @returns void
-     */
-    addPermissionObserver(observer: (event: ChangeEvent<PermissionChange>) => void): void {
-        this._permissionObserverList.push(observer);
-        const permissionCallBackProcessor = (state: ChangeEvent<PermissionChange>) => {
-            this._processFunctionList(this._permissionObserverList, state);
-        };
-        window.cordova.exec(permissionCallBackProcessor, function(){}, "OneSignalPush", "addPermissionObserver", []);
-    };
-
-    /**
-     * Only applies to iOS (does nothing on Android as it always silently registers)
-     * Call only if you passed false to autoRegister
-     * Request for Direct-To-History push notification authorization
-     *
-     * For more information: https://documentation.onesignal.com/docs/ios-customizations#provisional-push-notifications
-     *
-     * @param  {(response:{accepted:boolean})=>void} handler
-     * @returns void
-     */
-    registerForProvisionalAuthorization(handler?: (response: { accepted: boolean }) => void): void {
-        // TODO: Update the response in next major release to just boolean
-        window.cordova.exec(handler, function(){}, "OneSignalPush", "registerForProvisionalAuthorization", []);
-    };
-
-    /**
-     * Prompts the user for push notifications permission in iOS and Android 13+.
-     * Use the fallbackToSettings parameter to prompt to open the settings app if a user has already declined push permissions.
-     *
-     * Call with promptForPushNotificationsWithUserResponse(fallbackToSettings?, handler?)
-     *
-     * @param  {boolean} fallbackToSettings
-     * @param  {(response:boolean)=>void} handler
-     * @returns void
-     */
-    promptForPushNotificationsWithUserResponse(fallbackToSettingsOrHandler?: boolean | ((response: boolean) => void), handler?: (response: boolean) => void): void {
-        var fallbackToSettings = false;
-
-        if (typeof fallbackToSettingsOrHandler === "function") {
-            // Method was called like promptForPushNotificationsWithUserResponse(handler: function)
-            handler = fallbackToSettingsOrHandler;
-        }
-        else if (typeof fallbackToSettingsOrHandler === "boolean") {
-            // Method was called like promptForPushNotificationsWithUserResponse(fallbackToSettings: boolean, handler?: function)
-            fallbackToSettings = fallbackToSettingsOrHandler;
-        }
-        // Else method was called like promptForPushNotificationsWithUserResponse(), no need to modify
-
-        const internalCallback = (response: boolean) => {
-            if (handler) {
-                handler(response);
-            }
-        };
-        window.cordova.exec(internalCallback, function(){}, "OneSignalPush", "promptForPushNotificationsWithUserResponse", [fallbackToSettings]);
-    };
-
-    /**
-     * Android Only. iOS provides a standard way to clear notifications by clearing badge count.
-     * @returns void
-     */
-    clearOneSignalNotifications(): void {
-        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "clearOneSignalNotifications", []);
-    };
-
-    /**
-     * Android Only. If notifications are disabled for your application, unsubscribe the user from OneSignal.
-     * @param  {boolean} unsubscribe
-     * @returns void
-     */
-    unsubscribeWhenNotificationsAreDisabled(unsubscribe: boolean): void {
-        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "unsubscribeWhenNotificationsAreDisabled", [unsubscribe]);
-    };
-
-    /**
-     * Removes a single OneSignal notification based on its Android notification integer id.
-     * @param  {number} id - notification id to cancel
-     * @returns void
-     */
-    removeNotification(id: number): void {
-        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "removeNotification", [id]);
-    };
-
-    /**
-     * Removes all OneSignal notifications based on its Android notification group Id.
-     * @param  {string} id - notification group id to cancel
-     * @returns void
-     */
-    removeGroupedNotifications(id: string): void {
-        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "removeGroupedNotifications", [id]);
-    };
-
-    /**
-     * Disable the push notification subscription to OneSignal.
-     * @param  {boolean} disable
-     * @returns void
-     */
-    disablePush(disable: boolean): void {
-        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "disablePush", [disable]);
-    };
-
-    /**
-     * Send a notification
-     * @param  {object} notificationObject - JSON payload (see REST API reference)
-     * @param  {(success:object)=>void} onSuccess
-     * @param  {(failure:object)=>void} onFailure
-     * @returns void
-     */
-    postNotification(notificationObject: object, onSuccess?: (success: object) => void, onFailure?: (failure: object) => void): void {
-        if (onSuccess == null) {
-            onSuccess = function() {};
-        }
-
-        if (onFailure == null) {
-            onFailure = function() {};
-        }
-
-        window.cordova.exec(onSuccess, onFailure, "OneSignalPush", "postNotification", [notificationObject]);
-    };
 
     /**
      * iOS only.
