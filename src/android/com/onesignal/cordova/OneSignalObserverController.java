@@ -85,12 +85,10 @@ public class OneSignalObserverController {
             pushSubscriptionProperties.put("id", pushSubscription.getId());
             pushSubscriptionProperties.put("token", pushSubscription.getToken());
             pushSubscriptionProperties.put("optedIn", pushSubscription.getOptedIn());
-
-            callbackSuccess(jsSubscriptionObserverCallBack, pushSubscriptionProperties);
-            
           } catch (JSONException e) {
             e.printStackTrace();
           }
+          callbackSuccess(jsSubscriptionObserverCallBack, pushSubscriptionProperties);
         }
       };
       OneSignal.getUser().getPushSubscription().addChangeHandler(handler);
