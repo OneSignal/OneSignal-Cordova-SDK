@@ -37,9 +37,8 @@ public class OneSignalObserverController {
       @Override
       public void onPermissionChanged(boolean permission) {
         JSONObject permissionObj = new JSONObject();
-
         try {
-          System.out.println(permissionObj);
+          permissionObj.put("value", permission);
         } catch (JSONException e) {
           e.printStackTrace();
         }

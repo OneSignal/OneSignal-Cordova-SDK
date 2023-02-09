@@ -494,8 +494,6 @@ public class OneSignalPush extends CordovaPlugin {
     @Override
     public void notificationWillShowInForeground(INotificationReceivedEvent notificationReceivedEvent) {
       try {
-        System.out.println(notificationReceivedEvent.getNotification());
-
         INotification notification = notificationReceivedEvent.getNotification();
         notificationReceivedEventCache.put(notification.getNotificationId(), notificationReceivedEvent);
 
