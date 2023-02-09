@@ -11,16 +11,13 @@ import com.onesignal.OneSignal;
 import com.onesignal.user.subscriptions.IPushSubscription;
 import com.onesignal.user.subscriptions.ISubscription;
 import com.onesignal.user.subscriptions.ISubscriptionChangedHandler;
-
-
-import com.onesignal.OSPermissionObserver;
-import com.onesignal.OSPermissionStateChanges;
+import com.onesignal.notifications.IPermissionChangedHandler;
 
 public class OneSignalObserverController {
   private static CallbackContext jsPermissionObserverCallBack;
   private static CallbackContext jsSubscriptionObserverCallBack;
 
-  private static OSPermissionObserver permissionObserver;
+  private static IPermissionChangedHandler permissionObserver;
 
   private static ISubscriptionChangedHandler handler;
 
@@ -36,31 +33,20 @@ public class OneSignalObserverController {
 
   public static boolean addPermissionObserver(CallbackContext callbackContext) {
     jsPermissionObserverCallBack = callbackContext;
-    if (permissionObserver == null) {
-      permissionObserver = new OSPermissionObserver() {
-        @Override
-        public void onOSPermissionChanged(OSPermissionStateChanges stateChanges) {
-          JSONObject fromJSON = stateChanges.getFrom().toJSONObject();
-          JSONObject toJSON = stateChanges.getTo().toJSONObject();
-          JSONObject modifiedObj = new JSONObject();
+    permissionObserver = new IPermissionChangedHandler() {
+      @Override
+      public void onPermissionChanged(boolean permission) {
+        JSONObject permissionObj = new JSONObject();
 
-          try {
-            // convert areNotificationsEnabled to status of type PermissionStatus
-            fromJSON.put("status", fromJSON.getBoolean("areNotificationsEnabled") ? 2 : 1);
-            fromJSON.remove("areNotificationsEnabled");
-            toJSON.put("status", toJSON.getBoolean("areNotificationsEnabled") ? 2 : 1);
-            toJSON.remove("areNotificationsEnabled");
-
-            modifiedObj.put("from", fromJSON);
-            modifiedObj.put("to", toJSON);
-          } catch (JSONException e) {
-            e.printStackTrace();
-          }
-          callbackSuccess(jsPermissionObserverCallBack, modifiedObj);
+        try {
+          System.out.println(permissionObj);
+        } catch (JSONException e) {
+          e.printStackTrace();
         }
-      };
-      OneSignal.addPermissionObserver(permissionObserver);
-    }
+        callbackSuccess(jsPermissionObserverCallBack, permissionObj);
+      }
+    };
+    OneSignal.getNotifications().addPermissionChangedHandler(permissionObserver);
     return true;
   }
 
