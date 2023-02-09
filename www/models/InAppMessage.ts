@@ -1,10 +1,12 @@
 export interface InAppMessageAction {
-    closesMessage  : boolean;
-    firstClick     : boolean;
-    clickName      ?: string;
-    clickUrl       ?: string;
-    outcomes       ?: object[];
-    tags           ?: object;
+    closesMessage       : boolean;
+    isFirstClick        : boolean;
+    clickName           ?: string;
+    clickUrl            ?: string;
+    
+    // Not currently exposed in Android 5.0.0-beta1
+    // outcomes            ?: object[];
+    // tags                ?: object;
 }
 
 export interface OSInAppMessage {
