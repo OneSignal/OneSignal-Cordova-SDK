@@ -39,8 +39,6 @@
 - (void)completeNotification:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)init:(CDVInvokedUrlCommand* _Nonnull)command;
 
-- (void)getDeviceState:(CDVInvokedUrlCommand* _Nonnull)command;
-
 - (void)addPermissionObserver:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)addSubscriptionObserver:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)addEmailSubscriptionObserver:(CDVInvokedUrlCommand* _Nonnull)command;
@@ -64,17 +62,16 @@
 - (void)optIn:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)optOut:(CDVInvokedUrlCommand* _Nonnull)command;
 
-- (void)promptForPushNotificationsWithUserResponse:(CDVInvokedUrlCommand* _Nonnull)command;
+// Notifications
+- (void)addPermissionObserver:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)requestPermission:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)getPermission:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)canRequestPermission:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)registerForProvisionalAuthorization:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)disablePush:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)postNotification:(CDVInvokedUrlCommand* _Nonnull)command;
-
-// Start Android Only
-- (void)clearOneSignalNotifications:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)unsubscribeWhenNotificationsAreDisabled:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)clearAllNotifications:(CDVInvokedUrlCommand* _Nonnull)command;
+// Android Only - Notifications
 - (void)removeNotification:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)removeGroupedNotifications:(CDVInvokedUrlCommand* _Nonnull)command;
-// End Android Only
 
 - (void)getPrivacyConsent:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)getRequiresPrivacyConsent:(CDVInvokedUrlCommand* _Nonnull)command;
