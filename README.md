@@ -15,11 +15,9 @@
 See the [Documentation](https://documentation.onesignal.com/docs) for installation and setup instructions:
 - Cordova: https://documentation.onesignal.com/docs/cordova-sdk-setup
 - Ionic: https://documentation.onesignal.com/docs/ionic-sdk-setup
-- Phonegap: https://documentation.onesignal.com/docs/phonegap-sdk-setup
-- Intel XDK: https://documentation.onesignal.com/docs/intel-xdk-setup
 
 #### API
-See OneSignal's [Cordova SDK API](https://documentation.onesignal.com/docs/cordova-sdk) page for a list of all available methods.
+See OneSignal's [Client SDK Reference](https://documentation.onesignal.com/docs/sdk-reference) page for a list of all available methods.
 
 #### Change Log
 See this repository's [release tags](https://github.com/OneSignal/OneSignal-Cordova-SDK/releases) for a complete change log of every released version.
