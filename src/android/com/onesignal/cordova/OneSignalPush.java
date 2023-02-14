@@ -71,7 +71,6 @@ public class OneSignalPush extends CordovaPlugin {
 
   private static final String ADD_PERMISSION_OBSERVER = "addPermissionObserver";
   private static final String ADD_PUSH_SUBSCRIPTION_OBSERVER = "addPushSubscriptionObserver";
-  private static final String REMOVE_PUSH_SUBSCRIPTION_OBSERVER = "removePushSubscriptionObserver";
 
   private static final String OPT_IN = "optInPushSubscription";
   private static final String OPT_OUT = "optOutPushSubscription";
@@ -284,10 +283,6 @@ public class OneSignalPush extends CordovaPlugin {
 
       case ADD_PUSH_SUBSCRIPTION_OBSERVER:
         result = OneSignalObserverController.addPushSubscriptionObserver(callbackContext);
-        break;
-      
-      case REMOVE_PUSH_SUBSCRIPTION_OBSERVER:
-        result = OneSignalObserverController.removePushSubscriptionObserver();
         break;
 
       case OPT_IN:

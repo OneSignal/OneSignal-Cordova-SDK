@@ -1,5 +1,4 @@
-import { ChangeEvent,
-    PushSubscriptionChange } from "./Subscription";
+import { PushSubscriptionState } from "./Subscription";
 
 // Suppress TS warnings about window.cordova
 declare let window: any; // turn off type checking
@@ -9,9 +8,9 @@ export default class PushSubscription {
     private _token?: string | null;
     private _optedIn?: boolean;
 
-    private _subscriptionObserverList: ((event:ChangeEvent<PushSubscriptionChange>)=>void)[] = [];
+    private _subscriptionObserverList: ((event:PushSubscriptionState)=>void)[] = [];
 
-    private _processFunctionList<ObserverChangeEvent>(array: ((event:ChangeEvent<ObserverChangeEvent>)=>void)[], param: ChangeEvent<ObserverChangeEvent>): void {
+    private _processFunctionList(array: ((event:PushSubscriptionState)=>void)[], param: PushSubscriptionState): void {
         for (let i = 0; i < array.length; i++) {
             array[i](param);
         }
@@ -49,9 +48,9 @@ export default class PushSubscription {
         window.cordova.exec(getOptedInCallback, function(){}, "OneSignalPush", "getPushSubscriptionOptedIn");
 
         this.addObserver(event => {
-            this._id = event.to.id;
-            this._token = event.to.token;
-            this._optedIn = event.to.optedIn;
+            this._id = event.id;
+            this._token = event.token;
+            this._optedIn = event.optedIn;
         });
     }
     
@@ -68,14 +67,13 @@ export default class PushSubscription {
     }  
 
     /**
-     * The OSPushSubscriptionObserver.onOSPushSubscriptionChanged method will be fired on the passed-in object when the push subscription changes. 
-     * This method returns the current OSPushSubscriptionState at the time of adding this observer.
-     * @param  {(event:ChangeEvent<SubscriptionChange>)=>void} observer
+     * Add a callback that fires when the OneSignal push subscription state changes.
+     * @param  {(event: PushSubscriptionState)=>void} observer
      * @returns void
      */
-    addObserver(observer: (event: ChangeEvent<PushSubscriptionChange>) => void): void {
+    addObserver(observer: (event: PushSubscriptionState) => void): void {
         this._subscriptionObserverList.push(observer);
-        const subscriptionCallBackProcessor = (state: ChangeEvent<PushSubscriptionChange>) => {
+        const subscriptionCallBackProcessor = (state: PushSubscriptionState) => {
             this._processFunctionList(this._subscriptionObserverList, state);
         };
         window.cordova.exec(subscriptionCallBackProcessor, function(){}, "OneSignalPush", "addPushSubscriptionObserver", []);
@@ -83,10 +81,10 @@ export default class PushSubscription {
 
     /**
      * Remove a push subscription observer that has been previously added.
-     * @param  {(event:ChangeEvent<PushSubscriptionChange>)=>void} observer
+     * @param  {(event: PushSubscriptionState)=>void} observer
      * @returns void
      */
-    removeObserver(observer: (event:ChangeEvent<PushSubscriptionChange>) => void): void {
+    removeObserver(observer: (event: PushSubscriptionState) => void): void {
         let index = this._subscriptionObserverList.indexOf(observer);
         if (index !== -1) {
             this._subscriptionObserverList.splice(index, 1);
