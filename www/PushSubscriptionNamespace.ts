@@ -28,7 +28,7 @@ export default class PushSubscription {
         const getIdCallback = (obj: {value: string}) => {
             this._id = obj.value;
         };
-        window.cordova.exec(getIdCallback, function(){}, "OneSignalPush", "getId");
+        window.cordova.exec(getIdCallback, function(){}, "OneSignalPush", "getPushSubscriptionId");
 
         /**
          * Receive token
@@ -37,7 +37,7 @@ export default class PushSubscription {
         const getTokenCallback = (obj: {value: string}) => {
             this._token = obj.value;
         };
-        window.cordova.exec(getTokenCallback, function(){}, "OneSignalPush", "getToken");
+        window.cordova.exec(getTokenCallback, function(){}, "OneSignalPush", "getPushSubscriptionToken");
         
         /**
          * Receive opted-in status
@@ -46,7 +46,7 @@ export default class PushSubscription {
         const getOptedInCallback = (obj: {value: boolean}) => {
             this._optedIn = obj.value;
         };
-        window.cordova.exec(getOptedInCallback, function(){}, "OneSignalPush", "getOptedIn");
+        window.cordova.exec(getOptedInCallback, function(){}, "OneSignalPush", "getPushSubscriptionOptedIn");
 
         this.addObserver(event => {
             this._id = event.to.id;
@@ -98,7 +98,7 @@ export default class PushSubscription {
      * @returns void
      */
     optIn(): void {
-        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "optIn");
+        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "OptInPushSubscription");
     }
 
     /**
@@ -106,6 +106,6 @@ export default class PushSubscription {
      * @returns void
      */
     optOut(): void {
-        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "optOut");
+        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "optOutPushSubscription");
     }
 }

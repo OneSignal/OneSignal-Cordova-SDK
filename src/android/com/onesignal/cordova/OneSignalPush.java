@@ -73,11 +73,11 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String ADD_PUSH_SUBSCRIPTION_OBSERVER = "addPushSubscriptionObserver";
   private static final String REMOVE_PUSH_SUBSCRIPTION_OBSERVER = "removePushSubscriptionObserver";
 
-  private static final String OPT_IN = "optIn";
-  private static final String OPT_OUT = "optOut";
-   private static final String GET_ID = "getId";
-  private static final String GET_TOKEN = "getToken";
-  private static final String GET_OPTED_IN = "getOptedIn";
+  private static final String OPT_IN = "optInPushSubscription";
+  private static final String OPT_OUT = "optOutPushSubscription";
+   private static final String GET_ID = "getPushSubscriptionId";
+  private static final String GET_TOKEN = "getPushSubscriptionToken";
+  private static final String GET_OPTED_IN = "getPushSubscriptionOptedIn";
   
   private static final String ADD_ALIASES = "addAliases";
   private static final String REMOVE_ALIASES = "removeAliases";
@@ -291,23 +291,23 @@ public class OneSignalPush extends CordovaPlugin {
         break;
 
       case OPT_IN:
-        result = OneSignalController.optIn();
+        result = OneSignalController.optInPushSubscription();
         break;
 
       case OPT_OUT:
-        result = OneSignalController.optOut();
+        result = OneSignalController.optOutPushSubscription();
         break;
       
       case GET_ID:
-        result = OneSignalController.getId(callbackContext);
+        result = OneSignalController.getPushSubscriptionId(callbackContext);
         break;
 
       case GET_TOKEN:
-        result = OneSignalController.getToken(callbackContext);
+        result = OneSignalController.getPushSubscriptionToken(callbackContext);
         break;
 
       case GET_OPTED_IN:
-        result = OneSignalController.getOptedIn(callbackContext);
+        result = OneSignalController.getPushSubscriptionOptedIn(callbackContext);
         break;
 
       case ADD_ALIASES:

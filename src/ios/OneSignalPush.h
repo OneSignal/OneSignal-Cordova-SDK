@@ -57,11 +57,11 @@
 
 // Push Subscription
 - (void)addPushSubscriptionObserver:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)getId:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)getToken:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)getOptedIn:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)optIn:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)optOut:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)getPushSubscriptionId:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)getPushSubscriptionToken:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)getPushSubscriptionOptedIn:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)optInPushSubscription:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)optOutPushSubscription:(CDVInvokedUrlCommand* _Nonnull)command;
 
 - (void)promptForPushNotificationsWithUserResponse:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)registerForProvisionalAuthorization:(CDVInvokedUrlCommand* _Nonnull)command;
