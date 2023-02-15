@@ -537,10 +537,7 @@ static Class delegateClass = nil;
 
 - (void)isLocationShared:(CDVInvokedUrlCommand *)command {
     bool isShared = [OneSignal.Location isShared];
-    NSDictionary *result = @{
-            @"value" : @(isShared)
-    };
-    successCallback(command.callbackId, result);
+    successCallbackBoolean(command.callbackId, isShared);
 }
 
 /**
