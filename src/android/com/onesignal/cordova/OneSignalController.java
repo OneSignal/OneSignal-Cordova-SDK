@@ -91,7 +91,57 @@ public class OneSignalController {
     OneSignal.logout();
     return true;
   }
+
+  public static boolean optInPushSubscription() {
+    OneSignal.getUser().getPushSubscription().optIn();
+    return true;
+  }
+
+  public static boolean optOutPushSubscription() {
+    OneSignal.getUser().getPushSubscription().optOut();
+    return true;
+  }
+
+  public static boolean getPushSubscriptionId(CallbackContext callbackContext) {
+    String pushId = OneSignal.getUser().getPushSubscription().getId();
+    try {
+      JSONObject subscriptionProperty = new JSONObject ();
+      subscriptionProperty.put("value", pushId);
+
+      CallbackHelper.callbackSuccess(callbackContext, subscriptionProperty);
+    } catch (JSONException e){
+      e.printStackTrace();
+    }
+    return true;
+  }
+
+  public static boolean getPushSubscriptionToken(CallbackContext callbackContext) {
+    String token = OneSignal.getUser().getPushSubscription().getToken();
+    try {
+      JSONObject subscriptionProperty = new JSONObject ();
+      subscriptionProperty.put("value", token);
+
+      CallbackHelper.callbackSuccess(callbackContext, subscriptionProperty);
+    } catch (JSONException e){
+      e.printStackTrace();
+    }
+    return true;
+  }
   
+  public static boolean getPushSubscriptionOptedIn(CallbackContext callbackContext) {
+    boolean optedIn = OneSignal.getUser().getPushSubscription().getOptedIn();
+    try {
+    JSONObject subscriptionProperty = new JSONObject ();
+    subscriptionProperty.put("value", optedIn);
+
+    CallbackHelper.callbackSuccess(callbackContext, subscriptionProperty);
+  } catch (JSONException e){
+    e.printStackTrace();
+  }
+  return true;
+    
+  }
+
   /** 
   * Aliases
   */

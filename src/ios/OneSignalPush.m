@@ -72,20 +72,6 @@ void failureCallback(NSString* callbackId, NSDictionary* data) {
     [pluginCommandDelegate sendPluginResult:commandResult callbackId:callbackId];
 }
 
-// Helper method to rename a property of subscription state changes.
-// Currently used by email and SMS state changes to rename the `isSubscribed` key.
-NSDictionary* renameStateChangesKey(NSDictionary* oldFrom, NSDictionary* oldTo, NSString* oldKey, NSString* newKey) {
-    NSMutableDictionary *from = [oldFrom mutableCopy];
-    [from setObject: [from objectForKey: oldKey] forKey: newKey];
-    [from removeObjectForKey: oldKey];
-
-    NSMutableDictionary *to = [oldTo mutableCopy];
-    [to setObject: [to objectForKey: oldKey] forKey: newKey];
-    [to removeObjectForKey: oldKey];
-
-    return @{@"from": from, @"to": to};
-}
-
 void processNotificationWillShowInForeground(OSNotification* _notif) {
     NSString * data = [_notif stringify];
     NSError *jsonError;
@@ -184,26 +170,6 @@ static Class delegateClass = nil;
     successCallback(subscriptionObserverCallbackId, [stateChanges toDictionary]);
 }
 
-- (void)onOSEmailSubscriptionChanged:(OSEmailSubscriptionStateChanges *)stateChanges {
-    NSDictionary *result = renameStateChangesKey(
-        [stateChanges.from toDictionary],
-        [stateChanges.to toDictionary],
-        @"isSubscribed",
-        @"isEmailSubscribed"
-    );
-    successCallback(emailSubscriptionCallbackId, result);
-}
-
-- (void)onOSSMSSubscriptionChanged:(OSSMSSubscriptionStateChanges *)stateChanges {
-    NSDictionary *result = renameStateChangesKey(
-        [stateChanges.from toDictionary],
-        [stateChanges.to toDictionary],
-        @"isSubscribed",
-        @"isSMSSubscribed"
-    );
-    successCallback(smsSubscriptionCallbackId, result);
-}
-
 - (void)setProvidesNotificationSettingsView:(CDVInvokedUrlCommand *)command {
     BOOL providesView = command.arguments[0];
     [OneSignal setProvidesNotificationSettingsView:providesView];
@@ -285,58 +251,40 @@ static Class delegateClass = nil;
         [OneSignal.User.pushSubscription addObserver:self];
 }
 
-- (void)removePushSubscriptionObserver:(CDVInvokedUrlCommand*)command {
-    [OneSignal.User.pushSubscription removeObserver:self];
-}
-
-- (void)getId:(CDVInvokedUrlCommand*)command {
+- (void)getPushSubscriptionId:(CDVInvokedUrlCommand*)command {
     NSString *pushId = OneSignal.User.pushSubscription.id;
     if (pushId) {
         NSDictionary *result = @{
             @"value" : pushId
-    };
-    successCallback(command.callbackId, result);
+        };
+        successCallback(command.callbackId, result);
     }
 }
 
-- (void)getToken:(CDVInvokedUrlCommand*)command {
+- (void)getPushSubscriptionToken:(CDVInvokedUrlCommand*)command {
     NSString *token = OneSignal.User.pushSubscription.token;
     if (token) {
         NSDictionary *result = @{
             @"value" : token
-    };
-    successCallback(command.callbackId, result);
+        };
+        successCallback(command.callbackId, result);
     }
 }
 
-- (void)getOptedIn:(CDVInvokedUrlCommand*)command {
+- (void)getPushSubscriptionOptedIn:(CDVInvokedUrlCommand*)command {
     bool optedIn = OneSignal.User.pushSubscription.optedIn;
     NSDictionary *result = @{
-            @"value" : @(optedIn)
+        @"value" : @(optedIn)
     };
     successCallback(command.callbackId, result);
 }
 
-- (void)optIn:(CDVInvokedUrlCommand*)command {
+- (void)optInPushSubscription:(CDVInvokedUrlCommand*)command {
     [OneSignal.User.pushSubscription optIn];
 }
 
-- (void)optOut:(CDVInvokedUrlCommand*)command {
+- (void)optOutPushSubscription:(CDVInvokedUrlCommand*)command {
     [OneSignal.User.pushSubscription optOut];
-}
-
-- (void)addEmailSubscriptionObserver:(CDVInvokedUrlCommand *)command {
-    bool first = emailSubscriptionCallbackId == nil;
-    emailSubscriptionCallbackId = command.callbackId;
-    if (first)
-        [OneSignal addEmailSubscriptionObserver:self];
-}
-
-- (void)addSMSSubscriptionObserver:(CDVInvokedUrlCommand *)command {
-    bool first = smsSubscriptionCallbackId == nil;
-    smsSubscriptionCallbackId = command.callbackId;
-    if (first)
-        [OneSignal addSMSSubscriptionObserver:self];
 }
 
 - (void)setLogLevel:(CDVInvokedUrlCommand*)command {

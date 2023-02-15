@@ -8,26 +8,21 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.onesignal.OneSignal;
+import com.onesignal.user.subscriptions.IPushSubscription;
+import com.onesignal.user.subscriptions.ISubscription;
+import com.onesignal.user.subscriptions.ISubscriptionChangedHandler;
+
 
 import com.onesignal.OSPermissionObserver;
-import com.onesignal.OSEmailSubscriptionObserver;
-import com.onesignal.OSSMSSubscriptionObserver;
-import com.onesignal.OSSubscriptionObserver;
 import com.onesignal.OSPermissionStateChanges;
-import com.onesignal.OSSubscriptionStateChanges;
-import com.onesignal.OSEmailSubscriptionStateChanges;
-import com.onesignal.OSSMSSubscriptionStateChanges;
 
 public class OneSignalObserverController {
   private static CallbackContext jsPermissionObserverCallBack;
   private static CallbackContext jsSubscriptionObserverCallBack;
-  private static CallbackContext jsEmailSubscriptionObserverCallBack;
-  private static CallbackContext jsSMSSubscriptionObserverCallBack;
 
   private static OSPermissionObserver permissionObserver;
-  private static OSSubscriptionObserver subscriptionObserver;
-  private static OSEmailSubscriptionObserver emailSubscriptionObserver;
-  private static OSSMSSubscriptionObserver smsSubscriptionObserver;
+
+  private static ISubscriptionChangedHandler pushSubscriptionChangedHandler;
 
   // This is to prevent an issue where if two Javascript calls are made to OneSignal expecting a callback then only one would fire.
   private static void callbackSuccess(CallbackContext callbackContext, JSONObject jsonObject) {
@@ -37,23 +32,6 @@ public class OneSignalObserverController {
     PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jsonObject);
     pluginResult.setKeepCallback(true);
     callbackContext.sendPluginResult(pluginResult);
-  }
-
-  // Helper method to rename a property of subscription state changes.
-  // Currently used by email and SMS state changes to rename the `isSubscribed` key.
-  private static JSONObject renameStateChangesKey(JSONObject fromJSON, JSONObject toJSON, String oldKey, String newKey) {
-    JSONObject modifiedObj = new JSONObject();
-    try {
-      fromJSON.put(newKey, fromJSON.getBoolean(oldKey));
-      fromJSON.remove(oldKey);
-      toJSON.put(newKey, toJSON.getBoolean(oldKey));
-      toJSON.remove(oldKey);
-      modifiedObj.put("from", fromJSON);
-      modifiedObj.put("to", toJSON);
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return modifiedObj;
   }
 
   public static boolean addPermissionObserver(CallbackContext callbackContext) {
@@ -86,57 +64,31 @@ public class OneSignalObserverController {
     return true;
   }
 
-  public static boolean addSubscriptionObserver(CallbackContext callbackContext) {
+  public static boolean addPushSubscriptionObserver(CallbackContext callbackContext) {
     jsSubscriptionObserverCallBack = callbackContext;
-      if (subscriptionObserver == null) {
-        subscriptionObserver = new OSSubscriptionObserver() {
-          @Override
-          public void onOSSubscriptionChanged(OSSubscriptionStateChanges stateChanges) {
-            callbackSuccess(jsSubscriptionObserverCallBack, stateChanges.toJSONObject());
+    if (pushSubscriptionChangedHandler == null) {
+      pushSubscriptionChangedHandler = new ISubscriptionChangedHandler() {
+        @Override
+        public void onSubscriptionChanged(ISubscription subscription) {
+          if (!(subscription instanceof IPushSubscription)){
+            return;
           }
-        };
-        OneSignal.addSubscriptionObserver(subscriptionObserver);
-      }
-      return true;
-  }
+          IPushSubscription pushSubscription = (IPushSubscription) subscription;
 
-  public static boolean addEmailSubscriptionObserver(CallbackContext callbackContext) {
-    jsEmailSubscriptionObserverCallBack = callbackContext;
-      if (emailSubscriptionObserver == null) {
-        emailSubscriptionObserver = new OSEmailSubscriptionObserver() {
-          @Override
-          public void onOSEmailSubscriptionChanged(OSEmailSubscriptionStateChanges stateChanges) {
-            JSONObject fromJSON = stateChanges.getFrom().toJSONObject();
-            JSONObject toJSON = stateChanges.getTo().toJSONObject();
+          try {
+            JSONObject pushSubscriptionProperties = new JSONObject();
 
-            // rename the isSubscribed property to isEmailSubscribed
-            JSONObject modifiedObj = renameStateChangesKey(fromJSON, toJSON, "isSubscribed", "isEmailSubscribed");
-
-            callbackSuccess(jsEmailSubscriptionObserverCallBack, modifiedObj);
+            pushSubscriptionProperties.put("id", pushSubscription.getId());
+            pushSubscriptionProperties.put("token", pushSubscription.getToken());
+            pushSubscriptionProperties.put("optedIn", pushSubscription.getOptedIn());
+          } catch (JSONException e) {
+            e.printStackTrace();
           }
-        };
-        OneSignal.addEmailSubscriptionObserver(emailSubscriptionObserver);
-      }
-      return true;
-  }
-
-  public static boolean addSMSSubscriptionObserver(CallbackContext callbackContext) {
-    jsSMSSubscriptionObserverCallBack = callbackContext;
-      if (smsSubscriptionObserver == null) {
-        smsSubscriptionObserver = new OSSMSSubscriptionObserver() {
-          @Override
-          public void onSMSSubscriptionChanged(OSSMSSubscriptionStateChanges stateChanges) {
-            JSONObject fromJSON = stateChanges.getFrom().toJSONObject();
-            JSONObject toJSON = stateChanges.getTo().toJSONObject();
-
-            // rename the isSubscribed property to isSMSSubscribed
-            JSONObject modifiedObj = renameStateChangesKey(fromJSON, toJSON, "isSubscribed", "isSMSSubscribed");
-
-            callbackSuccess(jsSMSSubscriptionObserverCallBack, modifiedObj);
-          }
-        };
-        OneSignal.addSMSSubscriptionObserver(smsSubscriptionObserver);
-      }
-      return true;
+          callbackSuccess(jsSubscriptionObserverCallBack, pushSubscriptionProperties);
+        }
+      };
+      OneSignal.getUser().getPushSubscription().addChangeHandler(handler);
+    }
+    return true;      
   }
 }
