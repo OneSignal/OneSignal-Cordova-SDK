@@ -19,7 +19,7 @@ public class OneSignalObserverController {
 
   private static IPermissionChangedHandler permissionObserver;
 
-  private static ISubscriptionChangedHandler handler;
+  private static ISubscriptionChangedHandler pushSubscriptionChangedHandler;
 
   // This is to prevent an issue where if two Javascript calls are made to OneSignal expecting a callback then only one would fire.
   private static void callbackSuccess(CallbackContext callbackContext, JSONObject jsonObject) {
@@ -49,14 +49,10 @@ public class OneSignalObserverController {
     return true;
   }
 
-  public static boolean removePushSubscriptionObserver() {
-    OneSignal.getUser().getPushSubscription().removeChangeHandler(handler);
-    return true;    
-  }
-
   public static boolean addPushSubscriptionObserver(CallbackContext callbackContext) {
     jsSubscriptionObserverCallBack = callbackContext;
-      handler = new ISubscriptionChangedHandler() {
+    if (pushSubscriptionChangedHandler == null) {
+      pushSubscriptionChangedHandler = new ISubscriptionChangedHandler() {
         @Override
         public void onSubscriptionChanged(ISubscription subscription) {
           if (!(subscription instanceof IPushSubscription)){
@@ -70,15 +66,14 @@ public class OneSignalObserverController {
             pushSubscriptionProperties.put("id", pushSubscription.getId());
             pushSubscriptionProperties.put("token", pushSubscription.getToken());
             pushSubscriptionProperties.put("optedIn", pushSubscription.getOptedIn());
-
-            callbackSuccess(jsSubscriptionObserverCallBack, pushSubscriptionProperties);
-            
           } catch (JSONException e) {
             e.printStackTrace();
           }
+          callbackSuccess(jsSubscriptionObserverCallBack, pushSubscriptionProperties);
         }
       };
       OneSignal.getUser().getPushSubscription().addChangeHandler(handler);
+    }
     return true;      
   }
 }

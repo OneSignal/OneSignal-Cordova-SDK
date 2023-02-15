@@ -22,8 +22,20 @@ public class OneSignalController {
   public static void setLogLevel(JSONArray data) {
     try {
       int logLevel = data.getInt(0);
-      int visualLevel = data.getInt(1);
-      OneSignal.setLogLevel(logLevel, visualLevel);
+      LogLevel convertedLogLevel = LogLevel.fromInt(logLevel);
+
+      OneSignal.getDebug().setLogLevel(convertedLogLevel);
+    } catch (Throwable t) {
+      t.printStackTrace();
+    }
+  }
+
+  public static void setAlertLevel(JSONArray data) {
+    try {
+      int alertLevel = data.getInt(0);
+      LogLevel convertedVisualLevel = LogLevel.fromInt(alertLevel);
+
+      OneSignal.getDebug().setAlertLevel(convertedVisualLevel);
     } catch (Throwable t) {
       t.printStackTrace();
     }
@@ -57,17 +69,17 @@ public class OneSignalController {
     return true;
   }
 
-  public static boolean optIn() {
+  public static boolean optInPushSubscription() {
     OneSignal.getUser().getPushSubscription().optIn();
     return true;
   }
 
-  public static boolean optOut() {
+  public static boolean optOutPushSubscription() {
     OneSignal.getUser().getPushSubscription().optOut();
     return true;
   }
 
-  public static boolean getId(CallbackContext callbackContext) {
+  public static boolean getPushSubscriptionId(CallbackContext callbackContext) {
     String pushId = OneSignal.getUser().getPushSubscription().getId();
     try {
       JSONObject subscriptionProperty = new JSONObject ();
@@ -80,7 +92,7 @@ public class OneSignalController {
     return true;
   }
 
-  public static boolean getToken(CallbackContext callbackContext) {
+  public static boolean getPushSubscriptionToken(CallbackContext callbackContext) {
     String token = OneSignal.getUser().getPushSubscription().getToken();
     try {
       JSONObject subscriptionProperty = new JSONObject ();
@@ -93,7 +105,7 @@ public class OneSignalController {
     return true;
   }
   
-  public static boolean getOptedIn(CallbackContext callbackContext) {
+  public static boolean getPushSubscriptionOptedIn(CallbackContext callbackContext) {
     boolean optedIn = OneSignal.getUser().getPushSubscription().getOptedIn();
     try {
     JSONObject subscriptionProperty = new JSONObject ();
@@ -309,15 +321,8 @@ public class OneSignalController {
    * Location
    */
   
-  public static boolean requestLocationPermission(CallbackContext callbackContext) {
-    OneSignal.getLocation().requestPermission(Continue.with(r -> {
-      if (r.isSuccess()) {
-        if (r.getData()) {
-          Boolean didPermit = r.getData();
-          CallbackHelper.callbackSuccessBoolean(callbackContext, didPermit);
-        }
-      }
-    }));
+  public static boolean requestLocationPermission() {
+    OneSignal.getLocation().requestPermission(Continue.none());
     return true;
   }
 

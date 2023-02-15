@@ -246,43 +246,39 @@ static Class delegateClass = nil;
         [OneSignal.User.pushSubscription addObserver:self];
 }
 
-- (void)removePushSubscriptionObserver:(CDVInvokedUrlCommand*)command {
-    [OneSignal.User.pushSubscription removeObserver:self];
-}
-
-- (void)getId:(CDVInvokedUrlCommand*)command {
+- (void)getPushSubscriptionId:(CDVInvokedUrlCommand*)command {
     NSString *pushId = OneSignal.User.pushSubscription.id;
     if (pushId) {
         NSDictionary *result = @{
             @"value" : pushId
-    };
-    successCallback(command.callbackId, result);
+        };
+        successCallback(command.callbackId, result);
     }
 }
 
-- (void)getToken:(CDVInvokedUrlCommand*)command {
+- (void)getPushSubscriptionToken:(CDVInvokedUrlCommand*)command {
     NSString *token = OneSignal.User.pushSubscription.token;
     if (token) {
         NSDictionary *result = @{
             @"value" : token
-    };
-    successCallback(command.callbackId, result);
+        };
+        successCallback(command.callbackId, result);
     }
 }
 
-- (void)getOptedIn:(CDVInvokedUrlCommand*)command {
+- (void)getPushSubscriptionOptedIn:(CDVInvokedUrlCommand*)command {
     bool optedIn = OneSignal.User.pushSubscription.optedIn;
     NSDictionary *result = @{
-            @"value" : @(optedIn)
+        @"value" : @(optedIn)
     };
     successCallback(command.callbackId, result);
 }
 
-- (void)optIn:(CDVInvokedUrlCommand*)command {
+- (void)optInPushSubscription:(CDVInvokedUrlCommand*)command {
     [OneSignal.User.pushSubscription optIn];
 }
 
-- (void)optOut:(CDVInvokedUrlCommand*)command {
+- (void)optOutPushSubscription:(CDVInvokedUrlCommand*)command {
     [OneSignal.User.pushSubscription optOut];
 }
 
@@ -532,10 +528,7 @@ static Class delegateClass = nil;
 
 - (void)isLocationShared:(CDVInvokedUrlCommand *)command {
     bool isShared = [OneSignal.Location isShared];
-    NSDictionary *result = @{
-            @"value" : @(isShared)
-    };
-    successCallback(command.callbackId, result);
+    successCallbackBoolean(command.callbackId, isShared);
 }
 
 /**

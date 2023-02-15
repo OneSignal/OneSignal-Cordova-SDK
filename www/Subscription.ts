@@ -43,7 +43,7 @@ export interface ChangeEvent<ObserverChangeEvent> {
     to   : ObserverChangeEvent;
 }
 
-export type ObserverChangeEvent = PermissionChange | PushSubscriptionChange | EmailSubscriptionChange | SMSSubscriptionChange
+export type ObserverChangeEvent = PermissionChange | PushSubscriptionState | EmailSubscriptionChange | SMSSubscriptionChange
 
 export interface PermissionChange {
     status                  : PermissionStatus;
@@ -52,7 +52,7 @@ export interface PermissionChange {
 }
 
 /// Represents the current user's push notification subscription state with OneSignal
-export interface PushSubscriptionChange {
+export interface PushSubscriptionState {
     id                  ?: string;
     token               ?: string;
     optedIn             : boolean;

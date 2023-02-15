@@ -37,7 +37,7 @@ public class OneSignalInAppMessagingController {
                 triggers.put(key, triggersObject.get(key));
             }
 
-            OneSignal.addTriggers(triggers);
+            OneSignal.getInAppMessages().addTriggers(triggers);
             return true;
         } catch (JSONException e) {
             e.printStackTrace();
@@ -45,7 +45,7 @@ public class OneSignalInAppMessagingController {
         }
     }
 
-    public static boolean removeTriggersForKeys(JSONArray data) {
+    public static boolean removeTriggers(JSONArray data) {
         try {
             JSONArray triggerKeysArray = data.getJSONArray(0);
             List<String> triggerKeys = new ArrayList<>();
@@ -54,7 +54,7 @@ public class OneSignalInAppMessagingController {
                 triggerKeys.add(triggerKeysArray.getString(i));
             }
 
-            OneSignal.removeTriggersForKeys(triggerKeys);
+            OneSignal.getInAppMessages().removeTriggers(triggerKeys);
             return true;
         } catch (JSONException e) {
             e.printStackTrace();
@@ -62,27 +62,19 @@ public class OneSignalInAppMessagingController {
         }
     }
 
-    public static boolean getTriggerValueForKey(CallbackContext callbackContext, JSONArray data) {
+    public static boolean clearTriggers(){
         try {
-            Object value = OneSignal.getTriggerValueForKey(data.getString(0));
-            if (value == null) {
-                callbackSuccess(callbackContext, new JSONObject());
-            } else {
-                callbackSuccess(callbackContext, new JSONObject(
-                        "{value:"
-                                + value.toString()
-                                + "}"));
-            }
+            OneSignal.getInAppMessages().clearTriggers();
             return true;
-        } catch (JSONException e) {
-            e.printStackTrace();
+        } catch (Throwable t) {
+            t.printStackTrace();
             return false;
         }
     }
 
-    public static boolean pauseInAppMessages(JSONArray data) {
+    public static boolean setPaused(JSONArray data) {
         try {
-            OneSignal.pauseInAppMessages(data.getBoolean(0));
+            OneSignal.getInAppMessages().setPaused(data.getBoolean(0));
             return true;
         } catch (JSONException e) {
             e.printStackTrace();
@@ -90,8 +82,8 @@ public class OneSignalInAppMessagingController {
         }
     }
 
-    public static boolean isInAppMessagingPaused(CallbackContext callbackContext) {
-        boolean inAppMessagingPaused = OneSignal.isInAppMessagingPaused();
+    public static boolean isPaused(CallbackContext callbackContext) {
+        boolean inAppMessagingPaused = OneSignal.getInAppMessages().getPaused();
         CallbackHelper.callbackSuccessBoolean(callbackContext, inAppMessagingPaused);
         return true;
     }

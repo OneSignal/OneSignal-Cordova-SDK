@@ -29,9 +29,10 @@ package com.onesignal.cordova;
 
 import android.util.Log;
 
-import com.onesignal.OSInAppMessageAction;
-import com.onesignal.OSInAppMessage;
-import com.onesignal.OSInAppMessageLifecycleHandler;
+import com.onesignal.inAppMessages.IInAppMessage;
+import com.onesignal.inAppMessages.IInAppMessageClickHandler;
+import com.onesignal.inAppMessages.IInAppMessageClickResult;
+import com.onesignal.inAppMessages.IInAppMessageLifecycleHandler;
 import com.onesignal.OneSignal;
 import com.onesignal.common.OneSignalWrapper;
 
@@ -58,9 +59,9 @@ public class OneSignalPush extends CordovaPlugin {
 
   private static final String SET_NOTIFICATION_WILL_SHOW_IN_FOREGROUND_HANDLER = "setNotificationWillShowInForegroundHandler";
   private static final String SET_NOTIFICATION_OPENED_HANDLER = "setNotificationOpenedHandler";
-  private static final String SET_IN_APP_MESSAGE_CLICK_HANDLER = "setInAppMessageClickHandler";
-
-  private static final String SET_IN_APP_MESSAGE_LIFECYCLE_HANDLER = "setInAppMessageLifecycleHandler";
+  
+  private static final String SET_CLICK_HANDLER = "setClickHandler";
+  private static final String SET_LIFECYCLE_HANDLER = "setLifecycleHandler";
   private static final String SET_ON_WILL_DISPLAY_IN_APP_MESSAGE_HANDLER = "setOnWillDisplayInAppMessageHandler";
   private static final String SET_ON_DID_DISPLAY_IN_APP_MESSAGE_HANDLER = "setOnDidDisplayInAppMessageHandler";
   private static final String SET_ON_WILL_DISMISS_IN_APP_MESSAGE_HANDLER = "setOnWillDismissInAppMessageHandler";
@@ -76,13 +77,12 @@ public class OneSignalPush extends CordovaPlugin {
 
   private static final String ADD_PERMISSION_OBSERVER = "addPermissionObserver";
   private static final String ADD_PUSH_SUBSCRIPTION_OBSERVER = "addPushSubscriptionObserver";
-  private static final String REMOVE_PUSH_SUBSCRIPTION_OBSERVER = "removePushSubscriptionObserver";
 
-  private static final String OPT_IN = "optIn";
-  private static final String OPT_OUT = "optOut";
-   private static final String GET_ID = "getId";
-  private static final String GET_TOKEN = "getToken";
-  private static final String GET_OPTED_IN = "getOptedIn";
+  private static final String OPT_IN = "optInPushSubscription";
+  private static final String OPT_OUT = "optOutPushSubscription";
+   private static final String GET_ID = "getPushSubscriptionId";
+  private static final String GET_TOKEN = "getPushSubscriptionToken";
+  private static final String GET_OPTED_IN = "getPushSubscriptionOptedIn";
   
   private static final String ADD_ALIASES = "addAliases";
   private static final String REMOVE_ALIASES = "removeAliases";
@@ -122,15 +122,14 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String SET_PRIVACY_CONSENT = "setPrivacyConsent";
 
   private static final String ADD_TRIGGERS = "addTriggers";
-  private static final String REMOVE_TRIGGERS_FOR_KEYS = "removeTriggersForKeys";
-  private static final String GET_TRIGGER_VALUE_FOR_KEY = "getTriggerValueForKey";
+  private static final String REMOVE_TRIGGERS = "removeTriggers";
+  private static final String CLEAR_TRIGGERS = "clearTriggers";
+  private static final String SET_PAUSED = "setPaused";
+  private static final String IS_PAUSED = "isPaused";
 
-  private static final String PAUSE_IN_APP_MESSAGES = "pauseInAppMessages";
-  private static final String IN_APP_MESSAGING_PAUSED = "isInAppMessagingPaused";
-
-  private static final String SEND_OUTCOME = "sendOutcome";
-  private static final String SEND_UNIQUE_OUTCOME = "sendUniqueOutcome";
-  private static final String SEND_OUTCOME_WITH_VALUE = "sendOutcomeWithValue";
+  private static final String ADD_OUTCOME = "addOutcome";
+  private static final String ADD_UNIQUE_OUTCOME = "addUniqueOutcome";
+  private static final String ADD_OUTCOME_WITH_VALUE = "addOutcomeWithValue";
 
   private static final String ENTER_LIVE_ACTIVITY = "enterLiveActivity";
   private static final String EXIT_LIVE_ACTIVITY = "exitLiveActivity";
@@ -152,37 +151,42 @@ public class OneSignalPush extends CordovaPlugin {
     return true;
   }
 
-
-  public boolean setInAppMessageClickHandler(CallbackContext callbackContext) {
-    OneSignal.setInAppMessageClickHandler(new CordovaInAppMessageClickHandler(callbackContext));
+  public boolean setClickHandler(CallbackContext callbackContext) {
+    OneSignal.getInAppMessages().setInAppMessageClickHandler(new CordovaInAppMessageClickHandler(callbackContext));
     return true;
   }
 
-  public boolean setInAppMessageLifecycleHandler() {
-    OneSignal.setInAppMessageLifecycleHandler(new OSInAppMessageLifecycleHandler() {
-      @Override
-      public void onWillDisplayInAppMessage(OSInAppMessage message) {
-        if (jsInAppMessageWillDisplayCallback != null) {
-          CallbackHelper.callbackSuccess(jsInAppMessageWillDisplayCallback, message.toJSONObject());
+  public boolean setLifecycleHandler() {
+    OneSignal.getInAppMessages().setInAppMessageLifecycleHandler(new IInAppMessageLifecycleHandler() {
+
+      JSONObject convertInAppMessageToJSON(IInAppMessage message, CallbackContext callbackContext) {
+        JSONObject result = new JSONObject();
+        try {
+          result.put("messageId", message.getMessageId());
+          if (callbackContext != null) {
+            CallbackHelper.callbackSuccess(callbackContext, result);
+          }
+        } catch (JSONException e) {
+          e.printStackTrace();
         }
+        return result;
+      }
+          
+      @Override
+      public void onWillDisplayInAppMessage(IInAppMessage message) {
+        convertInAppMessageToJSON(message,jsInAppMessageWillDisplayCallback);
       }
       @Override
-      public void onDidDisplayInAppMessage(OSInAppMessage message) {
-        if (jsInAppMessageDidDisplayCallBack != null) {
-          CallbackHelper.callbackSuccess(jsInAppMessageDidDisplayCallBack, message.toJSONObject());
-        }
+      public void onDidDisplayInAppMessage(IInAppMessage message) {
+        convertInAppMessageToJSON(message, jsInAppMessageDidDisplayCallBack);
       }
       @Override
-      public void onWillDismissInAppMessage(OSInAppMessage message) {
-        if (jsInAppMessageWillDismissCallback != null) {
-          CallbackHelper.callbackSuccess(jsInAppMessageWillDismissCallback, message.toJSONObject());
-        }
+      public void onWillDismissInAppMessage(IInAppMessage message) {
+        convertInAppMessageToJSON(message, jsInAppMessageWillDismissCallback);
       }
       @Override
-      public void onDidDismissInAppMessage(OSInAppMessage message) {
-        if (jsInAppMessageDidDismissCallBack != null) {
-          CallbackHelper.callbackSuccess(jsInAppMessageDidDismissCallBack, message.toJSONObject());
-        }
+      public void onDidDismissInAppMessage(IInAppMessage message) {
+        convertInAppMessageToJSON(message, jsInAppMessageDidDismissCallBack);
       }
     });
     return true;
@@ -238,12 +242,12 @@ public class OneSignalPush extends CordovaPlugin {
         result = setNotificationWillShowInForegroundHandler(callbackContext);
         break;
 
-      case SET_IN_APP_MESSAGE_CLICK_HANDLER:
-        result = setInAppMessageClickHandler(callbackContext);
+      case SET_CLICK_HANDLER:
+        result = setClickHandler(callbackContext);
         break;
 
-      case SET_IN_APP_MESSAGE_LIFECYCLE_HANDLER:
-        result = setInAppMessageLifecycleHandler();
+      case SET_LIFECYCLE_HANDLER:
+        result = setLifecycleHandler();
         break;
 
       case SET_ON_WILL_DISPLAY_IN_APP_MESSAGE_HANDLER:
@@ -288,29 +292,25 @@ public class OneSignalPush extends CordovaPlugin {
       case ADD_PUSH_SUBSCRIPTION_OBSERVER:
         result = OneSignalObserverController.addPushSubscriptionObserver(callbackContext);
         break;
-      
-      case REMOVE_PUSH_SUBSCRIPTION_OBSERVER:
-        result = OneSignalObserverController.removePushSubscriptionObserver();
-        break;
 
       case OPT_IN:
-        result = OneSignalController.optIn();
+        result = OneSignalController.optInPushSubscription();
         break;
 
       case OPT_OUT:
-        result = OneSignalController.optOut();
+        result = OneSignalController.optOutPushSubscription();
         break;
       
       case GET_ID:
-        result = OneSignalController.getId(callbackContext);
+        result = OneSignalController.getPushSubscriptionId(callbackContext);
         break;
 
       case GET_TOKEN:
-        result = OneSignalController.getToken(callbackContext);
+        result = OneSignalController.getPushSubscriptionToken(callbackContext);
         break;
 
       case GET_OPTED_IN:
-        result = OneSignalController.getOptedIn(callbackContext);
+        result = OneSignalController.getPushSubscriptionOptedIn(callbackContext);
         break;
 
       case ADD_ALIASES:
@@ -361,7 +361,11 @@ public class OneSignalPush extends CordovaPlugin {
         break;
 
       case SET_LOG_LEVEL:
-        OneSignalController.setLogLevel(callbackContext,data);
+        OneSignalController.setLogLevel(data);
+        break;
+
+      case SET_ALERT_LEVEL:
+        OneSignalController.setAlertLevel(data);
         break;
 
       case ADD_EMAIL:
@@ -381,7 +385,7 @@ public class OneSignalPush extends CordovaPlugin {
         break;
 
       case REQUEST_LOCATION_PERMISSION:
-        OneSignalController.requestLocationPermission(callbackContext);
+        OneSignalController.requestLocationPermission();
         break;
 
       case SET_LOCATION_SHARED:
@@ -412,32 +416,32 @@ public class OneSignalPush extends CordovaPlugin {
         result = OneSignalInAppMessagingController.addTriggers(data);
         break;
 
-      case REMOVE_TRIGGERS_FOR_KEYS:
-        result = OneSignalInAppMessagingController.removeTriggersForKeys(data);
+      case REMOVE_TRIGGERS:
+        result = OneSignalInAppMessagingController.removeTriggers(data);
         break;
 
-      case GET_TRIGGER_VALUE_FOR_KEY:
-        result = OneSignalInAppMessagingController.getTriggerValueForKey(callbackContext, data);
+      case CLEAR_TRIGGERS:
+        result = OneSignalInAppMessagingController.clearTriggers();
         break;
 
-      case PAUSE_IN_APP_MESSAGES:
-        result = OneSignalInAppMessagingController.pauseInAppMessages(data);
+      case SET_PAUSED:
+        result = OneSignalInAppMessagingController.setPaused(data);
         break;
 
-      case IN_APP_MESSAGING_PAUSED:
-        result = OneSignalInAppMessagingController.isInAppMessagingPaused(callbackContext);
+      case IS_PAUSED:
+        result = OneSignalInAppMessagingController.isPaused(callbackContext);
         break;
 
-      case SEND_OUTCOME:
-        result = OneSignalOutcomeController.sendOutcome(callbackContext, data);
+      case ADD_OUTCOME:
+        result = OneSignalOutcomeController.addOutcome(data);
         break;
 
-      case SEND_UNIQUE_OUTCOME:
-        result = OneSignalOutcomeController.sendUniqueOutcome(callbackContext, data);
+      case ADD_UNIQUE_OUTCOME:
+        result = OneSignalOutcomeController.addUniqueOutcome(data);
         break;
 
-      case SEND_OUTCOME_WITH_VALUE:
-        result = OneSignalOutcomeController.sendOutcomeWithValue(callbackContext, data);
+      case ADD_OUTCOME_WITH_VALUE:
+        result = OneSignalOutcomeController.addOutcomeWithValue(data);
         break;
 
       case ENTER_LIVE_ACTIVITY:
@@ -557,7 +561,7 @@ public class OneSignalPush extends CordovaPlugin {
     }
   }
 
-  private static class CordovaInAppMessageClickHandler implements OneSignal.OSInAppMessageClickHandler {
+  private static class CordovaInAppMessageClickHandler implements IInAppMessageClickHandler {
 
     private CallbackContext jsInAppMessageClickedCallback;
 
@@ -566,24 +570,16 @@ public class OneSignalPush extends CordovaPlugin {
     }
 
     @Override
-    public void inAppMessageClicked(OSInAppMessageAction result) {
+    public void inAppMessageClicked(IInAppMessageClickResult result) {
       try {
-        JSONObject resultJSON = result.toJSONObject();
-        JSONObject actionJSON = new JSONObject();
+        JSONObject clickResults = new JSONObject();
 
-        // Convert key names to camelCase, which is the expected type
-        if (resultJSON.has("first_click")) {
-          actionJSON.put("firstClick", resultJSON.getBoolean("first_click"));
-        }
-        if (resultJSON.has("closes_message")) {
-          actionJSON.put("closesMessage", resultJSON.getBoolean("closes_message"));
-        }
-        actionJSON.put("clickName", resultJSON.optString("click_name", null));
-        actionJSON.put("clickUrl", resultJSON.optString("click_url", null));
-        actionJSON.put("outcomes", resultJSON.optJSONArray("outcomes"));
-        actionJSON.put("tags", resultJSON.optJSONObject("tags"));
+        clickResults.put("isFirstClick", result.getAction().isFirstClick());
+        clickResults.put("closesMessage", result.getAction().getClosesMessage());
+        clickResults.put("clickName", result.getAction().getClickName());
+        clickResults.put("clickUrl", result.getAction().getClickUrl());
 
-        CallbackHelper.callbackSuccess(jsInAppMessageClickedCallback, actionJSON);
+        CallbackHelper.callbackSuccess(jsInAppMessageClickedCallback, clickResults);
       }
       catch (JSONException e) {
         e.printStackTrace();
