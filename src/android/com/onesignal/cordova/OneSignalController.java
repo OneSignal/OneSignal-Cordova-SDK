@@ -346,15 +346,8 @@ public class OneSignalController {
    * Location
    */
   
-  public static boolean requestLocationPermission(CallbackContext callbackContext) {
-    OneSignal.getLocation().requestPermission(Continue.with(r -> {
-      if (r.isSuccess()) {
-        if (r.getData()) {
-          Boolean didPermit = r.getData();
-          CallbackHelper.callbackSuccessBoolean(callbackContext, didPermit);
-        }
-      }
-    }));
+  public static boolean requestLocationPermission() {
+    OneSignal.getLocation().requestPermission(Continue.none());
     return true;
   }
 

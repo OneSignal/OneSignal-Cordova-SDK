@@ -383,7 +383,7 @@ public class OneSignalPush extends CordovaPlugin {
         break;
 
       case REQUEST_LOCATION_PERMISSION:
-        OneSignalController.requestLocationPermission(callbackContext);
+        OneSignalController.requestLocationPermission();
         break;
 
       case SET_LOCATION_SHARED:
