@@ -94,6 +94,7 @@ export default class Notifications {
     };
 
     /**
+     * Whether attempting to request notification permission will show a prompt. Returns true if the device has not been prompted for push notification permission already.
      * @param {(value: boolean) => void} handler
      * @returns void
      */
@@ -114,11 +115,10 @@ export default class Notifications {
      *
      * For more information: https://documentation.onesignal.com/docs/ios-customizations#provisional-push-notifications
      *
-     * @param  {(response:{accepted:boolean})=>void} handler
+     * @param  {(response: boolean)=>void} handler
      * @returns void
      */
-    registerForProvisionalAuthorization(handler?: (response: { accepted: boolean }) => void): void {
-        // TODO: Update the response in GA release to just boolean
+    registerForProvisionalAuthorization(handler?: (response: boolean) => void): void {
         window.cordova.exec(handler, function(){}, "OneSignalPush", "registerForProvisionalAuthorization", []);
     };
 
