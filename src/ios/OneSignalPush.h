@@ -39,11 +39,6 @@
 - (void)completeNotification:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)init:(CDVInvokedUrlCommand* _Nonnull)command;
 
-- (void)addPermissionObserver:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)addSubscriptionObserver:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)addEmailSubscriptionObserver:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)addSMSSubscriptionObserver:(CDVInvokedUrlCommand* _Nonnull)command;
-
 - (void)setLogLevel:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)setAlertLevel:(CDVInvokedUrlCommand* _Nonnull)command;
 

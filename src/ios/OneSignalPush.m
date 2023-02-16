@@ -161,8 +161,8 @@ static Class delegateClass = nil;
 
 @implementation OneSignalPush
 
-- (void)onOSPermissionChanged:(OSPermissionStateChanges*)stateChanges {
-    successCallback(permissionObserverCallbackId, [stateChanges toDictionary]);
+- (void)onOSPermissionChanged:(OSPermissionState*)state {
+    successCallbackBoolean(permissionObserverCallbackId, state.permission);
 }
 
 - (void)onOSSubscriptionChanged:(OSSubscriptionStateChanges*)stateChanges {
@@ -200,6 +200,7 @@ static Class delegateClass = nil;
     OSNotificationDisplayResponse completion = self.notificationCompletionCache[notificationId];
 
     if (!completion) {
+        [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"OneSignal (objc): could not find notification completion block with id: %@", notificationId]];
         return;
     }
 
@@ -332,8 +333,7 @@ static Class delegateClass = nil;
 - (void)registerForProvisionalAuthorization:(CDVInvokedUrlCommand *)command {
     registerForProvisionalAuthorizationCallbackId = command.callbackId;
     [OneSignal.Notifications registerForProvisionalAuthorization:^(BOOL accepted) {
-        // TODO: Update the response in 5.0.0 GA release to just boolean
-        successCallback(registerForProvisionalAuthorizationCallbackId, @{@"accepted": (accepted ? @"true" : @"false")});
+        successCallbackBoolean(registerForProvisionalAuthorizationCallbackId, accepted);
     }];
 }
 
