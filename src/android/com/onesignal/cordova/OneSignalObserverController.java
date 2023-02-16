@@ -37,17 +37,11 @@ public class OneSignalObserverController {
       permissionObserver = new IPermissionChangedHandler() {
         @Override
         public void onPermissionChanged(boolean permission) {
-          JSONObject permissionObj = new JSONObject();
-          try {
-            permissionObj.put("value", permission);
-          } catch (JSONException e) {
-            e.printStackTrace();
-          }
-          callbackSuccess(jsPermissionObserverCallBack, permissionObj);
+          CallbackHelper.callbackSuccessBoolean(jsPermissionObserverCallBack, permission);
         }
-      OneSignal.getNotifications().addPermissionChangedHandler(permissionObserver);
       };
-    }
+      OneSignal.getNotifications().addPermissionChangedHandler(permissionObserver);
+    };  
     return true;
   }
 

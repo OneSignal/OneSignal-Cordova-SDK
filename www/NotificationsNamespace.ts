@@ -38,7 +38,7 @@ export default class Notifications {
 
     /**
      * Add a callback that fires when the native push permission changes.
-     * @param  {(event:ChangeEvent<PermissionChange>)=>void} observer
+     * @param  {(event: boolean) => void} observer
      * @returns void
      */
     addPermissionObserver(observer: (event: boolean) => void): void {
@@ -52,7 +52,7 @@ export default class Notifications {
 
     /**
      * Remove a push permission observer that has been previously added.
-     * @param  {(event:ChangeEvent<PermissionChange>)=>void} observer
+     * @param  {(observer: (event: boolean) => void)} observer
      * @returns void
      */
     removePermissionObserver(observer: (event: boolean) => void): void {
