@@ -34,6 +34,7 @@ import com.onesignal.inAppMessages.IInAppMessageClickHandler;
 import com.onesignal.inAppMessages.IInAppMessageClickResult;
 import com.onesignal.inAppMessages.IInAppMessageLifecycleHandler;
 import com.onesignal.OneSignal;
+import com.onesignal.debug.internal.logging.Logging;
 import com.onesignal.common.OneSignalWrapper;
 
 import com.onesignal.notifications.INotification;
@@ -224,7 +225,7 @@ public class OneSignalPush extends CordovaPlugin {
       CallbackHelper.callbackSuccessBoolean(callbackContext, true);
       return true;
     } catch (JSONException e) {
-      Log.e(TAG, "execute: Got JSON Exception " + e.getMessage());
+      Logging.error(TAG + "execute: Got JSON Exception " + e.getMessage(), null);
       return false;
     }
   }
@@ -453,7 +454,7 @@ public class OneSignalPush extends CordovaPlugin {
         break;
 
       default:
-        Log.e(TAG, "Invalid action : " + action);
+        Logging.error(TAG + "Invalid action : " + action, null);
         CallbackHelper.callbackError(callbackContext, "Invalid action : " + action);
     }
 
@@ -468,6 +469,7 @@ public class OneSignalPush extends CordovaPlugin {
       INotificationReceivedEvent notificationReceivedEvent = notificationReceivedEventCache.get(notificationId);
 
       if (notificationReceivedEvent == null) {
+        Logging.error("Could not find notification completion block with id: " + notificationId, null); //crashes without 2nd parameter
         return false;
       }
 
