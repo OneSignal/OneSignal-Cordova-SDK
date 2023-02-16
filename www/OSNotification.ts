@@ -3,7 +3,7 @@ export default class OSNotification {
     sound               ?: string;
     title               ?: string;
     launchURL           ?: string;
-    rawPayload          : object;
+    rawPayload          : string;
     actionButtons       ?: object[];
     additionalData      : object;
     notificationId      : string;

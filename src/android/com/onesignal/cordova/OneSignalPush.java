@@ -509,8 +509,7 @@ public class OneSignalPush extends CordovaPlugin {
         foregroundData.put("sound", notification.getSound());
         foregroundData.put("title", notification.getTitle());
         foregroundData.put("launchURL", notification.getLaunchURL());
-        // Can't seem to access this?
-        // foregroundData.put("rawPayload", notification.getrawPayload());
+        foregroundData.put("rawPayload", notification.getrawPayload());
         foregroundData.put("actionButtons", notification.getActionButtons());
         foregroundData.put("additionalData", notification.getAdditionalData());
         foregroundData.put("notificationId", notification.getNotificationId());
