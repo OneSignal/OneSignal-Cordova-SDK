@@ -2,6 +2,7 @@ package com.onesignal.cordova;
 
 import com.onesignal.OneSignal;
 import com.onesignal.Continue;
+import com.onesignal.debug.LogLevel;
 
 import org.apache.cordova.CallbackContext;
 import org.json.JSONArray;
@@ -122,7 +123,6 @@ public class OneSignalController {
   /** 
   * Aliases
   */
-
   public static boolean addAliases(JSONArray data) {
     try{
       JSONObject aliasObject = data.getJSONObject(0);
@@ -160,7 +160,6 @@ public class OneSignalController {
   /**
    * Tags
    */
-
   public static boolean addTags(JSONArray data) {
     try {
       JSONObject tagsObject = data.getJSONObject(0);
@@ -196,7 +195,6 @@ public class OneSignalController {
   /**
    * Notifications
    */
-
   public static boolean clearAllNotifications() {
     try {
       OneSignal.getNotifications().clearAllNotifications();
@@ -279,12 +277,6 @@ public class OneSignalController {
   /**
    * Privacy consent
    */
-  public static boolean userProvidedConsent(CallbackContext callbackContext) {
-    boolean providedConsent = OneSignal.userProvidedPrivacyConsent();
-    CallbackHelper.callbackSuccessBoolean(callbackContext, providedConsent);
-    return true;
-  }
-
   public static boolean getRequiresPrivacyConsent(CallbackContext callbackContext) {
     boolean requiresUserConsent = OneSignal.getRequiresPrivacyConsent();
     CallbackHelper.callbackSuccessBoolean(callbackContext, requiresUserConsent);
@@ -320,7 +312,6 @@ public class OneSignalController {
   /**
    * Location
    */
-  
   public static boolean requestLocationPermission() {
     OneSignal.getLocation().requestPermission(Continue.none());
     return true;

@@ -18,7 +18,6 @@ public class OneSignalObserverController {
   private static CallbackContext jsSubscriptionObserverCallBack;
 
   private static IPermissionChangedHandler permissionObserver;
-
   private static ISubscriptionChangedHandler pushSubscriptionChangedHandler;
 
   // This is to prevent an issue where if two Javascript calls are made to OneSignal expecting a callback then only one would fire.
@@ -62,13 +61,14 @@ public class OneSignalObserverController {
             pushSubscriptionProperties.put("id", pushSubscription.getId());
             pushSubscriptionProperties.put("token", pushSubscription.getToken());
             pushSubscriptionProperties.put("optedIn", pushSubscription.getOptedIn());
+
+            callbackSuccess(jsSubscriptionObserverCallBack, pushSubscriptionProperties);
+            OneSignal.getUser().getPushSubscription().addChangeHandler(pushSubscriptionChangedHandler);
           } catch (JSONException e) {
             e.printStackTrace();
           }
-          callbackSuccess(jsSubscriptionObserverCallBack, pushSubscriptionProperties);
         }
       };
-      OneSignal.getUser().getPushSubscription().addChangeHandler(handler);
     }
     return true;      
   }
