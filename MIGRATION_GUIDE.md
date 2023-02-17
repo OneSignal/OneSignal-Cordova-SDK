@@ -1,4 +1,4 @@
-# Cordova v5.0.0-beta1 Migration Guide
+# Cordova v5.0.0-beta-01 Migration Guide
 
 # Intro
 
@@ -137,7 +137,7 @@ Email and/or SMS subscriptions can be added or removed via the following methods
 
 # API Reference
 
-Below is a comprehensive reference to the `5.0.0-beta1` OneSignal Cordova SDK.
+Below is a comprehensive reference to the `5.0.0-beta-01` OneSignal Cordova SDK.
 
 ## OneSignal
 
