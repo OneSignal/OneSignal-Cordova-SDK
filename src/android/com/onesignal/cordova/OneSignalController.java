@@ -1,9 +1,6 @@
 package com.onesignal.cordova;
 
-import com.onesignal.OSDeviceState;
 import com.onesignal.OneSignal;
-import com.onesignal.debug.LogLevel;
-import com.onesignal.OneSignal.PostNotificationResponseHandler;
 import com.onesignal.Continue;
 
 import org.apache.cordova.CallbackContext;
@@ -18,27 +15,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class OneSignalController {
-
-  /**
-   * Subscriptions
-   */
-  public static boolean getDeviceState(CallbackContext callbackContext) {
-    OSDeviceState deviceState = OneSignal.getDeviceState();
-    if (deviceState != null)
-      CallbackHelper.callbackSuccess(callbackContext, deviceState.toJSONObject());
-    return true;
-  }
-
-  public static boolean disablePush(JSONArray data) {
-    try {
-      OneSignal.disablePush(data.getBoolean(0));
-      return true;
-    }
-    catch (Throwable t) {
-      t.printStackTrace();
-      return false;
-    }
-  }
 
   /**
    * Misc
@@ -220,34 +196,10 @@ public class OneSignalController {
   /**
    * Notifications
    */
-  public static boolean postNotification(CallbackContext callbackContext, JSONArray data) {
+
+  public static boolean clearAllNotifications() {
     try {
-      JSONObject jo = data.getJSONObject(0);
-      final CallbackContext jsPostNotificationCallBack = callbackContext;
-      OneSignal.postNotification(jo,
-              new PostNotificationResponseHandler() {
-                @Override
-                public void onSuccess(JSONObject response) {
-                  CallbackHelper.callbackSuccess(jsPostNotificationCallBack, response);
-                }
-
-                @Override
-                public void onFailure(JSONObject response) {
-                  CallbackHelper.callbackError(jsPostNotificationCallBack, response);
-                }
-              });
-
-      return true;
-    }
-    catch (Throwable t) {
-      t.printStackTrace();
-      return false;
-    }
-  }
-
-  public static boolean clearOneSignalNotifications() {
-    try {
-      OneSignal.clearOneSignalNotifications();
+      OneSignal.getNotifications().clearAllNotifications();
       return true;
     }
     catch(Throwable t) {
@@ -258,7 +210,7 @@ public class OneSignalController {
 
   public static boolean removeNotification(JSONArray data) {
     try {
-      OneSignal.removeNotification(data.getInt(0));
+      OneSignal.getNotifications().removeNotification(data.getInt(0));
       return true;
     } catch (Throwable t) {
       t.printStackTrace();
@@ -268,7 +220,7 @@ public class OneSignalController {
 
   public static boolean removeGroupedNotifications(JSONArray data) {
     try {
-      OneSignal.removeGroupedNotifications(data.getString(0));
+      OneSignal.getNotifications().removeGroupedNotifications(data.getString(0));
       return true;
     } catch (Throwable t) {
       t.printStackTrace();
@@ -281,7 +233,7 @@ public class OneSignalController {
     return true;
   }
 
-  public static boolean promptForPushNotificationsWithUserResponse(CallbackContext callbackContext, JSONArray data) {
+  public static boolean requestPermission(CallbackContext callbackContext, JSONArray data) {
     final CallbackContext jsPromptForPushNotificationsCallback = callbackContext;
     boolean fallbackToSettings = false;
     try {
@@ -290,28 +242,38 @@ public class OneSignalController {
       e.printStackTrace();
     }
 
-    OneSignal.promptForPushNotifications(fallbackToSettings, new OneSignal.PromptForPushNotificationPermissionResponseHandler() {
-      @Override
-      public void response(boolean accepted) {
-        CallbackHelper.callbackSuccessBoolean(callbackContext, accepted);
+    OneSignal.getNotifications().requestPermission(fallbackToSettings, Continue.with(r -> {
+      if (r.isSuccess()) {
+        if (r.getData()) {
+          Boolean didPermit = r.getData();
+          CallbackHelper.callbackSuccessBoolean(callbackContext, didPermit);
+        }
       }
-    });
+    }));
     return true;
+  }
+
+  public static boolean getPermission(CallbackContext callbackContext) {
+    boolean granted = OneSignal.getNotifications().getPermission();
+    try {
+      JSONObject permissionObj = new JSONObject ();
+      permissionObj.put("value", granted);
+
+      CallbackHelper.callbackSuccess(callbackContext, permissionObj);
+    } catch (JSONException e){
+      e.printStackTrace();
+    }
+    return true;
+  }
+
+  public static boolean canRequestPermission() {
+      // doesn't apply to Android 5.0.0-beta1?
+      return true;
   }
 
   public static boolean setLaunchURLsInApp() {
     // doesn't apply to Android
     return true;
-  }
-
-  public static boolean unsubscribeWhenNotificationsAreDisabled(JSONArray data) {
-    try {
-      OneSignal.unsubscribeWhenNotificationsAreDisabled(data.getBoolean(0));
-      return true;
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return false;
   }
 
   /**

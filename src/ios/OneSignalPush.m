@@ -34,10 +34,9 @@
 NSString* notificationWillShowInForegoundCallbackId;
 NSString* notificationOpenedCallbackId;
 NSString* getIdsCallbackId;
-NSString* postNotificationCallbackId;
 NSString* permissionObserverCallbackId;
 NSString* subscriptionObserverCallbackId;
-NSString* promptForPushNotificationsWithUserResponseCallbackId;
+NSString* requestPermissionCallbackId;
 NSString* registerForProvisionalAuthorizationCallbackId;
 NSString* enterLiveActivityCallbackId;
 NSString* exitLiveActivityCallbackId;
@@ -162,8 +161,8 @@ static Class delegateClass = nil;
 
 @implementation OneSignalPush
 
-- (void)onOSPermissionChanged:(OSPermissionStateChanges*)stateChanges {
-    successCallback(permissionObserverCallbackId, [stateChanges toDictionary]);
+- (void)onOSPermissionChanged:(OSPermissionState*)state {
+    successCallbackBoolean(permissionObserverCallbackId, state.permission);
 }
 
 - (void)onOSSubscriptionChanged:(OSSubscriptionStateChanges*)stateChanges {
@@ -178,7 +177,7 @@ static Class delegateClass = nil;
 - (void)setNotificationWillShowInForegroundHandler:(CDVInvokedUrlCommand*)command {
     notificationWillShowInForegoundCallbackId = command.callbackId;
 
-    [OneSignal setNotificationWillShowInForegroundHandler:^(OSNotification *notification, OSNotificationDisplayResponse completion) {
+    [OneSignal.Notifications setNotificationWillShowInForegroundHandler:^(OSNotification *notification, OSNotificationDisplayResponse completion) {
         self.receivedNotificationCache[notification.notificationId] = notification;
         self.notificationCompletionCache[notification.notificationId] = completion;
         processNotificationWillShowInForeground(notification);
@@ -188,7 +187,7 @@ static Class delegateClass = nil;
 - (void)setNotificationOpenedHandler:(CDVInvokedUrlCommand*)command {
     notificationOpenedCallbackId = command.callbackId;
 
-    [OneSignal setNotificationOpenedHandler:^(OSNotificationOpenedResult * _Nonnull result) {
+    [OneSignal.Notifications setNotificationOpenedHandler:^(OSNotificationOpenedResult * _Nonnull result) {
         actionNotification = result;
         if (pluginCommandDelegate)
             processNotificationOpened(actionNotification);
@@ -201,7 +200,7 @@ static Class delegateClass = nil;
     OSNotificationDisplayResponse completion = self.notificationCompletionCache[notificationId];
 
     if (!completion) {
-        [OneSignal onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"OneSignal (objc): could not find notification completion block with id: %@", notificationId]];
+        [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"OneSignal (objc): could not find notification completion block with id: %@", notificationId]];
         return;
     }
 
@@ -229,10 +228,6 @@ static Class delegateClass = nil;
         processNotificationOpened(actionNotification);
 }
 
-- (void)getDeviceState:(CDVInvokedUrlCommand*)command {
-    successCallback(command.callbackId, [[OneSignal getDeviceState] jsonRepresentation]);
-}
-
 - (void)setLanguage:(CDVInvokedUrlCommand*)command {
     [OneSignal.User setLanguage:command.arguments[0]];
 }
@@ -240,8 +235,9 @@ static Class delegateClass = nil;
 - (void)addPermissionObserver:(CDVInvokedUrlCommand*)command {
     bool first = permissionObserverCallbackId  == nil;
     permissionObserverCallbackId = command.callbackId;
-    if (first)
-        [OneSignal addPermissionObserver:self];
+    if (first) {
+        [OneSignal.Notifications addPermissionObserver:self];
+    }
 }
 
 - (void)addPushSubscriptionObserver:(CDVInvokedUrlCommand*)command {
@@ -311,46 +307,41 @@ static Class delegateClass = nil;
     [OneSignal.User removeTags:command.arguments];
 }
 
-- (void)promptForPushNotificationsWithUserResponse:(CDVInvokedUrlCommand*)command {
-   promptForPushNotificationsWithUserResponseCallbackId = command.callbackId;
-    [OneSignal promptForPushNotificationsWithUserResponse:^(BOOL accepted) {
-        successCallbackBoolean(promptForPushNotificationsWithUserResponseCallbackId, accepted);
+- (void)requestPermission:(CDVInvokedUrlCommand*)command {
+    requestPermissionCallbackId = command.callbackId;
+    [OneSignal.Notifications requestPermission:^(BOOL accepted) {
+        successCallbackBoolean(requestPermissionCallbackId, accepted);
     } fallbackToSettings:[command.arguments[0] boolValue]];
+}
+
+- (void)getPermission:(CDVInvokedUrlCommand*)command {
+    bool isPermitted = [OneSignal.Notifications permission];
+    NSDictionary *result = @{
+            @"value" : @(isPermitted)
+    };
+    successCallback(command.callbackId, result);
+}
+
+- (void)canRequestPermission:(CDVInvokedUrlCommand*)command {
+    bool canRequest = [OneSignal.Notifications canRequestPermission];
+    NSDictionary *result = @{
+            @"value" : @(canRequest)
+    };
+    successCallback(command.callbackId, result);
 }
 
 - (void)registerForProvisionalAuthorization:(CDVInvokedUrlCommand *)command {
     registerForProvisionalAuthorizationCallbackId = command.callbackId;
-    [OneSignal registerForProvisionalAuthorization:^(BOOL accepted) {
-        // TODO: Update the response in next major release to just boolean
-        successCallback(registerForProvisionalAuthorizationCallbackId, @{@"accepted": (accepted ? @"true" : @"false")});
+    [OneSignal.Notifications registerForProvisionalAuthorization:^(BOOL accepted) {
+        successCallbackBoolean(registerForProvisionalAuthorizationCallbackId, accepted);
     }];
 }
 
-- (void)disablePush:(CDVInvokedUrlCommand*)command {
-    [OneSignal disablePush:[command.arguments[0] boolValue]];
-}
-
-- (void)postNotification:(CDVInvokedUrlCommand*)command {
-    postNotificationCallbackId = command.callbackId;
-
-    [OneSignal postNotification:command.arguments[0]
-        onSuccess:^(NSDictionary* results) {
-            successCallback(postNotificationCallbackId, results);
-        }
-        onFailure:^(NSError* error) {
-            if (error.userInfo && error.userInfo[@"returned"])
-                failureCallback(postNotificationCallbackId, error.userInfo[@"returned"]);
-            else
-                failureCallback(postNotificationCallbackId, @{@"error": @"HTTP no response error"});
-
-    }];
+- (void)clearAllNotifications:(CDVInvokedUrlCommand*)command {
+    [OneSignal.Notifications clearAll];
 }
 
 // Start Android only
-- (void)clearOneSignalNotifications:(CDVInvokedUrlCommand*)command {}
-
-- (void)unsubscribeWhenNotificationsAreDisabled:(CDVInvokedUrlCommand *)command {}
-
 - (void)removeNotification:(CDVInvokedUrlCommand *)command {}
 
 - (void)removeGroupedNotifications:(CDVInvokedUrlCommand *)command {}
