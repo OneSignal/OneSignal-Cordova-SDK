@@ -29,23 +29,21 @@ package com.onesignal.cordova;
 
 import android.util.Log;
 
+import com.onesignal.OneSignal;
+import com.onesignal.debug.internal.logging.Logging;
+import com.onesignal.common.OneSignalWrapper;
+
 import com.onesignal.inAppMessages.IInAppMessage;
 import com.onesignal.inAppMessages.IInAppMessageClickHandler;
 import com.onesignal.inAppMessages.IInAppMessageClickResult;
 import com.onesignal.inAppMessages.IInAppMessageLifecycleHandler;
-import com.onesignal.OneSignal;
-import com.onesignal.debug.internal.logging.Logging;
-import com.onesignal.common.OneSignalWrapper;
 
 import com.onesignal.notifications.INotification;
 import com.onesignal.notifications.INotificationClickHandler;
 import com.onesignal.notifications.INotificationClickResult;
 import com.onesignal.notifications.INotificationReceivedEvent;
 import com.onesignal.notifications.IRemoteNotificationReceivedHandler;
-
 import com.onesignal.notifications.INotificationWillShowInForegroundHandler;
-import com.onesignal.notifications.INotificationReceivedEvent;
-import com.onesignal.notifications.IRemoteNotificationReceivedHandler;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -215,8 +213,8 @@ public class OneSignalPush extends CordovaPlugin {
 
   public boolean init(CallbackContext callbackContext, JSONArray data) {
     OneSignalWrapper.setSdkType("cordova");  
-    // For 5.0.0-beta, hard code to reflect Cordova SDK version found in plugin.xml
-    OneSignalWrapper.setSdkVersion("3.3.0");
+    // For 5.0.0-beta, hard code to reflect SDK version
+    OneSignalWrapper.setSdkVersion("050000");
     try {
       String appId = data.getString(0);
 
@@ -509,7 +507,7 @@ public class OneSignalPush extends CordovaPlugin {
         foregroundData.put("sound", notification.getSound());
         foregroundData.put("title", notification.getTitle());
         foregroundData.put("launchURL", notification.getLaunchURL());
-        foregroundData.put("rawPayload", notification.getrawPayload());
+        foregroundData.put("rawPayload", notification.getRawPayload());
         foregroundData.put("actionButtons", notification.getActionButtons());
         foregroundData.put("additionalData", notification.getAdditionalData());
         foregroundData.put("notificationId", notification.getNotificationId());

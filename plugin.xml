@@ -37,7 +37,7 @@
   <js-module src="dist/NotificationsNamespace.js" name="NotificationsNamespace" />
 
   <platform name="android">
-    <framework src="com.onesignal:OneSignal:5.0.0-beta1" />
+    <framework src="com.onesignal:OneSignal:5.0.0-beta2" />
     <framework src="build-extras-onesignal.gradle" custom="true" type="gradleReference" />
     <framework src="org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.7.10" />
 
@@ -84,7 +84,7 @@
             <source url="https://cdn.cocoapods.org/"/>
         </config>
         <pods use-frameworks="true">
-            <pod name="OneSignalXCFramework" spec="5.0.0-alpha-02" />
+            <pod name="OneSignalXCFramework" spec="5.0.0-beta-02" />
         </pods>
     </podspec>
 

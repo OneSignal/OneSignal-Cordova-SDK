@@ -1,7 +1,12 @@
-import { PushSubscriptionState } from "./Subscription";
-
 // Suppress TS warnings about window.cordova
 declare let window: any; // turn off type checking
+
+// Represents the current user's push notification subscription state with OneSignal
+export interface PushSubscriptionState {
+    id                  ?: string;
+    token               ?: string;
+    optedIn             : boolean;
+}
 
 export default class PushSubscription {
     private _id?: string | null;

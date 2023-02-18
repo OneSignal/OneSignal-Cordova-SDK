@@ -98,7 +98,8 @@ void processNotificationOpened(OSNotificationOpenedResult* result) {
 }
 
 void initOneSignalObject(NSDictionary* launchOptions) {
-    [OneSignal setMSDKType:@"cordova"];
+    OneSignalWrapper.sdkType = @"cordova";
+    OneSignalWrapper.sdkVersion = @"050000";
     [OneSignal setLaunchOptions:launchOptions];
     initialLaunchFired = true;
 }
@@ -161,12 +162,13 @@ static Class delegateClass = nil;
 
 @implementation OneSignalPush
 
-- (void)onOSPermissionChanged:(OSPermissionState*)state {
-    successCallbackBoolean(permissionObserverCallbackId, state.permission);
+- (void)onOSPermissionChanged:(OSPermissionState*)stateChanges {
+    BOOL permission = stateChanges.permission;
+    successCallbackBoolean(permissionObserverCallbackId, permission);
 }
 
-- (void)onOSSubscriptionChanged:(OSSubscriptionStateChanges*)stateChanges {
-    successCallback(subscriptionObserverCallbackId, [stateChanges toDictionary]);
+- (void)onOSPushSubscriptionChangedWithStateChanges:(OSPushSubscriptionStateChanges*)stateChanges {
+    successCallback(subscriptionObserverCallbackId, [stateChanges.to jsonRepresentation]);
 }
 
 - (void)setProvidesNotificationSettingsView:(CDVInvokedUrlCommand *)command {
@@ -288,7 +290,7 @@ static Class delegateClass = nil;
 }
 
 - (void)setAlertLevel:(CDVInvokedUrlCommand*)command {
-    [OneSignal.Debug setVisualLevel:[command.arguments[0] intValue]];
+    [OneSignal.Debug setAlertLevel:[command.arguments[0] intValue]];
 }
 
 - (void)login:(CDVInvokedUrlCommand*)command {
@@ -347,7 +349,6 @@ static Class delegateClass = nil;
 - (void)removeGroupedNotifications:(CDVInvokedUrlCommand *)command {}
 // Finish Android only
 
-// Note: This implementation may not be accurate, as this method doesn't seem to exist in iOS
 - (void)getPrivacyConsent:(CDVInvokedUrlCommand *)command {
     bool userProvidedPrivacyConsent = OneSignal.getPrivacyConsent;
     successCallbackBoolean(command.callbackId, userProvidedPrivacyConsent);
@@ -363,7 +364,7 @@ static Class delegateClass = nil;
         [OneSignal setRequiresPrivacyConsent:[command.arguments[0] boolValue]];
 }
 
-- (void)setPrivacyConsentConsent:(CDVInvokedUrlCommand *)command {
+- (void)setPrivacyConsent:(CDVInvokedUrlCommand *)command {
     if (command.arguments.count >= 1)
         [OneSignal setPrivacyConsent:[command.arguments[0] boolValue]];
 }
@@ -388,12 +389,12 @@ static Class delegateClass = nil;
 
 - (void)addSms:(CDVInvokedUrlCommand *)command {
     NSString *smsNumber = command.arguments[0];
-    [OneSignal.User addSmsNumber:smsNumber];
+    [OneSignal.User addSms:smsNumber];
 }
 
 - (void)removeSms:(CDVInvokedUrlCommand *)command {
     NSString *smsNumber = command.arguments[0];
-    [OneSignal.User removeSmsNumber:smsNumber];
+    [OneSignal.User removeSms:smsNumber];
 }
 
 - (void)setLaunchURLsInApp:(CDVInvokedUrlCommand *)command {
