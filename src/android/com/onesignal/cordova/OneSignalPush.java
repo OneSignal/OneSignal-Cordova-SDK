@@ -27,6 +27,7 @@
 
 package com.onesignal.cordova;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.onesignal.OSInAppMessageAction;
@@ -36,6 +37,7 @@ import com.onesignal.OSNotification;
 import com.onesignal.OSNotificationOpenedResult;
 import com.onesignal.OSNotificationReceivedEvent;
 import com.onesignal.OneSignal;
+import com.onesignal.OneSignalRemoteNotificationHandlerSetter;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -128,6 +130,7 @@ public class OneSignalPush extends CordovaPlugin {
 
   public boolean setNotificationWillShowInForegroundHandler(CallbackContext callbackContext) {
     OneSignal.setNotificationWillShowInForegroundHandler(new CordovaNotificationInForegroundHandler(callbackContext));
+    OneSignalRemoteNotificationHandlerSetter.setRemoteNotificationHandler(new CordovaRemoteNotificationHandler(callbackContext));
     return true;
   }
 
@@ -456,6 +459,26 @@ public class OneSignalPush extends CordovaPlugin {
    * Handlers
    */
 
+  private static class CordovaRemoteNotificationHandler implements OneSignal.OSRemoteNotificationReceivedHandler {
+    private CallbackContext jsNotificationInForegroundCallBack;
+
+    public CordovaRemoteNotificationHandler(CallbackContext inCallbackContext) {
+      jsNotificationInForegroundCallBack = inCallbackContext;
+    }
+
+    @Override
+    public void remoteNotificationReceived(Context context, OSNotificationReceivedEvent osNotificationReceivedEvent) {
+      try {
+        OSNotification notification = osNotificationReceivedEvent.getNotification();
+        notificationReceivedEventCache.put(notification.getNotificationId(), osNotificationReceivedEvent);
+
+        CallbackHelper.callbackSuccess(jsNotificationInForegroundCallBack, notification.toJSONObject());
+      } catch (Throwable t) {
+        t.printStackTrace();
+      }
+    }
+  }
+
   private static class CordovaNotificationInForegroundHandler implements OneSignal.OSNotificationWillShowInForegroundHandler {
 
     private CallbackContext jsNotificationInForegroundCallBack;
@@ -530,7 +553,7 @@ public class OneSignalPush extends CordovaPlugin {
     }
   }
 
-  @Override
+    @Override
   public void onDestroy() {
     OneSignal.setNotificationOpenedHandler(null);
     OneSignal.setNotificationWillShowInForegroundHandler(null);

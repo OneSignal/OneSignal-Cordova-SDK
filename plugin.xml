@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="onesignal-cordova-plugin"
-    version="3.3.1">
+    version="3.3.1-patched">
 
   <name>OneSignal Push Notifications</name>
   <author>Josh Kasten, Bradley Hesse, Rodrigo Gomez-Palacio</author>
@@ -46,6 +46,7 @@
     <source-file src="src/android/com/onesignal/cordova/OneSignalObserverController.java" target-dir="src/com/onesignal/cordova/" />
     <source-file src="src/android/com/onesignal/cordova/OneSignalOutcomeController.java" target-dir="src/com/onesignal/cordova/" />
     <source-file src="src/android/com/onesignal/cordova/OneSignalInAppMessagingController.java" target-dir="src/com/onesignal/cordova/" />
+    <source-file src="src/android/com/onesignal/OneSignalRemoteNotificationHandlerSetter.java" target-dir="src/com/onesignal/cordova/" />
     <source-file src="src/android/com/onesignal/cordova/CallbackHelper.java" target-dir="src/com/onesignal/cordova/" />
   </platform>
 
