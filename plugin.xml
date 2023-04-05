@@ -46,7 +46,7 @@
     <source-file src="src/android/com/onesignal/cordova/OneSignalObserverController.java" target-dir="src/com/onesignal/cordova/" />
     <source-file src="src/android/com/onesignal/cordova/OneSignalOutcomeController.java" target-dir="src/com/onesignal/cordova/" />
     <source-file src="src/android/com/onesignal/cordova/OneSignalInAppMessagingController.java" target-dir="src/com/onesignal/cordova/" />
-    <source-file src="src/android/com/onesignal/OneSignalRemoteNotificationHandlerSetter.java" target-dir="src/com/onesignal/cordova/" />
+    <source-file src="src/android/com/onesignal/OneSignalRemoteNotificationHandlerSetter.java" target-dir="src/com/onesignal/" />
     <source-file src="src/android/com/onesignal/cordova/CallbackHelper.java" target-dir="src/com/onesignal/cordova/" />
   </platform>
 
