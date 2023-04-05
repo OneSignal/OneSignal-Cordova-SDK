@@ -470,8 +470,12 @@ public class OneSignalPush extends CordovaPlugin {
     public void remoteNotificationReceived(Context context, OSNotificationReceivedEvent osNotificationReceivedEvent) {
       try {
         OSNotification notification = osNotificationReceivedEvent.getNotification();
-        notificationReceivedEventCache.put(notification.getNotificationId(), osNotificationReceivedEvent);
-
+        synchronized (notificationReceivedEventCache) {
+          if( notificationReceivedEventCache.containsKey(notification.getNotificationId()) ) {
+            return;
+          }
+          notificationReceivedEventCache.put(notification.getNotificationId(), osNotificationReceivedEvent);
+        }
         CallbackHelper.callbackSuccess(jsNotificationInForegroundCallBack, notification.toJSONObject());
       } catch (Throwable t) {
         t.printStackTrace();
@@ -491,7 +495,12 @@ public class OneSignalPush extends CordovaPlugin {
     public void notificationWillShowInForeground(OSNotificationReceivedEvent notificationReceivedEvent) {
       try {
         OSNotification notification = notificationReceivedEvent.getNotification();
-        notificationReceivedEventCache.put(notification.getNotificationId(), notificationReceivedEvent);
+        synchronized (notificationReceivedEventCache) {
+          if( notificationReceivedEventCache.containsKey(notification.getNotificationId()) ) {
+            return;
+          }
+          notificationReceivedEventCache.put(notification.getNotificationId(), notificationReceivedEvent);
+        }
 
         CallbackHelper.callbackSuccess(jsNotificationInForegroundCallBack, notification.toJSONObject());
       } catch (Throwable t) {
