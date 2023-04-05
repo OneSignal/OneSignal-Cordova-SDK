@@ -557,5 +557,6 @@ public class OneSignalPush extends CordovaPlugin {
   public void onDestroy() {
     OneSignal.setNotificationOpenedHandler(null);
     OneSignal.setNotificationWillShowInForegroundHandler(null);
+    OneSignalRemoteNotificationHandlerSetter.setRemoteNotificationHandler(null);
   }
 }
