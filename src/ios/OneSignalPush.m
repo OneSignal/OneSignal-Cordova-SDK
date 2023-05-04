@@ -349,24 +349,14 @@ static Class delegateClass = nil;
 - (void)removeGroupedNotifications:(CDVInvokedUrlCommand *)command {}
 // Finish Android only
 
-- (void)getPrivacyConsent:(CDVInvokedUrlCommand *)command {
-    bool userProvidedPrivacyConsent = OneSignal.getPrivacyConsent;
-    successCallbackBoolean(command.callbackId, userProvidedPrivacyConsent);
-}
-
-- (void)getRequiresPrivacyConsent:(CDVInvokedUrlCommand *)command {
-    BOOL requiresUserPrivacyConsent = [OneSignal requiresPrivacyConsent];
-    successCallbackBoolean(command.callbackId, requiresUserPrivacyConsent);
-}
-
-- (void)setRequiresPrivacyConsent:(CDVInvokedUrlCommand *)command {
+- (void)setPrivacyConsentRequired:(CDVInvokedUrlCommand *)command {
     if (command.arguments.count >= 1)
-        [OneSignal setRequiresPrivacyConsent:[command.arguments[0] boolValue]];
+        [OneSignal setConsentRequired:[command.arguments[0] boolValue]];
 }
 
-- (void)setPrivacyConsent:(CDVInvokedUrlCommand *)command {
+- (void)setPrivacyConsentGiven:(CDVInvokedUrlCommand *)command {
     if (command.arguments.count >= 1)
-        [OneSignal setPrivacyConsent:[command.arguments[0] boolValue]];
+        [OneSignal setConsentGiven:[command.arguments[0] boolValue]];
 }
 
 - (void)addAliases:(CDVInvokedUrlCommand *)command {

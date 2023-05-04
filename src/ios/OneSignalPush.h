@@ -67,10 +67,8 @@
 - (void)removeNotification:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)removeGroupedNotifications:(CDVInvokedUrlCommand* _Nonnull)command;
 
-- (void)getPrivacyConsent:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)getRequiresPrivacyConsent:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)setRequiresPrivacyConsent:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)setPrivacyConsent:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)setPrivacyConsentRequired:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)setPrivacyConsentGiven:(CDVInvokedUrlCommand* _Nonnull)command;
 
 // Aliases
 - (void)addAliases:(CDVInvokedUrlCommand* _Nonnull)command;
