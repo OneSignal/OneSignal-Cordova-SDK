@@ -35,6 +35,7 @@
   <js-module src="dist/SessionNamespace.js" name="SessionNamespace" />
   <js-module src="dist/LocationNamespace.js" name="LocationNamespace" />
   <js-module src="dist/NotificationsNamespace.js" name="NotificationsNamespace" />
+  <js-module src="dist/LiveActivitiesNamespace.js" name="LiveActivitiesNamespace" />
 
   <platform name="android">
     <framework src="com.onesignal:OneSignal:5.0.0-beta2" />
