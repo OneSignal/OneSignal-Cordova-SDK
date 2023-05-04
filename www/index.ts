@@ -96,17 +96,8 @@ export class OneSignalPlugin {
      * @param  {boolean} required
      * @returns void
      */
-    setRequiresPrivacyConsent(required: boolean): void {
-        window.cordova.exec(function () { }, function () { }, "OneSignalPush", "setRequiresPrivacyConsent", [required]);
-    };
-
-    /**
-     * Determines whether a user must consent to privacy prior to their user data being sent up to OneSignal. This should be set to true prior to the invocation of initialization to ensure compliance.
-     * @param  {(response: boolean) => void} handler
-     * @returns void
-     */
-    getRequiresPrivacyConsent(handler: (value: boolean) => void): void {
-        window.cordova.exec(handler, function () { }, "OneSignalPush", "getRequiresPrivacyConsent", []);
+    setConsentRequired(required: boolean): void {
+        window.cordova.exec(function () { }, function () { }, "OneSignalPush", "setPrivacyConsentRequired", [required]);
     };
 
     /**
@@ -114,17 +105,8 @@ export class OneSignalPlugin {
      * @param  {boolean} granted
      * @returns void
      */
-    setPrivacyConsent(granted: boolean): void {
-        window.cordova.exec(function () { }, function () { }, "OneSignalPush", "setPrivacyConsent", [granted]);
-    };
-
-    /**
-     * Whether privacy consent has been granted. This field is only relevant when the application has opted into data privacy protections.
-     * @param {(value: boolean) => void} handler
-     * @returns void
-     */
-    getPrivacyConsent(handler: (value: boolean) => void): void {
-        window.cordova.exec(handler, function () { }, "OneSignalPush", "getPrivacyConsent", []);
+    setConsentGiven(granted: boolean): void {
+        window.cordova.exec(function () { }, function () { }, "OneSignalPush", "setPrivacyConsentGiven", [granted]);
     };
 }
 
