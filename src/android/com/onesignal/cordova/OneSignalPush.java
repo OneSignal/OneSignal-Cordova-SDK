@@ -115,10 +115,8 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String IS_LOCATION_SHARED = "isLocationShared";
   private static final String REQUEST_LOCATION_PERMISSION = "requestLocationPermission";
 
-  private static final String GET_PRIVACY_CONSENT = "getPrivacyConsent";
-  private static final String GET_REQUIRES_PRIVACY_CONSENT = "getRequiresPrivacyConsent";
-  private static final String SET_REQUIRES_PRIVACY_CONSENT = "setRequiresPrivacyConsent";
-  private static final String SET_PRIVACY_CONSENT = "setPrivacyConsent";
+  private static final String SET_PRIVACY_CONSENT_REQUIRED = "setPrivacyConsentRequired";
+  private static final String SET_PRIVACY_CONSENT_GIVEN = "setPrivacyConsentGiven";
 
   private static final String ADD_TRIGGERS = "addTriggers";
   private static final String REMOVE_TRIGGERS = "removeTriggers";
@@ -395,20 +393,12 @@ public class OneSignalPush extends CordovaPlugin {
         result = OneSignalController.isLocationShared(callbackContext);
         break;
 
-      case GET_PRIVACY_CONSENT:
-        result = OneSignalController.getPrivacyConsent(callbackContext);
+      case SET_PRIVACY_CONSENT_REQUIRED:
+        result = OneSignalController.setPrivacyConsentRequired(data);
         break;
 
-      case GET_REQUIRES_PRIVACY_CONSENT:
-        result = OneSignalController.getRequiresPrivacyConsent(callbackContext);
-        break;
-
-      case SET_REQUIRES_PRIVACY_CONSENT:
-        result = OneSignalController.setRequiresPrivacyConsent(data);
-        break;
-
-      case SET_PRIVACY_CONSENT:
-        result = OneSignalController.setPrivacyConsent(data);
+      case SET_PRIVACY_CONSENT_GIVEN:
+        result = OneSignalController.setPrivacyConsentGiven(data);
         break;
 
       case ADD_TRIGGERS:
