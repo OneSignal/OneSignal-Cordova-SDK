@@ -31,7 +31,7 @@
 
 #import <OneSignalFramework/OneSignalFramework.h>
 
-@interface OneSignalPush : CDVPlugin <OSPermissionObserver, OSPushSubscriptionObserver, OSInAppMessageLifecycleHandler>
+@interface OneSignalPush : CDVPlugin <OSPermissionObserver, OSPushSubscriptionObserver, OSInAppMessageLifecycleListener,OSInAppMessageClickListener>
 
 - (void)setProvidesNotificationSettingsView:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)setNotificationWillShowInForegroundHandler:(CDVInvokedUrlCommand* _Nonnull)command;
@@ -85,8 +85,10 @@
 - (void)setLaunchURLsInApp:(CDVInvokedUrlCommand* _Nonnull)command;
 
 // In-App Messages
-- (void)setClickHandler:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)setLifecycleHandler:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)addInAppMessageClickListener:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)setOnClickInAppMessageHandler:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)onClickInAppMessage:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)addInAppMessageLifecycleListener:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)setOnWillDisplayInAppMessageHandler:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)setOnDidDisplayInAppMessageHandler:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)setOnWillDismissInAppMessageHandler:(CDVInvokedUrlCommand* _Nonnull)command;

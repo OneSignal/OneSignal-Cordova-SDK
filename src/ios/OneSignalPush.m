@@ -45,6 +45,7 @@ NSString* inAppMessageWillDisplayCallbackId;
 NSString* inAppMessageDidDisplayCallbackId;
 NSString* inAppMessageWillDismissCallbackId;
 NSString* inAppMessageDidDismissCallbackId;
+NSString* inAppMessageClickedCallbackId;
 
 OSNotificationOpenedResult* actionNotification;
 OSNotification *notification;
@@ -396,24 +397,29 @@ static Class delegateClass = nil;
  * In-App Messages
  */
 
-- (void)setClickHandler:(CDVInvokedUrlCommand*)command {
-    [OneSignal.InAppMessages setClickHandler:^(OSInAppMessageAction* action) {
-            NSDictionary *actionDict = [action jsonRepresentation];
-            NSDictionary *result = @{
-                @"clickName": action.clickName ?: [NSNull null],
-                @"clickUrl" : action.clickUrl.absoluteString ?: [NSNull null],
-                @"firstClick" : @(action.firstClick),
-                @"closesMessage" : @(action.closesMessage),
-                @"outcomes" : actionDict[@"outcomes"] ?: [NSNull null],
-                @"tags" : actionDict[@"tags"] ?: [NSNull null]
-            };
-            successCallback(command.callbackId, result);
-        }
-    ];
+ - (void)setOnClickInAppMessageHandler:(CDVInvokedUrlCommand*)command {
+    inAppMessageClickedCallbackId = command.callbackId;
 }
 
-- (void)setLifecycleHandler:(CDVInvokedUrlCommand *)command {
-    [OneSignal.InAppMessages setLifecycleHandler:self];
+ - (void)onClickInAppMessage:(OSInAppMessageClickEvent * _Nonnull)event {
+    NSDictionary *eventDict = [event jsonRepresentation];
+    NSDictionary *response = @{
+        @"actionId": event.result.actionId ?: [NSNull null],
+        @"url": event.result.url ?: [NSNull null],
+        @"urlTarget": @(event.result.urlTarget),
+        @"closingMessage": @(event.result.closingMessage),
+        @"outcomes" : eventDict[@"outcomes"] ?: [NSNull null],
+        @"tags" : eventDict[@"tags"] ?: [NSNull null]
+    };
+    successCallback(inAppMessageClickedCallbackId, response);
+}
+
+- (void)addInAppMessageClickListener:(CDVInvokedUrlCommand*)command {
+    [OneSignal.InAppMessages addClickListener:self];
+}
+
+- (void)addInAppMessageLifecycleListener:(CDVInvokedUrlCommand *)command {
+    [OneSignal.InAppMessages addLifecycleListener:self];
 }
 
 - (void)setOnWillDisplayInAppMessageHandler:(CDVInvokedUrlCommand*)command {
@@ -432,27 +438,27 @@ static Class delegateClass = nil;
     inAppMessageDidDismissCallbackId = command.callbackId;
 }
 
-- (void)onWillDisplayInAppMessage:(OSInAppMessage * _Nonnull)message {
+- (void)onWillDisplayInAppMessage:(OSInAppMessageWillDisplayEvent * _Nonnull)event {
     if (inAppMessageWillDisplayCallbackId != nil) {
-        successCallback(inAppMessageWillDisplayCallbackId, [message jsonRepresentation]);
+        successCallback(inAppMessageWillDisplayCallbackId, [event.message jsonRepresentation]);
     }
 }
 
-- (void)onDidDisplayInAppMessage:(OSInAppMessage * _Nonnull)message {
+- (void)onDidDisplayInAppMessage:(OSInAppMessageDidDisplayEvent * _Nonnull)event {
     if (inAppMessageDidDisplayCallbackId != nil) {
-        successCallback(inAppMessageDidDisplayCallbackId, [message jsonRepresentation]);
+        successCallback(inAppMessageDidDisplayCallbackId, [event.message jsonRepresentation]);
     }
 }
 
-- (void)onWillDismissInAppMessage:(OSInAppMessage * _Nonnull)message {
+- (void)onWillDismissInAppMessage:(OSInAppMessageWillDismissEvent * _Nonnull)event {
     if (inAppMessageWillDismissCallbackId != nil) {
-        successCallback(inAppMessageWillDismissCallbackId, [message jsonRepresentation]);
+        successCallback(inAppMessageWillDismissCallbackId, [event.message jsonRepresentation]);
     }
 }
 
-- (void)onDidDismissInAppMessage:(OSInAppMessage * _Nonnull)message {
+- (void)onDidDismissInAppMessage:(OSInAppMessageDidDismissEvent * _Nonnull)event {
     if (inAppMessageDidDismissCallbackId != nil) {
-        successCallback(inAppMessageDidDismissCallbackId, [message jsonRepresentation]);
+        successCallback(inAppMessageDidDismissCallbackId, [event.message jsonRepresentation]);
     }
 }
 
