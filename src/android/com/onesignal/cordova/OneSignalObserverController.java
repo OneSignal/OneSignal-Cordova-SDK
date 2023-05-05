@@ -10,7 +10,9 @@ import org.json.JSONObject;
 import com.onesignal.OneSignal;
 import com.onesignal.user.subscriptions.IPushSubscription;
 import com.onesignal.user.subscriptions.ISubscription;
-import com.onesignal.user.subscriptions.ISubscriptionChangedHandler;
+import com.onesignal.user.subscriptions.IPushSubscriptionObserver;
+import com.onesignal.user.subscriptions.PushSubscriptionChangedState;
+import com.onesignal.user.subscriptions.PushSubscriptionState;
 import com.onesignal.notifications.IPermissionChangedHandler;
 
 public class OneSignalObserverController {
@@ -18,7 +20,7 @@ public class OneSignalObserverController {
   private static CallbackContext jsSubscriptionObserverCallBack;
 
   private static IPermissionChangedHandler permissionObserver;
-  private static ISubscriptionChangedHandler pushSubscriptionChangedHandler;
+  private static IPushSubscriptionObserver pushSubscriptionObserver;
 
   // This is to prevent an issue where if two Javascript calls are made to OneSignal expecting a callback then only one would fire.
   private static void callbackSuccess(CallbackContext callbackContext, JSONObject jsonObject) {
@@ -46,14 +48,15 @@ public class OneSignalObserverController {
 
   public static boolean addPushSubscriptionObserver(CallbackContext callbackContext) {
     jsSubscriptionObserverCallBack = callbackContext;
-    if (pushSubscriptionChangedHandler == null) {
-      pushSubscriptionChangedHandler = new ISubscriptionChangedHandler() {
+    if (pushSubscriptionObserver == null) {
+      pushSubscriptionObserver = new IPushSubscriptionObserver() {
         @Override
-        public void onSubscriptionChanged(ISubscription subscription) {
-          if (!(subscription instanceof IPushSubscription)){
+        public void onPushSubscriptionChange(PushSubscriptionChangedState state) {
+          PushSubscriptionState pushSubscription = state.getCurrent();
+          
+          if (!(pushSubscription instanceof PushSubscriptionState)){
             return;
           }
-          IPushSubscription pushSubscription = (IPushSubscription) subscription;
 
           try {
             JSONObject pushSubscriptionProperties = new JSONObject();
@@ -68,7 +71,7 @@ public class OneSignalObserverController {
           }
         }
       };
-      OneSignal.getUser().getPushSubscription().addChangeHandler(pushSubscriptionChangedHandler);
+      OneSignal.getUser().getPushSubscription().addObserver(pushSubscriptionObserver);
     }
     return true;      
   }
