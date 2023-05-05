@@ -1,8 +1,8 @@
-export interface InAppMessageAction {
-    closesMessage       : boolean;
-    isFirstClick        : boolean;
-    clickName           ?: string;
-    clickUrl            ?: string;
+export interface InAppMessageClickResult {
+    closingMessage      : boolean;
+    actionId            ?: string;
+    url                 ?: string;
+    urlTarget           ?: string;
     
     // Not currently exposed in Android 5.0.0-beta1
     // outcomes            ?: object[];

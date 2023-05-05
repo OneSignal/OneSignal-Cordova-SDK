@@ -1,28 +1,28 @@
-import { InAppMessageAction, InAppMessageLifecycleHandlerObject, OSInAppMessage } from "./models/InAppMessage";
+import { InAppMessageClickResult, InAppMessageLifecycleHandlerObject, OSInAppMessage } from "./models/InAppMessage";
 
 // Suppress TS warnings about window.cordova
 declare let window: any; // turn off type checking
 
 export default class InAppMessages {
-    private _inAppMessageClickDelegate = function (action: InAppMessageAction) {};
+    private _inAppMessageClickListener = function (action: InAppMessageClickResult) {};
     private _onWillDisplayInAppMessageDelegate = function(message: OSInAppMessage) {};
     private _onDidDisplayInAppMessageDelegate = function(message: OSInAppMessage) {};
     private _onWillDismissInAppMessageDelegate = function(message: OSInAppMessage) {};
     private _onDidDismissInAppMessageDelegate = function(message: OSInAppMessage) {};
     
     /**
-     * Set the in-app message click handler.
-     * @param  {(action:InAppMessageAction)=>void} handler
+     * Set the in-app message click listener.
+     * @param  {(action:InAppMessageClickResult)=>void} handler
      * @returns void
      */
-    setClickHandler(handler: (action: InAppMessageAction) => void): void {
-        this._inAppMessageClickDelegate = handler;
+    addClickListener(handler: (action: InAppMessageClickResult) => void): void {
+        this._inAppMessageClickListener = handler;
 
-        const inAppMessageClickHandler = (json: InAppMessageAction) => {
-            this._inAppMessageClickDelegate(json);
+        const inAppMessageClickHandler = (json: InAppMessageClickResult) => {
+            this._inAppMessageClickListener(json);
         };
 
-        window.cordova.exec(inAppMessageClickHandler, function() {}, "OneSignalPush", "setClickHandler", []);
+        window.cordova.exec(inAppMessageClickHandler, function() {}, "OneSignalPush", "addInAppMessageClickListener", []);
     };
 
     /**
@@ -30,7 +30,7 @@ export default class InAppMessages {
      * @param  {InAppMessageLifecycleHandlerObject} handlerObject
      * @returns void
      */
-    setLifecycleHandler(handlerObject: InAppMessageLifecycleHandlerObject) : void {
+    addLifecycleListener(handlerObject: InAppMessageLifecycleHandlerObject) : void {
         if (handlerObject.onWillDisplayInAppMessage) {
             this._onWillDisplayInAppMessageDelegate = handlerObject.onWillDisplayInAppMessage;
 
@@ -68,27 +68,27 @@ export default class InAppMessages {
             window.cordova.exec(onDidDismissInAppMessageHandler, function() {}, "OneSignalPush", "setOnDidDismissInAppMessageHandler", []);
         }
 
-        window.cordova.exec(function() {}, function() {}, "OneSignalPush", "setLifecycleHandler", []);
+        window.cordova.exec(function() {}, function() {}, "OneSignalPush", "addInAppMessageLifecycleListener", []);
     };
 
     /**
      * Add a trigger for the current user. Triggers are currently explicitly used to determine whether a specific IAM should be displayed to the user.
      * @param  {string} key
-     * @param  {string | number | boolean} value
+     * @param  {string} value
      * @returns void
      */
-    addTrigger(key: string, value: string | number | boolean): void {
+    addTrigger(key: string, value: string): void {
         const obj = {[key]: value};
         this.addTriggers(obj);
     };
 
     /**
      * Add multiple triggers for the current user. Triggers are currently explicitly used to determine whether a specific IAM should be displayed to the user.
-     * @param  {[key: string]: string | number | boolean} triggers
+     * @param  {[key: string]: string} triggers
      * @returns void
      */
 
-    addTriggers(triggers: {[key: string]: string | number | boolean}): void {
+    addTriggers(triggers: {[key: string]: string}): void {
       Object.keys(triggers).forEach(function(key){
           // forces values to be string types
           if (typeof triggers[key] !== "string") {
