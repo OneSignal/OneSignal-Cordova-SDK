@@ -167,8 +167,8 @@ static Class delegateClass = nil;
     successCallbackBoolean(permissionObserverCallbackId, permission);
 }
 
-- (void)onOSPushSubscriptionChangedWithStateChanges:(OSPushSubscriptionStateChanges*)stateChanges {
-    successCallback(subscriptionObserverCallbackId, [stateChanges.to jsonRepresentation]);
+- (void)onPushSubscriptionDidChangeWithStateChanges:(OSPushSubscriptionChangedState*)stateChanges {
+    successCallback(subscriptionObserverCallbackId, [stateChanges.current jsonRepresentation]);
 }
 
 - (void)setProvidesNotificationSettingsView:(CDVInvokedUrlCommand *)command {
