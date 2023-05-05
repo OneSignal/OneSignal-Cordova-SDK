@@ -34,9 +34,14 @@ import com.onesignal.debug.internal.logging.Logging;
 import com.onesignal.common.OneSignalWrapper;
 
 import com.onesignal.inAppMessages.IInAppMessage;
-import com.onesignal.inAppMessages.IInAppMessageClickHandler;
+import com.onesignal.inAppMessages.IInAppMessageClickListener;
+import com.onesignal.inAppMessages.IInAppMessageClickEvent;
 import com.onesignal.inAppMessages.IInAppMessageClickResult;
-import com.onesignal.inAppMessages.IInAppMessageLifecycleHandler;
+import com.onesignal.inAppMessages.IInAppMessageLifecycleListener;
+import com.onesignal.inAppMessages.IInAppMessageWillDisplayEvent;
+import com.onesignal.inAppMessages.IInAppMessageDidDisplayEvent;
+import com.onesignal.inAppMessages.IInAppMessageWillDismissEvent;
+import com.onesignal.inAppMessages.IInAppMessageDidDismissEvent;
 
 import com.onesignal.notifications.INotification;
 import com.onesignal.notifications.INotificationClickHandler;
@@ -59,8 +64,8 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String SET_NOTIFICATION_WILL_SHOW_IN_FOREGROUND_HANDLER = "setNotificationWillShowInForegroundHandler";
   private static final String SET_NOTIFICATION_OPENED_HANDLER = "setNotificationOpenedHandler";
   
-  private static final String SET_CLICK_HANDLER = "setClickHandler";
-  private static final String SET_LIFECYCLE_HANDLER = "setLifecycleHandler";
+  private static final String ADD_IN_APP_MESSAGE_CLICK_LISTENER = "addInAppMessageClickListener";
+  private static final String ADD_IN_APP_MESSAGE_LIFECYCLE_LISTENER = "addInAppMessageLifecycleListener";
   private static final String SET_ON_WILL_DISPLAY_IN_APP_MESSAGE_HANDLER = "setOnWillDisplayInAppMessageHandler";
   private static final String SET_ON_DID_DISPLAY_IN_APP_MESSAGE_HANDLER = "setOnDidDisplayInAppMessageHandler";
   private static final String SET_ON_WILL_DISMISS_IN_APP_MESSAGE_HANDLER = "setOnWillDismissInAppMessageHandler";
@@ -148,42 +153,64 @@ public class OneSignalPush extends CordovaPlugin {
     return true;
   }
 
-  public boolean setClickHandler(CallbackContext callbackContext) {
-    OneSignal.getInAppMessages().setInAppMessageClickHandler(new CordovaInAppMessageClickHandler(callbackContext));
+  public boolean addInAppMessageClickListener(CallbackContext callbackContext) {
+    OneSignal.getInAppMessages().addClickListener(new CordovaInAppMessageClickListener(callbackContext));
     return true;
   }
 
-  public boolean setLifecycleHandler() {
-    OneSignal.getInAppMessages().setInAppMessageLifecycleHandler(new IInAppMessageLifecycleHandler() {
-
-      JSONObject convertInAppMessageToJSON(IInAppMessage message, CallbackContext callbackContext) {
-        JSONObject result = new JSONObject();
+public boolean addInAppMessageLifecycleListener() {
+    OneSignal.getInAppMessages().addLifecycleListener(new IInAppMessageLifecycleListener() {   
+      @Override
+      public void onWillDisplay(IInAppMessageWillDisplayEvent event) {
         try {
-          result.put("messageId", message.getMessageId());
-          if (callbackContext != null) {
-            CallbackHelper.callbackSuccess(callbackContext, result);
-          }
+            JSONObject onWillDisplayResult = new JSONObject();
+            onWillDisplayResult.put("messageId", event.getMessage().getMessageId());
+
+            if (jsInAppMessageWillDisplayCallback != null) {
+              CallbackHelper.callbackSuccess(jsInAppMessageWillDisplayCallback, onWillDisplayResult);
+            }
         } catch (JSONException e) {
-          e.printStackTrace();
+            e.printStackTrace();
         }
-        return result;
-      }
-          
-      @Override
-      public void onWillDisplayInAppMessage(IInAppMessage message) {
-        convertInAppMessageToJSON(message,jsInAppMessageWillDisplayCallback);
       }
       @Override
-      public void onDidDisplayInAppMessage(IInAppMessage message) {
-        convertInAppMessageToJSON(message, jsInAppMessageDidDisplayCallBack);
+      public void onDidDisplay(IInAppMessageDidDisplayEvent event) {
+        try {
+            JSONObject onDidDisplayResult = new JSONObject();
+            onDidDisplayResult.put("messageId", event.getMessage().getMessageId());
+
+            if (jsInAppMessageDidDisplayCallBack != null) {
+              CallbackHelper.callbackSuccess(jsInAppMessageDidDisplayCallBack, onDidDisplayResult);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
       }
       @Override
-      public void onWillDismissInAppMessage(IInAppMessage message) {
-        convertInAppMessageToJSON(message, jsInAppMessageWillDismissCallback);
+      public void onWillDismiss(IInAppMessageWillDismissEvent event) {
+        try {
+            JSONObject onWillDismissResult = new JSONObject();
+            onWillDismissResult.put("messageId", event.getMessage().getMessageId());
+
+            if (jsInAppMessageWillDismissCallback != null) {
+              CallbackHelper.callbackSuccess(jsInAppMessageWillDismissCallback, onWillDismissResult);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
       }
       @Override
-      public void onDidDismissInAppMessage(IInAppMessage message) {
-        convertInAppMessageToJSON(message, jsInAppMessageDidDismissCallBack);
+      public void onDidDismiss(IInAppMessageDidDismissEvent event) {
+        try {
+            JSONObject onDidDismissResult = new JSONObject();
+            onDidDismissResult.put("messageId", event.getMessage().getMessageId());
+
+            if (jsInAppMessageDidDismissCallBack != null) {
+              CallbackHelper.callbackSuccess(jsInAppMessageDidDismissCallBack, onDidDismissResult);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
       }
     });
     return true;
@@ -239,12 +266,12 @@ public class OneSignalPush extends CordovaPlugin {
         result = setNotificationWillShowInForegroundHandler(callbackContext);
         break;
 
-      case SET_CLICK_HANDLER:
-        result = setClickHandler(callbackContext);
+      case ADD_IN_APP_MESSAGE_CLICK_LISTENER:
+        result = addInAppMessageClickListener(callbackContext);
         break;
 
-      case SET_LIFECYCLE_HANDLER:
-        result = setLifecycleHandler();
+      case ADD_IN_APP_MESSAGE_LIFECYCLE_LISTENER:
+        result = addInAppMessageLifecycleListener();
         break;
 
       case SET_ON_WILL_DISPLAY_IN_APP_MESSAGE_HANDLER:
@@ -550,23 +577,25 @@ public class OneSignalPush extends CordovaPlugin {
     }
   }
 
-  private static class CordovaInAppMessageClickHandler implements IInAppMessageClickHandler {
+  private static class CordovaInAppMessageClickListener implements IInAppMessageClickListener {
 
     private CallbackContext jsInAppMessageClickedCallback;
 
-    public CordovaInAppMessageClickHandler(CallbackContext inCallbackContext) {
+    public CordovaInAppMessageClickListener(CallbackContext inCallbackContext) {
       jsInAppMessageClickedCallback = inCallbackContext;
     }
 
     @Override
-    public void inAppMessageClicked(IInAppMessageClickResult result) {
+    public void onClick(IInAppMessageClickEvent event) {
       try {
+        IInAppMessageClickResult inAppMessage = event.getResult();
+
         JSONObject clickResults = new JSONObject();
 
-        clickResults.put("isFirstClick", result.getAction().isFirstClick());
-        clickResults.put("closesMessage", result.getAction().getClosesMessage());
-        clickResults.put("clickName", result.getAction().getClickName());
-        clickResults.put("clickUrl", result.getAction().getClickUrl());
+        clickResults.put("actionId", inAppMessage.getActionId());
+        clickResults.put("urlTarget", inAppMessage.getUrlTarget());
+        clickResults.put("url", inAppMessage.getUrl());
+        clickResults.put("closingMessage", inAppMessage.getClosingMessage());
 
         CallbackHelper.callbackSuccess(jsInAppMessageClickedCallback, clickResults);
       }
