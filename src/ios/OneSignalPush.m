@@ -187,13 +187,17 @@ static Class delegateClass = nil;
 
 - (void)onWillDisplayNotification:(OSNotificationWillDisplayEvent *)event {
     self.notificationWillDisplayCache[event.notification.notificationId] = event;
-    processForegroundLifecycleListener(event);
     [event preventDefault];
+    processForegroundLifecycleListener(event);
 }
 
 - (void)preventDefault:(CDVInvokedUrlCommand *)command {
     NSString *notificationId = command.arguments[0];
     OSNotificationWillDisplayEvent *event = _notificationWillDisplayCache[notificationId];
+    if (!event) {
+        [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"OneSignal (objc): could not find notification will display event for notification with id: %@", notificationId]];
+        return;
+    }
     [event preventDefault];
     self.preventDefaultCache[event.notification.notificationId] = event;
 }
@@ -201,12 +205,20 @@ static Class delegateClass = nil;
 -(void)displayNotification:(CDVInvokedUrlCommand *)command {
     NSString *notificationId = command.arguments[0];
     OSNotificationWillDisplayEvent *event = _notificationWillDisplayCache[notificationId];
+    if (!event) {
+        [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"OneSignal (objc): could not find notification will display event for notification with id: %@", notificationId]];
+        return;
+    }
     [event.notification display];
 }
 
 -(void)proceedWithWillDisplay:(CDVInvokedUrlCommand *)command {
     NSString *notificationId = command.arguments[0];
     OSNotificationWillDisplayEvent *event = self.notificationWillDisplayCache[notificationId];
+    if (!event) {
+        [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"OneSignal (objc): could not find notification will display event for notification with id: %@", notificationId]];
+        return;
+    }
     if (self.preventDefaultCache[notificationId]) {
         return;
     }
