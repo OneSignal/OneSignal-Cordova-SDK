@@ -1,4 +1,4 @@
-# Cordova v5.0.0-beta-01 Migration Guide
+# Cordova v5.0.0-beta-02 Migration Guide
 
 # Intro
 
@@ -137,7 +137,7 @@ Email and/or SMS subscriptions can be added or removed via the following methods
 
 # API Reference
 
-Below is a comprehensive reference to the `5.0.0-beta-01` OneSignal Cordova SDK.
+Below is a comprehensive reference to the `5.0.0-beta-02` OneSignal Cordova SDK.
 
 ## OneSignal
 
@@ -151,8 +151,8 @@ The SDK is still accessible via a `OneSignal` static class. It provides access t
 | `window.plugins.OneSignal.getPrivacyConsent();`<br><br>`window.plugins.OneSignal.setPrivacyConsent(true);`                 | *Indicates whether privacy consent has been granted. This field is only relevant when the application has opted into data privacy protections. See [requiresPrivacyConsent].*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | `window.plugins.OneSignal.setRequiresPrivacyConsent(true);` | *Determines whether a user must consent to privacy prior to their user data being sent up to OneSignal.  This should be set to `true` prior to the invocation of `initialize` to ensure compliance.*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | `window.plugins.OneSignal.setLaunchURLsInApp(true);`                                                                    | *This method can be used to set if launch URLs should be opened in safari or within the application. Set to `true` to launch all notifications with a URL in the app instead of the default web browser. Make sure to call `setLaunchURLsInApp` before the `initialize` call.*                                                                                                                                                                                                                                                                   |                                                      
-| `window.plugins.OneSignal.enterLiveActivity("ACTIVITY_ID", "TOKEN");`<br><br>***See below for usage of callbacks***|*Entering a Live Activity associates an `activityId` with a live activity temporary push `token` on OneSignal's server. The activityId is then used with the OneSignal REST API to update one or multiple Live Activities at one time.*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| `window.plugins.OneSignal.exitLiveActivity("ACTIVITY_ID");`<br><br>***See below for usage of callbacks***  |*Exiting a Live activity deletes the association between a customer defined `activityId` with a Live Activity temporary push `token` on OneSignal's server.*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `window.plugins.OneSignal.LiveActivities.enter("ACTIVITY_ID", "TOKEN");`<br><br>***See below for usage of callbacks***|*Entering a Live Activity associates an `activityId` with a live activity temporary push `token` on OneSignal's server. The activityId is then used with the OneSignal REST API to update one or multiple Live Activities at one time.*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `window.plugins.OneSignal.LiveActivities.exit("ACTIVITY_ID");`<br><br>***See below for usage of callbacks***  |*Exiting a Live activity deletes the association between a customer defined `activityId` with a Live Activity temporary push `token` on OneSignal's server.*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 
 
 
@@ -165,13 +165,13 @@ Please refer to OneSignal’s guide on [Live Activities](https://documentation.o
 **Cordova/Ionic**
 ```typescript
     // Enter a Live Activity
-    window.plugins.OneSignal.enterLiveActivity("ACTIVITY_ID", "TOKEN", (results) => {
+    window.plugins.OneSignal.LiveActivities.enter("ACTIVITY_ID", "TOKEN", (results) => {
         console.log("Results of entering live activity");
         console.log(results);
     });
     
     // Exit a Live Activity
-    window.plugins.OneSignal.exitLiveActivity("ACTIVITY_ID", (results) => {
+    window.plugins.OneSignal.LiveActivities.exit("ACTIVITY_ID", (results) => {
         console.log("Results of exiting live activity");
         console.log(results);
     });
@@ -188,7 +188,7 @@ The User name space is accessible via `OneSignal.User` and provides access to us
 | `window.plugins.OneSignal.User.addAlias("ALIAS_LABEL", "ALIAS_ID");`                                    | *Set an alias for the current user.  If this alias label already exists on this user, it will be overwritten with the new alias id.*                                                                                         |
 | `window.plugins.OneSignal.User.addAliases({ALIAS_LABEL_01: "ALIAS_ID_01", ALIAS_LABEL_02: "ALIAS_ID_02"});` | *Set aliases for the current user. If any alias already exists, it will be overwritten to the new values.*                                                                                                                       |
 | `window.plugins.OneSignal.User.removeAlias("ALIAS_LABEL");`                                                         | *Remove an alias from the current user.*                                                                                                                                                                                                 |
-| `window.plugins.OneSignal.User.removeAliases(["ALIAS_LABEL_01", "ALIAS_LABEL_02"]]`                              | *Remove aliases from the current user.*                                                                                                                                                                                              |
+| `window.plugins.OneSignal.User.removeAliases(["ALIAS_LABEL_01", "ALIAS_LABEL_02"]);`                              | *Remove aliases from the current user.*                                                                                                                                                                                              |
 | `window.plugins.OneSignal.User.addEmail("customer@company.com");`                                               | *Add a new email subscription to the current user.*                                                                                                                                                                                      |
 | `window.plugins.OneSignal.User.removeEmail("customer@company.com");`                             | *Results in a no-op if the specified email does not exist on the user within the SDK, and no request will be made.*                                                               |
 | `window.plugins.OneSignal.User.addSms("+15558675309");`                                                   | *Add a new SMS subscription to the current user.*                                                                                                                                                                                        |
@@ -253,14 +253,14 @@ The Notifications namespace is accessible via `OneSignal.Notifications` and prov
 | `let permission = window.plugins.Notifications.permission`               | *Whether this app has push notification permission.*                                                                                                                                                                                                                                                                                                                                                                        |
 | `let canRequest = window.plugins.OneSignal.Notifications.canRequestPermission();`  | *Whether attempting to request notification permission will show a prompt. Returns `true` if the device has not been prompted for push notification permission already.*                                                                                                                                                                                                                                                |
 | `window.plugins.OneSignal.Notifications.clearAll();`                                           | *Removes all OneSignal notifications.*|                                                                                                                                                           
-| `window.plugins.OneSignal.Notifications.removeNotification("NOTIFICATION_ID");`                                                                                               | *(Android only) Cancels a single OneSignal notification based on its Android notification integer ID. Use instead of Android's [android.app.NotificationManager.cancel], otherwise the notification will be restored when your app is restarted.*|                                                                                                                                                                                                    
+| `window.plugins.OneSignal.Notifications.removeNotification(1234567890);`                                                                                               | *(Android only) Cancels a single OneSignal notification based on its Android notification integer ID. Use instead of Android's [android.app.NotificationManager.cancel], otherwise the notification will be restored when your app is restarted.*|                                                                                                                                                                                                    
 | `window.plugins.OneSignal.Notifications.removeGroupedNotifications("GROUP_KEY");`                                                                                               | *(Android only) Cancels a group of OneSignal notifications with the provided group key. Grouping notifications is a OneSignal concept, there is no [android.app.NotificationManager] equivalent.*|                                                                                                                                                                                                                                                                                                                        
 | `window.plugins.OneSignal.Notifications.requestPermission();`<br><br>***See below for usage*** | *Prompt the user for permission to receive push notifications. This will display the native system prompt to request push notification permission.* |                                                                                                                                                                                                   
 | `window.plugins.OneSignal.Notifications.registerForProvisionalAuthorization();`                  | *(iOS only) Instead of having to prompt the user for permission to send them push notifications, your app can request provisional authorization.*|                                                                                                                                                                                                    
 | `window.plugins.OneSignal.Notifications.addPermissionObserver(observer);`<br><br>***See below for usage***                   | *This method will fire when a notification permission setting changes. This happens when the user enables or disables notifications for your app from the system settings outside of your app.*|                                        
 | `window.plugins.OneSignal.Notifications.removePermissionObserver(observer;`<br><br>***See below for usage***        | *Remove a push permission observer that has been previously added.*|                                                                                                                                                                                                                         
-| `window.plugins.OneSignal.Notifications.setNotificationWillShowInForegroundHandler(handler);`<br><br>***See below for usage***       | *Sets the handler to run before displaying a notification while the app is in focus. Use this handler to read notification data and change it or decide if the notification ***should*** show or not.<br><br>***Note:*** this runs ***after*** the [Notification Service Extension](https://documentation.onesignal.com/docs/service-extensions) which can be used to modify the notification before showing it.* |
-| `window.plugins.OneSignal.Notifications.setNotificationOpenedHandler();`<br><br>***See below for usage***                   | *Sets a handler that will run whenever a notification is opened by the user.*|                                                                                                                                                                                                                                                                                                                     
+| `window.plugins.OneSignal.Notifications.window.plugins.OneSignal.Notifications.addForegroundWillDisplayListener(listener);`<br><br>***See below for usage***       | *Sets the listener to run before displaying a notification while the app is in focus. Use this listener to read notification data and change it or decide if the notification ***should*** show or not.<br><br>***Note:*** this runs ***after*** the [Notification Service Extension](https://documentation.onesignal.com/docs/service-extensions) which can be used to modify the notification before showing it.* |
+| `window.plugins.OneSignal.Notifications.addClickListener(listener);`<br><br>***See below for usage***                   | *Sets a listener that will run whenever a notification is clicked by the user.*|                                                                                                                                                                                                                                                                                                                     
 
 ### Prompt for Push Notification Permission
 
@@ -268,7 +268,7 @@ The Notifications namespace is accessible via `OneSignal.Notifications` and prov
 ```typescript
     window.plugins.OneSignal.Notifications.requestPermission(function(accepted) {
         console.log("User accepted notifications: " + accepted);
-});
+    });
 ```
 
 ### Permission Observer
@@ -286,22 +286,34 @@ Add an observer when permission status changes. You can call `removePermissionOb
     window.plugins.OneSignal.Notifications.removePermissionObserver(observer);
 ```
 
-### Notification Will Show in Foreground Handler
+### Notification Lifecycle Listener
 
 **Cordova/Ionic**
 ```typescript
-    window.plugins.OneSignal.Notifications.setNotificationWillShowInForegroundHandler(function(notificationReceivedEvent) {
-        notificationReceivedEvent.complete(notificationReceivedEvent.getNotification());
-    });
+    let myLifecyleListener = function(event) {
+        /// Display Notification, preventDefault to not display
+        event.preventDefault();
+
+        // Use notification.display() to display the notification after some async work
+        event.notification.display();
+    }
+    window.plugins.OneSignal.Notifications.addForegroundWillDisplayListener(myLifecyleListener);
+    
+    // Remove the observer
+    window.plugins.OneSignal.Notifications.removeForegroundWillDisplayListener(myLifecyleListener);
 ```
 
-### Notification Opened Handler
+### Notification Click Listener
 **Cordova/Ionic**
 ```typescript
-    window.plugins.OneSignal.Notifications.setNotificationOpenedHandler(function(opened) {
-        let notificationData = JSON.stringify(opened);
-        console.log('notificationOpenedCallback: ' + notificationData);
-    });
+    let myListener = function(result) {
+        let notificationData = JSON.stringify(result);
+        console.log("Notification Click Listener: " + notificationData);
+    };
+    window.plugins.OneSignal.Notifications.addClickListener(myListener);
+
+    // Remove the observer
+    window.plugins.OneSignal.Notifications.removeClickListener(myClickListener);
 ```
 
 ## Location Namespace
@@ -311,6 +323,7 @@ The Location namespace is accessible via `OneSignal.Location` and provide access
 | **Cordova/Ionic**                                         | **Description**                                                                           |
 | ----------------------------------------------------------|-------------------------------------------------------------------------------------------|
 | `window.plugins.OneSignal.Location.isShared();` <br><br>***See below for usage***             | *Whether location is currently shared with OneSignal.*|
+| `window.plugins.OneSignal.Location.setShared(true);` | *Enable location sharing.* |
 | `window.plugins.OneSignal.Location.requestPermission();` | *Use this method to manually prompt the user for location permissions. This allows for geotagging so you send notifications to users based on location.* |
 
 ### isShared method
@@ -329,12 +342,12 @@ The In App Messages namespace is accessible via `OneSignal.InAppMessages` and pr
 | -------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
 |`window.plugins.OneSignal.InAppMessages.isPaused()`<br><br>***See below for usage***<br><br>`window.plugins.OneSignal.InAppMessages.setPaused(true);`                           | *Whether in-app messaging is currently paused.  When set to `true`, no IAM will be presented to the user regardless of whether they qualify for them. When set to `false`, any IAMs the user qualifies for will be presented to the user at the appropriate time.*                                                                                                                                                                                                  |
 |`window.plugins.OneSignal.InAppMessages.addTrigger("triggerKey", "triggerValue");` | *Add a trigger for the current user.  Triggers are currently explicitly used to determine whether a specific IAM should be displayed to the user. See [Triggers](https://documentation.onesignal.com/docs/iam-triggers).<br><br>If the trigger key already exists, it will be replaced with the value provided here. Note that triggers are not persisted to the backend. They only exist on the local device and are applicable to the current user.*                    |
-| `window.plugins.OneSignal.InAppMessages.addTriggers({"triggerKey1":"triggerValue", "triggerKey2": "triggerValue"});`                          | *Add multiple triggers for the current user. Triggers are currently explicitly used to determine whether a specific IAM should be displayed to the user. See [Triggers](https://documentation.onesignal.com/docs/iam-triggers).<br><br>If any trigger key already exists, it will be replaced with the value provided here. Note that triggers are not persisted to the backend. They only exist on the local device and are applicable to the current user.* |
+| `window.plugins.OneSignal.InAppMessages.addTriggers({"triggerKey1": "triggerValue", "triggerKey2": "triggerValue"});`                          | *Add multiple triggers for the current user. Triggers are currently explicitly used to determine whether a specific IAM should be displayed to the user. See [Triggers](https://documentation.onesignal.com/docs/iam-triggers).<br><br>If any trigger key already exists, it will be replaced with the value provided here. Note that triggers are not persisted to the backend. They only exist on the local device and are applicable to the current user.* |
 | `window.plugins.OneSignal.InAppMessages.removeTrigger("triggerKey");`                                                                           | *Remove the trigger with the provided key from the current user.*                                                                                                                                                                                                                                                                                                                                                                                                               |
 | `window.plugins.OneSignal.InAppMessages.removeTriggers(["triggerKey1", "triggerKey2"]);`                                                         | *Remove multiple triggers from the current user.*                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | `window.plugins.OneSignal.InAppMessages.clearTriggers();`                                                                                  | *Clear all triggers from the current user.*                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| ` window.plugins.OneSignal.InAppMessages.setLifecycleHandler(handlerObject);`<br><br>***See below for usage*** | *Set the in-app message lifecycle handler.*                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `window.plugins.OneSignal.InAppMessages.setClickHandler(handler);`<br><br>***See below for usage***                         | *Set the in-app message click handler.*                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ` window.plugins.OneSignal.InAppMessages.addLifecycleListener(listenerObject);`<br><br>***See below for usage*** | *Set the in-app message lifecycle listener.*                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `window.plugins.OneSignal.InAppMessages.addClickListener(listener);`<br><br>***See below for usage***                         | *Set the in-app message click listener.*                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 
 ### In-App Message isPaused method
 
@@ -345,35 +358,42 @@ The In App Messages namespace is accessible via `OneSignal.InAppMessages` and pr
     });
 ```
 
-### In-App Message Click Handler
+### In-App Message Click Listener
 
 **Cordova/Ionic**
 ```typescript
-    let iamClickCallback = function(result) {
-        let iamClickAction = JSON.stringify(jsonData);
-        console.log('iamClickCallback: ' + iamClickAction);
+    let inAppClickListener = function(result) {
+        let iamClickAction = JSON.stringify(result);
+        console.log("In-App Message Clicked: "+ iamClickAction);
     };
-
-    window.plugins.OneSignal.InAppMessages.setClickHandler(iamClickCallback);
+    window.plugins.OneSignal.InAppMessages.removeClickListener(inAppClickListener);
 ```
 
-### In-App Message Lifecycle Handler
+### In-App Message Lifecycle Listener
 
 **Cordova/Ionic**
 ```typescript
-    window.plugins.OneSignal.InAppMessages.setLifecycleHandler({
-        onWillDisplayInAppMessage: message => {
-            console.log("OneSignal: will display IAM: ", message.messageId)
-        },
-        onDidDisplayInAppMessage: message => {
-            console.log("OneSignal: did display IAM: ", message.messageId)
-        },
-        onWillDismissInAppMessage: message => {
-            console.log("OneSignal: will dismiss IAM: ", message.messageId)
-        },
-        onDidDismissInAppMessage: message => {
-            console.log("OneSignal: did dismiss IAM: ", message.messageId)
-        }
+    let onWillDisplayInAppMessage = function(message) {
+    console.log("OneSignal: will display IAM: ", message.messageId)
+    };
+
+    let onDidDisplayInAppMessage = function(message) {
+    console.log("OneSignal: did display IAM: ", message.messageId)
+    };
+
+    let onWillDismissInAppMessage = function(message) {
+    console.log("OneSignal: will dismiss IAM: ", message.messageId)
+    };
+
+    let onDidDismissInAppMessage = function(message) {
+    console.log("OneSignal: did dismiss IAM: ", message.messageId)
+    };
+
+    window.plugins.OneSignal.InAppMessages.addLifecycleListener({
+    onWillDisplayInAppMessage,
+    onDidDisplayInAppMessage,
+    onWillDismissInAppMessage,
+    onDidDismissInAppMessage
     });
 ```
 
@@ -383,8 +403,8 @@ The Debug namespace is accessible via `OneSignal.Debug` and provide access to de
 
 | **Objective-C**                                  | **Description**                                                                    |
 | ------------------------------------------------ | ---------------------------------------------------------------------------------- |
-| `window.plugins.OneSignal.Debug.setLogLevel(6);` | *Sets the log level the OneSignal SDK should be writing to the Xcode log.* |
-| `window.plugins.OneSignal.Debug.setAlertLevel(0);` | *Sets the logging level to show as alert dialogs.*                                 |
+| `window.plugins.OneSignal.Debug.setLogLevel(6);` | *Sets the log level the OneSignal SDK should be writing to the Xcode log.*\n 0 = None, 1 = Fatal, 2 = Errors, 3 = Warnings, 4 = Info, 5 = Debug, 6 = Verbose |
+| `window.plugins.OneSignal.Debug.setAlertLevel(0);` | *Sets the logging level to show as alert dialogs.\n 0 = None, 1 = Fatal, 2 = Errors, 3 = Warnings, 4 = Info, 5 = Debug, 6 = Verbose*                                 |
 
 
 # Glossary
@@ -402,6 +422,4 @@ The Debug namespace is accessible via `OneSignal.Debug` and provide access to de
 
 # Known issues
 - Identity Verification 
-    - We will be introducing JWT in a follow up Alpha or Beta release
-- User properties may not update correctly when Subscriptions are transferred
-    - Please report any issues you find with this
+    - We will be introducing JWT in a followup Alpha or Beta release
