@@ -7,7 +7,7 @@ declare let window: any; // turn off type checking
 
 export default class Notifications {
     private _permissionObserverList: ((event:boolean)=>void)[] = [];
-    private _notificationClickedListener = [function(notificationClicked: ClickedEvent) {}];
+    private _notificationClickedListeners = [function(notificationClicked: ClickedEvent) {}];
     private _notificationWillDisplayListeners: ((notification: OSNotificationWillDisplayEvent) => void)[] = [];
 
     private _processFunctionList(array: ((event:any)=>void)[], param: any): void {
@@ -128,10 +128,10 @@ export default class Notifications {
      * @returns void
      */
     addClickListener(listener: (ClickedEvent: ClickedEvent) => void): void {
-        this._notificationClickedListener.push(listener);
+        this._notificationClickedListeners.push(listener);
 
         const notificationClickedListener = (json: ClickedEvent) => {
-            this._processFunctionList(this._notificationClickedListener, json);
+            this._processFunctionList(this._notificationClickedListeners, json);
         };
 
         window.cordova.exec(notificationClickedListener, function(){}, "OneSignalPush", "addNotificationClickListener", []);
@@ -143,9 +143,9 @@ export default class Notifications {
      * @returns void
      */
     removeClickListener(listener: (ClickedEvent: ClickedEvent) => void): void {
-        let index = this._notificationClickedListener.indexOf(listener);
+        let index = this._notificationClickedListeners.indexOf(listener);
         if (index !== -1) {
-            this._notificationClickedListener.splice(index, 1);
+            this._notificationClickedListeners.splice(index, 1);
         }
     };
 
