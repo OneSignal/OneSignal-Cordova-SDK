@@ -32,7 +32,7 @@
 #import <OneSignalFramework/OneSignalFramework.h>
 
 NSString* notificationWillShowInForegoundCallbackId;
-NSString* notificationOpenedCallbackId;
+NSString* notificationClickedCallbackId;
 NSString* getIdsCallbackId;
 NSString* permissionObserverCallbackId;
 NSString* subscriptionObserverCallbackId;
@@ -47,7 +47,15 @@ NSString* inAppMessageWillDismissCallbackId;
 NSString* inAppMessageDidDismissCallbackId;
 NSString* inAppMessageClickedCallbackId;
 
-OSNotificationOpenedResult* actionNotification;
+NSString* addInAppMessageClickListenerCallbackId;
+NSString* addInAppMessageLifecyleListenerCallbackId;
+
+NSString* removeOnDidDismissInAppMessageCallbackId;
+NSString* removeOnWillDismissInAppMessageCallbackId;
+NSString* removeOnDidDisplayInAppMessageCallbackId;
+NSString* removeOnWillDisplayInAppMessageCallbackId;
+
+OSNotificationClickResult *actionNotification;
 OSNotification *notification;
 
 id <CDVCommandDelegate> pluginCommandDelegate;
@@ -72,8 +80,8 @@ void failureCallback(NSString* callbackId, NSDictionary* data) {
     [pluginCommandDelegate sendPluginResult:commandResult callbackId:callbackId];
 }
 
-void processNotificationWillShowInForeground(OSNotification* _notif) {
-    NSString * data = [_notif stringify];
+void processForegroundLifecycleListener(OSNotificationWillDisplayEvent* _notif) {
+    NSString * data = [_notif.notification stringify];
     NSError *jsonError;
     NSData *objectData = [data dataUsingEncoding:NSUTF8StringEncoding];
     NSDictionary *json = [NSJSONSerialization JSONObjectWithData:objectData
@@ -85,7 +93,7 @@ void processNotificationWillShowInForeground(OSNotification* _notif) {
     }
 }
 
-void processNotificationOpened(OSNotificationOpenedResult* result) {
+void processNotificationClicked(OSNotificationClickEvent* result) {
     NSString * data = [result stringify];
     NSError *jsonError;
     NSData *objectData = [data dataUsingEncoding:NSUTF8StringEncoding];
@@ -93,7 +101,7 @@ void processNotificationOpened(OSNotificationOpenedResult* result) {
                                                          options:NSJSONReadingMutableContainers
                                                            error:&jsonError];
     if(!jsonError) {
-        successCallback(notificationOpenedCallbackId, json);
+        successCallback(notificationClickedCallbackId, json);
         actionNotification = nil;
     }
 }
@@ -156,8 +164,8 @@ static Class delegateClass = nil;
 
 @interface OneSignalPush ()
 
-@property (strong, nonatomic) NSMutableDictionary* notificationCompletionCache;
-@property (strong, nonatomic) NSMutableDictionary* receivedNotificationCache;
+@property (strong, nonatomic) NSMutableDictionary* notificationWillDisplayCache;
+@property (strong, nonatomic) NSMutableDictionary* preventDefaultCache;
 
 @end
 
@@ -177,45 +185,48 @@ static Class delegateClass = nil;
     [OneSignal setProvidesNotificationSettingsView:providesView];
 }
 
-- (void)setNotificationWillShowInForegroundHandler:(CDVInvokedUrlCommand*)command {
-    notificationWillShowInForegoundCallbackId = command.callbackId;
-
-    [OneSignal.Notifications setNotificationWillShowInForegroundHandler:^(OSNotification *notification, OSNotificationDisplayResponse completion) {
-        self.receivedNotificationCache[notification.notificationId] = notification;
-        self.notificationCompletionCache[notification.notificationId] = completion;
-        processNotificationWillShowInForeground(notification);
-    }];
+- (void)onWillDisplayNotification:(OSNotificationWillDisplayEvent *)event {
+    self.notificationWillDisplayCache[event.notification.notificationId] = event;
+    processForegroundLifecycleListener(event);
+    [event preventDefault];
 }
 
-- (void)setNotificationOpenedHandler:(CDVInvokedUrlCommand*)command {
-    notificationOpenedCallbackId = command.callbackId;
-
-    [OneSignal.Notifications setNotificationOpenedHandler:^(OSNotificationOpenedResult * _Nonnull result) {
-        actionNotification = result;
-        if (pluginCommandDelegate)
-            processNotificationOpened(actionNotification);
-    }];
-}
-
-- (void)completeNotification:(CDVInvokedUrlCommand*)command {
+- (void)preventDefault:(CDVInvokedUrlCommand *)command {
     NSString *notificationId = command.arguments[0];
-    BOOL shouldDisplay = [command.arguments[1] boolValue];
-    OSNotificationDisplayResponse completion = self.notificationCompletionCache[notificationId];
+    OSNotificationWillDisplayEvent *event = _notificationWillDisplayCache[notificationId];
+    [event preventDefault];
+    self.preventDefaultCache[event.notification.notificationId] = event;
+}
 
-    if (!completion) {
-        [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"OneSignal (objc): could not find notification completion block with id: %@", notificationId]];
+-(void)displayNotification:(CDVInvokedUrlCommand *)command {
+    NSString *notificationId = command.arguments[0];
+    OSNotificationWillDisplayEvent *event = _notificationWillDisplayCache[notificationId];
+    [event.notification display];
+}
+
+-(void)proceedWithWillDisplay:(CDVInvokedUrlCommand *)command {
+    NSString *notificationId = command.arguments[0];
+    OSNotificationWillDisplayEvent *event = self.notificationWillDisplayCache[notificationId];
+    if (self.preventDefaultCache[notificationId]) {
         return;
     }
+    [event.notification display];
+}
 
-    if (shouldDisplay) {
-        OSNotification *notification = self.receivedNotificationCache[notificationId];
-        completion(notification);
-    } else {
-        completion(nil);
-    }
+- (void)addForegroundLifecycleListener:(CDVInvokedUrlCommand*)command {
+    notificationWillShowInForegoundCallbackId = command.callbackId;
+    [OneSignal.Notifications addForegroundLifecycleListener:self];
+}
 
-    [self.notificationCompletionCache removeObjectForKey:notificationId];
-    [self.receivedNotificationCache removeObjectForKey:notificationId];
+- (void)onClickNotification:(OSNotificationClickEvent * _Nonnull)event {
+    actionNotification = event;
+    if (pluginCommandDelegate)
+        processNotificationClicked(actionNotification);
+}
+
+- (void)addNotificationClickListener:(CDVInvokedUrlCommand*)command {
+    [OneSignal.Notifications addClickListener:self];
+    notificationClickedCallbackId = command.callbackId;
 }
 
 - (void)init:(CDVInvokedUrlCommand*)command {
@@ -228,7 +239,7 @@ static Class delegateClass = nil;
     setAppId([appId UTF8String]);
 
     if (actionNotification)
-        processNotificationOpened(actionNotification);
+        processNotificationClicked(actionNotification);
 }
 
 - (void)setLanguage:(CDVInvokedUrlCommand*)command {

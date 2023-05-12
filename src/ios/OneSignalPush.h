@@ -31,12 +31,16 @@
 
 #import <OneSignalFramework/OneSignalFramework.h>
 
-@interface OneSignalPush : CDVPlugin <OSPermissionObserver, OSPushSubscriptionObserver, OSInAppMessageLifecycleListener,OSInAppMessageClickListener>
+@interface OneSignalPush : CDVPlugin <OSNotificationPermissionObserver, OSNotificationLifecycleListener, OSNotificationClickListener, OSPushSubscriptionObserver, OSInAppMessageLifecycleListener, OSInAppMessageClickListener>
 
 - (void)setProvidesNotificationSettingsView:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)setNotificationWillShowInForegroundHandler:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)setNotificationOpenedHandler:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)completeNotification:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)addForegroundLifecycleListener:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)onWillDisplayNotification:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)onClickNotification:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)preventDefault:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)proceedWithWillDisplay:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)displayNotification:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)addNotificationClickListener:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)init:(CDVInvokedUrlCommand* _Nonnull)command;
 
 - (void)setLogLevel:(CDVInvokedUrlCommand* _Nonnull)command;
