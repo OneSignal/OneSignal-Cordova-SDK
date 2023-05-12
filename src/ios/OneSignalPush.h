@@ -86,7 +86,6 @@
 
 // In-App Messages
 - (void)addInAppMessageClickListener:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)setOnClickInAppMessageHandler:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)onClickInAppMessage:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)addInAppMessageLifecycleListener:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)setOnWillDisplayInAppMessageHandler:(CDVInvokedUrlCommand* _Nonnull)command;

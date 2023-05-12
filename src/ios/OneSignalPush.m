@@ -397,10 +397,6 @@ static Class delegateClass = nil;
  * In-App Messages
  */
 
- - (void)setOnClickInAppMessageHandler:(CDVInvokedUrlCommand*)command {
-    inAppMessageClickedCallbackId = command.callbackId;
-}
-
  - (void)onClickInAppMessage:(OSInAppMessageClickEvent * _Nonnull)event {
     NSDictionary *eventDict = [event jsonRepresentation];
     NSDictionary *response = @{
@@ -411,15 +407,23 @@ static Class delegateClass = nil;
         @"outcomes" : eventDict[@"outcomes"] ?: [NSNull null],
         @"tags" : eventDict[@"tags"] ?: [NSNull null]
     };
-    successCallback(inAppMessageClickedCallbackId, response);
+    successCallback(addInAppMessageClickListenerCallbackId, response);
 }
 
 - (void)addInAppMessageClickListener:(CDVInvokedUrlCommand*)command {
-    [OneSignal.InAppMessages addClickListener:self];
+    bool first = addInAppMessageClickListenerCallbackId = command.callbackId;
+    addInAppMessageClickListenerCallbackId = command.callbackId;
+    if (first) {
+        [OneSignal.InAppMessages addClickListener:self];
+    }
 }
 
 - (void)addInAppMessageLifecycleListener:(CDVInvokedUrlCommand *)command {
-    [OneSignal.InAppMessages addLifecycleListener:self];
+    bool first = addInAppMessageLifecyleListenerCallbackId  == nil;
+    addInAppMessageLifecyleListenerCallbackId = command.callbackId;
+    if (first) {
+        [OneSignal.InAppMessages addLifecycleListener:self];
+    } 
 }
 
 - (void)setOnWillDisplayInAppMessageHandler:(CDVInvokedUrlCommand*)command {
