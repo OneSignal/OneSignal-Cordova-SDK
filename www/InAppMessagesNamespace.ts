@@ -1,20 +1,22 @@
-import { InAppMessageWillDisplayEvent, 
+import {InAppMessageEventTypeMap,
+    InAppMessageEventName,
+    InAppMessageWillDisplayEvent, 
     InAppMessageDidDisplayEvent, 
     InAppMessageWillDismissEvent, 
-    InAppMessageDidDismissEvent, 
-    InAppMessageClickResult,
-    InAppMessageLifecycleListenerObject
+    InAppMessageDidDismissEvent,
+    InAppMessageClickEvent, 
+    InAppMessageClickResult
 } from "./models/InAppMessage";
 
 // Suppress TS warnings about window.cordova
 declare let window: any; // turn off type checking
 
 export default class InAppMessages {
-    private _inAppMessageClickListeners: ((action: InAppMessageClickResult) => void)[] = [];
-    private _willDisplayInAppMessageListener: ((event: InAppMessageWillDisplayEvent) => void) [] = [];
-    private _didDisplayInAppMessageListener: ((event: InAppMessageDidDisplayEvent) => void) [] = [];
-    private _willDismissInAppMessageListener: ((event: InAppMessageWillDismissEvent) => void) [] = [];
-    private _didDismissInAppMessageListener: ((event: InAppMessageDidDismissEvent) => void) [] = [];
+    private _inAppMessageClickListeners: ((action: InAppMessageClickEvent) => void)[] = [];
+    private _willDisplayInAppMessageListeners: ((event: InAppMessageWillDisplayEvent) => void) [] = [];
+    private _didDisplayInAppMessageListeners: ((event: InAppMessageDidDisplayEvent) => void) [] = [];
+    private _willDismissInAppMessageListeners: ((event: InAppMessageWillDismissEvent) => void) [] = [];
+    private _didDismissInAppMessageListeners: ((event: InAppMessageDidDismissEvent) => void) [] = [];
 
     private _processFunctionList(array: ((event:any)=>void)[], param: any): void {
         for (let i = 0; i < array.length; i++) {
@@ -23,98 +25,82 @@ export default class InAppMessages {
     }
 
     /**
-     * Add an in-app message click listener.
-     * @param  {(action:InAppMessageClickResult)=>void} listener
-     * @returns void
+     * Add event listeners for In-App Message click and/or lifecycle events.
+     * @param event 
+     * @param listener 
+     * @returns 
      */
-    addClickListener(listener: (action: InAppMessageClickResult) => void): void {
-        this._inAppMessageClickListeners.push(listener);
-
-        const inAppMessageClickListener = (json: InAppMessageClickResult) => {
-            this._processFunctionList(this._inAppMessageClickListeners, json);
-        };
-
-        window.cordova.exec(inAppMessageClickListener, function() {}, "OneSignalPush", "addInAppMessageClickListener", []);
-    };
-
-    /**
-     * Remove an in-app message click listener that has been previously added.
-     * @param  {(action:InAppMessageClickResult)=>void} listener
-     * @returns void
-     */
-    removeClickListener(listener: (action: InAppMessageClickResult) => void): void {
-        let index = this._inAppMessageClickListeners.indexOf(listener);
-        if (index !== -1) {
-            this._inAppMessageClickListeners.splice(index, 1);
+    addEventListener<K extends InAppMessageEventName>(event: K, listener: (event: InAppMessageEventTypeMap[K]) => void): void {
+        if (event === "click") {
+            this._inAppMessageClickListeners.push(listener as (event: InAppMessageClickEvent) => void);
+            const inAppMessageClickListener = (json: InAppMessageClickResult) => {
+                this._processFunctionList(this._inAppMessageClickListeners, json);
+            };
+            window.cordova.exec(inAppMessageClickListener, function () {}, "OneSignalPush", "setInAppMessageClickHandler", []);
+        } else if (event === "willDisplay") {
+            this._willDisplayInAppMessageListeners.push(listener as (event: InAppMessageWillDisplayEvent) => void);
+            const willDisplayCallBackProcessor = (event: InAppMessageWillDisplayEvent) => {
+                this._processFunctionList(this._willDisplayInAppMessageListeners, event);
+            };
+            window.cordova.exec(willDisplayCallBackProcessor, function () {}, "OneSignalPush", "setOnWillDisplayInAppMessageHandler", []);
+        } else if (event === "didDisplay") {
+            this._didDisplayInAppMessageListeners.push(listener as (event: InAppMessageDidDisplayEvent) => void);
+            const didDisplayCallBackProcessor = (event: InAppMessageDidDisplayEvent) => {
+              this._processFunctionList(this._didDisplayInAppMessageListeners, event);
+            }
+            window.cordova.exec(didDisplayCallBackProcessor, function () {}, "OneSignalPush", "setOnDidDisplayInAppMessageHandler", []);
+        } else if (event === "willDismiss") {
+            this._willDismissInAppMessageListeners.push(listener as (event: InAppMessageWillDismissEvent) => void);
+            const willDismissInAppMessageProcessor = (event: InAppMessageWillDismissEvent) => {
+              this._processFunctionList(this._willDismissInAppMessageListeners, event);
+            };
+            window.cordova.exec(willDismissInAppMessageProcessor, function () {}, "OneSignalPush", "setOnWillDismissInAppMessageHandler", []);
+        } else if (event === "didDismiss") {
+            this._didDismissInAppMessageListeners.push(listener as (event: InAppMessageDidDismissEvent) => void);
+            const didDismissInAppMessageCallBackProcessor = (event: InAppMessageDidDismissEvent) => {
+                this._processFunctionList(this._didDismissInAppMessageListeners, event);
+            };
+            window.cordova.exec(didDismissInAppMessageCallBackProcessor, function () {}, "OneSignalPush", "setOnDidDismissInAppMessageHandler", []);
+        } else {
+          return;
         }
-    };
+    }
     
     /**
-     * Add an in-app message lifecycle listener.
-     * @param  {InAppMessageLifecycleListenerObject} listenerObject
-     * @returns void
+     * Remove event listeners for In-App Message click and/or lifecycle events.
+     * @param event 
+     * @param listener 
+     * @returns 
      */
-    addLifecycleListener(listenerObject: InAppMessageLifecycleListenerObject): void {
-        if (listenerObject.onWillDisplayInAppMessage) {
-            this._willDisplayInAppMessageListener.push(listenerObject.onWillDisplayInAppMessage);
-            const willDisplayCallBackProcessor = (event: InAppMessageWillDisplayEvent) => {
-                this._processFunctionList(this._willDisplayInAppMessageListener, event);
-            };
-            window.cordova.exec(willDisplayCallBackProcessor, function() {}, "OneSignalPush", "setOnWillDisplayInAppMessageHandler", []);
-        }
-        if (listenerObject.onDidDisplayInAppMessage) {
-            this._didDisplayInAppMessageListener.push(listenerObject.onDidDisplayInAppMessage);
-            const didDisplayCallBackProcessor = (event: InAppMessageDidDisplayEvent) => {
-                this._processFunctionList(this._didDisplayInAppMessageListener, event);
-            };
-            window.cordova.exec(didDisplayCallBackProcessor, function() {}, "OneSignalPush", "setOnDidDisplayInAppMessageHandler", []);
-        }
-        if (listenerObject.onWillDismissInAppMessage) {
-            this._willDismissInAppMessageListener.push(listenerObject.onWillDismissInAppMessage);
-            const willDismissInAppMessageProcessor = (event: InAppMessageWillDismissEvent) => {
-                this._processFunctionList(this._willDismissInAppMessageListener, event);
-            };
-            window.cordova.exec(willDismissInAppMessageProcessor, function() {}, "OneSignalPush", "setOnWillDismissInAppMessageHandler", []);
-        }
-        if (listenerObject.onDidDismissInAppMessage) {
-            this._didDismissInAppMessageListener.push(listenerObject.onDidDismissInAppMessage);
-            const didDismissInAppMessageCallBackProcessor = (event: InAppMessageDidDismissEvent) => {
-                this._processFunctionList(this._didDismissInAppMessageListener, event);
-            };
-            window.cordova.exec(didDismissInAppMessageCallBackProcessor, function() {}, "OneSignalPush", "setOnDidDismissInAppMessageHandler", []);
-        }
-
-        window.cordova.exec(function() {}, function() {}, "OneSignalPush", "addInAppMessageLifecycleListener", []);
-    }
-
-    /**
-     * Remove an in-app message lifecycle listener.
-     * @param  {InAppMessageLifecycleListenerObject} listenerObject
-     * @returns void
-     */
-    removeLifecycleListener(listenerObject: InAppMessageLifecycleListenerObject): void {
-        if (listenerObject.onWillDisplayInAppMessage) {
-            let index = this._willDisplayInAppMessageListener.indexOf(listenerObject.onWillDisplayInAppMessage);
+    removeEventListener<K extends InAppMessageEventName>(event: K, listener: (obj: InAppMessageEventTypeMap[K]) => void): void {
+        if (event === "click") {
+            const index = this._inAppMessageClickListeners.indexOf(listener);
             if (index !== -1) {
-                this._willDisplayInAppMessageListener.splice(index, 1);
+                this._inAppMessageClickListeners.splice(index, 1);
             }
-        }
-        if (listenerObject.onDidDisplayInAppMessage) {
-            let index = this._didDisplayInAppMessageListener.indexOf(listenerObject.onDidDisplayInAppMessage);
-            if (index !== -1) {
-                this._didDisplayInAppMessageListener.splice(index, 1);
-            }
-        }
-        if (listenerObject.onWillDismissInAppMessage) {
-            let index = this._willDismissInAppMessageListener.indexOf(listenerObject.onWillDismissInAppMessage);
-            if (index !== -1) {
-                this._willDismissInAppMessageListener.splice(index, 1);
-            }
-        }
-        if (listenerObject.onDidDismissInAppMessage) {
-            let index = this._didDismissInAppMessageListener.indexOf(listenerObject.onDidDismissInAppMessage);
-            if (index !== -1) {
-                this._didDismissInAppMessageListener.splice(index, 1);
+        } else {        
+            if (event === "willDisplay") {
+                let index = this._willDisplayInAppMessageListeners.indexOf(listener as (event: InAppMessageWillDisplayEvent) => void);
+                if (index !== -1) {
+                    this._willDisplayInAppMessageListeners.splice(index, 1);
+                }
+            } else if (event === "didDisplay") {
+                let index = this._didDisplayInAppMessageListeners.indexOf(listener as (event: InAppMessageDidDisplayEvent) => void);
+                if (index !== -1) {
+                    this._willDisplayInAppMessageListeners.splice(index, 1);
+                }
+            } else if (event === "willDismiss") {
+                let index = this._willDismissInAppMessageListeners.indexOf(listener as (event: InAppMessageWillDismissEvent) => void);
+                if (index !== -1) {
+                    this._willDismissInAppMessageListeners.splice(index, 1);
+                }
+            } else if (event === "didDismiss") {
+                let index = this._didDismissInAppMessageListeners.indexOf(listener as (event: InAppMessageDidDismissEvent) => void);
+                if (index !== -1) {
+                    this._didDismissInAppMessageListeners.splice(index, 1);
+                }
+            } else {
+                return;
             }
         }
     }
@@ -163,7 +149,7 @@ export default class InAppMessages {
      */
     removeTriggers(keys: string[]): void {
         if (!Array.isArray(keys)) {
-            console.error("OneSignal: removeTriggers: argument must be of type Array")
+            console.error("OneSignal: removeTriggers: argument must be of type Array");
         }
         
         window.cordova.exec(function() {}, function() {}, "OneSignalPush", "removeTriggers", [keys]);
