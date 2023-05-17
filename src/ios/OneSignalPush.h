@@ -85,9 +85,8 @@
 - (void)setLaunchURLsInApp:(CDVInvokedUrlCommand* _Nonnull)command;
 
 // In-App Messages
-- (void)addInAppMessageClickListener:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)setInAppMessageClickHandler:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)onClickInAppMessage:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)addInAppMessageLifecycleListener:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)setOnWillDisplayInAppMessageHandler:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)setOnDidDisplayInAppMessageHandler:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)setOnWillDismissInAppMessageHandler:(CDVInvokedUrlCommand* _Nonnull)command;

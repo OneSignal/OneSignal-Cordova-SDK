@@ -225,10 +225,14 @@ static Class delegateClass = nil;
     pluginCommandDelegate = self.commandDelegate;
 
     NSString* appId = (NSString*)command.arguments[0];
-    setAppId([appId UTF8String]);
+    NSString* appIdStr = (appId ? [NSString stringWithUTF8String: [appId UTF8String]] : nil);
+
+    [OneSignal initialize:appIdStr withLaunchOptions:nil];
 
     if (actionNotification)
         processNotificationOpened(actionNotification);
+    
+    successCallbackBoolean(command.callbackId, true);
 }
 
 - (void)setLanguage:(CDVInvokedUrlCommand*)command {
@@ -410,20 +414,8 @@ static Class delegateClass = nil;
     successCallback(addInAppMessageClickListenerCallbackId, response);
 }
 
-- (void)addInAppMessageClickListener:(CDVInvokedUrlCommand*)command {
-    bool first = addInAppMessageClickListenerCallbackId = command.callbackId;
+- (void)addInAppMessageClickListenerHandler:(CDVInvokedUrlCommand*)command {
     addInAppMessageClickListenerCallbackId = command.callbackId;
-    if (first) {
-        [OneSignal.InAppMessages addClickListener:self];
-    }
-}
-
-- (void)addInAppMessageLifecycleListener:(CDVInvokedUrlCommand *)command {
-    bool first = addInAppMessageLifecyleListenerCallbackId  == nil;
-    addInAppMessageLifecyleListenerCallbackId = command.callbackId;
-    if (first) {
-        [OneSignal.InAppMessages addLifecycleListener:self];
-    } 
 }
 
 - (void)setOnWillDisplayInAppMessageHandler:(CDVInvokedUrlCommand*)command {
