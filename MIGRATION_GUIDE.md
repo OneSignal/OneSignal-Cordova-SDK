@@ -346,8 +346,8 @@ The In App Messages namespace is accessible via `OneSignal.InAppMessages` and pr
 | `window.plugins.OneSignal.InAppMessages.removeTrigger("triggerKey");`                                                                           | *Remove the trigger with the provided key from the current user.*                                                                                                                                                                                                                                                                                                                                                                                                               |
 | `window.plugins.OneSignal.InAppMessages.removeTriggers(["triggerKey1", "triggerKey2"]);`                                                         | *Remove multiple triggers from the current user.*                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | `window.plugins.OneSignal.InAppMessages.clearTriggers();`                                                                                  | *Clear all triggers from the current user.*                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| ` window.plugins.OneSignal.InAppMessages.addLifecycleListener(listenerObject);`<br><br>***See below for usage*** | *Set the in-app message lifecycle listener.*                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `window.plugins.OneSignal.InAppMessages.addClickListener(listener);`<br><br>***See below for usage***                         | *Set the in-app message click listener.*                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `window.plugins.OneSignal.InAppMessages.addEventListener("eventName", async function (event){});`<br><br>***See below for usage*** | *Set listeners for in-app message lifecycle events. Call `removeEventListener("eventName", listener)` to remove a listener.*                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `window.plugins.OneSignal.InAppMessages.addEventListener("click", async function (event){});;`<br><br>***See below for usage***                         | *Set an in-app message click listener. Call `removeEventListener("click", listener)` to remove a listener.*                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 
 ### In-App Message isPaused method
 
@@ -362,39 +362,35 @@ The In App Messages namespace is accessible via `OneSignal.InAppMessages` and pr
 
 **Cordova/Ionic**
 ```typescript
-    let inAppClickListener = function(result) {
-        let iamClickAction = JSON.stringify(result);
-        console.log("In-App Message Clicked: "+ iamClickAction);
+    let inAppClickListener = async function(event) {
+        let clickData = JSON.stringify(event);
+        console.log("In-App Message Clicked: "+ clickData);
     };
-    window.plugins.OneSignal.InAppMessages.removeClickListener(inAppClickListener);
+    window.plugins.OneSignal.InAppMessages.addEventListener("click", inAppClickListener);
 ```
 
-### In-App Message Lifecycle Listener
+### In-App Message Lifecycle Listeners
 
 **Cordova/Ionic**
 ```typescript
-    let onWillDisplayInAppMessage = function(message) {
-    console.log("OneSignal: will display IAM: ", message.messageId)
+    let willDisplayListener = async function(event) {
+        console.log("OneSignal: will display IAM: "+ event.messageId);
+    };
+    let didDisplayListener = async function(event) {
+        console.log("OneSignal: did display IAM: "+ event.messageId);
+    };
+    let willDismissListener = async function(event) {
+        console.log("OneSignal: will dismiss IAM: "+ event.messageId);
+    };
+    let didDismissListener = async function(event) {
+        console.log("OneSignal: did dismiss IAM: "+ event.messageId);
     };
 
-    let onDidDisplayInAppMessage = function(message) {
-    console.log("OneSignal: did display IAM: ", message.messageId)
-    };
-
-    let onWillDismissInAppMessage = function(message) {
-    console.log("OneSignal: will dismiss IAM: ", message.messageId)
-    };
-
-    let onDidDismissInAppMessage = function(message) {
-    console.log("OneSignal: did dismiss IAM: ", message.messageId)
-    };
-
-    window.plugins.OneSignal.InAppMessages.addLifecycleListener({
-    onWillDisplayInAppMessage,
-    onDidDisplayInAppMessage,
-    onWillDismissInAppMessage,
-    onDidDismissInAppMessage
-    });
+    // Listeners for each event added separately
+    window.plugins.OneSignal.InAppMessages.addEventListener("willDisplay", willDisplayListener);
+    window.plugins.OneSignal.InAppMessages.addEventListener("didDisplay", didDisplayListener);
+    window.plugins.OneSignal.InAppMessages.addEventListener("willDismiss", willDismissListener);
+    window.plugins.OneSignal.InAppMessages.addEventListener("didDismiss", didDismissListener);
 ```
 
 ## Debug Namespace
