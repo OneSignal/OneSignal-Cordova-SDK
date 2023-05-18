@@ -33,7 +33,6 @@
 
 NSString* notificationWillShowInForegoundCallbackId;
 NSString* notificationOpenedCallbackId;
-NSString* getIdsCallbackId;
 NSString* permissionObserverCallbackId;
 NSString* subscriptionObserverCallbackId;
 NSString* requestPermissionCallbackId;
@@ -105,11 +104,6 @@ void initOneSignalObject(NSDictionary* launchOptions) {
     initialLaunchFired = true;
 }
 
-void setAppId(const char* appId) {
-    NSString* appIdStr = (appId ? [NSString stringWithUTF8String: appId] : nil);
-    [OneSignal initialize:appIdStr withLaunchOptions:nil];
-}
-
 @implementation UIApplication(OneSignalCordovaPush)
 
 static void injectSelectorCordova(Class newClass, SEL newSel, Class addToClass, SEL makeLikeSel) {
@@ -168,8 +162,8 @@ static Class delegateClass = nil;
     successCallbackBoolean(permissionObserverCallbackId, permission);
 }
 
-- (void)onPushSubscriptionDidChangeWithStateChanges:(OSPushSubscriptionChangedState*)stateChanges {
-    successCallback(subscriptionObserverCallbackId, [stateChanges.current jsonRepresentation]);
+- (void)onPushSubscriptionDidChangeWithState:(OSPushSubscriptionChangedState *)state {
+    successCallback(subscriptionObserverCallbackId, [state.current jsonRepresentation]);
 }
 
 - (void)setProvidesNotificationSettingsView:(CDVInvokedUrlCommand *)command {
