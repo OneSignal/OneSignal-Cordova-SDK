@@ -229,6 +229,10 @@ static Class delegateClass = nil;
 
     [OneSignal initialize:appIdStr withLaunchOptions:nil];
 
+    // In-App Message listeners
+    [OneSignal.InAppMessages addLifecycleListener:self];
+    [OneSignal.InAppMessages addClickListener:self];
+
     if (actionNotification)
         processNotificationOpened(actionNotification);
     
