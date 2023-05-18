@@ -409,11 +409,11 @@ static Class delegateClass = nil;
         @"outcomes" : eventDict[@"outcomes"] ?: [NSNull null],
         @"tags" : eventDict[@"tags"] ?: [NSNull null]
     };
-    successCallback(addInAppMessageClickListenerCallbackId, response);
+    successCallback(inAppMessageClickedCallbackId, response);
 }
 
-- (void)addInAppMessageClickListenerHandler:(CDVInvokedUrlCommand*)command {
-    addInAppMessageClickListenerCallbackId = command.callbackId;
+- (void)setInAppMessageClickHandler:(CDVInvokedUrlCommand*)command {
+    inAppMessageClickedCallbackId = command.callbackId;
 }
 
 - (void)setOnWillDisplayInAppMessageHandler:(CDVInvokedUrlCommand*)command {
