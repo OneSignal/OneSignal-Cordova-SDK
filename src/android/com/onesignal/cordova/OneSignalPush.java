@@ -146,6 +146,7 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
   private static CallbackContext jsInAppMessageWillDismissCallback;
   private static CallbackContext jsInAppMessageDidDismissCallBack;
   private static CallbackContext jsNotificationInForegroundCallBack;
+  private static CallbackContext jsNotificationClickedCallback;
 
   private static CordovaInAppMessageClickListener inAppMessageClickListener;
 
@@ -223,7 +224,7 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
   }
 
   public boolean addNotificationClickListener(CallbackContext callbackContext) {
-    OneSignal.getNotifications().addClickListener(new CordovaNotificationClickListener(callbackContext));
+    jsNotificationClickedCallback = callbackContext;
     return true;
   }
 
@@ -319,6 +320,9 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
 
       OneSignal.initWithContext(this.cordova.getActivity(), appId);
 
+      // Notification listeners
+      OneSignal.getNotifications().addClickListener(new CordovaNotificationClickListener(callbackContext));
+      
       CallbackHelper.callbackSuccessBoolean(callbackContext, true);
       return true;
     } catch (JSONException e) {
@@ -563,10 +567,9 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
    */
 
   private static class CordovaNotificationClickListener implements INotificationClickListener {
-    private CallbackContext jsNotificationClickedCallBack;
 
     public CordovaNotificationClickListener(CallbackContext inCallbackContext) {
-      jsNotificationClickedCallBack = inCallbackContext;
+      jsNotificationClickedCallback = inCallbackContext;
     }
 
     @Override
@@ -576,12 +579,12 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
 
         JSONObject clickData = new JSONObject();
 
-        if (jsNotificationClickedCallBack != null) {
+        if (jsNotificationClickedCallback != null) {
           clickData.put("title", notification.getTitle());
           clickData.put("message", notification.getBody());
           clickData.put("additionalData", notification.getAdditionalData());
           
-          CallbackHelper.callbackSuccess(jsNotificationClickedCallBack, clickData);
+          CallbackHelper.callbackSuccess(jsNotificationClickedCallback, clickData);
         }
       } catch (Throwable t) {
         t.printStackTrace();
