@@ -259,8 +259,8 @@ The Notifications namespace is accessible via `OneSignal.Notifications` and prov
 | `window.plugins.OneSignal.Notifications.registerForProvisionalAuthorization();`                  | *(iOS only) Instead of having to prompt the user for permission to send them push notifications, your app can request provisional authorization.*|                                                                                                                                                                                                    
 | `window.plugins.OneSignal.Notifications.addPermissionObserver(observer);`<br><br>***See below for usage***                   | *This method will fire when a notification permission setting changes. This happens when the user enables or disables notifications for your app from the system settings outside of your app.*|                                        
 | `window.plugins.OneSignal.Notifications.removePermissionObserver(observer;`<br><br>***See below for usage***        | *Remove a push permission observer that has been previously added.*|                                                                                                                                                                                                                         
-| `window.plugins.OneSignal.Notifications.window.plugins.OneSignal.Notifications.addForegroundWillDisplayListener(listener);`<br><br>***See below for usage***       | *Sets the listener to run before displaying a notification while the app is in focus. Use this listener to read notification data and change it or decide if the notification ***should*** show or not.<br><br>***Note:*** this runs ***after*** the [Notification Service Extension](https://documentation.onesignal.com/docs/service-extensions) which can be used to modify the notification before showing it.* |
-| `window.plugins.OneSignal.Notifications.addClickListener(listener);`<br><br>***See below for usage***                   | *Sets a listener that will run whenever a notification is clicked by the user.*|                                                                                                                                                                                                                                                                                                                     
+| `window.plugins.OneSignal.Notifications.addEventListener("foregroundWillDisplay", async function (event){});`<br><br>***See below for usage***       | *Sets the listener to run before displaying a notification while the app is in focus. Use this listener to read notification data and change it or decide if the notification ***should*** show or not.<br><br>***Note:*** this runs ***after*** the [Notification Service Extension](https://documentation.onesignal.com/docs/service-extensions) which can be used to modify the notification before showing it.* \n Call `removeEventListener("foregroundWillDisplay", listener)` to remove a listener.|
+| `window.plugins.OneSignal.Notifications.addEventListener("click", async function (event){});`<br><br>***See below for usage***                   | *Sets a listener that will run whenever a notification is clicked by the user.\n Call `removeEventListener("click", listener)` to remove a listener.|*|                                                                                                                                                                                                                                                                                                                     
 
 ### Prompt for Push Notification Permission
 
@@ -293,27 +293,26 @@ Add an observer when permission status changes. You can call `removePermissionOb
     let myLifecyleListener = function(event) {
         /// Display Notification, preventDefault to not display
         event.preventDefault();
-
+        
         // Use notification.display() to display the notification after some async work
-        event.notification.display();
+          event.notification.display();
     }
-    window.plugins.OneSignal.Notifications.addForegroundWillDisplayListener(myLifecyleListener);
-    
-    // Remove the observer
-    window.plugins.OneSignal.Notifications.removeForegroundWillDisplayListener(myLifecyleListener);
+    window.plugins.OneSignal.Notifications.addEventListener("foregroundWillDisplay", myLifecyleListener);
+
+    // Remove the listener
+    window.plugins.OneSignal.Notifications.removeEventListener("foregroundWillDisplay", myLifecyleListener);
 ```
 
 ### Notification Click Listener
 **Cordova/Ionic**
 ```typescript
-    let myListener = function(result) {
-        let notificationData = JSON.stringify(result);
-        console.log("Notification Click Listener: " + notificationData);
+    let myClickListener = async function(event) {
+        let notificationData = JSON.stringify(event);
     };
-    window.plugins.OneSignal.Notifications.addClickListener(myListener);
+    window.plugins.OneSignal.Notifications.addEventListener("click", myClickListener);
 
-    // Remove the observer
-    window.plugins.OneSignal.Notifications.removeClickListener(myClickListener);
+    // Remove the listener
+    window.plugins.OneSignal.Notifications.removeEventListener("click", myClickListener);
 ```
 
 ## Location Namespace
@@ -347,7 +346,7 @@ The In App Messages namespace is accessible via `OneSignal.InAppMessages` and pr
 | `window.plugins.OneSignal.InAppMessages.removeTriggers(["triggerKey1", "triggerKey2"]);`                                                         | *Remove multiple triggers from the current user.*                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | `window.plugins.OneSignal.InAppMessages.clearTriggers();`                                                                                  | *Clear all triggers from the current user.*                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | `window.plugins.OneSignal.InAppMessages.addEventListener("eventName", async function (event){});`<br><br>***See below for usage*** | *Set listeners for in-app message lifecycle events. Call `removeEventListener("eventName", listener)` to remove a listener.*                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `window.plugins.OneSignal.InAppMessages.addEventListener("click", async function (event){});;`<br><br>***See below for usage***                         | *Set an in-app message click listener. Call `removeEventListener("click", listener)` to remove a listener.*                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `window.plugins.OneSignal.InAppMessages.addEventListener("click", async function (event){});`<br><br>***See below for usage***                         | *Set an in-app message click listener. Call `removeEventListener("click", listener)` to remove a listener.*                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 
 ### In-App Message isPaused method
 
