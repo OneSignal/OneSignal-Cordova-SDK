@@ -1,13 +1,16 @@
-import { ClickedEvent } from "./models/NotificationOpened";
 import OSNotificationWillDisplayEvent from "./NotificationReceivedEvent";
 import OSNotification from './OSNotification';
+import { NotificationEventName,
+    NotificationEventTypeMap,
+    ClickedEvent 
+ } from "./models/NotificationClicked";
 
 // Suppress TS warnings about window.cordova
 declare let window: any; // turn off type checking
 
 export default class Notifications {
     private _permissionObserverList: ((event:boolean)=>void)[] = [];
-    private _notificationClickedListeners = [function(notificationClicked: ClickedEvent) {}];
+    private _notificationClickedListeners: ((action: ClickedEvent) => void)[] = [];
     private _notificationWillDisplayListeners: ((notification: OSNotificationWillDisplayEvent) => void)[] = [];
 
     private _processFunctionList(array: ((event:any)=>void)[], param: any): void {
@@ -123,61 +126,53 @@ export default class Notifications {
     };
 
     /**
-     * Adds a listener that will run whenever a notification is clicked by the user.
-     * @param  {(ClickedEvent:ClickedEvent) => void} listener
-     * @returns void
+     * Add event listeners for notification click and/or lifecycle events.
+     * @param event 
+     * @param listener 
+     * @returns 
      */
-    addClickListener(listener: (ClickedEvent: ClickedEvent) => void): void {
-        this._notificationClickedListeners.push(listener);
-
-        const notificationClickedListener = (json: ClickedEvent) => {
-            this._processFunctionList(this._notificationClickedListeners, json);
-        };
-
-        window.cordova.exec(notificationClickedListener, function(){}, "OneSignalPush", "addNotificationClickListener", []);
-    };
-
-    /**
-     * Removes a listener that runs whenever a notification is clicked by the user.
-     * @param  {(ClickedEvent:ClickedEvent) => void} listener
-     * @returns void
-     */
-    removeClickListener(listener: (ClickedEvent: ClickedEvent) => void): void {
-        let index = this._notificationClickedListeners.indexOf(listener);
-        if (index !== -1) {
-            this._notificationClickedListeners.splice(index, 1);
+    addEventListener<K extends NotificationEventName>(event: K, listener: (event: NotificationEventTypeMap[K]) => void): void {
+        if (event === "click") {
+            this._notificationClickedListeners.push(listener as (event: ClickedEvent) => void);
+            const clickParsingHandler = (json: ClickedEvent) => {
+                this._processFunctionList(this._notificationClickedListeners, json);
+            };
+            window.cordova.exec(clickParsingHandler, function(){}, "OneSignalPush", "addNotificationClickListener", []);
+        } else if (event === "foregroundWillDisplay") {
+            this._notificationWillDisplayListeners.push(listener as (event: OSNotificationWillDisplayEvent) => void);
+            const foregroundParsingHandler = (notification: OSNotification) => {
+                this._notificationWillDisplayListeners.forEach(listener => {
+                    listener(new OSNotificationWillDisplayEvent(notification));
+                });
+                window.cordova.exec(function(){}, function(){}, "OneSignalPush", "proceedWithWillDisplay", [notification.notificationId]);
+            };
+            window.cordova.exec(foregroundParsingHandler, function(){}, "OneSignalPush", "addForegroundLifecycleListener", []);
+        } else {
+            return;
         }
-    };
-
+    }
+    
     /**
-     * Add a listener to run before displaying a notification while the app is in focus. Use this listener to read notification data and change it or decide if the notification should show or not.
-     * Note: this runs after the Notification Service Extension which can be used to modify the notification before showing it.
-     * @param  {(event:OSNotificationWillDisplayEvent)=>void} listener
-     * @returns void
+     * Add event listeners for notification click and/or lifecycle events.
+     * @param event 
+     * @param listener 
+     * @returns 
      */
-    addForegroundWillDisplayListener(listener: (event: OSNotificationWillDisplayEvent) => void): void {
-        this._notificationWillDisplayListeners.push(listener);
-        const foregroundParsingHandler = (notification: OSNotification) => {
-            this._notificationWillDisplayListeners.forEach(listener => {
-                listener(new OSNotificationWillDisplayEvent(notification));
-            });
-            window.cordova.exec(function(){}, function(){}, "OneSignalPush", "proceedWithWillDisplay", [notification.notificationId]);
-        };
-
-        window.cordova.exec(foregroundParsingHandler, function(){}, "OneSignalPush", "addForegroundLifecycleListener", []);
-    };
-
-    /**
-     * Remove a listener that runs before displaying a notification while the app is in focus.
-     * @param  {(event:OSNotificationWillDisplayEvent)=>void} listener
-     * @returns void
-     */
-    removeForegroundWillDisplayListener(listener: (event: OSNotificationWillDisplayEvent) => void): void {
-        let index = this._notificationWillDisplayListeners.indexOf(listener);
-        if (index !== -1) {
-            this._notificationWillDisplayListeners.splice(index, 1);
+    removeEventListener<K extends NotificationEventName>(event: K, listener: (obj: NotificationEventTypeMap[K]) => void): void {
+        if (event === "click") {
+            let index = this._notificationClickedListeners.indexOf(listener as (ClickedEvent: ClickedEvent) => void);
+            if (index !== -1) {
+                this._notificationClickedListeners.splice(index, 1);
+            }
+        } else if (event === "foregroundWillDisplay") {
+            let index = this._notificationWillDisplayListeners.indexOf(listener as (event: OSNotificationWillDisplayEvent) => void);
+            if (index !== -1) {
+                this._notificationWillDisplayListeners.splice(index, 1);
+            }
+        } else {
+            return;
         }
-    };
+    }
 
     /**
      * Removes all OneSignal notifications.
