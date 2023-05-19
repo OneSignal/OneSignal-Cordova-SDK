@@ -213,6 +213,7 @@ static Class delegateClass = nil;
 }
 
 -(void)proceedWithWillDisplay:(CDVInvokedUrlCommand *)command {
+    notificationWillShowInForegoundCallbackId = command.callbackId;
     NSString *notificationId = command.arguments[0];
     OSNotificationWillDisplayEvent *event = self.notificationWillDisplayCache[notificationId];
     if (!event) {
@@ -237,18 +238,20 @@ static Class delegateClass = nil;
 }
 
 - (void)addNotificationClickListener:(CDVInvokedUrlCommand*)command {
-    [OneSignal.Notifications addClickListener:self];
     notificationClickedCallbackId = command.callbackId;
 }
 
 - (void)init:(CDVInvokedUrlCommand*)command {
-    _receivedNotificationCache = [NSMutableDictionary new];
-    _notificationCompletionCache = [NSMutableDictionary new];;
+    _notificationWillDisplayCache = [NSMutableDictionary new];
+    _preventDefaultCache = [NSMutableDictionary new];
 
     pluginCommandDelegate = self.commandDelegate;
 
     NSString* appId = (NSString*)command.arguments[0];
     setAppId([appId UTF8String]);
+
+    // Notification click listener
+    [OneSignal.Notifications addClickListener:self];
 
     if (actionNotification)
         processNotificationClicked(actionNotification);
