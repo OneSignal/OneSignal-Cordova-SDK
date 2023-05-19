@@ -33,7 +33,6 @@
 
 NSString* notificationWillShowInForegoundCallbackId;
 NSString* notificationClickedCallbackId;
-NSString* getIdsCallbackId;
 NSString* permissionObserverCallbackId;
 NSString* subscriptionObserverCallbackId;
 NSString* requestPermissionCallbackId;
@@ -113,11 +112,6 @@ void initOneSignalObject(NSDictionary* launchOptions) {
     initialLaunchFired = true;
 }
 
-void setAppId(const char* appId) {
-    NSString* appIdStr = (appId ? [NSString stringWithUTF8String: appId] : nil);
-    [OneSignal initialize:appIdStr withLaunchOptions:nil];
-}
-
 @implementation UIApplication(OneSignalCordovaPush)
 
 static void injectSelectorCordova(Class newClass, SEL newSel, Class addToClass, SEL makeLikeSel) {
@@ -176,8 +170,8 @@ static Class delegateClass = nil;
     successCallbackBoolean(permissionObserverCallbackId, permission);
 }
 
-- (void)onPushSubscriptionDidChangeWithStateChanges:(OSPushSubscriptionChangedState*)stateChanges {
-    successCallback(subscriptionObserverCallbackId, [stateChanges.current jsonRepresentation]);
+- (void)onPushSubscriptionDidChangeWithState:(OSPushSubscriptionChangedState *)state {
+    successCallback(subscriptionObserverCallbackId, [state.current jsonRepresentation]);
 }
 
 - (void)setProvidesNotificationSettingsView:(CDVInvokedUrlCommand *)command {
@@ -248,13 +242,21 @@ static Class delegateClass = nil;
     pluginCommandDelegate = self.commandDelegate;
 
     NSString* appId = (NSString*)command.arguments[0];
-    setAppId([appId UTF8String]);
+    NSString* appIdStr = (appId ? [NSString stringWithUTF8String: [appId UTF8String]] : nil);
+
+    [OneSignal initialize:appIdStr withLaunchOptions:nil];
+
+    // In-App Message listeners
+    [OneSignal.InAppMessages addLifecycleListener:self];
+    [OneSignal.InAppMessages addClickListener:self];
 
     // Notification click listener
     [OneSignal.Notifications addClickListener:self];
 
     if (actionNotification)
         processNotificationClicked(actionNotification);
+    
+    successCallbackBoolean(command.callbackId, true);
 }
 
 - (void)setLanguage:(CDVInvokedUrlCommand*)command {
@@ -423,10 +425,6 @@ static Class delegateClass = nil;
  * In-App Messages
  */
 
- - (void)setOnClickInAppMessageHandler:(CDVInvokedUrlCommand*)command {
-    inAppMessageClickedCallbackId = command.callbackId;
-}
-
  - (void)onClickInAppMessage:(OSInAppMessageClickEvent * _Nonnull)event {
     NSDictionary *eventDict = [event jsonRepresentation];
     NSDictionary *response = @{
@@ -440,12 +438,8 @@ static Class delegateClass = nil;
     successCallback(inAppMessageClickedCallbackId, response);
 }
 
-- (void)addInAppMessageClickListener:(CDVInvokedUrlCommand*)command {
-    [OneSignal.InAppMessages addClickListener:self];
-}
-
-- (void)addInAppMessageLifecycleListener:(CDVInvokedUrlCommand *)command {
-    [OneSignal.InAppMessages addLifecycleListener:self];
+- (void)setInAppMessageClickHandler:(CDVInvokedUrlCommand*)command {
+    inAppMessageClickedCallbackId = command.callbackId;
 }
 
 - (void)setOnWillDisplayInAppMessageHandler:(CDVInvokedUrlCommand*)command {
