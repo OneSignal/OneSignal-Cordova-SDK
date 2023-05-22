@@ -149,6 +149,7 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
   private static CallbackContext jsNotificationClickedCallback;
 
   private static CordovaInAppMessageClickListener inAppMessageClickListener;
+  private static INotificationClickListener cordovaNotificationClickListener;
 
   public boolean addForegroundLifecycleListener(CallbackContext callbackContext) {
     jsNotificationInForegroundCallBack = callbackContext;
@@ -263,7 +264,8 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
 
 
       // Notification listener
-      OneSignal.getNotifications().addClickListener(new CordovaNotificationClickListener(callbackContext));
+      CordovaNotificationClickListener cordovaNotificationClickListener = new CordovaNotificationClickListener(callbackContext);
+      OneSignal.getNotifications().addClickListener(cordovaNotificationClickListener);
       
       //In-App Message listeners
       CordovaInAppMessageLifecycleListener listener = new CordovaInAppMessageLifecycleListener();
@@ -648,7 +650,7 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
 
   @Override
   public void onDestroy() {
-    OneSignal.getNotifications().addClickListener(null);
-    OneSignal.getNotifications().addForegroundLifecycleListener(null);
+    OneSignal.getNotifications().removeClickListener(cordovaNotificationClickListener);
+    OneSignal.getNotifications().removeForegroundLifecycleListener(this);
   }
 }
