@@ -542,7 +542,7 @@ static Class delegateClass = nil;
     NSString *activityId = command.arguments[0];
     NSString *token = command.arguments[1];
     
-    [OneSignal enterLiveActivity:activityId withToken:token withSuccess:^(NSDictionary* results){
+    [OneSignal.LiveActivities enter:activityId withToken:token withSuccess:^(NSDictionary* results){
         successCallback(enterLiveActivityCallbackId, results);
     } withFailure:^(NSError *error) {
         failureCallback(enterLiveActivityCallbackId, error.userInfo);
@@ -554,7 +554,7 @@ static Class delegateClass = nil;
 
     NSString *activityId = command.arguments[0];
 
-    [OneSignal exitLiveActivity:activityId withSuccess:^(NSDictionary* results){
+    [OneSignal.LiveActivities exit:activityId withSuccess:^(NSDictionary* results){
         successCallback(exitLiveActivityCallbackId, results);
     } withFailure:^(NSError *error) {
         failureCallback(exitLiveActivityCallbackId, error.userInfo);

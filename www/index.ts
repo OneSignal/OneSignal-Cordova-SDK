@@ -31,6 +31,7 @@ import Session from "./SessionNamespace";
 import Location from "./LocationNamespace";
 import InAppMessages from "./InAppMessagesNamespace";
 import Notifications from "./NotificationsNamespace";
+import LiveActivities from "./LiveActivitiesNamespace";
 
 // Suppress TS warnings about window.cordova
 declare let window: any; // turn off type checking
@@ -42,6 +43,7 @@ export class OneSignalPlugin {
     Location: Location = new Location();
     InAppMessages: InAppMessages = new InAppMessages();
     Notifications: Notifications = new Notifications();
+    LiveActivities: LiveActivities = new LiveActivities();
 
     private _appID = "";
 
@@ -123,49 +125,6 @@ export class OneSignalPlugin {
      */
     getPrivacyConsent(handler: (value: boolean) => void): void {
         window.cordova.exec(handler, function () { }, "OneSignalPush", "getPrivacyConsent", []);
-    };
-
-    /**
-     * Live Activities
-     */
-
-    /**
-     * Enter a live activity
-     * @param  {string} activityId
-     * @param  {string} token
-     * @param  {Function} onSuccess
-     * @param  {Function} onFailure
-     * @returns void
-     */
-    enterLiveActivity(activityId: string, token: string, onSuccess?: Function, onFailure?: Function): void {
-        if (onSuccess == null) {
-            onSuccess = function() {};
-        }
-    
-        if (onFailure == null) {
-            onFailure = function() {};
-        }
-
-        window.cordova.exec(onSuccess, onFailure, "OneSignalPush", "enterLiveActivity", [activityId, token]);
-    };
-
-    /**
-     * Exit a live activity
-     * @param  {string} activityId
-     * @param  {Function} onSuccess
-     * @param  {Function} onFailure
-     * @returns void
-     */
-     exitLiveActivity(activityId: string, onSuccess?: Function, onFailure?: Function): void {
-        if (onSuccess == null) {
-            onSuccess = function() {};
-        }
-
-        if (onFailure == null) {
-            onFailure = function() {};
-        }
-
-        window.cordova.exec(onSuccess, onFailure, "OneSignalPush", "exitLiveActivity", [activityId]);
     };
 }
 
