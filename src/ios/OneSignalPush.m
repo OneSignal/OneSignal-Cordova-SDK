@@ -165,9 +165,8 @@ static Class delegateClass = nil;
 
 @implementation OneSignalPush
 
-- (void)onOSPermissionChanged:(OSPermissionState*)stateChanges {
-    BOOL permission = stateChanges.permission;
-    successCallbackBoolean(permissionObserverCallbackId, permission);
+- (void)onNotificationPermissionDidChange:(BOOL)permission {
+   successCallbackBoolean(permissionObserverCallbackId, permission);
 }
 
 - (void)onPushSubscriptionDidChangeWithState:(OSPushSubscriptionChangedState *)state {
