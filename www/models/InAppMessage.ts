@@ -11,7 +11,6 @@ export type InAppMessageEventTypeMap = {
 export interface InAppMessageClickEvent {
     message             : OSInAppMessage
     result              : InAppMessageClickResult
-    
 }
 
 export interface InAppMessageClickResult {
@@ -19,10 +18,6 @@ export interface InAppMessageClickResult {
     actionId            ?: string;
     url                 ?: string;
     urlTarget           ?: string;
-    
-    // Not currently exposed in Android 5.0.0-beta1
-    // outcomes            ?: object[];
-    // tags                ?: object;
 }
 
 export interface InAppMessageWillDisplayEvent {

@@ -406,8 +406,6 @@ static Class delegateClass = nil;
         @"url": event.result.url ?: [NSNull null],
         @"urlTarget": @(event.result.urlTarget),
         @"closingMessage": @(event.result.closingMessage),
-        @"outcomes" : eventDict[@"outcomes"] ?: [NSNull null],
-        @"tags" : eventDict[@"tags"] ?: [NSNull null]
     };
     successCallback(inAppMessageClickedCallbackId, response);
 }
