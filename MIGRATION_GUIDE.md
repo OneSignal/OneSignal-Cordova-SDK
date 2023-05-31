@@ -295,7 +295,7 @@ Add an observer when permission status changes. You can call `removePermissionOb
         event.preventDefault();
         
         // Use notification.display() to display the notification after some async work
-          event.notification.display();
+        event.notification.display();
     }
     window.plugins.OneSignal.Notifications.addEventListener("foregroundWillDisplay", myLifecyleListener);
 
