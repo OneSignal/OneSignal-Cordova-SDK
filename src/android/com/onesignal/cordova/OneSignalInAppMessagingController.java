@@ -29,12 +29,12 @@ public class OneSignalInAppMessagingController {
     public static boolean addTriggers(JSONArray data) {
         try {
             JSONObject triggersObject = data.getJSONObject(0);
-            Map<String, Object> triggers = new HashMap<>();
+            Map<String, String> triggers = new HashMap<>();
             Iterator<String> keys = triggersObject.keys();
 
             while (keys.hasNext()) {
                 String key = keys.next();
-                triggers.put(key, triggersObject.get(key));
+                triggers.put(key, (String) triggersObject.get(key));
             }
 
             OneSignal.getInAppMessages().addTriggers(triggers);
