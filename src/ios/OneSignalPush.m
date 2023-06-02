@@ -231,7 +231,11 @@ static Class delegateClass = nil;
 }
 
 - (void)addNotificationClickListener:(CDVInvokedUrlCommand*)command {
+    bool first = notificationClickedCallbackId  == nil;
     notificationClickedCallbackId = command.callbackId;
+    if (first) {
+        [OneSignal.Notifications addClickListener:self];
+    }
 }
 
 - (void)init:(CDVInvokedUrlCommand*)command {
@@ -249,9 +253,6 @@ static Class delegateClass = nil;
     [OneSignal.InAppMessages addLifecycleListener:self];
     [OneSignal.InAppMessages addClickListener:self];
 
-    // Notification click listener
-    [OneSignal.Notifications addClickListener:self];
-
     if (actionNotification)
         processNotificationClicked(actionNotification);
     
@@ -263,7 +264,7 @@ static Class delegateClass = nil;
 }
 
 - (void)addPermissionObserver:(CDVInvokedUrlCommand*)command {
-    bool first = permissionObserverCallbackId  == nil;
+    bool first = permissionObserverCallbackId == nil;
     permissionObserverCallbackId = command.callbackId;
     if (first) {
         [OneSignal.Notifications addPermissionObserver:self];
