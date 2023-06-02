@@ -426,7 +426,6 @@ static Class delegateClass = nil;
  */
 
  - (void)onClickInAppMessage:(OSInAppMessageClickEvent * _Nonnull)event {
-    NSDictionary *eventDict = [event jsonRepresentation];
     NSDictionary *response = @{
         @"actionId": event.result.actionId ?: [NSNull null],
         @"url": event.result.url ?: [NSNull null],
