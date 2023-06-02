@@ -33,7 +33,6 @@ import com.onesignal.OneSignal;
 import com.onesignal.debug.internal.logging.Logging;
 import com.onesignal.common.OneSignalWrapper;
 
-import com.onesignal.inAppMessages.IInAppMessage;
 import com.onesignal.inAppMessages.IInAppMessageClickListener;
 import com.onesignal.inAppMessages.IInAppMessageClickEvent;
 import com.onesignal.inAppMessages.IInAppMessageClickResult;
@@ -46,7 +45,6 @@ import com.onesignal.inAppMessages.IInAppMessageDidDismissEvent;
 import com.onesignal.notifications.INotification;
 import com.onesignal.notifications.INotificationClickListener;
 import com.onesignal.notifications.INotificationClickEvent;
-import com.onesignal.notifications.INotificationReceivedEvent;
 import com.onesignal.notifications.INotificationLifecycleListener;
 import com.onesignal.notifications.INotificationWillDisplayEvent;
 
@@ -99,8 +97,6 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
   private static final String REQUEST_PERMISSION = "requestPermission";
   private static final String GET_PERMISSION = "getPermission";
   private static final String CAN_REQUEST_PERMISSION = "canRequestPermission";
-  private static final String PROMPT_FOR_PUSH_NOTIFICATIONS_WITH_USER_RESPONSE = "promptForPushNotificationsWithUserResponse";
-  private static final String UNSUBSCRIBE_WHEN_NOTIFICATIONS_DISABLED = "unsubscribeWhenNotificationsAreDisabled";
 
   private static final String CLEAR_ALL_NOTIFICATIONS = "clearAllNotifications";
   private static final String REMOVE_NOTIFICATION = "removeNotification";
@@ -588,7 +584,7 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
             e.printStackTrace();
         }
       }
-  };
+  }
 
   private static class CordovaInAppMessageClickListener implements IInAppMessageClickListener {
     public CordovaInAppMessageClickListener(CallbackContext inCallbackContext) {

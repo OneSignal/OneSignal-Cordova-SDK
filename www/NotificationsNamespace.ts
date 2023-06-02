@@ -79,14 +79,14 @@ export default class Notifications {
         var fallbackToSettings = false;
 
         if (typeof fallbackToSettingsOrHandler === "function") {
-            // Method was called like promptForPushNotificationsWithUserResponse(handler: function)
+            // Method was called like requestPermission(handler: function)
             handler = fallbackToSettingsOrHandler;
         }
         else if (typeof fallbackToSettingsOrHandler === "boolean") {
-            // Method was called like promptForPushNotificationsWithUserResponse(fallbackToSettings: boolean, handler?: function)
+            // Method was called like requestPermission(fallbackToSettings: boolean, handler?: function)
             fallbackToSettings = fallbackToSettingsOrHandler;
         }
-        // Else method was called like promptForPushNotificationsWithUserResponse(), no need to modify
+        // Else method was called like requestPermission(), no need to modify
 
         const internalCallback = (response: boolean) => {
             if (handler) {
