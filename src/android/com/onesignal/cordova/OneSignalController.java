@@ -277,21 +277,9 @@ public class OneSignalController {
   /**
    * Privacy consent
    */
-  public static boolean getRequiresPrivacyConsent(CallbackContext callbackContext) {
-    boolean requiresUserConsent = OneSignal.getRequiresPrivacyConsent();
-    CallbackHelper.callbackSuccessBoolean(callbackContext, requiresUserConsent);
-    return true;
-  }
-
-   public static boolean getPrivacyConsent(CallbackContext callbackContext) {
-    boolean getPrivacyConsent = OneSignal.getPrivacyConsent();
-    CallbackHelper.callbackSuccessBoolean(callbackContext, getPrivacyConsent);
-    return true;
-  }
-
-  public static boolean setRequiresPrivacyConsent(JSONArray data) {
+  public static boolean setPrivacyConsentRequired(JSONArray data) {
     try {
-      OneSignal.setRequiresPrivacyConsent(data.getBoolean(0));
+      OneSignal.setConsentRequired(data.getBoolean(0));
       return true;
     } catch (JSONException e) {
       e.printStackTrace();
@@ -299,9 +287,9 @@ public class OneSignalController {
     }
   }
 
-  public static boolean setPrivacyConsent(JSONArray data) {
+  public static boolean setPrivacyConsentGiven(JSONArray data) {
     try {
-      OneSignal.setPrivacyConsent(data.getBoolean(0));
+      OneSignal.setConsentGiven(data.getBoolean(0));
       return true;
     } catch (JSONException e) {
       e.printStackTrace();

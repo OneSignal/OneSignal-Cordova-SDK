@@ -34,16 +34,21 @@ import com.onesignal.debug.internal.logging.Logging;
 import com.onesignal.common.OneSignalWrapper;
 
 import com.onesignal.inAppMessages.IInAppMessage;
-import com.onesignal.inAppMessages.IInAppMessageClickHandler;
+import com.onesignal.inAppMessages.IInAppMessageClickListener;
+import com.onesignal.inAppMessages.IInAppMessageClickEvent;
 import com.onesignal.inAppMessages.IInAppMessageClickResult;
-import com.onesignal.inAppMessages.IInAppMessageLifecycleHandler;
+import com.onesignal.inAppMessages.IInAppMessageLifecycleListener;
+import com.onesignal.inAppMessages.IInAppMessageWillDisplayEvent;
+import com.onesignal.inAppMessages.IInAppMessageDidDisplayEvent;
+import com.onesignal.inAppMessages.IInAppMessageWillDismissEvent;
+import com.onesignal.inAppMessages.IInAppMessageDidDismissEvent;
 
 import com.onesignal.notifications.INotification;
-import com.onesignal.notifications.INotificationClickHandler;
-import com.onesignal.notifications.INotificationClickResult;
+import com.onesignal.notifications.INotificationClickListener;
+import com.onesignal.notifications.INotificationClickEvent;
 import com.onesignal.notifications.INotificationReceivedEvent;
-import com.onesignal.notifications.IRemoteNotificationReceivedHandler;
-import com.onesignal.notifications.INotificationWillShowInForegroundHandler;
+import com.onesignal.notifications.INotificationLifecycleListener;
+import com.onesignal.notifications.INotificationWillDisplayEvent;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -53,20 +58,21 @@ import org.json.JSONException;
 
 import java.util.HashMap;
 
-public class OneSignalPush extends CordovaPlugin {
+public class OneSignalPush extends CordovaPlugin implements INotificationLifecycleListener {
   private static final String TAG = "OneSignalPush";
 
-  private static final String SET_NOTIFICATION_WILL_SHOW_IN_FOREGROUND_HANDLER = "setNotificationWillShowInForegroundHandler";
-  private static final String SET_NOTIFICATION_OPENED_HANDLER = "setNotificationOpenedHandler";
+  private static final String ADD_FOREGROUND_LIFECYCLE_LISTENER = "addForegroundLifecycleListener";
+  private static final String PROCEED_WITH_WILL_DISPLAY = "proceedWithWillDisplay";
+  private static final String DISPLAY_NOTIFICATION = "displayNotification";
+  private static final String PREVENT_DEFAULT = "preventDefault";
+  private static final String ADD_NOTIFICATION_CLICK_LISTENER = "addNotificationClickListener";
   
-  private static final String SET_CLICK_HANDLER = "setClickHandler";
-  private static final String SET_LIFECYCLE_HANDLER = "setLifecycleHandler";
+  private static final String SET_IN_APP_MESSAGE_CLICK_HANDLER = "setInAppMessageClickHandler";
   private static final String SET_ON_WILL_DISPLAY_IN_APP_MESSAGE_HANDLER = "setOnWillDisplayInAppMessageHandler";
   private static final String SET_ON_DID_DISPLAY_IN_APP_MESSAGE_HANDLER = "setOnDidDisplayInAppMessageHandler";
   private static final String SET_ON_WILL_DISMISS_IN_APP_MESSAGE_HANDLER = "setOnWillDismissInAppMessageHandler";
   private static final String SET_ON_DID_DISMISS_IN_APP_MESSAGE_HANDLER = "setOnDidDismissInAppMessageHandler";
 
-  private static final String COMPLETE_NOTIFICATION = "completeNotification";
   private static final String INIT = "init";
 
   private static final String SET_LANGUAGE = "setLanguage";
@@ -115,10 +121,8 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String IS_LOCATION_SHARED = "isLocationShared";
   private static final String REQUEST_LOCATION_PERMISSION = "requestLocationPermission";
 
-  private static final String GET_PRIVACY_CONSENT = "getPrivacyConsent";
-  private static final String GET_REQUIRES_PRIVACY_CONSENT = "getRequiresPrivacyConsent";
-  private static final String SET_REQUIRES_PRIVACY_CONSENT = "setRequiresPrivacyConsent";
-  private static final String SET_PRIVACY_CONSENT = "setPrivacyConsent";
+  private static final String SET_PRIVACY_CONSENT_REQUIRED = "setPrivacyConsentRequired";
+  private static final String SET_PRIVACY_CONSENT_GIVEN = "setPrivacyConsentGiven";
 
   private static final String ADD_TRIGGERS = "addTriggers";
   private static final String REMOVE_TRIGGERS = "removeTriggers";
@@ -133,61 +137,103 @@ public class OneSignalPush extends CordovaPlugin {
   private static final String ENTER_LIVE_ACTIVITY = "enterLiveActivity";
   private static final String EXIT_LIVE_ACTIVITY = "exitLiveActivity";
 
-  private static final HashMap<String, INotificationReceivedEvent> notificationReceivedEventCache = new HashMap<>();
+  private static final HashMap<String, INotificationWillDisplayEvent> notificationWillDisplayCache = new HashMap<>();
+  private static final HashMap<String, INotificationWillDisplayEvent> preventDefaultCache = new HashMap<>();
 
   private static CallbackContext jsInAppMessageWillDisplayCallback;
   private static CallbackContext jsInAppMessageDidDisplayCallBack;
   private static CallbackContext jsInAppMessageWillDismissCallback;
   private static CallbackContext jsInAppMessageDidDismissCallBack;
+  private static CallbackContext jsInAppMessageClickedCallback;
+  private static CallbackContext jsNotificationInForegroundCallBack;
+  private static CallbackContext jsNotificationClickedCallback;
 
-  public boolean setNotificationWillShowInForegroundHandler(CallbackContext callbackContext) {
-    OneSignal.getNotifications().setNotificationWillShowInForegroundHandler(new CordovaNotificationInForegroundHandler(callbackContext));
+  private static CordovaInAppMessageClickListener inAppMessageClickListener;
+  private static INotificationClickListener cordovaNotificationClickListener;
+
+  public boolean addForegroundLifecycleListener(CallbackContext callbackContext) {
+    jsNotificationInForegroundCallBack = callbackContext;
+    OneSignal.getNotifications().addForegroundLifecycleListener(this);
     return true;
   }
 
-  public boolean setNotificationOpenedHandler(CallbackContext callbackContext) {
-    OneSignal.getNotifications().setNotificationClickHandler(new CordovaNotificationOpenedHandler(callbackContext));
+  @Override
+  public void onWillDisplay(INotificationWillDisplayEvent event) {
+    try {
+      INotification notification = event.getNotification();
+      notificationWillDisplayCache.put(notification.getNotificationId(), (INotificationWillDisplayEvent) event);
+
+      event.preventDefault();
+
+      JSONObject foregroundData = serializeNotification(notification);
+      CallbackHelper.callbackSuccess(jsNotificationInForegroundCallBack, foregroundData);
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private boolean proceedWithWillDisplay(JSONArray data) {
+    try{
+      String notificationId = data.getString(0);
+      INotificationWillDisplayEvent event = notificationWillDisplayCache.get(notificationId);
+      if (event == null) {
+          Logging.error("Could not find onWillDisplayNotification event for notification with id: " + notificationId, null);
+          return true;
+      }
+      if (this.preventDefaultCache.containsKey(notificationId)) {
+          return true;
+      }
+      event.getNotification().display();
+      return true;
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
     return true;
   }
 
-  public boolean setClickHandler(CallbackContext callbackContext) {
-    OneSignal.getInAppMessages().setInAppMessageClickHandler(new CordovaInAppMessageClickHandler(callbackContext));
-    return true;
-  }
-
-  public boolean setLifecycleHandler() {
-    OneSignal.getInAppMessages().setInAppMessageLifecycleHandler(new IInAppMessageLifecycleHandler() {
-
-      JSONObject convertInAppMessageToJSON(IInAppMessage message, CallbackContext callbackContext) {
-        JSONObject result = new JSONObject();
-        try {
-          result.put("messageId", message.getMessageId());
-          if (callbackContext != null) {
-            CallbackHelper.callbackSuccess(callbackContext, result);
-          }
-        } catch (JSONException e) {
-          e.printStackTrace();
+  private boolean displayNotification(JSONArray data) {
+    try {
+      String notificationId = data.getString(0);
+        INotificationWillDisplayEvent event = notificationWillDisplayCache.get(notificationId);
+        if (event == null) {
+            Logging.error("Could not find onWillDisplayNotification event for notification with id: " + notificationId, null);
+            return true;
         }
-        return result;
+        event.getNotification().display();
+      return true;
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return true;
+  }
+
+  private boolean preventDefault(JSONArray data) {
+    try {
+      String notificationId = data.getString(0);
+      INotificationWillDisplayEvent event = notificationWillDisplayCache.get(notificationId);
+      if (event == null) {
+          Logging.error("Could not find onWillDisplayNotification event for notification with id: " + notificationId, null);
+          return true;
       }
-          
-      @Override
-      public void onWillDisplayInAppMessage(IInAppMessage message) {
-        convertInAppMessageToJSON(message,jsInAppMessageWillDisplayCallback);
-      }
-      @Override
-      public void onDidDisplayInAppMessage(IInAppMessage message) {
-        convertInAppMessageToJSON(message, jsInAppMessageDidDisplayCallBack);
-      }
-      @Override
-      public void onWillDismissInAppMessage(IInAppMessage message) {
-        convertInAppMessageToJSON(message, jsInAppMessageWillDismissCallback);
-      }
-      @Override
-      public void onDidDismissInAppMessage(IInAppMessage message) {
-        convertInAppMessageToJSON(message, jsInAppMessageDidDismissCallBack);
-      }
-    });
+      event.preventDefault();
+      this.preventDefaultCache.put(notificationId, event);
+      return true;
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return true;
+  }
+
+  public boolean addNotificationClickListener(CallbackContext callbackContext) {
+    if (jsNotificationClickedCallback == null) {
+      CordovaNotificationClickListener cordovaNotificationClickListener = new CordovaNotificationClickListener(callbackContext);
+      OneSignal.getNotifications().addClickListener(cordovaNotificationClickListener);
+    }
+    return true;
+  }
+
+  public boolean setInAppMessageClickHandler(CallbackContext callbackContext) {
+    jsInAppMessageClickedCallback = callbackContext;
     return true;
   }
 
@@ -217,8 +263,12 @@ public class OneSignalPush extends CordovaPlugin {
     OneSignalWrapper.setSdkVersion("050000");
     try {
       String appId = data.getString(0);
-
       OneSignal.initWithContext(this.cordova.getActivity(), appId);
+      
+      //In-App Message listeners
+      CordovaInAppMessageLifecycleListener listener = new CordovaInAppMessageLifecycleListener();
+      OneSignal.getInAppMessages().addLifecycleListener(listener);
+      OneSignal.getInAppMessages().addClickListener(new CordovaInAppMessageClickListener(callbackContext));
 
       CallbackHelper.callbackSuccessBoolean(callbackContext, true);
       return true;
@@ -233,20 +283,28 @@ public class OneSignalPush extends CordovaPlugin {
     boolean result = false;
 
     switch(action) {
-      case SET_NOTIFICATION_OPENED_HANDLER:
-        result = setNotificationOpenedHandler(callbackContext);
+      case ADD_NOTIFICATION_CLICK_LISTENER:
+        result = addNotificationClickListener(callbackContext);
         break;
 
-      case SET_NOTIFICATION_WILL_SHOW_IN_FOREGROUND_HANDLER:
-        result = setNotificationWillShowInForegroundHandler(callbackContext);
+      case ADD_FOREGROUND_LIFECYCLE_LISTENER:
+        result = addForegroundLifecycleListener(callbackContext);
         break;
 
-      case SET_CLICK_HANDLER:
-        result = setClickHandler(callbackContext);
+      case PROCEED_WITH_WILL_DISPLAY:
+        result = proceedWithWillDisplay(data);
         break;
 
-      case SET_LIFECYCLE_HANDLER:
-        result = setLifecycleHandler();
+      case DISPLAY_NOTIFICATION:
+        result = displayNotification(data);
+        break;
+
+      case PREVENT_DEFAULT:
+        result = preventDefault(data);
+        break;
+
+      case SET_IN_APP_MESSAGE_CLICK_HANDLER:
+        result = setInAppMessageClickHandler(callbackContext);
         break;
 
       case SET_ON_WILL_DISPLAY_IN_APP_MESSAGE_HANDLER:
@@ -263,10 +321,6 @@ public class OneSignalPush extends CordovaPlugin {
 
       case SET_ON_DID_DISMISS_IN_APP_MESSAGE_HANDLER:
         result = setOnDidDismissInAppMessageHandler(callbackContext);
-        break;
-
-      case COMPLETE_NOTIFICATION:
-        result = completeNotification(data);
         break;
 
       case INIT:
@@ -395,20 +449,12 @@ public class OneSignalPush extends CordovaPlugin {
         result = OneSignalController.isLocationShared(callbackContext);
         break;
 
-      case GET_PRIVACY_CONSENT:
-        result = OneSignalController.getPrivacyConsent(callbackContext);
+      case SET_PRIVACY_CONSENT_REQUIRED:
+        result = OneSignalController.setPrivacyConsentRequired(data);
         break;
 
-      case GET_REQUIRES_PRIVACY_CONSENT:
-        result = OneSignalController.getRequiresPrivacyConsent(callbackContext);
-        break;
-
-      case SET_REQUIRES_PRIVACY_CONSENT:
-        result = OneSignalController.setRequiresPrivacyConsent(data);
-        break;
-
-      case SET_PRIVACY_CONSENT:
-        result = OneSignalController.setPrivacyConsent(data);
+      case SET_PRIVACY_CONSENT_GIVEN:
+        result = OneSignalController.setPrivacyConsentGiven(data);
         break;
 
       case ADD_TRIGGERS:
@@ -459,124 +505,107 @@ public class OneSignalPush extends CordovaPlugin {
     return result;
   }
 
-  private boolean completeNotification(JSONArray data) {
-    try {
-      String notificationId = data.getString(0);
-      boolean shouldDisplay = data.getBoolean(1);
-
-      INotificationReceivedEvent notificationReceivedEvent = notificationReceivedEventCache.get(notificationId);
-
-      if (notificationReceivedEvent == null) {
-        Logging.error("Could not find notification completion block with id: " + notificationId, null); //crashes without 2nd parameter
-        return false;
-      }
-
-      if (shouldDisplay)
-        notificationReceivedEvent.complete(notificationReceivedEvent.getNotification());
-      else
-        notificationReceivedEvent.complete(null);
-
-      return true;
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return false;
-  }
-
   /**
    * Handlers
    */
 
-  private static class CordovaNotificationInForegroundHandler implements INotificationWillShowInForegroundHandler {
-    
-    private CallbackContext jsNotificationInForegroundCallBack;
+  private static class CordovaNotificationClickListener implements INotificationClickListener {
 
-    public CordovaNotificationInForegroundHandler(CallbackContext inCallbackContext) {
-      jsNotificationInForegroundCallBack = inCallbackContext;
+    public CordovaNotificationClickListener(CallbackContext inCallbackContext) {
+      jsNotificationClickedCallback = inCallbackContext;
     }
 
     @Override
-    public void notificationWillShowInForeground(INotificationReceivedEvent notificationReceivedEvent) {
+    public void onClick(INotificationClickEvent event) {
       try {
-        INotification notification = notificationReceivedEvent.getNotification();
-        notificationReceivedEventCache.put(notification.getNotificationId(), notificationReceivedEvent);
+        INotification notification = event.getNotification();
 
-        JSONObject foregroundData = new JSONObject();
-        
-        foregroundData.put("body", notification.getBody());
-        foregroundData.put("sound", notification.getSound());
-        foregroundData.put("title", notification.getTitle());
-        foregroundData.put("launchURL", notification.getLaunchURL());
-        foregroundData.put("rawPayload", notification.getRawPayload());
-        foregroundData.put("actionButtons", notification.getActionButtons());
-        foregroundData.put("additionalData", notification.getAdditionalData());
-        foregroundData.put("notificationId", notification.getNotificationId());
-        foregroundData.put("groupKey", notification.getGroupKey());
-        foregroundData.put("groupMessage", notification.getGroupMessage());
-        foregroundData.put("groupedNotifications", notification.getGroupedNotifications());
-        foregroundData.put("ledColor", notification.getLedColor());
-        foregroundData.put("priority", notification.getPriority());
-        foregroundData.put("smallIcon", notification.getSmallIcon());
-        foregroundData.put("largeIcon", notification.getLargeIcon());
-        foregroundData.put("bigPicture", notification.getBigPicture());
-        foregroundData.put("collapseId", notification.getCollapseId());
-        foregroundData.put("fromProjectNumber", notification.getFromProjectNumber());
-        foregroundData.put("smallIconAccentColor", notification.getSmallIconAccentColor());
-        foregroundData.put("lockScreenVisibility", notification.getLockScreenVisibility());
-        foregroundData.put("androidNotificationId", notification.getAndroidNotificationId());
+        JSONObject clickData = new JSONObject();
 
-        CallbackHelper.callbackSuccess(jsNotificationInForegroundCallBack, foregroundData);
-      } catch (Throwable t) {
-        t.printStackTrace();
-      }
-    }
-  }
-
-  private static class CordovaNotificationOpenedHandler implements INotificationClickHandler {
-
-    private CallbackContext jsNotificationOpenedCallBack;
-
-    public CordovaNotificationOpenedHandler(CallbackContext inCallbackContext) {
-      jsNotificationOpenedCallBack = inCallbackContext;
-    }
-
-    @Override
-    public void notificationClicked(INotificationClickResult result) {
-      try {
-        JSONObject openedData = new JSONObject();
-
-        if (jsNotificationOpenedCallBack != null) {
-          openedData.put("actionId", result.getAction().getActionId());
-          openedData.put("type", result.getAction().getType());
-          openedData.put("title", result.getNotification().getTitle());
-          openedData.put("message", result.getNotification().getBody());
-          openedData.put("additionalData", result.getNotification().getAdditionalData());
-
-          CallbackHelper.callbackSuccess(jsNotificationOpenedCallBack, openedData);
+        if (jsNotificationClickedCallback != null) {
+          clickData.put("title", notification.getTitle());
+          clickData.put("message", notification.getBody());
+          clickData.put("additionalData", notification.getAdditionalData());
+          
+          CallbackHelper.callbackSuccess(jsNotificationClickedCallback, clickData);
         }
-      } catch (Throwable t) {
-        t.printStackTrace();
+      } catch (JSONException e) {
+        e.printStackTrace();
       }
     }
   }
+    
+  private static class CordovaInAppMessageLifecycleListener implements IInAppMessageLifecycleListener {
+    @Override
+      public void onWillDisplay(IInAppMessageWillDisplayEvent event) {
+        try {
+            JSONObject onWillDisplayResult = new JSONObject();
+            onWillDisplayResult.put("messageId", event.getMessage().getMessageId());
 
-  private static class CordovaInAppMessageClickHandler implements IInAppMessageClickHandler {
+            if (jsInAppMessageWillDisplayCallback != null) {
+              CallbackHelper.callbackSuccess(jsInAppMessageWillDisplayCallback, onWillDisplayResult);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+      }
+      @Override
+      public void onDidDisplay(IInAppMessageDidDisplayEvent event) {
+        try {
+            JSONObject onDidDisplayResult = new JSONObject();
+            onDidDisplayResult.put("messageId", event.getMessage().getMessageId());
 
-    private CallbackContext jsInAppMessageClickedCallback;
+            if (jsInAppMessageDidDisplayCallBack != null) {
+              CallbackHelper.callbackSuccess(jsInAppMessageDidDisplayCallBack, onDidDisplayResult);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+      }
+      @Override
+      public void onWillDismiss(IInAppMessageWillDismissEvent event) {
+        try {
+            JSONObject onWillDismissResult = new JSONObject();
+            onWillDismissResult.put("messageId", event.getMessage().getMessageId());
 
-    public CordovaInAppMessageClickHandler(CallbackContext inCallbackContext) {
+            if (jsInAppMessageWillDismissCallback != null) {
+              CallbackHelper.callbackSuccess(jsInAppMessageWillDismissCallback, onWillDismissResult);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+      }
+      @Override
+      public void onDidDismiss(IInAppMessageDidDismissEvent event) {
+        try {
+            JSONObject onDidDismissResult = new JSONObject();
+            onDidDismissResult.put("messageId", event.getMessage().getMessageId());
+
+            if (jsInAppMessageDidDismissCallBack != null) {
+              CallbackHelper.callbackSuccess(jsInAppMessageDidDismissCallBack, onDidDismissResult);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+      }
+  };
+
+  private static class CordovaInAppMessageClickListener implements IInAppMessageClickListener {
+    public CordovaInAppMessageClickListener(CallbackContext inCallbackContext) {
       jsInAppMessageClickedCallback = inCallbackContext;
     }
 
     @Override
-    public void inAppMessageClicked(IInAppMessageClickResult result) {
+    public void onClick(IInAppMessageClickEvent event) {
       try {
+        IInAppMessageClickResult inAppMessage = event.getResult();
+
         JSONObject clickResults = new JSONObject();
 
-        clickResults.put("isFirstClick", result.getAction().isFirstClick());
-        clickResults.put("closesMessage", result.getAction().getClosesMessage());
-        clickResults.put("clickName", result.getAction().getClickName());
-        clickResults.put("clickUrl", result.getAction().getClickUrl());
+        clickResults.put("actionId", inAppMessage.getActionId());
+        clickResults.put("urlTarget", inAppMessage.getUrlTarget());
+        clickResults.put("url", inAppMessage.getUrl());
+        clickResults.put("closingMessage", inAppMessage.getClosingMessage());
 
         CallbackHelper.callbackSuccess(jsInAppMessageClickedCallback, clickResults);
       }
@@ -586,9 +615,37 @@ public class OneSignalPush extends CordovaPlugin {
     }
   }
 
+  private JSONObject serializeNotification(INotification notification) throws JSONException {
+      JSONObject foregroundData = new JSONObject();
+
+      foregroundData.put("body", notification.getBody());
+      foregroundData.put("sound", notification.getSound());
+      foregroundData.put("title", notification.getTitle());
+      foregroundData.put("launchURL", notification.getLaunchURL());
+      foregroundData.put("rawPayload", notification.getRawPayload());
+      foregroundData.put("actionButtons", notification.getActionButtons());
+      foregroundData.put("additionalData", notification.getAdditionalData());
+      foregroundData.put("notificationId", notification.getNotificationId());
+      foregroundData.put("groupKey", notification.getGroupKey());
+      foregroundData.put("groupMessage", notification.getGroupMessage());
+      foregroundData.put("groupedNotifications", notification.getGroupedNotifications());
+      foregroundData.put("ledColor", notification.getLedColor());
+      foregroundData.put("priority", notification.getPriority());
+      foregroundData.put("smallIcon", notification.getSmallIcon());
+      foregroundData.put("largeIcon", notification.getLargeIcon());
+      foregroundData.put("bigPicture", notification.getBigPicture());
+      foregroundData.put("collapseId", notification.getCollapseId());
+      foregroundData.put("fromProjectNumber", notification.getFromProjectNumber());
+      foregroundData.put("smallIconAccentColor", notification.getSmallIconAccentColor());
+      foregroundData.put("lockScreenVisibility", notification.getLockScreenVisibility());
+      foregroundData.put("androidNotificationId", notification.getAndroidNotificationId());
+
+      return foregroundData;
+  }
+
   @Override
   public void onDestroy() {
-    OneSignal.getNotifications().setNotificationClickHandler(null);
-    OneSignal.getNotifications().setNotificationWillShowInForegroundHandler(null);
+    OneSignal.getNotifications().removeClickListener(cordovaNotificationClickListener);
+    OneSignal.getNotifications().removeForegroundLifecycleListener(this);
   }
 }

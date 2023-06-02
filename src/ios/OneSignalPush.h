@@ -31,12 +31,16 @@
 
 #import <OneSignalFramework/OneSignalFramework.h>
 
-@interface OneSignalPush : CDVPlugin <OSPermissionObserver, OSPushSubscriptionObserver, OSInAppMessageLifecycleHandler>
+@interface OneSignalPush : CDVPlugin <OSNotificationPermissionObserver, OSNotificationLifecycleListener, OSNotificationClickListener, OSPushSubscriptionObserver, OSInAppMessageLifecycleListener, OSInAppMessageClickListener>
 
 - (void)setProvidesNotificationSettingsView:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)setNotificationWillShowInForegroundHandler:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)setNotificationOpenedHandler:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)completeNotification:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)addForegroundLifecycleListener:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)onWillDisplayNotification:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)onClickNotification:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)preventDefault:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)proceedWithWillDisplay:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)displayNotification:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)addNotificationClickListener:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)init:(CDVInvokedUrlCommand* _Nonnull)command;
 
 - (void)setLogLevel:(CDVInvokedUrlCommand* _Nonnull)command;
@@ -67,10 +71,8 @@
 - (void)removeNotification:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)removeGroupedNotifications:(CDVInvokedUrlCommand* _Nonnull)command;
 
-- (void)getPrivacyConsent:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)getRequiresPrivacyConsent:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)setRequiresPrivacyConsent:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)setPrivacyConsent:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)setPrivacyConsentRequired:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)setPrivacyConsentGiven:(CDVInvokedUrlCommand* _Nonnull)command;
 
 // Aliases
 - (void)addAliases:(CDVInvokedUrlCommand* _Nonnull)command;
@@ -87,8 +89,8 @@
 - (void)setLaunchURLsInApp:(CDVInvokedUrlCommand* _Nonnull)command;
 
 // In-App Messages
-- (void)setClickHandler:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)setLifecycleHandler:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)setInAppMessageClickHandler:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)onClickInAppMessage:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)setOnWillDisplayInAppMessageHandler:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)setOnDidDisplayInAppMessageHandler:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)setOnWillDismissInAppMessageHandler:(CDVInvokedUrlCommand* _Nonnull)command;
