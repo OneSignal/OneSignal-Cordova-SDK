@@ -159,17 +159,17 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
 
   @Override
   public void onWillDisplay(INotificationWillDisplayEvent event) {
-      try {
-          INotification notification = event.getNotification();
-          notificationWillDisplayCache.put(notification.getNotificationId(), (INotificationWillDisplayEvent) event);
+    try {
+      INotification notification = event.getNotification();
+      notificationWillDisplayCache.put(notification.getNotificationId(), (INotificationWillDisplayEvent) event);
 
-          event.preventDefault();
+      event.preventDefault();
 
-          JSONObject foregroundData = serializeNotification(notification);
-          CallbackHelper.callbackSuccess(jsNotificationInForegroundCallBack, foregroundData);
-      } catch (Throwable t) {
-          t.printStackTrace();
-      }
+      JSONObject foregroundData = serializeNotification(notification);
+      CallbackHelper.callbackSuccess(jsNotificationInForegroundCallBack, foregroundData);
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
   }
 
   private boolean proceedWithWillDisplay(JSONArray data) {
@@ -531,8 +531,8 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
           
           CallbackHelper.callbackSuccess(jsNotificationClickedCallback, clickData);
         }
-      } catch (Throwable t) {
-        t.printStackTrace();
+      } catch (JSONException e) {
+        e.printStackTrace();
       }
     }
   }
@@ -617,34 +617,31 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
     }
   }
 
-  private JSONObject serializeNotification(INotification notification) {
+  private JSONObject serializeNotification(INotification notification) throws JSONException {
       JSONObject foregroundData = new JSONObject();
 
-      try{
-        foregroundData.put("body", notification.getBody());
-        foregroundData.put("sound", notification.getSound());
-        foregroundData.put("title", notification.getTitle());
-        foregroundData.put("launchURL", notification.getLaunchURL());
-        foregroundData.put("rawPayload", notification.getRawPayload());
-        foregroundData.put("actionButtons", notification.getActionButtons());
-        foregroundData.put("additionalData", notification.getAdditionalData());
-        foregroundData.put("notificationId", notification.getNotificationId());
-        foregroundData.put("groupKey", notification.getGroupKey());
-        foregroundData.put("groupMessage", notification.getGroupMessage());
-        foregroundData.put("groupedNotifications", notification.getGroupedNotifications());
-        foregroundData.put("ledColor", notification.getLedColor());
-        foregroundData.put("priority", notification.getPriority());
-        foregroundData.put("smallIcon", notification.getSmallIcon());
-        foregroundData.put("largeIcon", notification.getLargeIcon());
-        foregroundData.put("bigPicture", notification.getBigPicture());
-        foregroundData.put("collapseId", notification.getCollapseId());
-        foregroundData.put("fromProjectNumber", notification.getFromProjectNumber());
-        foregroundData.put("smallIconAccentColor", notification.getSmallIconAccentColor());
-        foregroundData.put("lockScreenVisibility", notification.getLockScreenVisibility());
-        foregroundData.put("androidNotificationId", notification.getAndroidNotificationId());
-      } catch (JSONException e) {
-        e.printStackTrace();
-      }
+      foregroundData.put("body", notification.getBody());
+      foregroundData.put("sound", notification.getSound());
+      foregroundData.put("title", notification.getTitle());
+      foregroundData.put("launchURL", notification.getLaunchURL());
+      foregroundData.put("rawPayload", notification.getRawPayload());
+      foregroundData.put("actionButtons", notification.getActionButtons());
+      foregroundData.put("additionalData", notification.getAdditionalData());
+      foregroundData.put("notificationId", notification.getNotificationId());
+      foregroundData.put("groupKey", notification.getGroupKey());
+      foregroundData.put("groupMessage", notification.getGroupMessage());
+      foregroundData.put("groupedNotifications", notification.getGroupedNotifications());
+      foregroundData.put("ledColor", notification.getLedColor());
+      foregroundData.put("priority", notification.getPriority());
+      foregroundData.put("smallIcon", notification.getSmallIcon());
+      foregroundData.put("largeIcon", notification.getLargeIcon());
+      foregroundData.put("bigPicture", notification.getBigPicture());
+      foregroundData.put("collapseId", notification.getCollapseId());
+      foregroundData.put("fromProjectNumber", notification.getFromProjectNumber());
+      foregroundData.put("smallIconAccentColor", notification.getSmallIconAccentColor());
+      foregroundData.put("lockScreenVisibility", notification.getLockScreenVisibility());
+      foregroundData.put("androidNotificationId", notification.getAndroidNotificationId());
+
       return foregroundData;
   }
 
