@@ -1,16 +1,19 @@
-import { OpenedEvent } from "./models/NotificationOpened";
-import NotificationReceivedEvent from "./NotificationReceivedEvent";
+import OSNotificationWillDisplayEvent from "./NotificationReceivedEvent";
 import OSNotification from './OSNotification';
+import { NotificationEventName,
+    NotificationEventTypeMap,
+    ClickedEvent 
+ } from "./models/NotificationClicked";
 
 // Suppress TS warnings about window.cordova
 declare let window: any; // turn off type checking
 
 export default class Notifications {
     private _permissionObserverList: ((event:boolean)=>void)[] = [];
-    private _notificationOpenedDelegate = function(notificationOpened: OpenedEvent) {};
-    private _notificationWillShowInForegroundDelegate = function(notificationReceived: NotificationReceivedEvent) {};
+    private _notificationClickedListeners: ((action: ClickedEvent) => void)[] = [];
+    private _notificationWillDisplayListeners: ((notification: OSNotificationWillDisplayEvent) => void)[] = [];
 
-    private _processFunctionList(array: ((event:boolean)=>void)[], param: boolean): void {
+    private _processFunctionList(array: ((event:any)=>void)[], param: any): void {
         for (let i = 0; i < array.length; i++) {
             array[i](param);
         }
@@ -104,7 +107,7 @@ export default class Notifications {
         };
 
         window.cordova.exec(canRequestPermissionCallback, function(){}, "OneSignalPush", "canRequestPermission", []);
-    }
+    };
 
     /**
      * iOS Only
@@ -123,35 +126,53 @@ export default class Notifications {
     };
 
     /**
-     * Sets a handler that will run whenever a notification is opened by the user.
-     * @param  {(openedEvent:OpenedEvent) => void} handler
-     * @returns void
+     * Add event listeners for notification click and/or lifecycle events.
+     * @param event 
+     * @param listener 
+     * @returns 
      */
-    setNotificationOpenedHandler(handler: (openedEvent: OpenedEvent) => void): void {
-        this._notificationOpenedDelegate = handler;
-
-        const notificationOpenedHandler = (json: OpenedEvent) => {
-            this._notificationOpenedDelegate(json);
-        };
-
-        window.cordova.exec(notificationOpenedHandler, function(){}, "OneSignalPush", "setNotificationOpenedHandler", []);
-    };
-
+    addEventListener<K extends NotificationEventName>(event: K, listener: (event: NotificationEventTypeMap[K]) => void): void {
+        if (event === "click") {
+            this._notificationClickedListeners.push(listener as (event: ClickedEvent) => void);
+            const clickParsingHandler = (json: ClickedEvent) => {
+                this._processFunctionList(this._notificationClickedListeners, json);
+            };
+            window.cordova.exec(clickParsingHandler, function(){}, "OneSignalPush", "addNotificationClickListener", []);
+        } else if (event === "foregroundWillDisplay") {
+            this._notificationWillDisplayListeners.push(listener as (event: OSNotificationWillDisplayEvent) => void);
+            const foregroundParsingHandler = (notification: OSNotification) => {
+                this._notificationWillDisplayListeners.forEach(listener => {
+                    listener(new OSNotificationWillDisplayEvent(notification));
+                });
+                window.cordova.exec(function(){}, function(){}, "OneSignalPush", "proceedWithWillDisplay", [notification.notificationId]);
+            };
+            window.cordova.exec(foregroundParsingHandler, function(){}, "OneSignalPush", "addForegroundLifecycleListener", []);
+        } else {
+            return;
+        }
+    }
+    
     /**
-     * Sets the handler to run before displaying a notification while the app is in focus. Use this handler to read notification data and change it or decide if the notification should show or not.
-     * Note: this runs after the Notification Service Extension which can be used to modify the notification before showing it.
-     * @param  {(event:NotificationReceivedEvent)=>void} handler
-     * @returns void
+     * Add event listeners for notification click and/or lifecycle events.
+     * @param event 
+     * @param listener 
+     * @returns 
      */
-    setNotificationWillShowInForegroundHandler(handler: (event: NotificationReceivedEvent) => void): void {
-        this._notificationWillShowInForegroundDelegate = handler;
-
-        const foregroundParsingHandler = (notificationReceived: OSNotification) => {
-            this._notificationWillShowInForegroundDelegate(new NotificationReceivedEvent(notificationReceived));
-        };
-
-        window.cordova.exec(foregroundParsingHandler, function(){}, "OneSignalPush", "setNotificationWillShowInForegroundHandler", []);
-    };
+    removeEventListener<K extends NotificationEventName>(event: K, listener: (obj: NotificationEventTypeMap[K]) => void): void {
+        if (event === "click") {
+            let index = this._notificationClickedListeners.indexOf(listener as (ClickedEvent: ClickedEvent) => void);
+            if (index !== -1) {
+                this._notificationClickedListeners.splice(index, 1);
+            }
+        } else if (event === "foregroundWillDisplay") {
+            let index = this._notificationWillDisplayListeners.indexOf(listener as (event: OSNotificationWillDisplayEvent) => void);
+            if (index !== -1) {
+                this._notificationWillDisplayListeners.splice(index, 1);
+            }
+        } else {
+            return;
+        }
+    }
 
     /**
      * Removes all OneSignal notifications.
