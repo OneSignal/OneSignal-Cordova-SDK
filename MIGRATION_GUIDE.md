@@ -46,7 +46,7 @@ The OneSignal SDK has been updated to be more modular in nature. The SDK has bee
 
 ## Initialization
 
-Initialization of the OneSignal SDK is now completed through the `init` method. A typical initialization now looks similar to below.
+Initialization of the OneSignal SDK is now completed through the `initialize` method. A typical initialization now looks similar to below.
 
 Navigate to your index.ts file, or the first Javascript file that loads with your app.
 
@@ -61,7 +61,7 @@ To the match the new initialization:
 
 **Cordova/Ionic**
 ```typescript
-    window.plugins.OneSignal.init("YOUR_ONESIGNAL_APP_ID");
+    window.plugins.OneSignal.initialize("YOUR_ONESIGNAL_APP_ID");
 ```
 
 If your integration is **not** user-centric, there is no additional startup code required. A device-scoped user *(please see definition of “**device-scoped user**” below in Glossary)* is automatically created as part of the push subscription creation, both of which are only accessible from the current device or through the OneSignal dashboard.

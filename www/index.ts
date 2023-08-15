@@ -52,7 +52,7 @@ export class OneSignalPlugin {
      * @param  {string} appId
      * @returns void
      */
-    init(appId: string): void {
+    initialize(appId: string): void {
         this._appID = appId;
 
         const observerCallback = () => {
