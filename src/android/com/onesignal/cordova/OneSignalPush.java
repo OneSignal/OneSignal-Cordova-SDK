@@ -102,8 +102,6 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
   private static final String REMOVE_NOTIFICATION = "removeNotification";
   private static final String REMOVE_GROUPED_NOTIFICATIONS = "removeGroupedNotifications";
 
-  private static final String SET_LAUNCH_URLS_IN_APP = "setLaunchURLsInApp";
-
   private static final String ADD_EMAIL = "addEmail";
   private static final String REMOVE_EMAIL = "removeEmail";
 
@@ -403,10 +401,6 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
 
       case REMOVE_GROUPED_NOTIFICATIONS:
         result = OneSignalController.removeGroupedNotifications(data);
-        break;
-
-      case SET_LAUNCH_URLS_IN_APP:
-        result = OneSignalController.setLaunchURLsInApp();
         break;
 
       case SET_LOG_LEVEL:

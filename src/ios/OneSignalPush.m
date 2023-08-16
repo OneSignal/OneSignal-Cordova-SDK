@@ -416,11 +416,6 @@ static Class delegateClass = nil;
     [OneSignal.User removeSms:smsNumber];
 }
 
-- (void)setLaunchURLsInApp:(CDVInvokedUrlCommand *)command {
-    BOOL launchInApp = [command.arguments[0] boolValue];
-    [OneSignal setLaunchURLsInApp:launchInApp];
-}
-
 /**
  * In-App Messages
  */

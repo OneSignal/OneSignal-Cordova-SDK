@@ -269,11 +269,6 @@ public class OneSignalController {
       return true;
   }
 
-  public static boolean setLaunchURLsInApp() {
-    // doesn't apply to Android
-    return true;
-  }
-
   /**
    * Privacy consent
    */

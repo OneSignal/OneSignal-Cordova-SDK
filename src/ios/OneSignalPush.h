@@ -85,8 +85,6 @@
 // SMS
 - (void)addSms:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)removeSms:(CDVInvokedUrlCommand* _Nonnull)command;
-    
-- (void)setLaunchURLsInApp:(CDVInvokedUrlCommand* _Nonnull)command;
 
 // In-App Messages
 - (void)setInAppMessageClickHandler:(CDVInvokedUrlCommand* _Nonnull)command;

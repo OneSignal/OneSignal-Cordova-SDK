@@ -81,16 +81,6 @@ export class OneSignalPlugin {
         window.cordova.exec(function () { }, function () { }, "OneSignalPush", "logout");
     }
 
-    /**
-     * iOS only.
-     * This method can be used to set if launch URLs should be opened within the application or in Safari.
-     * @param  {boolean} isEnabled - false will open the link in Safari or user's default browser
-     * @returns void
-     */
-    setLaunchURLsInApp(isEnabled: boolean): void {
-        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "setLaunchURLsInApp", [isEnabled]);
-    };
-
    /**
      * Determines whether a user must consent to privacy prior to their user data being sent up to OneSignal. This should be set to true prior to the invocation of initialization to ensure compliance.
      * @param  {boolean} required
