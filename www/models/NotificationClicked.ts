@@ -1,11 +1,12 @@
 import OSNotification from '../OSNotification';
 import OSNotificationWillDisplayEvent from '../NotificationReceivedEvent';
 
-export type NotificationEventName = "click" | "foregroundWillDisplay";
+export type NotificationEventName = "click" | "foregroundWillDisplay" | "permissionChange";
 
 export type NotificationEventTypeMap = {
   click: ClickedEvent;
   foregroundWillDisplay: OSNotificationWillDisplayEvent;
+  permissionChange: boolean;
 };
 
 // 0 = NotificationClicked, 1 = ButtonClicked

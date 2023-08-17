@@ -30,40 +30,14 @@ export default class Notifications {
         };
         window.cordova.exec(getPermissionCallback, function(){}, "OneSignalPush", "getPermission");
 
-        this.addPermissionObserver(result => {
+        this.addEventListener("permissionChange", result => {
             this._permission = result;
         });
     }
 
     get permission(): boolean {
         return this._permission || false;
-    }  
-
-    /**
-     * Add a callback that fires when the native push permission changes.
-     * @param  {(event: boolean) => void} observer
-     * @returns void
-     */
-    addPermissionObserver(observer: (event: boolean) => void): void {
-        this._permissionObserverList.push(observer);
-        const permissionCallBackProcessor = (state: boolean) => {
-            this._processFunctionList(this._permissionObserverList, state);
-        };
-
-        window.cordova.exec(permissionCallBackProcessor, function(){}, "OneSignalPush", "addPermissionObserver", []);
-    };
-
-    /**
-     * Remove a push permission observer that has been previously added.
-     * @param  {(observer: (event: boolean) => void)} observer
-     * @returns void
-     */
-    removePermissionObserver(observer: (event: boolean) => void): void {
-        let index = this._permissionObserverList.indexOf(observer);
-        if (index !== -1) {
-            this._permissionObserverList.splice(index, 1);
-        }
-    };
+    }
 
     /**
      * Prompt the user for permission to receive push notifications. This will display the native system prompt to request push notification permission.
@@ -126,7 +100,7 @@ export default class Notifications {
     };
 
     /**
-     * Add event listeners for notification click and/or lifecycle events.
+     * Add listeners for notification events.
      * @param event 
      * @param listener 
      * @returns 
@@ -147,13 +121,20 @@ export default class Notifications {
                 window.cordova.exec(function(){}, function(){}, "OneSignalPush", "proceedWithWillDisplay", [notification.notificationId]);
             };
             window.cordova.exec(foregroundParsingHandler, function(){}, "OneSignalPush", "addForegroundLifecycleListener", []);
-        } else {
+        } else if (event === "permissionChange") {
+            this._permissionObserverList.push(listener as (event: boolean) => void);
+            const permissionCallBackProcessor = (state: boolean) => {
+                this._processFunctionList(this._permissionObserverList, state);
+            };
+            window.cordova.exec(permissionCallBackProcessor, function(){}, "OneSignalPush", "addPermissionObserver", []);
+        }
+        else {
             return;
         }
     }
     
     /**
-     * Add event listeners for notification click and/or lifecycle events.
+     * Remove listeners for notification events.
      * @param event 
      * @param listener 
      * @returns 
@@ -169,7 +150,13 @@ export default class Notifications {
             if (index !== -1) {
                 this._notificationWillDisplayListeners.splice(index, 1);
             }
-        } else {
+        } else if (event === "permissionChange") {
+            let index = this._permissionObserverList.indexOf(listener as (event: boolean) => void);
+            if (index !== -1) {
+                this._permissionObserverList.splice(index, 1);
+            }
+        }
+        else {
             return;
         }
     }
