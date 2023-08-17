@@ -57,16 +57,15 @@ public class OneSignalObserverController {
           if (!(pushSubscription instanceof PushSubscriptionState)){
             return;
           }
-
+          
           try {
-            JSONObject pushSubscriptionProperties = new JSONObject();
+            JSONObject hash = new JSONObject();
+            hash.put("current", createPushSubscriptionProperties(state.getCurrent()));
+            hash.put("previous", createPushSubscriptionProperties(state.getPrevious()));
 
-            pushSubscriptionProperties.put("id", pushSubscription.getId());
-            pushSubscriptionProperties.put("token", pushSubscription.getToken());
-            pushSubscriptionProperties.put("optedIn", pushSubscription.getOptedIn());
-
-            callbackSuccess(jsSubscriptionObserverCallBack, pushSubscriptionProperties);
-          } catch (JSONException e) {
+            callbackSuccess(jsSubscriptionObserverCallBack, hash);
+            
+          } catch (Exception e) {
             e.printStackTrace();
           }
         }
@@ -74,5 +73,17 @@ public class OneSignalObserverController {
       OneSignal.getUser().getPushSubscription().addObserver(pushSubscriptionObserver);
     }
     return true;      
+  }
+
+  private static JSONObject createPushSubscriptionProperties(PushSubscriptionState pushSubscription) {
+    JSONObject pushSubscriptionProperties = new JSONObject();
+    try {
+      pushSubscriptionProperties.put("id", pushSubscription.getId());
+      pushSubscriptionProperties.put("token", pushSubscription.getToken());
+      pushSubscriptionProperties.put("optedIn", pushSubscription.getOptedIn());
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return pushSubscriptionProperties;
   }
 }

@@ -170,7 +170,7 @@ static Class delegateClass = nil;
 }
 
 - (void)onPushSubscriptionDidChangeWithState:(OSPushSubscriptionChangedState *)state {
-    successCallback(subscriptionObserverCallbackId, [state.current jsonRepresentation]);
+    successCallback(subscriptionObserverCallbackId, [state jsonRepresentation]);
 }
 
 - (void)setProvidesNotificationSettingsView:(CDVInvokedUrlCommand *)command {
