@@ -28,7 +28,7 @@ export default class Notifications {
         const getPermissionCallback = (obj: {value: boolean}) => {
             this._permission = obj.value;
         };
-        window.cordova.exec(getPermissionCallback, function(){}, "OneSignalPush", "getPermission");
+        window.cordova.exec(getPermissionCallback, function(){}, "OneSignalPush", "getPermissionInternal");
 
         this.addEventListener("permissionChange", result => {
             this._permission = result;

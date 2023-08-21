@@ -63,7 +63,7 @@
 // Notifications
 - (void)addPermissionObserver:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)requestPermission:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)getPermission:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)getPermissionInternal:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)canRequestPermission:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)registerForProvisionalAuthorization:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)clearAllNotifications:(CDVInvokedUrlCommand* _Nonnull)command;

@@ -95,7 +95,7 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
 
   private static final String REGISTER_FOR_PROVISIONAL_AUTHORIZATION = "registerForProvisionalAuthorization";
   private static final String REQUEST_PERMISSION = "requestPermission";
-  private static final String GET_PERMISSION = "getPermission";
+  private static final String GET_PERMISSION_INTERNAL = "getPermissionInternal";
   private static final String CAN_REQUEST_PERMISSION = "canRequestPermission";
 
   private static final String CLEAR_ALL_NOTIFICATIONS = "clearAllNotifications";
@@ -384,8 +384,9 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
         result = OneSignalController.requestPermission(callbackContext, data);
         break;
 
-      case GET_PERMISSION:
-        result = OneSignalController.getPermission(callbackContext);
+      case GET_PERMISSION_INTERNAL:
+        result = OneSignalController.getPermissionInternal(callbackContext);
+        break;
 
       case CAN_REQUEST_PERMISSION:
         result = OneSignalController.canRequestPermission();
