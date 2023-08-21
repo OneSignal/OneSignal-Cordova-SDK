@@ -112,4 +112,31 @@ if (!window.plugins.OneSignal) {
     window.plugins.OneSignal = OneSignal;
 }
 
+// Exporting
+
+export { LogLevel } from "./DebugNamespace";
+export { OSNotification } from './OSNotification';
+export { OSNotificationPermission } from "./NotificationsNamespace";
+export { NotificationWillDisplayEvent } from "./NotificationReceivedEvent";
+
+export {
+    PushSubscriptionState,
+    PushSubscriptionChangedState
+} from "./PushSubscriptionNamespace"
+
+export {
+    NotificationClickEvent,
+    NotificationClickResult,
+} from "./models/NotificationClicked";
+
+export {
+    OSInAppMessage,
+    InAppMessageWillDisplayEvent,
+    InAppMessageDidDisplayEvent,
+    InAppMessageWillDismissEvent,
+    InAppMessageDidDismissEvent,
+    InAppMessageClickEvent,
+    InAppMessageClickResult
+} from "./models/InAppMessage";
+
 export default OneSignal;
