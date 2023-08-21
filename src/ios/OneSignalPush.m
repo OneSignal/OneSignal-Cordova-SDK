@@ -345,6 +345,14 @@ static Class delegateClass = nil;
     } fallbackToSettings:[command.arguments[0] boolValue]];
 }
 
+- (void)permissionNative:(CDVInvokedUrlCommand*)command {
+    OSNotificationPermission permissionNative = [OneSignal.Notifications permissionNative];
+    NSDictionary *result = @{
+            @"permissionNative" : @(permissionNative)
+    };
+    successCallback(command.callbackId, result);
+}
+
 - (void)getPermissionInternal:(CDVInvokedUrlCommand*)command {
     bool isPermitted = [OneSignal.Notifications permission];
     NSDictionary *result = @{

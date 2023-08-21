@@ -8,6 +8,14 @@ import { NotificationEventName,
 // Suppress TS warnings about window.cordova
 declare let window: any; // turn off type checking
 
+export enum OSNotificationPermission {
+    NotDetermined = 0,
+    Denied,
+    Authorized,
+    Provisional, // only available in iOS 12
+    Ephemeral, // only available in iOS 14
+}
+
 export default class Notifications {
     private _permissionObserverList: ((event:boolean)=>void)[] = [];
     private _notificationClickedListeners: ((action: ClickedEvent) => void)[] = [];
@@ -37,6 +45,25 @@ export default class Notifications {
 
     get permission(): boolean {
         return this._permission || false;
+    }
+
+    /** iOS Only.
+     * Returns to the handler the enum for the native permission of the device. It will be one of:
+     * OSNotificationPermissionNotDetermined,
+     * OSNotificationPermissionDenied,
+     * OSNotificationPermissionAuthorized,
+     * OSNotificationPermissionProvisional - only available in iOS 12,
+     * OSNotificationPermissionEphemeral - only available in iOS 14
+     *
+     * @param {(value: OSNotificationPermission) => void} handler
+     * @returns void
+     *
+     * */
+    permissionNative(handler: (value: OSNotificationPermission) => void): void {
+        const permissionNativeCallback = (obj: { permissionNative: OSNotificationPermission }) => {
+            handler(obj.permissionNative);
+        };
+        window.cordova.exec(permissionNativeCallback, function(){}, "OneSignalPush", "permissionNative", []);
     }
 
     /**

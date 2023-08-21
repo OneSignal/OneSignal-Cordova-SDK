@@ -269,6 +269,18 @@ public class OneSignalController {
       return true;
   }
 
+  public static boolean permissionNative(CallbackContext callbackContext) {
+    boolean granted = OneSignal.getNotifications().getPermission();
+    try {
+      JSONObject result = new JSONObject();
+      result.put("permissionNative", granted ? 2 : 1);
+      CallbackHelper.callbackSuccess(callbackContext, result);
+    } catch (JSONException e){
+      e.printStackTrace();
+    }
+    return true;
+  }
+
   /**
    * Privacy consent
    */
