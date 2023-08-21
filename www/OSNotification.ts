@@ -3,7 +3,7 @@ declare let cordova: any;
 // Suppress TS warnings about window.cordova
 declare let window: any; // turn off type checking
 
-export default class OSNotification {
+export class OSNotification {
     body                : string;
     sound               ?: string;
     title               ?: string;

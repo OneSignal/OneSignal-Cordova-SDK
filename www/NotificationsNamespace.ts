@@ -1,8 +1,8 @@
-import OSNotificationWillDisplayEvent from "./NotificationReceivedEvent";
-import OSNotification from './OSNotification';
+import { NotificationWillDisplayEvent } from "./NotificationReceivedEvent";
+import { OSNotification } from './OSNotification';
 import { NotificationEventName,
     NotificationEventTypeMap,
-    ClickedEvent 
+    NotificationClickEvent,
  } from "./models/NotificationClicked";
 
 // Suppress TS warnings about window.cordova
@@ -18,8 +18,8 @@ export enum OSNotificationPermission {
 
 export default class Notifications {
     private _permissionObserverList: ((event:boolean)=>void)[] = [];
-    private _notificationClickedListeners: ((action: ClickedEvent) => void)[] = [];
-    private _notificationWillDisplayListeners: ((notification: OSNotificationWillDisplayEvent) => void)[] = [];
+    private _notificationClickedListeners: ((event: NotificationClickEvent) => void)[] = [];
+    private _notificationWillDisplayListeners: ((event: NotificationWillDisplayEvent) => void)[] = [];
 
     private _processFunctionList(array: ((event:any)=>void)[], param: any): void {
         for (let i = 0; i < array.length; i++) {
@@ -134,16 +134,16 @@ export default class Notifications {
      */
     addEventListener<K extends NotificationEventName>(event: K, listener: (event: NotificationEventTypeMap[K]) => void): void {
         if (event === "click") {
-            this._notificationClickedListeners.push(listener as (event: ClickedEvent) => void);
-            const clickParsingHandler = (json: ClickedEvent) => {
+            this._notificationClickedListeners.push(listener as (event: NotificationClickEvent) => void);
+            const clickParsingHandler = (json: NotificationClickEvent) => {
                 this._processFunctionList(this._notificationClickedListeners, json);
             };
             window.cordova.exec(clickParsingHandler, function(){}, "OneSignalPush", "addNotificationClickListener", []);
         } else if (event === "foregroundWillDisplay") {
-            this._notificationWillDisplayListeners.push(listener as (event: OSNotificationWillDisplayEvent) => void);
+            this._notificationWillDisplayListeners.push(listener as (event: NotificationWillDisplayEvent) => void);
             const foregroundParsingHandler = (notification: OSNotification) => {
                 this._notificationWillDisplayListeners.forEach(listener => {
-                    listener(new OSNotificationWillDisplayEvent(notification));
+                    listener(new NotificationWillDisplayEvent(notification));
                 });
                 window.cordova.exec(function(){}, function(){}, "OneSignalPush", "proceedWithWillDisplay", [notification.notificationId]);
             };
@@ -168,12 +168,12 @@ export default class Notifications {
      */
     removeEventListener<K extends NotificationEventName>(event: K, listener: (obj: NotificationEventTypeMap[K]) => void): void {
         if (event === "click") {
-            let index = this._notificationClickedListeners.indexOf(listener as (ClickedEvent: ClickedEvent) => void);
+            let index = this._notificationClickedListeners.indexOf(listener as (event: NotificationClickEvent) => void);
             if (index !== -1) {
                 this._notificationClickedListeners.splice(index, 1);
             }
         } else if (event === "foregroundWillDisplay") {
-            let index = this._notificationWillDisplayListeners.indexOf(listener as (event: OSNotificationWillDisplayEvent) => void);
+            let index = this._notificationWillDisplayListeners.indexOf(listener as (event: NotificationWillDisplayEvent) => void);
             if (index !== -1) {
                 this._notificationWillDisplayListeners.splice(index, 1);
             }

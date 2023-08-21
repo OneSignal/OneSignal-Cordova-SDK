@@ -1,11 +1,11 @@
-import OSNotification from './OSNotification';
+import { OSNotification } from './OSNotification';
 
 declare let cordova: any;
 // Suppress TS warnings about window.cordova
 
 declare let window: any; // turn off type checking
 
-export default class OSNotificationWillDisplayEvent {
+export class NotificationWillDisplayEvent {
     private notification: OSNotification;
 
     constructor(displayEvent: OSNotification) {

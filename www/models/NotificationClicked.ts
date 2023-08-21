@@ -1,21 +1,18 @@
-import OSNotification from '../OSNotification';
-import OSNotificationWillDisplayEvent from '../NotificationReceivedEvent';
+import { OSNotification } from '../OSNotification';
+import { NotificationWillDisplayEvent } from '../NotificationReceivedEvent';
 
 export type NotificationEventName = "click" | "foregroundWillDisplay" | "permissionChange";
 
 export type NotificationEventTypeMap = {
-  click: ClickedEvent;
-  foregroundWillDisplay: OSNotificationWillDisplayEvent;
+  click: NotificationClickEvent;
+  foregroundWillDisplay: NotificationWillDisplayEvent;
   permissionChange: boolean;
 };
 
-// 0 = NotificationClicked, 1 = ButtonClicked
-export type ClickedEventActionType = 0 | 1;
-
 /// An instance of this class represents a user interaction with
 /// your push notification, ie. if they tap a button
-export interface ClickedEvent {
-    action          : ClickedEventAction;
+export interface NotificationClickEvent {
+    result          : NotificationClickResult;
     notification    : OSNotification;
 }
 
@@ -23,7 +20,7 @@ export interface ClickedEvent {
 /// tapping the notification (or a button on the notification),
 /// or if your `inFocusDisplayType` is set to true - if they
 /// tapped 'close'.
-export interface ClickedEventAction {
+export interface NotificationClickResult {
     actionId   ?: string;
-    type       : ClickedEventActionType;
+    url        ?: string;
 }
