@@ -180,10 +180,6 @@ export default class InAppMessages {
      * @returns void
      */
     isPaused(handler: (value: boolean) => void): void {
-        const isPausedCallback = (obj: {value: boolean}) => {
-            handler(obj.value);
-        };
-        
-        window.cordova.exec(isPausedCallback, function(){}, "OneSignalPush", "isPaused", []);
+        window.cordova.exec(handler, function(){}, "OneSignalPush", "isPaused", []);
     };
 }

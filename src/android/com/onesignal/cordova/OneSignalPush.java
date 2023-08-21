@@ -332,6 +332,7 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
       
       case LOGOUT:
         result = OneSignalController.logout();
+        break;
 
       case ADD_PERMISSION_OBSERVER:
         result = OneSignalObserverController.addPermissionObserver(callbackContext);

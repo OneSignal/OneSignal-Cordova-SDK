@@ -502,10 +502,7 @@ static Class delegateClass = nil;
 
 - (void)isPaused:(CDVInvokedUrlCommand*)command {
     bool paused = [OneSignal.InAppMessages paused];
-    NSDictionary *result = @{
-            @"value" : @(paused)
-    };
-    successCallback(command.callbackId, result);
+    successCallbackBoolean(command.callbackId, paused);
 }
 
 /**
