@@ -264,8 +264,16 @@ public class OneSignalController {
     return true;
   }
 
-  public static boolean canRequestPermission() {
-      // doesn't apply to Android 5.0.0-beta1?
+  public static boolean canRequestPermission(CallbackContext callbackContext) {
+    boolean canRequest = OneSignal.getNotifications().getCanRequestPermission();
+    try {
+      JSONObject canRequestObj = new JSONObject ();
+      canRequestObj.put("value", canRequest);
+
+      CallbackHelper.callbackSuccess(callbackContext, canRequestObj);
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
       return true;
   }
 

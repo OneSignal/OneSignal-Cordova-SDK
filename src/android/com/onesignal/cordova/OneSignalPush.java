@@ -395,7 +395,7 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
         break;
 
       case CAN_REQUEST_PERMISSION:
-        result = OneSignalController.canRequestPermission();
+        result = OneSignalController.canRequestPermission(callbackContext);
         break;
       
       case CLEAR_ALL_NOTIFICATIONS:
