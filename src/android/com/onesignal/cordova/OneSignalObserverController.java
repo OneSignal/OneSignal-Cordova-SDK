@@ -22,16 +22,6 @@ public class OneSignalObserverController {
   private static IPermissionObserver permissionObserver;
   private static IPushSubscriptionObserver pushSubscriptionObserver;
 
-  // This is to prevent an issue where if two Javascript calls are made to OneSignal expecting a callback then only one would fire.
-  private static void callbackSuccess(CallbackContext callbackContext, JSONObject jsonObject) {
-    if (jsonObject == null) // in case there are no data
-      jsonObject = new JSONObject();
-
-    PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jsonObject);
-    pluginResult.setKeepCallback(true);
-    callbackContext.sendPluginResult(pluginResult);
-  }
-
   public static boolean addPermissionObserver(CallbackContext callbackContext) {
     jsPermissionObserverCallBack = callbackContext;
     if (permissionObserver == null) {
@@ -63,7 +53,7 @@ public class OneSignalObserverController {
             hash.put("current", createPushSubscriptionProperties(state.getCurrent()));
             hash.put("previous", createPushSubscriptionProperties(state.getPrevious()));
 
-            callbackSuccess(jsSubscriptionObserverCallBack, hash);
+            CallbackHelper.callbackSuccess(jsSubscriptionObserverCallBack, hash);
             
           } catch (Exception e) {
             e.printStackTrace();

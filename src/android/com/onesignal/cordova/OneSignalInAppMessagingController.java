@@ -16,16 +16,6 @@ import java.util.Map;
 
 public class OneSignalInAppMessagingController {
 
-    // This is to prevent an issue where if two Javascript calls are made to OneSignal expecting a callback then only one would fire.
-    private static void callbackSuccess(CallbackContext callbackContext, JSONObject jsonObject) {
-        if (jsonObject == null) // in case there are no data
-            jsonObject = new JSONObject();
-
-        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jsonObject);
-        pluginResult.setKeepCallback(true);
-        callbackContext.sendPluginResult(pluginResult);
-    }
-
     public static boolean addTriggers(JSONArray data) {
         try {
             JSONObject triggersObject = data.getJSONObject(0);
