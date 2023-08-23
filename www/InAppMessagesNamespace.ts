@@ -4,8 +4,7 @@ import {InAppMessageEventTypeMap,
     InAppMessageDidDisplayEvent, 
     InAppMessageWillDismissEvent, 
     InAppMessageDidDismissEvent,
-    InAppMessageClickEvent, 
-    InAppMessageClickResult
+    InAppMessageClickEvent,
 } from "./models/InAppMessage";
 
 // Suppress TS warnings about window.cordova
@@ -33,7 +32,7 @@ export default class InAppMessages {
     addEventListener<K extends InAppMessageEventName>(event: K, listener: (event: InAppMessageEventTypeMap[K]) => void): void {
         if (event === "click") {
             this._inAppMessageClickListeners.push(listener as (event: InAppMessageClickEvent) => void);
-            const inAppMessageClickListener = (json: InAppMessageClickResult) => {
+            const inAppMessageClickListener = (json: InAppMessageClickEvent) => {
                 this._processFunctionList(this._inAppMessageClickListeners, json);
             };
             window.cordova.exec(inAppMessageClickListener, function () {}, "OneSignalPush", "setInAppMessageClickHandler", []);
