@@ -136,7 +136,8 @@ export {
     InAppMessageWillDismissEvent,
     InAppMessageDidDismissEvent,
     InAppMessageClickEvent,
-    InAppMessageClickResult
+    InAppMessageClickResult,
+    InAppMessageActionUrlType,
 } from "./models/InAppMessage";
 
 export default OneSignal;

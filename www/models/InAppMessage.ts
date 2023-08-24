@@ -17,7 +17,13 @@ export interface InAppMessageClickResult {
     closingMessage      : boolean;
     actionId            ?: string;
     url                 ?: string;
-    urlTarget           ?: string;
+    urlTarget           ?: InAppMessageActionUrlType;
+}
+
+export enum InAppMessageActionUrlType {
+    Browser         = "browser",
+    InAppWebview    = "webview",
+    ReplaceContent  = "replacement",
 }
 
 export interface InAppMessageWillDisplayEvent {

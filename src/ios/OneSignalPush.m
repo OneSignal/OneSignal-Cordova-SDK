@@ -417,9 +417,34 @@ static Class delegateClass = nil;
  * In-App Messages
  */
 
- - (void)onClickInAppMessage:(OSInAppMessageClickEvent * _Nonnull)event {
+- (void)onClickInAppMessage:(OSInAppMessageClickEvent * _Nonnull)event {
     if (inAppMessageClickedCallbackId != nil) {
-        successCallback(inAppMessageClickedCallbackId, [event jsonRepresentation]);
+        NSInteger urlTargetInt = event.result.urlTarget;
+        NSString *urlTarget;
+        switch (urlTargetInt) {
+            case 0:
+                urlTarget = @"browser";
+                break;
+            case 1:
+                urlTarget = @"webview";
+                break;
+            case 2:
+                urlTarget = @"replacement";
+                break;
+        }
+
+        NSMutableDictionary *clickResultDict = [NSMutableDictionary new];
+        clickResultDict[@"actionId"] = event.result.actionId;
+        clickResultDict[@"urlTarget"] = urlTarget;
+        clickResultDict[@"closingMessage"] = @(event.result.closingMessage);
+        clickResultDict[@"url"] = event.result.url;
+
+        NSDictionary *json = @{
+            @"message" : [event.message jsonRepresentation],
+            @"result": clickResultDict
+        };
+
+        successCallback(inAppMessageClickedCallbackId, json);
     }
 }
 
