@@ -46,15 +46,7 @@ NSString* inAppMessageWillDismissCallbackId;
 NSString* inAppMessageDidDismissCallbackId;
 NSString* inAppMessageClickedCallbackId;
 
-NSString* addInAppMessageClickListenerCallbackId;
-NSString* addInAppMessageLifecyleListenerCallbackId;
-
-NSString* removeOnDidDismissInAppMessageCallbackId;
-NSString* removeOnWillDismissInAppMessageCallbackId;
-NSString* removeOnDidDisplayInAppMessageCallbackId;
-NSString* removeOnWillDisplayInAppMessageCallbackId;
-
-OSNotificationClickResult *actionNotification;
+OSNotificationClickEvent *actionNotification;
 OSNotification *notification;
 
 id <CDVCommandDelegate> pluginCommandDelegate;
@@ -92,15 +84,9 @@ void processForegroundLifecycleListener(OSNotificationWillDisplayEvent* _notif) 
     }
 }
 
-void processNotificationClicked(OSNotificationClickEvent* result) {
-    NSString * data = [result stringify];
-    NSError *jsonError;
-    NSData *objectData = [data dataUsingEncoding:NSUTF8StringEncoding];
-    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:objectData
-                                                         options:NSJSONReadingMutableContainers
-                                                           error:&jsonError];
-    if(!jsonError) {
-        successCallback(notificationClickedCallbackId, json);
+void processNotificationClicked(OSNotificationClickEvent* event) {
+    if (notificationClickedCallbackId != nil) {
+        successCallback(notificationClickedCallbackId, [event jsonRepresentation]);
         actionNotification = nil;
     }
 }
@@ -220,8 +206,11 @@ static Class delegateClass = nil;
 }
 
 - (void)addForegroundLifecycleListener:(CDVInvokedUrlCommand*)command {
+    bool first = notificationWillShowInForegoundCallbackId  == nil;
     notificationWillShowInForegoundCallbackId = command.callbackId;
-    [OneSignal.Notifications addForegroundLifecycleListener:self];
+    if (first) {
+        [OneSignal.Notifications addForegroundLifecycleListener:self];
+    }
 }
 
 - (void)onClickNotification:(OSNotificationClickEvent * _Nonnull)event {
@@ -429,13 +418,9 @@ static Class delegateClass = nil;
  */
 
  - (void)onClickInAppMessage:(OSInAppMessageClickEvent * _Nonnull)event {
-    NSDictionary *response = @{
-        @"actionId": event.result.actionId ?: [NSNull null],
-        @"url": event.result.url ?: [NSNull null],
-        @"urlTarget": @(event.result.urlTarget),
-        @"closingMessage": @(event.result.closingMessage),
-    };
-    successCallback(inAppMessageClickedCallbackId, response);
+    if (inAppMessageClickedCallbackId != nil) {
+        successCallback(inAppMessageClickedCallbackId, [event jsonRepresentation]);
+    }
 }
 
 - (void)setInAppMessageClickHandler:(CDVInvokedUrlCommand*)command {
@@ -460,25 +445,25 @@ static Class delegateClass = nil;
 
 - (void)onWillDisplayInAppMessage:(OSInAppMessageWillDisplayEvent * _Nonnull)event {
     if (inAppMessageWillDisplayCallbackId != nil) {
-        successCallback(inAppMessageWillDisplayCallbackId, [event.message jsonRepresentation]);
+        successCallback(inAppMessageWillDisplayCallbackId, [event jsonRepresentation]);
     }
 }
 
 - (void)onDidDisplayInAppMessage:(OSInAppMessageDidDisplayEvent * _Nonnull)event {
     if (inAppMessageDidDisplayCallbackId != nil) {
-        successCallback(inAppMessageDidDisplayCallbackId, [event.message jsonRepresentation]);
+        successCallback(inAppMessageDidDisplayCallbackId, [event jsonRepresentation]);
     }
 }
 
 - (void)onWillDismissInAppMessage:(OSInAppMessageWillDismissEvent * _Nonnull)event {
     if (inAppMessageWillDismissCallbackId != nil) {
-        successCallback(inAppMessageWillDismissCallbackId, [event.message jsonRepresentation]);
+        successCallback(inAppMessageWillDismissCallbackId, [event jsonRepresentation]);
     }
 }
 
 - (void)onDidDismissInAppMessage:(OSInAppMessageDidDismissEvent * _Nonnull)event {
     if (inAppMessageDidDismissCallbackId != nil) {
-        successCallback(inAppMessageDidDismissCallbackId, [event.message jsonRepresentation]);
+        successCallback(inAppMessageDidDismissCallbackId, [event jsonRepresentation]);
     }
 }
 
