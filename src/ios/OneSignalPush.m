@@ -65,6 +65,12 @@ void successCallbackBoolean(NSString* callbackId, bool param) {
     [pluginCommandDelegate sendPluginResult:commandResult callbackId:callbackId];
 }
 
+void successCallbackNSInteger(NSString* callbackId, int param) {
+    CDVPluginResult* commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsNSInteger:param];
+    commandResult.keepCallback = @1;
+    [pluginCommandDelegate sendPluginResult:commandResult callbackId:callbackId];
+}
+
 void failureCallback(NSString* callbackId, NSDictionary* data) {
     CDVPluginResult* commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:data];
     commandResult.keepCallback = @1;
@@ -336,10 +342,7 @@ static Class delegateClass = nil;
 
 - (void)permissionNative:(CDVInvokedUrlCommand*)command {
     OSNotificationPermission permissionNative = [OneSignal.Notifications permissionNative];
-    NSDictionary *result = @{
-            @"permissionNative" : @(permissionNative)
-    };
-    successCallback(command.callbackId, result);
+    successCallbackNSInteger(command.callbackId, permissionNative);
 }
 
 - (void)getPermissionInternal:(CDVInvokedUrlCommand*)command {
@@ -352,10 +355,7 @@ static Class delegateClass = nil;
 
 - (void)canRequestPermission:(CDVInvokedUrlCommand*)command {
     bool canRequest = [OneSignal.Notifications canRequestPermission];
-    NSDictionary *result = @{
-            @"value" : @(canRequest)
-    };
-    successCallback(command.callbackId, result);
+    successCallbackBoolean(command.callbackId, canRequest);
 }
 
 - (void)registerForProvisionalAuthorization:(CDVInvokedUrlCommand *)command {

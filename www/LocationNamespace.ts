@@ -23,12 +23,13 @@ export default class Location {
         window.cordova.exec(function() {}, function() {}, "OneSignalPush", "setLocationShared", [shared]);
     };
 
-     /**
+    /**
      * Whether location is currently shared with OneSignal.
-     * @param  {(response: boolean) => void} handler
-     * @returns void
+     * @returns {Promise<boolean>}
      */
-     isShared(handler: (response: boolean) => void): void {
-        window.cordova.exec(handler, function(){}, "OneSignalPush", "isLocationShared", []);
+     isShared(): Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
+            window.cordova.exec(resolve, reject, "OneSignalPush", "isLocationShared", []);
+        });
     };
 }

@@ -48,66 +48,46 @@ export default class Notifications {
     }
 
     /** iOS Only.
-     * Returns to the handler the enum for the native permission of the device. It will be one of:
+     * Returns the enum for the native permission of the device. It will be one of:
      * OSNotificationPermissionNotDetermined,
      * OSNotificationPermissionDenied,
      * OSNotificationPermissionAuthorized,
      * OSNotificationPermissionProvisional - only available in iOS 12,
      * OSNotificationPermissionEphemeral - only available in iOS 14
      *
-     * @param {(value: OSNotificationPermission) => void} handler
-     * @returns void
+     * @returns {Promise<OSNotificationPermission>}
      *
      * */
-    permissionNative(handler: (value: OSNotificationPermission) => void): void {
-        const permissionNativeCallback = (obj: { permissionNative: OSNotificationPermission }) => {
-            handler(obj.permissionNative);
-        };
-        window.cordova.exec(permissionNativeCallback, function(){}, "OneSignalPush", "permissionNative", []);
+    permissionNative(): Promise<OSNotificationPermission> {
+        return new Promise<OSNotificationPermission>((resolve, reject) => {
+            window.cordova.exec(resolve, reject, "OneSignalPush", "permissionNative", []);
+        });
     }
 
     /**
      * Prompt the user for permission to receive push notifications. This will display the native system prompt to request push notification permission.
      * Use the fallbackToSettings parameter to prompt to open the settings app if a user has already declined push permissions.
      *
-     * Call with requestPermission(fallbackToSettings?, handler?)
      *
      * @param  {boolean} fallbackToSettings
-     * @param  {(response:boolean)=>void} handler
-     * @returns void
+     * @returns {Promise<boolean>}
      */
-    requestPermission(fallbackToSettingsOrHandler?: boolean | ((response: boolean) => void), handler?: (response: boolean) => void): void {
-        var fallbackToSettings = false;
+    requestPermission(fallbackToSettings?: boolean): Promise<boolean> {
+        let fallback = fallbackToSettings ?? false;
 
-        if (typeof fallbackToSettingsOrHandler === "function") {
-            // Method was called like requestPermission(handler: function)
-            handler = fallbackToSettingsOrHandler;
-        }
-        else if (typeof fallbackToSettingsOrHandler === "boolean") {
-            // Method was called like requestPermission(fallbackToSettings: boolean, handler?: function)
-            fallbackToSettings = fallbackToSettingsOrHandler;
-        }
-        // Else method was called like requestPermission(), no need to modify
-
-        const internalCallback = (response: boolean) => {
-            if (handler) {
-                handler(response);
-            }
-        };
-        window.cordova.exec(internalCallback, function(){}, "OneSignalPush", "requestPermission", [fallbackToSettings]);
+        return new Promise<boolean>((resolve, reject) => {
+            window.cordova.exec(resolve, reject, "OneSignalPush", "requestPermission", [fallback]);
+        });
     };
 
     /**
      * Whether attempting to request notification permission will show a prompt. Returns true if the device has not been prompted for push notification permission already.
-     * @param {(value: boolean) => void} handler
-     * @returns void
+     * @returns {Promise<boolean>}
      */
-    canRequestPermission(handler: (value: boolean) => void): void {
-        const canRequestPermissionCallback = (obj: {value: boolean}) => {
-            handler(obj.value);
-        };
-
-        window.cordova.exec(canRequestPermissionCallback, function(){}, "OneSignalPush", "canRequestPermission", []);
+    canRequestPermission(): Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
+            window.cordova.exec(resolve, reject, "OneSignalPush", "canRequestPermission", []);
+        });
     };
 
     /**
@@ -201,6 +181,7 @@ export default class Notifications {
      */
     
     /**
+     * Android only.
      * Cancels a single OneSignal notification based on its Android notification integer ID. Use instead of Android's [android.app.NotificationManager.cancel], otherwise the notification will be restored when your app is restarted.
      * @param  {number} id - notification id to cancel
      * @returns void
@@ -210,6 +191,7 @@ export default class Notifications {
     };
 
     /**
+     * Android only.
      * Cancels a group of OneSignal notifications with the provided group key. Grouping notifications is a OneSignal concept, there is no [android.app.NotificationManager] equivalent.
      * @param  {string} id - notification group id to cancel
      * @returns void

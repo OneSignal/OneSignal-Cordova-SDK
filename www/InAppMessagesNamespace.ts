@@ -175,10 +175,11 @@ export default class InAppMessages {
 
     /**
      * Whether in-app messaging is currently paused.
-     * @param  {(value: boolean) => void} handler
-     * @returns void
+     * @returns {Promise<boolean>}
      */
-    isPaused(handler: (value: boolean) => void): void {
-        window.cordova.exec(handler, function(){}, "OneSignalPush", "isPaused", []);
+    getPaused(): Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
+            window.cordova.exec(resolve, reject, "OneSignalPush", "isPaused", []);
+        });
     };
 }

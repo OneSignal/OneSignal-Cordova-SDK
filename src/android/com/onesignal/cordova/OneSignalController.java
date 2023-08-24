@@ -266,26 +266,13 @@ public class OneSignalController {
 
   public static boolean canRequestPermission(CallbackContext callbackContext) {
     boolean canRequest = OneSignal.getNotifications().getCanRequestPermission();
-    try {
-      JSONObject canRequestObj = new JSONObject ();
-      canRequestObj.put("value", canRequest);
-
-      CallbackHelper.callbackSuccess(callbackContext, canRequestObj);
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-      return true;
+    CallbackHelper.callbackSuccessBoolean(callbackContext, canRequest);
+    return true;
   }
 
   public static boolean permissionNative(CallbackContext callbackContext) {
     boolean granted = OneSignal.getNotifications().getPermission();
-    try {
-      JSONObject result = new JSONObject();
-      result.put("permissionNative", granted ? 2 : 1);
-      CallbackHelper.callbackSuccess(callbackContext, result);
-    } catch (JSONException e){
-      e.printStackTrace();
-    }
+    CallbackHelper.callbackSuccessInt(callbackContext, granted ? 2 : 1);
     return true;
   }
 
