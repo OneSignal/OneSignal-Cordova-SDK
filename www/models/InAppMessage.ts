@@ -20,11 +20,7 @@ export interface InAppMessageClickResult {
     urlTarget           ?: InAppMessageActionUrlType;
 }
 
-export enum InAppMessageActionUrlType {
-    Browser         = "browser",
-    InAppWebview    = "webview",
-    ReplaceContent  = "replacement",
-}
+export type InAppMessageActionUrlType = "browser" | "webview" | "replacement"
 
 export interface InAppMessageWillDisplayEvent {
     message : OSInAppMessage
