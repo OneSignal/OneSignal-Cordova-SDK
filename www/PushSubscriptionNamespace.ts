@@ -72,7 +72,12 @@ export default class PushSubscription {
     get token(): string | null | undefined {
         return this._token;
     }
-
+    /**
+     * Gets a boolean value indicating whether the current user is opted in to push notifications.
+     * This returns true when the app has notifications permission and optOut() is NOT called.
+     * Note: Does not take into account the existence of the subscription ID and push token.
+     * This boolean may return true but push notifications may still not be received by the user.
+     */
     get optedIn(): boolean {
         return this._optedIn || false;
     }

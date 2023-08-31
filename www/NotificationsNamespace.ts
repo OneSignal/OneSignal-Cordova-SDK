@@ -43,7 +43,7 @@ export default class Notifications {
         });
     }
 
-    get permission(): boolean {
+    hasPermission(): boolean {
         return this._permission || false;
     }
 
