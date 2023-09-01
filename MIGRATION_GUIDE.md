@@ -50,6 +50,8 @@ In your Project Root > ios > Podfile, update the notification service extension:
 Close Xcode. While still in the ios directory, run `pod install --repo-update`.
 
 # API Changes
+**Note: If you are using Cordova, please prepend all calls to `OneSignal` with `window.plugins.OneSignal`.**
+
 ## Namespaces
 
 The OneSignal SDK has been updated to be more modular in nature. The SDK has been split into namespaces, and functionality previously in the static `OneSignal` class has been moved to the appropriate namespace. The namespaces and how to access them in code are as follows:
