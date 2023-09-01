@@ -46,15 +46,7 @@ NSString* inAppMessageWillDismissCallbackId;
 NSString* inAppMessageDidDismissCallbackId;
 NSString* inAppMessageClickedCallbackId;
 
-NSString* addInAppMessageClickListenerCallbackId;
-NSString* addInAppMessageLifecyleListenerCallbackId;
-
-NSString* removeOnDidDismissInAppMessageCallbackId;
-NSString* removeOnWillDismissInAppMessageCallbackId;
-NSString* removeOnDidDisplayInAppMessageCallbackId;
-NSString* removeOnWillDisplayInAppMessageCallbackId;
-
-OSNotificationClickResult *actionNotification;
+OSNotificationClickEvent *actionNotification;
 OSNotification *notification;
 
 id <CDVCommandDelegate> pluginCommandDelegate;
@@ -69,6 +61,12 @@ void successCallback(NSString* callbackId, NSDictionary* data) {
 
 void successCallbackBoolean(NSString* callbackId, bool param) {
     CDVPluginResult* commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:param];
+    commandResult.keepCallback = @1;
+    [pluginCommandDelegate sendPluginResult:commandResult callbackId:callbackId];
+}
+
+void successCallbackNSInteger(NSString* callbackId, int param) {
+    CDVPluginResult* commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsNSInteger:param];
     commandResult.keepCallback = @1;
     [pluginCommandDelegate sendPluginResult:commandResult callbackId:callbackId];
 }
@@ -92,15 +90,9 @@ void processForegroundLifecycleListener(OSNotificationWillDisplayEvent* _notif) 
     }
 }
 
-void processNotificationClicked(OSNotificationClickEvent* result) {
-    NSString * data = [result stringify];
-    NSError *jsonError;
-    NSData *objectData = [data dataUsingEncoding:NSUTF8StringEncoding];
-    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:objectData
-                                                         options:NSJSONReadingMutableContainers
-                                                           error:&jsonError];
-    if(!jsonError) {
-        successCallback(notificationClickedCallbackId, json);
+void processNotificationClicked(OSNotificationClickEvent* event) {
+    if (notificationClickedCallbackId != nil) {
+        successCallback(notificationClickedCallbackId, [event jsonRepresentation]);
         actionNotification = nil;
     }
 }
@@ -170,7 +162,7 @@ static Class delegateClass = nil;
 }
 
 - (void)onPushSubscriptionDidChangeWithState:(OSPushSubscriptionChangedState *)state {
-    successCallback(subscriptionObserverCallbackId, [state.current jsonRepresentation]);
+    successCallback(subscriptionObserverCallbackId, [state jsonRepresentation]);
 }
 
 - (void)setProvidesNotificationSettingsView:(CDVInvokedUrlCommand *)command {
@@ -220,8 +212,11 @@ static Class delegateClass = nil;
 }
 
 - (void)addForegroundLifecycleListener:(CDVInvokedUrlCommand*)command {
+    bool first = notificationWillShowInForegoundCallbackId  == nil;
     notificationWillShowInForegoundCallbackId = command.callbackId;
-    [OneSignal.Notifications addForegroundLifecycleListener:self];
+    if (first) {
+        [OneSignal.Notifications addForegroundLifecycleListener:self];
+    }
 }
 
 - (void)onClickNotification:(OSNotificationClickEvent * _Nonnull)event {
@@ -345,7 +340,12 @@ static Class delegateClass = nil;
     } fallbackToSettings:[command.arguments[0] boolValue]];
 }
 
-- (void)getPermission:(CDVInvokedUrlCommand*)command {
+- (void)permissionNative:(CDVInvokedUrlCommand*)command {
+    OSNotificationPermission permissionNative = [OneSignal.Notifications permissionNative];
+    successCallbackNSInteger(command.callbackId, permissionNative);
+}
+
+- (void)getPermissionInternal:(CDVInvokedUrlCommand*)command {
     bool isPermitted = [OneSignal.Notifications permission];
     NSDictionary *result = @{
             @"value" : @(isPermitted)
@@ -355,10 +355,7 @@ static Class delegateClass = nil;
 
 - (void)canRequestPermission:(CDVInvokedUrlCommand*)command {
     bool canRequest = [OneSignal.Notifications canRequestPermission];
-    NSDictionary *result = @{
-            @"value" : @(canRequest)
-    };
-    successCallback(command.callbackId, result);
+    successCallbackBoolean(command.callbackId, canRequest);
 }
 
 - (void)registerForProvisionalAuthorization:(CDVInvokedUrlCommand *)command {
@@ -416,23 +413,39 @@ static Class delegateClass = nil;
     [OneSignal.User removeSms:smsNumber];
 }
 
-- (void)setLaunchURLsInApp:(CDVInvokedUrlCommand *)command {
-    BOOL launchInApp = [command.arguments[0] boolValue];
-    [OneSignal setLaunchURLsInApp:launchInApp];
-}
-
 /**
  * In-App Messages
  */
 
- - (void)onClickInAppMessage:(OSInAppMessageClickEvent * _Nonnull)event {
-    NSDictionary *response = @{
-        @"actionId": event.result.actionId ?: [NSNull null],
-        @"url": event.result.url ?: [NSNull null],
-        @"urlTarget": @(event.result.urlTarget),
-        @"closingMessage": @(event.result.closingMessage),
-    };
-    successCallback(inAppMessageClickedCallbackId, response);
+- (void)onClickInAppMessage:(OSInAppMessageClickEvent * _Nonnull)event {
+    if (inAppMessageClickedCallbackId != nil) {
+        NSInteger urlTargetInt = event.result.urlTarget;
+        NSString *urlTarget;
+        switch (urlTargetInt) {
+            case 0:
+                urlTarget = @"browser";
+                break;
+            case 1:
+                urlTarget = @"webview";
+                break;
+            case 2:
+                urlTarget = @"replacement";
+                break;
+        }
+
+        NSMutableDictionary *clickResultDict = [NSMutableDictionary new];
+        clickResultDict[@"actionId"] = event.result.actionId;
+        clickResultDict[@"urlTarget"] = urlTarget;
+        clickResultDict[@"closingMessage"] = @(event.result.closingMessage);
+        clickResultDict[@"url"] = event.result.url;
+
+        NSDictionary *json = @{
+            @"message" : [event.message jsonRepresentation],
+            @"result": clickResultDict
+        };
+
+        successCallback(inAppMessageClickedCallbackId, json);
+    }
 }
 
 - (void)setInAppMessageClickHandler:(CDVInvokedUrlCommand*)command {
@@ -457,25 +470,25 @@ static Class delegateClass = nil;
 
 - (void)onWillDisplayInAppMessage:(OSInAppMessageWillDisplayEvent * _Nonnull)event {
     if (inAppMessageWillDisplayCallbackId != nil) {
-        successCallback(inAppMessageWillDisplayCallbackId, [event.message jsonRepresentation]);
+        successCallback(inAppMessageWillDisplayCallbackId, [event jsonRepresentation]);
     }
 }
 
 - (void)onDidDisplayInAppMessage:(OSInAppMessageDidDisplayEvent * _Nonnull)event {
     if (inAppMessageDidDisplayCallbackId != nil) {
-        successCallback(inAppMessageDidDisplayCallbackId, [event.message jsonRepresentation]);
+        successCallback(inAppMessageDidDisplayCallbackId, [event jsonRepresentation]);
     }
 }
 
 - (void)onWillDismissInAppMessage:(OSInAppMessageWillDismissEvent * _Nonnull)event {
     if (inAppMessageWillDismissCallbackId != nil) {
-        successCallback(inAppMessageWillDismissCallbackId, [event.message jsonRepresentation]);
+        successCallback(inAppMessageWillDismissCallbackId, [event jsonRepresentation]);
     }
 }
 
 - (void)onDidDismissInAppMessage:(OSInAppMessageDidDismissEvent * _Nonnull)event {
     if (inAppMessageDidDismissCallbackId != nil) {
-        successCallback(inAppMessageDidDismissCallbackId, [event.message jsonRepresentation]);
+        successCallback(inAppMessageDidDismissCallbackId, [event jsonRepresentation]);
     }
 }
 
@@ -499,10 +512,7 @@ static Class delegateClass = nil;
 
 - (void)isPaused:(CDVInvokedUrlCommand*)command {
     bool paused = [OneSignal.InAppMessages paused];
-    NSDictionary *result = @{
-            @"value" : @(paused)
-    };
-    successCallback(command.callbackId, result);
+    successCallbackBoolean(command.callbackId, paused);
 }
 
 /**

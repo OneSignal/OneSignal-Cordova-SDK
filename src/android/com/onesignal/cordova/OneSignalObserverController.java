@@ -22,16 +22,6 @@ public class OneSignalObserverController {
   private static IPermissionObserver permissionObserver;
   private static IPushSubscriptionObserver pushSubscriptionObserver;
 
-  // This is to prevent an issue where if two Javascript calls are made to OneSignal expecting a callback then only one would fire.
-  private static void callbackSuccess(CallbackContext callbackContext, JSONObject jsonObject) {
-    if (jsonObject == null) // in case there are no data
-      jsonObject = new JSONObject();
-
-    PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jsonObject);
-    pluginResult.setKeepCallback(true);
-    callbackContext.sendPluginResult(pluginResult);
-  }
-
   public static boolean addPermissionObserver(CallbackContext callbackContext) {
     jsPermissionObserverCallBack = callbackContext;
     if (permissionObserver == null) {
@@ -57,16 +47,15 @@ public class OneSignalObserverController {
           if (!(pushSubscription instanceof PushSubscriptionState)){
             return;
           }
-
+          
           try {
-            JSONObject pushSubscriptionProperties = new JSONObject();
+            JSONObject hash = new JSONObject();
+            hash.put("current", createPushSubscriptionProperties(state.getCurrent()));
+            hash.put("previous", createPushSubscriptionProperties(state.getPrevious()));
 
-            pushSubscriptionProperties.put("id", pushSubscription.getId());
-            pushSubscriptionProperties.put("token", pushSubscription.getToken());
-            pushSubscriptionProperties.put("optedIn", pushSubscription.getOptedIn());
-
-            callbackSuccess(jsSubscriptionObserverCallBack, pushSubscriptionProperties);
-          } catch (JSONException e) {
+            CallbackHelper.callbackSuccess(jsSubscriptionObserverCallBack, hash);
+            
+          } catch (Exception e) {
             e.printStackTrace();
           }
         }
@@ -74,5 +63,17 @@ public class OneSignalObserverController {
       OneSignal.getUser().getPushSubscription().addObserver(pushSubscriptionObserver);
     }
     return true;      
+  }
+
+  private static JSONObject createPushSubscriptionProperties(PushSubscriptionState pushSubscription) {
+    JSONObject pushSubscriptionProperties = new JSONObject();
+    try {
+      pushSubscriptionProperties.put("id", pushSubscription.getId());
+      pushSubscriptionProperties.put("token", pushSubscription.getToken());
+      pushSubscriptionProperties.put("optedIn", pushSubscription.getOptedIn());
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return pushSubscriptionProperties;
   }
 }

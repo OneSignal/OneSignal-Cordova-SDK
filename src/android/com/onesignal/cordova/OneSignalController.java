@@ -251,7 +251,7 @@ public class OneSignalController {
     return true;
   }
 
-  public static boolean getPermission(CallbackContext callbackContext) {
+  public static boolean getPermissionInternal(CallbackContext callbackContext) {
     boolean granted = OneSignal.getNotifications().getPermission();
     try {
       JSONObject permissionObj = new JSONObject ();
@@ -264,13 +264,15 @@ public class OneSignalController {
     return true;
   }
 
-  public static boolean canRequestPermission() {
-      // doesn't apply to Android 5.0.0-beta1?
-      return true;
+  public static boolean canRequestPermission(CallbackContext callbackContext) {
+    boolean canRequest = OneSignal.getNotifications().getCanRequestPermission();
+    CallbackHelper.callbackSuccessBoolean(callbackContext, canRequest);
+    return true;
   }
 
-  public static boolean setLaunchURLsInApp() {
-    // doesn't apply to Android
+  public static boolean permissionNative(CallbackContext callbackContext) {
+    boolean granted = OneSignal.getNotifications().getPermission();
+    CallbackHelper.callbackSuccessInt(callbackContext, granted ? 2 : 1);
     return true;
   }
 

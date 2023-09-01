@@ -17,8 +17,10 @@ export interface InAppMessageClickResult {
     closingMessage      : boolean;
     actionId            ?: string;
     url                 ?: string;
-    urlTarget           ?: string;
+    urlTarget           ?: InAppMessageActionUrlType;
 }
+
+export type InAppMessageActionUrlType = "browser" | "webview" | "replacement"
 
 export interface InAppMessageWillDisplayEvent {
     message : OSInAppMessage

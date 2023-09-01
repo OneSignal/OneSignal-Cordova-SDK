@@ -4,8 +4,7 @@ import {InAppMessageEventTypeMap,
     InAppMessageDidDisplayEvent, 
     InAppMessageWillDismissEvent, 
     InAppMessageDidDismissEvent,
-    InAppMessageClickEvent, 
-    InAppMessageClickResult
+    InAppMessageClickEvent,
 } from "./models/InAppMessage";
 
 // Suppress TS warnings about window.cordova
@@ -33,7 +32,7 @@ export default class InAppMessages {
     addEventListener<K extends InAppMessageEventName>(event: K, listener: (event: InAppMessageEventTypeMap[K]) => void): void {
         if (event === "click") {
             this._inAppMessageClickListeners.push(listener as (event: InAppMessageClickEvent) => void);
-            const inAppMessageClickListener = (json: InAppMessageClickResult) => {
+            const inAppMessageClickListener = (json: InAppMessageClickEvent) => {
                 this._processFunctionList(this._inAppMessageClickListeners, json);
             };
             window.cordova.exec(inAppMessageClickListener, function () {}, "OneSignalPush", "setInAppMessageClickHandler", []);
@@ -176,14 +175,11 @@ export default class InAppMessages {
 
     /**
      * Whether in-app messaging is currently paused.
-     * @param  {(value: boolean) => void} handler
-     * @returns void
+     * @returns {Promise<boolean>}
      */
-    isPaused(handler: (value: boolean) => void): void {
-        const isPausedCallback = (obj: {value: boolean}) => {
-            handler(obj.value);
-        };
-        
-        window.cordova.exec(isPausedCallback, function(){}, "OneSignalPush", "isPaused", []);
+    getPaused(): Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
+            window.cordova.exec(resolve, reject, "OneSignalPush", "isPaused", []);
+        });
     };
 }

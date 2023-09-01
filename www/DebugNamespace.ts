@@ -1,17 +1,25 @@
 // Suppress TS warnings about window.cordova
 declare let window: any; // turn off type checking
 
-// 0 = None, 1 = Fatal, 2 = Errors, 3 = Warnings, 4 = Info, 5 = Debug, 6 = Verbose
-export type LogLevel = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+// An enum that declares different types of log levels you can use with the OneSignal SDK, going from the least verbose (none) to verbose (print all comments).
+export enum LogLevel {
+    None = 0,
+    Fatal,
+    Error,
+    Warn,
+    Info,
+    Debug,
+    Verbose,
+}
 
 export default class Debug {
     /**
      * Enable logging to help debug if you run into an issue setting up OneSignal.
-     * @param  {LogLevel} nsLogLevel - Sets the logging level to print to the Android LogCat log or Xcode log.
+     * @param  {LogLevel} logLevel - Sets the logging level to print to the Android LogCat log or Xcode log.
      * @returns void
      */
-    setLogLevel(nsLogLevel: LogLevel): void {
-        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "setLogLevel", [nsLogLevel]);
+    setLogLevel(logLevel: LogLevel): void {
+        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "setLogLevel", [logLevel]);
     };
 
     /**

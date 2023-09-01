@@ -52,7 +52,7 @@ export class OneSignalPlugin {
      * @param  {string} appId
      * @returns void
      */
-    init(appId: string): void {
+    initialize(appId: string): void {
         this._appID = appId;
 
         const observerCallback = () => {
@@ -80,16 +80,6 @@ export class OneSignalPlugin {
     logout(): void {
         window.cordova.exec(function () { }, function () { }, "OneSignalPush", "logout");
     }
-
-    /**
-     * iOS only.
-     * This method can be used to set if launch URLs should be opened within the application or in Safari.
-     * @param  {boolean} isEnabled - false will open the link in Safari or user's default browser
-     * @returns void
-     */
-    setLaunchURLsInApp(isEnabled: boolean): void {
-        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "setLaunchURLsInApp", [isEnabled]);
-    };
 
    /**
      * Determines whether a user must consent to privacy prior to their user data being sent up to OneSignal. This should be set to true prior to the invocation of initialization to ensure compliance.
@@ -121,5 +111,33 @@ if (!window.plugins) {
 if (!window.plugins.OneSignal) {
     window.plugins.OneSignal = OneSignal;
 }
+
+// Exporting
+
+export { LogLevel } from "./DebugNamespace";
+export { OSNotification } from './OSNotification';
+export { OSNotificationPermission } from "./NotificationsNamespace";
+export { NotificationWillDisplayEvent } from "./NotificationReceivedEvent";
+
+export {
+    PushSubscriptionState,
+    PushSubscriptionChangedState
+} from "./PushSubscriptionNamespace"
+
+export {
+    NotificationClickEvent,
+    NotificationClickResult,
+} from "./models/NotificationClicked";
+
+export {
+    OSInAppMessage,
+    InAppMessageWillDisplayEvent,
+    InAppMessageDidDisplayEvent,
+    InAppMessageWillDismissEvent,
+    InAppMessageDidDismissEvent,
+    InAppMessageClickEvent,
+    InAppMessageClickResult,
+    InAppMessageActionUrlType,
+} from "./models/InAppMessage";
 
 export default OneSignal;
