@@ -343,7 +343,6 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
 
   public boolean init(CallbackContext callbackContext, JSONArray data) {
     OneSignalWrapper.setSdkType("cordova");  
-    // For 5.0.0-beta, hard code to reflect SDK version
     OneSignalWrapper.setSdkVersion("050000");
     try {
       String appId = data.getString(0);
