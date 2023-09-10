@@ -112,7 +112,7 @@ export default class PushSubscription {
      * @returns void
      */
     optIn(): void {
-        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "OptInPushSubscription");
+        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "optInPushSubscription");
     }
 
     /**
