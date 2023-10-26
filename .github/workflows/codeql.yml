@@ -13,7 +13,7 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ "main", "user_model/main" ]
+    branches: [ "main", "user_model/main", "add_codeql" ]
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ "main", "user_model/main" ]
