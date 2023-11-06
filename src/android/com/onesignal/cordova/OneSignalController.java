@@ -242,10 +242,10 @@ public class OneSignalController {
 
     OneSignal.getNotifications().requestPermission(fallbackToSettings, Continue.with(r -> {
       if (r.isSuccess()) {
-        if (r.getData()) {
-          Boolean didPermit = r.getData();
-          CallbackHelper.callbackSuccessBoolean(callbackContext, didPermit);
-        }
+        CallbackHelper.callbackSuccessBoolean(callbackContext, r.getData());
+      } else {
+        // coroutine was not successful
+        CallbackHelper.callbackError(callbackContext, r.getThrowable().getMessage());
       }
     }));
     return true;
