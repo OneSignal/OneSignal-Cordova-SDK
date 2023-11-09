@@ -1,12 +1,5 @@
 import java.nio.file.Files
 
-android.defaultConfig {
-  manifestPlaceholders = [
-    onesignal_app_id: '', // Use from js code
-    onesignal_google_project_number: 'REMOTE'
-  ]
-}
-
 // Required for Android Support Library 26.0.0+ and Google Play services 11.+
 repositories {
   maven { url 'https://maven.google.com' }
