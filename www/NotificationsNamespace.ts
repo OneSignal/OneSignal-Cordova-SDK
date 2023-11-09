@@ -73,6 +73,10 @@ export default class Notifications {
      * @returns {Promise<boolean>}
      */
     requestPermission(fallbackToSettings?: boolean): Promise<boolean> {
+        // if permission already exists, return early as the native call will not resolve
+        if (this.hasPermission()) {
+            return Promise.resolve(true);
+        }
         let fallback = fallbackToSettings ?? false;
 
         return new Promise<boolean>((resolve, reject) => {
