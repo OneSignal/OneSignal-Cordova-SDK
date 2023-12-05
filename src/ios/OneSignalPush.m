@@ -326,7 +326,15 @@ static Class delegateClass = nil;
 }
 
 - (void)addTags:(CDVInvokedUrlCommand*)command {
-    [OneSignal.User addTags:command.arguments[0]];
+    NSDictionary *tags = command.arguments[0];
+    NSMutableDictionary *convertedTags = [NSMutableDictionary dictionary];
+
+    for (id key in tags) {
+        id value = tags[key];
+        convertedTags[key] = [value isKindOfClass:[NSString class]] ? value : [NSString stringWithFormat:@"%@", value];
+    }
+
+    [OneSignal.User addTags:convertedTags];
 }
 
 - (void)removeTags:(CDVInvokedUrlCommand*)command {
