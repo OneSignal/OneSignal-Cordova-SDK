@@ -192,6 +192,18 @@ public class OneSignalController {
     }
   }
 
+  public static boolean getTags(CallbackContext callbackContext) {
+    try {
+        Map<String, String> tagsMap = OneSignal.getUser().getTags();
+        JSONObject tagsJson = new JSONObject(tagsMap);
+        CallbackHelper.callbackSuccess(callbackContext, tagsJson);
+    } catch (Throwable t) {
+        t.printStackTrace();
+        return false;
+    }
+    return true;
+  }
+
   /**
    * Notifications
    */

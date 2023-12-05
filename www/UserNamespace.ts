@@ -143,4 +143,13 @@ export default class User {
     removeTags(keys: string[]): void {
         window.cordova.exec(function(){}, function(){}, "OneSignalPush", "removeTags", keys);
     };
+
+    /** Returns the local tags for the current user.
+     * @returns Promise<{ [key: string]: string }>
+     */
+    getTags(): Promise<{ [key: string]: string }> {
+        return new Promise<{ [key: string]: string; }>((resolve, reject) => {
+            window.cordova.exec(resolve, reject, "OneSignalPush", "getTags", []);
+        });
+    };
 }

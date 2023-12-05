@@ -51,6 +51,7 @@
 
 - (void)addTags:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)removeTags:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)getTags:(CDVInvokedUrlCommand* _Nonnull)command;
 
 // Push Subscription
 - (void)addPushSubscriptionObserver:(CDVInvokedUrlCommand* _Nonnull)command;

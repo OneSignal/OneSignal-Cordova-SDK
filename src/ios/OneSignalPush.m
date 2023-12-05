@@ -333,6 +333,11 @@ static Class delegateClass = nil;
     [OneSignal.User removeTags:command.arguments];
 }
 
+- (void)getTags:(CDVInvokedUrlCommand*)command {
+    NSDictionary<NSString *, NSString *> *tags = [OneSignal.User getTags];
+    successCallback(command.callbackId, tags);
+}
+
 - (void)requestPermission:(CDVInvokedUrlCommand*)command {
     requestPermissionCallbackId = command.callbackId;
     [OneSignal.Notifications requestPermission:^(BOOL accepted) {
