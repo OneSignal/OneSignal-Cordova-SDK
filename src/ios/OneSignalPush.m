@@ -331,7 +331,12 @@ static Class delegateClass = nil;
 
     for (id key in tags) {
         id value = tags[key];
-        convertedTags[key] = [value isKindOfClass:[NSString class]] ? value : [NSString stringWithFormat:@"%@", value];
+
+        if ([value isKindOfClass:[NSNumber class]] && CFGetTypeID((__bridge CFTypeRef)(value)) == CFBooleanGetTypeID()) {
+            convertedTags[key] = [value boolValue] ? @"true" : @"false";
+        } else {
+            convertedTags[key] = [value isKindOfClass:[NSString class]] ? value : [NSString stringWithFormat:@"%@", value];
+        }
     }
 
     [OneSignal.User addTags:convertedTags];
