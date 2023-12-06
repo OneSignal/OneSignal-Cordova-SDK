@@ -94,6 +94,7 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
 
   private static final String REMOVE_TAGS = "removeTags";
   private static final String ADD_TAGS = "addTags";
+  private static final String GET_TAGS = "getTags";
 
   private static final String REGISTER_FOR_PROVISIONAL_AUTHORIZATION = "registerForProvisionalAuthorization";
   private static final String REQUEST_PERMISSION = "requestPermission";
@@ -465,6 +466,10 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
 
       case REMOVE_TAGS:
         result = OneSignalController.removeTags(data);
+        break;
+
+      case GET_TAGS:
+        result = OneSignalController.getTags(callbackContext);
         break;
 
       case REGISTER_FOR_PROVISIONAL_AUTHORIZATION:
