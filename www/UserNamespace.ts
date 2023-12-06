@@ -123,7 +123,14 @@ export default class User {
      * @returns void
      */
     addTags(tags: object): void {
-        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "addTags", [tags]);
+        const convertedTags = tags as { [key: string]: any };
+        Object.keys(tags).forEach(function(key){
+            // forces values to be string types
+            if (typeof convertedTags[key] !== "string") {
+                convertedTags[key] = JSON.stringify(convertedTags[key]);
+            }
+        });
+        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "addTags", [convertedTags]);
     };
 
     /**
