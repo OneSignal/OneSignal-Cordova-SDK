@@ -107,7 +107,7 @@ export default class User {
      */
 
     /**
-     * Add a tag for the current user. Tags are key:value pairs used as building blocks for targeting specific users and/or personalizing messages. If the tag key already exists, it will be replaced with the value provided here.
+     * Add a tag for the current user. Tags are key:value string pairs used as building blocks for targeting specific users and/or personalizing messages. If the tag key already exists, it will be replaced with the value provided here.
      * @param  {string} key
      * @param  {string} value
      * @returns void
@@ -118,12 +118,19 @@ export default class User {
     };
 
     /**
-     * Add multiple tags for the current user. Tags are key:value pairs used as building blocks for targeting specific users and/or personalizing messages. If the tag key already exists, it will be replaced with the value provided here.
+     * Add multiple tags for the current user. Tags are key:value string pairs used as building blocks for targeting specific users and/or personalizing messages. If the tag key already exists, it will be replaced with the value provided here.
      * @param  {object} tags
      * @returns void
      */
     addTags(tags: object): void {
-        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "addTags", [tags]);
+        const convertedTags = tags as { [key: string]: any };
+        Object.keys(tags).forEach(function(key){
+            // forces values to be string types
+            if (typeof convertedTags[key] !== "string") {
+                convertedTags[key] = JSON.stringify(convertedTags[key]);
+            }
+        });
+        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "addTags", [convertedTags]);
     };
 
     /**
