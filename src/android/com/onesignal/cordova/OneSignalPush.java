@@ -82,6 +82,10 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
 
   private static final String ADD_PERMISSION_OBSERVER = "addPermissionObserver";
   private static final String ADD_PUSH_SUBSCRIPTION_OBSERVER = "addPushSubscriptionObserver";
+  private static final String ADD_USER_STATE_OBSERVER = "addUserStateObserver";
+
+  private static final String GET_ONESIGNAL_ID = "getOnesignalId";
+  private static final String GET_EXTERNAL_ID = "getExternalId";
 
   private static final String OPT_IN = "optInPushSubscription";
   private static final String OPT_OUT = "optOutPushSubscription";
@@ -430,6 +434,18 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
 
       case ADD_PUSH_SUBSCRIPTION_OBSERVER:
         result = OneSignalObserverController.addPushSubscriptionObserver(callbackContext);
+        break;
+
+      case ADD_USER_STATE_OBSERVER:
+        result = OneSignalObserverController.addUserStateObserver(callbackContext);
+        break;
+
+      case GET_ONESIGNAL_ID:
+        result = OneSignalController.getOnesignalId(callbackContext);
+        break;
+
+      case GET_EXTERNAL_ID:
+        result = OneSignalController.getExternalId(callbackContext);
         break;
 
       case OPT_IN:
