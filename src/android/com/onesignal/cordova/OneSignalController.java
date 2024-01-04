@@ -199,6 +199,34 @@ public class OneSignalController {
     return true;
   }
 
+  public static boolean getOnesignalId(CallbackContext callbackContext) {
+    String onesignalId = OneSignal.getUser().getOnesignalId();
+    try {
+      JSONObject onesignalIdObject = new JSONObject ();
+      if (!onesignalId.isEmpty()) {
+        onesignalIdObject.put("value", onesignalId);
+      }
+      CallbackHelper.callbackSuccess(callbackContext, onesignalIdObject);
+    } catch (JSONException e){
+      e.printStackTrace();
+    }
+    return true;
+  }
+
+  public static boolean getExternalId(CallbackContext callbackContext) {
+    String externalId = OneSignal.getUser().getExternalId();
+    try {
+      JSONObject externalIdObject = new JSONObject ();
+      if (!externalId.isEmpty()) {
+        externalIdObject.put("value", externalId);
+      }
+      CallbackHelper.callbackSuccess(callbackContext, externalIdObject);
+    } catch (JSONException e){
+      e.printStackTrace();
+    }
+    return true;
+  }
+
   /**
    * Notifications
    */
