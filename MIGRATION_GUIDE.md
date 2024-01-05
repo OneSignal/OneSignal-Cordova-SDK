@@ -222,8 +222,21 @@ The User name space is accessible via `OneSignal.User` and provides access to us
 | `OneSignal.User.removeTag("KEY");`                                                                   | *Remove the data tag with the provided key from the current user.*                                                                                                                                                                       |
 | `OneSignal.User.removeTags(["KEY_01", "KEY_02"]);`                                                 | *Remove multiple tags with the provided keys from the current user.*                                                                                                                                                             |
 | `OneSignal.User.getTags();`                                                   | *Returns the local tags for the current user.*                                                                                                                                                                                        |
+| `OneSignal.User.addEventListener("change", (event: UserChangedState) => void);` <br><br>***See below for usage***                                                   | *Add a User State callback which contains the nullable onesignalId and externalId. The listener will be fired when these values change.*                                                                                                                                                                                        |
+| `OneSignal.User.getOnesignalId();`                                                   | *Returns the nullable OneSignal ID for the current user.*                                                                                                                                                                                        |
+| `OneSignal.User.getExternalId();`                                                   | *Returns the nullable external ID for the current user.*                                                                                                                                                                                        |
 
+### User State Listener
 
+**Cordova/Ionic**
+```typescript
+    const listener = (event: UserChangedState) => {
+        console.log("User changed: " + (event));
+    };
+    OneSignal.User.addEventListener("change", listener);
+    // Remove the listener
+    OneSignal.User.removeEventListener("change", listener);
+```
 
 ## Push Subscription Namespace
 
