@@ -140,4 +140,9 @@ export {
     InAppMessageActionUrlType,
 } from "./models/InAppMessage";
 
+export {
+    UserState,
+    UserChangedState,
+} from "./UserNamespace";
+
 export default OneSignal;
