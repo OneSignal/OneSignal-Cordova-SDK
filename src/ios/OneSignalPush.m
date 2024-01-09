@@ -165,6 +165,45 @@ static Class delegateClass = nil;
     successCallback(subscriptionObserverCallbackId, [state jsonRepresentation]);
 }
 
+- (void)onUserStateDidChangeWithState:(OSUserChangedState * _Nonnull)state {
+    NSString *onesignalId = state.current.onesignalId;
+    NSString *externalId = state.current.externalId;
+
+    NSMutableDictionary *result = [NSMutableDictionary new];
+    
+    NSMutableDictionary *currentObject = [NSMutableDictionary new];
+    if (onesignalId.length > 0) {
+        currentObject[@"onesignalId"] = onesignalId;
+    }
+    if (externalId.length > 0) {
+        currentObject[@"externalId"] = externalId;
+    }
+
+    result[@"current"] = currentObject;
+
+    successCallback(userObserverCallbackId, result);
+}
+
+- (void)getOnesignalId:(CDVInvokedUrlCommand *)command {
+    NSString *onesignalId = OneSignal.User.onesignalId;
+    
+    NSDictionary *result = @{
+        @"value" : (onesignalId ? onesignalId : [NSNull null])
+    };
+    
+    successCallback(command.callbackId, result);
+}
+
+- (void)getExternalId:(CDVInvokedUrlCommand *)command {
+    NSString *externalId = OneSignal.User.externalId;
+    
+    NSDictionary *result = @{
+        @"value" : (externalId ? externalId : [NSNull null])
+    };
+    
+    successCallback(command.callbackId, result);
+}
+
 - (void)setProvidesNotificationSettingsView:(CDVInvokedUrlCommand *)command {
     BOOL providesView = command.arguments[0];
     [OneSignal setProvidesNotificationSettingsView:providesView];
@@ -270,6 +309,14 @@ static Class delegateClass = nil;
     subscriptionObserverCallbackId = command.callbackId;
     if (first)
         [OneSignal.User.pushSubscription addObserver:self];
+}
+
+- (void)addUserStateObserver:(CDVInvokedUrlCommand*)command {
+    bool first = userObserverCallbackId == nil;
+    userObserverCallbackId = command.callbackId;
+    if (first) {
+        [OneSignal.User addObserver:self];
+    }
 }
 
 - (void)getPushSubscriptionId:(CDVInvokedUrlCommand*)command {
