@@ -31,7 +31,7 @@
 
 #import <OneSignalFramework/OneSignalFramework.h>
 
-@interface OneSignalPush : CDVPlugin <OSNotificationPermissionObserver, OSNotificationLifecycleListener, OSNotificationClickListener, OSPushSubscriptionObserver, OSInAppMessageLifecycleListener, OSInAppMessageClickListener>
+@interface OneSignalPush : CDVPlugin <OSNotificationPermissionObserver, OSNotificationLifecycleListener, OSNotificationClickListener, OSPushSubscriptionObserver, OSInAppMessageLifecycleListener, OSInAppMessageClickListener, OSUserStateObserver>
 
 - (void)setProvidesNotificationSettingsView:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)addForegroundLifecycleListener:(CDVInvokedUrlCommand* _Nonnull)command;
@@ -53,6 +53,10 @@
 - (void)removeTags:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)getTags:(CDVInvokedUrlCommand* _Nonnull)command;
 
+- (void)addUserStateObserver:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)getOnesignalId:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)getExternalId:(CDVInvokedUrlCommand* _Nonnull)command;
+
 // Push Subscription
 - (void)addPushSubscriptionObserver:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)getPushSubscriptionId:(CDVInvokedUrlCommand* _Nonnull)command;
@@ -69,6 +73,7 @@
 - (void)canRequestPermission:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)registerForProvisionalAuthorization:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)clearAllNotifications:(CDVInvokedUrlCommand* _Nonnull)command;
+
 // Android Only - Notifications
 - (void)removeNotification:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)removeGroupedNotifications:(CDVInvokedUrlCommand* _Nonnull)command;
