@@ -45,6 +45,7 @@ NSString* inAppMessageDidDisplayCallbackId;
 NSString* inAppMessageWillDismissCallbackId;
 NSString* inAppMessageDidDismissCallbackId;
 NSString* inAppMessageClickedCallbackId;
+NSString* userObserverCallbackId;
 
 OSNotificationClickEvent *actionNotification;
 OSNotification *notification;
