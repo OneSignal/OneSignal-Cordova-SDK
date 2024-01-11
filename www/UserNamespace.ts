@@ -179,7 +179,8 @@ export default class User {
     };
     
     /**
-     * Add a callback that fires when the OneSignal User state changes.
+     * Add a callback that fires when the OneSignal User state changes. 
+     * Important: When using the observer to retrieve the onesignalId, check the externalId as well to confirm the values are associated with the expected user.
      * @param  {(event: UserChangedState)=>void} listener
      * @returns void
      */
