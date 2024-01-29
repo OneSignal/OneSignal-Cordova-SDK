@@ -198,7 +198,6 @@ static Class delegateClass = nil;
 }
 
 -(void)proceedWithWillDisplay:(CDVInvokedUrlCommand *)command {
-    notificationWillShowInForegoundCallbackId = command.callbackId;
     NSString *notificationId = command.arguments[0];
     OSNotificationWillDisplayEvent *event = self.notificationWillDisplayCache[notificationId];
     if (!event) {
