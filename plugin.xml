@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="onesignal-cordova-plugin"
-    version="5.0.5">
+    version="5.0.6">
 
   <name>OneSignal Push Notifications</name>
   <author>Josh Kasten, Bradley Hesse, Rodrigo Gomez-Palacio</author>
@@ -37,7 +37,7 @@
   <js-module src="dist/LiveActivitiesNamespace.js" name="LiveActivitiesNamespace" />
 
   <platform name="android">
-    <framework src="com.onesignal:OneSignal:5.1.2" />
+    <framework src="com.onesignal:OneSignal:5.1.4" />
     <framework src="build-extras-onesignal.gradle" custom="true" type="gradleReference" />
     <framework src="org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.7.10" />
 
