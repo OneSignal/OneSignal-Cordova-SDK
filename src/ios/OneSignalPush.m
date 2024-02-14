@@ -405,10 +405,7 @@ static Class delegateClass = nil;
 
 - (void)getPermissionInternal:(CDVInvokedUrlCommand*)command {
     bool isPermitted = [OneSignal.Notifications permission];
-    NSDictionary *result = @{
-            @"value" : @(isPermitted)
-    };
-    successCallback(command.callbackId, result);
+    successCallbackBoolean(command.callbackId, isPermitted);
 }
 
 - (void)canRequestPermission:(CDVInvokedUrlCommand*)command {
