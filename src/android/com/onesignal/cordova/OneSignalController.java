@@ -260,14 +260,7 @@ public class OneSignalController {
 
   public static boolean getPermissionInternal(CallbackContext callbackContext) {
     boolean granted = OneSignal.getNotifications().getPermission();
-    try {
-      JSONObject permissionObj = new JSONObject ();
-      permissionObj.put("value", granted);
-
-      CallbackHelper.callbackSuccess(callbackContext, permissionObj);
-    } catch (JSONException e){
-      e.printStackTrace();
-    }
+    CallbackHelper.callbackSuccessBoolean(callbackContext, granted);
     return true;
   }
 
