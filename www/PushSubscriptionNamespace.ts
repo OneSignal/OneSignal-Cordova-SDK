@@ -29,16 +29,18 @@ export default class PushSubscription {
     /**
      * Sets initial Push Subscription properties and adds observer for changes
      */
-    _setPropertiesAndObserver():void {
+    async _setPropertiesAndObserver(): Promise<void> {
         /**
-         * Receive push Id
+         * Receive push id
          * @param obj 
          */
         const getIdCallback = (obj: {value: string}) => {
             this._id = obj.value;
         };
-        window.cordova.exec(getIdCallback, function(){}, "OneSignalPush", "getPushSubscriptionId");
-
+        await new Promise<void>((resolve, reject) => {
+            window.cordova.exec(getIdCallback, resolve, reject, "OneSignalPush", "getPushSubscriptionId");
+        });
+    
         /**
          * Receive token
          * @param obj 
@@ -46,7 +48,9 @@ export default class PushSubscription {
         const getTokenCallback = (obj: {value: string}) => {
             this._token = obj.value;
         };
-        window.cordova.exec(getTokenCallback, function(){}, "OneSignalPush", "getPushSubscriptionToken");
+        await new Promise<void>((resolve, reject) => {
+            window.cordova.exec(getTokenCallback, resolve, reject, "OneSignalPush", "getPushSubscriptionToken");
+        });
         
         /**
          * Receive opted-in status
@@ -55,31 +59,84 @@ export default class PushSubscription {
         const getOptedInCallback = (obj: {value: boolean}) => {
             this._optedIn = obj.value;
         };
-        window.cordova.exec(getOptedInCallback, function(){}, "OneSignalPush", "getPushSubscriptionOptedIn");
+        await new Promise<void>((resolve, reject) => {
+            window.cordova.exec(getOptedInCallback, resolve, reject, "OneSignalPush", "getPushSubscriptionOptedIn");
+        });
         
         this.addEventListener("change", (subscriptionChange) => {
             this._id = subscriptionChange.current.id;
             this._token = subscriptionChange.current.token;
             this._optedIn = subscriptionChange.current.optedIn;
         });
-        
     }
     
+    /**
+     * @deprecated
+     */
     get id(): string | null | undefined {
+        console.warn("OneSignal: This method has been deprecated. Use getIdAsync instead for getting push subscription id.");
         return this._id;
     }
     
+    /**
+     * @deprecated
+     */
     get token(): string | null | undefined {
+        console.warn("OneSignal: This method has been deprecated. Use getTokenAsync instead for getting push subscription token.");
         return this._token;
     }
+
+    /**
+     * @deprecated
+     */
+    get optedIn(): boolean {
+        console.warn("OneSignal: This method has been deprecated. Use getOptedInAsync instead for getting push subscription opted in status.");
+        return this._optedIn || false;
+    }
+
+    /**
+     * The readonly push subscription ID.
+     * @returns {Promise<string | null | undefined>}
+     */
+    getIdAsync(): Promise<string | null | undefined> {
+        return new Promise((resolve, reject) => {
+            const getIdCallback = (obj: { value: string }) => {
+                this._id = obj.value;
+                resolve(this._id);
+            };
+            window.cordova.exec(getIdCallback, function () {}, "OneSignalPush", "getPushSubscriptionId");
+        });
+    }
+    
+    /**
+     * The readonly push token.
+     * @returns {Promise<string | null | undefined>}
+     */
+    getTokenAsync(): Promise<string | null | undefined> {
+        return new Promise((resolve, reject) => {
+            const getTokenCallback = (obj: { value: string }) => {
+                this._token = obj.value;
+                resolve(this._token);
+            };
+            window.cordova.exec(getTokenCallback, function () {}, "OneSignalPush", "getPushSubscriptionToken");
+        });
+    }
+    
     /**
      * Gets a boolean value indicating whether the current user is opted in to push notifications.
      * This returns true when the app has notifications permission and optOut() is NOT called.
      * Note: Does not take into account the existence of the subscription ID and push token.
      * This boolean may return true but push notifications may still not be received by the user.
+     * @returns {Promise<boolean>}
      */
-    get optedIn(): boolean {
-        return this._optedIn || false;
+    getOptedInAsync(): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            const getOptedInCallback = (obj: { value: boolean }) => {
+                this._optedIn = obj.value;
+                resolve(this._optedIn || false);
+            };
+            window.cordova.exec(getOptedInCallback, function () {}, "OneSignalPush", "getPushSubscriptionOptedIn");
+        });
     }
 
     /**
