@@ -101,14 +101,13 @@ public class OneSignalObserverController {
   private static JSONObject createUserIds(UserState user) {
     JSONObject userIds = new JSONObject();
     try {
-      if (!user.getExternalId().isEmpty()) {
-        userIds.put("externalId", user.getExternalId());
-      }
-      if (!user.getOnesignalId().isEmpty()) {
-        userIds.put("onesignalId", user.getOnesignalId());
-      }
+        String externalId = user.getExternalId();
+        String onesignalId = user.getOnesignalId();
+
+        userIds.put("externalId", externalId != null && !externalId.isEmpty() ? externalId : JSONObject.NULL);
+        userIds.put("onesignalId", onesignalId != null && !onesignalId.isEmpty() ? onesignalId : JSONObject.NULL);
     } catch (JSONException e) {
-      e.printStackTrace();
+        e.printStackTrace();
     }
     return userIds;
   }
