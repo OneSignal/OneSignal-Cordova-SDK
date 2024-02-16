@@ -173,11 +173,17 @@ static Class delegateClass = nil;
     NSMutableDictionary *result = [NSMutableDictionary new];
     
     NSMutableDictionary *currentObject = [NSMutableDictionary new];
-    if (onesignalId.length > 0) {
+    
+    if (onesignalId && ![onesignalId isEqualToString:@""]) {
         currentObject[@"onesignalId"] = onesignalId;
+    } else {
+        currentObject[@"onesignalId"] = [NSNull null];
     }
-    if (externalId.length > 0) {
+    
+    if (externalId && ![externalId isEqualToString:@""]) {
         currentObject[@"externalId"] = externalId;
+    } else {
+        currentObject[@"externalId"] = [NSNull null];
     }
 
     result[@"current"] = currentObject;
