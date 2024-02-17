@@ -45,8 +45,7 @@ export default class Notifications {
     }
 
     /**
-     * @deprecated
-     * {@link getPermissionAsync}
+     * @deprecated This method is deprecated. It has been replaced by {@link getPermissionAsync}.
      */
     hasPermission(): boolean {
         return this._permission || false;
