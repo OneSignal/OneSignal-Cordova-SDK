@@ -68,11 +68,24 @@ public class OneSignalObserverController {
   private static JSONObject createPushSubscriptionProperties(PushSubscriptionState pushSubscription) {
     JSONObject pushSubscriptionProperties = new JSONObject();
     try {
-      pushSubscriptionProperties.put("id", pushSubscription.getId());
-      pushSubscriptionProperties.put("token", pushSubscription.getToken());
-      pushSubscriptionProperties.put("optedIn", pushSubscription.getOptedIn());
+        String id = pushSubscription.getId();
+        String token = pushSubscription.getToken();
+
+        if (id != null && !id.isEmpty()) {
+            pushSubscriptionProperties.put("id", id);
+        } else {
+            pushSubscriptionProperties.put("id", JSONObject.NULL);
+        }
+
+        if (token != null && !token.isEmpty()) {
+            pushSubscriptionProperties.put("token", token);
+        } else {
+            pushSubscriptionProperties.put("token", JSONObject.NULL);
+        }
+
+        pushSubscriptionProperties.put("optedIn", pushSubscription.getOptedIn());
     } catch (JSONException e) {
-      e.printStackTrace();
+        e.printStackTrace();
     }
     return pushSubscriptionProperties;
   }
