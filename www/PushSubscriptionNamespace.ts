@@ -29,18 +29,16 @@ export default class PushSubscription {
     /**
      * Sets initial Push Subscription properties and adds observer for changes
      */
-    async _setPropertiesAndObserver(): Promise<void> {
+    _setPropertiesAndObserver():void {
         /**
-         * Receive push id
+         * Receive push Id
          * @param obj 
          */
         const getIdCallback = (obj: {value: string}) => {
             this._id = obj.value;
         };
-        await new Promise<void>((resolve, reject) => {
-            window.cordova.exec(getIdCallback, resolve, reject, "OneSignalPush", "getPushSubscriptionId");
-        });
-    
+        window.cordova.exec(getIdCallback, function(){}, "OneSignalPush", "getPushSubscriptionId");
+
         /**
          * Receive token
          * @param obj 
@@ -48,20 +46,16 @@ export default class PushSubscription {
         const getTokenCallback = (obj: {value: string}) => {
             this._token = obj.value;
         };
-        await new Promise<void>((resolve, reject) => {
-            window.cordova.exec(getTokenCallback, resolve, reject, "OneSignalPush", "getPushSubscriptionToken");
-        });
+        window.cordova.exec(getTokenCallback, function(){}, "OneSignalPush", "getPushSubscriptionToken");
         
         /**
          * Receive opted-in status
-         * @param obj 
+         * @param granted 
          */
-        const getOptedInCallback = (obj: {value: boolean}) => {
-            this._optedIn = obj.value;
+        const getOptedInCallback = (granted: boolean) => {
+            this._optedIn = granted;
         };
-        await new Promise<void>((resolve, reject) => {
-            window.cordova.exec(getOptedInCallback, resolve, reject, "OneSignalPush", "getPushSubscriptionOptedIn");
-        });
+        window.cordova.exec(getOptedInCallback, function(){}, "OneSignalPush", "getPushSubscriptionOptedIn");
         
         this.addEventListener("change", (subscriptionChange) => {
             this._id = subscriptionChange.current.id;

@@ -32,13 +32,12 @@ export default class Notifications {
     /**
      * Sets initial permission value and adds observer for changes
      */
-    async _setPropertyAndObserver(): Promise<void> {
-        const granted = await new Promise<boolean>((resolve, reject) => {
-            window.cordova.exec(resolve, reject, "OneSignalPush", "getPermissionInternal");
-        });
-    
-        this._permission = granted;
-    
+    _setPropertyAndObserver():void {
+        const getPermissionCallback = (granted: boolean) => {
+            this._permission = granted;
+        };
+        window.cordova.exec(getPermissionCallback, function(){}, "OneSignalPush", "getPermissionInternal");
+
         this.addEventListener("permissionChange", result => {
             this._permission = result;
         });
@@ -87,12 +86,19 @@ export default class Notifications {
      * @returns {Promise<boolean>}
      */
     requestPermission(fallbackToSettings?: boolean): Promise<boolean> {
-        let fallback = fallbackToSettings ?? false;
+        return this.getPermissionAsync()
+            .then(hasPermission => {
+                // If permission already exists, return early
+                if (hasPermission) {
+                    return true;
+                }
+                let fallback = fallbackToSettings ?? false;
 
-        return new Promise<boolean>((resolve, reject) => {
-            window.cordova.exec(resolve, reject, "OneSignalPush", "requestPermission", [fallback]);
-        });
-    };
+                return new Promise<boolean>((resolve, reject) => {
+                    window.cordova.exec(resolve, reject, "OneSignalPush", "requestPermission", [fallback]);
+                });
+            });
+    }; 
 
     /**
      * Whether attempting to request notification permission will show a prompt. Returns true if the device has not been prompted for push notification permission already.
