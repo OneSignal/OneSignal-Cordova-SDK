@@ -173,7 +173,23 @@ static Class delegateClass = nil;
 }
 
 - (void)onPushSubscriptionDidChangeWithState:(OSPushSubscriptionChangedState *)state {
-    successCallback(subscriptionObserverCallbackId, [state jsonRepresentation]);
+    NSMutableDictionary *result = [NSMutableDictionary new];
+    
+    //Previous state
+    NSMutableDictionary *previousObject = [NSMutableDictionary new];
+    previousObject[@"token"] = (state.previous.token && ![state.previous.token isEqualToString:@""]) ? state.previous.token : [NSNull null];
+    previousObject[@"id"] = (state.previous.id && ![state.previous.id isEqualToString:@""]) ? state.previous.id : [NSNull null];
+    previousObject[@"optedIn"] = @(state.previous.optedIn);
+    result[@"previous"] = previousObject;
+    
+    //Current state
+    NSMutableDictionary *currentObject = [NSMutableDictionary new];
+    currentObject[@"token"] = (state.current.token && ![state.current.token isEqualToString:@""]) ? state.current.token : [NSNull null];
+    currentObject[@"id"] = (state.current.id && ![state.current.id isEqualToString:@""]) ? state.current.id : [NSNull null];
+    currentObject[@"optedIn"] = @(state.current.optedIn);
+    result[@"current"] = currentObject;
+    
+    successCallback(subscriptionObserverCallbackId, result);
 }
 
 - (void)onUserStateDidChangeWithState:(OSUserChangedState * _Nonnull)state {
