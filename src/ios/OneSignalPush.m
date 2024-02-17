@@ -328,9 +328,14 @@ static Class delegateClass = nil;
 
 - (void)getPushSubscriptionId:(CDVInvokedUrlCommand*)command {
     NSString *pushId = OneSignal.User.pushSubscription.id;
-    if (pushId) {
+    if (pushId && ![pushId isEqualToString:@""]) {
         NSDictionary *result = @{
             @"value" : pushId
+        };
+        successCallback(command.callbackId, result);
+    } else {
+        NSDictionary *result = @{
+            @"value" : [NSNull null]
         };
         successCallback(command.callbackId, result);
     }
@@ -338,9 +343,14 @@ static Class delegateClass = nil;
 
 - (void)getPushSubscriptionToken:(CDVInvokedUrlCommand*)command {
     NSString *token = OneSignal.User.pushSubscription.token;
-    if (token) {
+    if (token && ![token isEqualToString:@""]) {
         NSDictionary *result = @{
             @"value" : token
+        };
+        successCallback(command.callbackId, result);
+    } else {
+        NSDictionary *result = @{
+            @"value" : [NSNull null]
         };
         successCallback(command.callbackId, result);
     }
@@ -348,10 +358,7 @@ static Class delegateClass = nil;
 
 - (void)getPushSubscriptionOptedIn:(CDVInvokedUrlCommand*)command {
     bool optedIn = OneSignal.User.pushSubscription.optedIn;
-    NSDictionary *result = @{
-        @"value" : @(optedIn)
-    };
-    successCallback(command.callbackId, result);
+    successCallbackBoolean(command.callbackId, optedIn);
 }
 
 - (void)optInPushSubscription:(CDVInvokedUrlCommand*)command {

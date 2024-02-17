@@ -96,9 +96,9 @@ export default class PushSubscription {
 
     /**
      * The readonly push subscription ID.
-     * @returns {Promise<string | null | undefined>}
+     * @returns {Promise<string | null>}
      */
-    getIdAsync(): Promise<string | null | undefined> {
+    getIdAsync(): Promise<string | null> {
         return new Promise((resolve, reject) => {
             const getIdCallback = (obj: { value: string }) => {
                 this._id = obj.value;
@@ -110,9 +110,9 @@ export default class PushSubscription {
     
     /**
      * The readonly push token.
-     * @returns {Promise<string | null | undefined>}
+     * @returns {Promise<string | null>}
      */
-    getTokenAsync(): Promise<string | null | undefined> {
+    getTokenAsync(): Promise<string | null> {
         return new Promise((resolve, reject) => {
             const getTokenCallback = (obj: { value: string }) => {
                 this._token = obj.value;
