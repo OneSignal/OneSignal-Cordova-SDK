@@ -76,15 +76,15 @@ public class OneSignalObserverController {
       userStateObserver = new IUserStateObserver() {
         @Override
         public void onUserStateChange(UserChangedState state) {
-          UserState user = state.getCurrent();
+          UserState current = state.getCurrent();
 
-          if (!(user instanceof UserState)) {
+          if (!(current instanceof UserState)) {
             return;
           }
 
           try {
             JSONObject hash = new JSONObject();
-            hash.put("current", createUserIds(state.getCurrent()));
+            hash.put("current", createUserIds(current));
 
             CallbackHelper.callbackSuccess(jsUserObserverCallBack, hash);
             
@@ -98,14 +98,23 @@ public class OneSignalObserverController {
     return true;
   }
 
+  /** Helper method to return JSONObject.NULL if string is empty or nil **/
+  private static Object getStringOrJSONObjectNull(String str) {
+    if (str != null && !str.isEmpty()) {
+        return str;
+    } else {
+        return JSONObject.NULL;
+    }
+  }
+
   private static JSONObject createUserIds(UserState user) {
     JSONObject userIds = new JSONObject();
     try {
         String externalId = user.getExternalId();
         String onesignalId = user.getOnesignalId();
 
-        userIds.put("externalId", externalId != null && !externalId.isEmpty() ? externalId : JSONObject.NULL);
-        userIds.put("onesignalId", onesignalId != null && !onesignalId.isEmpty() ? onesignalId : JSONObject.NULL);
+        userIds.put("externalId", getStringOrJSONObjectNull(externalId));
+        userIds.put("onesignalId", getStringOrJSONObjectNull(onesignalId));
     } catch (JSONException e) {
         e.printStackTrace();
     }

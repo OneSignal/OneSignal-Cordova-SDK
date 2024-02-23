@@ -105,6 +105,16 @@ void initOneSignalObject(NSDictionary* launchOptions) {
     initialLaunchFired = true;
 }
 
+/** Helper method to return NSNull if string is empty or nil **/
+NSString* getStringOrNSNull(NSString* string) {
+    // length method can be used on nil and strings
+    if (string.length > 0) {
+        return string;
+    } else {
+        return [NSNull null];
+    }
+}
+
 @implementation UIApplication(OneSignalCordovaPush)
 
 static void injectSelectorCordova(Class newClass, SEL newSel, Class addToClass, SEL makeLikeSel) {
@@ -174,18 +184,8 @@ static Class delegateClass = nil;
     
     NSMutableDictionary *currentObject = [NSMutableDictionary new];
     
-    if (onesignalId && ![onesignalId isEqualToString:@""]) {
-        currentObject[@"onesignalId"] = onesignalId;
-    } else {
-        currentObject[@"onesignalId"] = [NSNull null];
-    }
-    
-    if (externalId && ![externalId isEqualToString:@""]) {
-        currentObject[@"externalId"] = externalId;
-    } else {
-        currentObject[@"externalId"] = [NSNull null];
-    }
-
+    currentObject[@"onesignalId"] = getStringOrNSNull(onesignalId);
+    currentObject[@"externalId"] = getStringOrNSNull(externalId);
     result[@"current"] = currentObject;
 
     successCallback(userObserverCallbackId, result);
