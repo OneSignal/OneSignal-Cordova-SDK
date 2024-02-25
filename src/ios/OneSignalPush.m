@@ -177,15 +177,15 @@ static Class delegateClass = nil;
     
     //Previous state
     NSMutableDictionary *previousObject = [NSMutableDictionary new];
-    previousObject[@"token"] = (state.previous.token && ![state.previous.token isEqualToString:@""]) ? state.previous.token : [NSNull null];
-    previousObject[@"id"] = (state.previous.id && ![state.previous.id isEqualToString:@""]) ? state.previous.id : [NSNull null];
+    previousObject[@"token"] = getStringOrNSNull(state.previous.token);
+    previousObject[@"id"] = getStringOrNSNull(state.previous.id);
     previousObject[@"optedIn"] = @(state.previous.optedIn);
     result[@"previous"] = previousObject;
     
     //Current state
     NSMutableDictionary *currentObject = [NSMutableDictionary new];
-    currentObject[@"token"] = (state.current.token && ![state.current.token isEqualToString:@""]) ? state.current.token : [NSNull null];
-    currentObject[@"id"] = (state.current.id && ![state.current.id isEqualToString:@""]) ? state.current.id : [NSNull null];
+    currentObject[@"token"] = getStringOrNSNull(state.current.token);
+    currentObject[@"id"] = getStringOrNSNull(state.current.id);
     currentObject[@"optedIn"] = @(state.current.optedIn);
     result[@"current"] = currentObject;
     
@@ -343,33 +343,16 @@ static Class delegateClass = nil;
 }
 
 - (void)getPushSubscriptionId:(CDVInvokedUrlCommand*)command {
-    NSString *pushId = OneSignal.User.pushSubscription.id;
-    if (pushId && ![pushId isEqualToString:@""]) {
-        NSDictionary *result = @{
-            @"value" : pushId
-        };
-        successCallback(command.callbackId, result);
-    } else {
-        NSDictionary *result = @{
-            @"value" : [NSNull null]
-        };
-        successCallback(command.callbackId, result);
-    }
+    NSMutableDictionary *result = [NSMutableDictionary new];
+    result[@"value"] = getStringOrNSNull(OneSignal.User.pushSubscription.id);
+    successCallback(command.callbackId, result);
 }
 
 - (void)getPushSubscriptionToken:(CDVInvokedUrlCommand*)command {
-    NSString *token = OneSignal.User.pushSubscription.token;
-    if (token && ![token isEqualToString:@""]) {
-        NSDictionary *result = @{
-            @"value" : token
-        };
-        successCallback(command.callbackId, result);
-    } else {
-        NSDictionary *result = @{
-            @"value" : [NSNull null]
-        };
-        successCallback(command.callbackId, result);
-    }
+
+    NSMutableDictionary *result = [NSMutableDictionary new];
+    result[@"value"] = getStringOrNSNull(OneSignal.User.pushSubscription.token);
+    successCallback(command.callbackId, result);
 }
 
 - (void)getPushSubscriptionOptedIn:(CDVInvokedUrlCommand*)command {
