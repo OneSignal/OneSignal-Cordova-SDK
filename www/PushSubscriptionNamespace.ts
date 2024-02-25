@@ -124,12 +124,8 @@ export default class PushSubscription {
      * @returns {Promise<boolean>}
      */
     getOptedInAsync(): Promise<boolean> {
-        return new Promise((resolve, reject) => {
-            const getOptedInCallback = (obj: { value: boolean }) => {
-                this._optedIn = obj.value;
-                resolve(this._optedIn || false);
-            };
-            window.cordova.exec(getOptedInCallback, function () {}, "OneSignalPush", "getPushSubscriptionOptedIn");
+        return new Promise<boolean>((resolve, reject) => {
+            window.cordova.exec(resolve, reject, "OneSignalPush", "getPushSubscriptionOptedIn");
         });
     }
 
