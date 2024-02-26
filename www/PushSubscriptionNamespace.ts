@@ -34,8 +34,8 @@ export default class PushSubscription {
          * Receive push Id
          * @param obj 
          */
-        const getIdCallback = (obj: {value: string}) => {
-            this._id = obj.value;
+        const getIdCallback = (id: string) => {
+            this._id = id;
         };
         window.cordova.exec(getIdCallback, function(){}, "OneSignalPush", "getPushSubscriptionId");
 
@@ -43,8 +43,8 @@ export default class PushSubscription {
          * Receive token
          * @param obj 
          */
-        const getTokenCallback = (obj: {value: string}) => {
-            this._token = obj.value;
+        const getTokenCallback = (token: string) => {
+            this._token = token;
         };
         window.cordova.exec(getTokenCallback, function(){}, "OneSignalPush", "getPushSubscriptionToken");
         
@@ -93,12 +93,8 @@ export default class PushSubscription {
      * @returns {Promise<string | null>}
      */
     getIdAsync(): Promise<string | null> {
-        return new Promise((resolve, reject) => {
-            const getIdCallback = (obj: { value: string }) => {
-                this._id = obj.value;
-                resolve(this._id);
-            };
-            window.cordova.exec(getIdCallback, function () {}, "OneSignalPush", "getPushSubscriptionId");
+        return new Promise<string | null>((resolve, reject) => {
+            window.cordova.exec(resolve, reject, "OneSignalPush", "getPushSubscriptionId");
         });
     }
     
@@ -107,12 +103,8 @@ export default class PushSubscription {
      * @returns {Promise<string | null>}
      */
     getTokenAsync(): Promise<string | null> {
-        return new Promise((resolve, reject) => {
-            const getTokenCallback = (obj: { value: string }) => {
-                this._token = obj.value;
-                resolve(this._token);
-            };
-            window.cordova.exec(getTokenCallback, function () {}, "OneSignalPush", "getPushSubscriptionToken");
+        return new Promise<string | null>((resolve, reject) => {
+            window.cordova.exec(resolve, reject, "OneSignalPush", "getPushSubscriptionToken");
         });
     }
     

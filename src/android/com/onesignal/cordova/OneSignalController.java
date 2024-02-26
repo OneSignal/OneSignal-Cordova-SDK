@@ -82,25 +82,13 @@ public class OneSignalController {
 
   public static boolean getPushSubscriptionId(CallbackContext callbackContext) {
     String pushId = OneSignal.getUser().getPushSubscription().getId();
-    try {
-        JSONObject subscriptionProperty = new JSONObject();
-        subscriptionProperty.put("value", pushId.isEmpty() ? JSONObject.NULL : pushId);
-        CallbackHelper.callbackSuccess(callbackContext, subscriptionProperty);
-    } catch (JSONException e) {
-        e.printStackTrace();
-    }
+    CallbackHelper.callbackSuccessString(callbackContext, OneSignalUtils.getStringOrNull(pushId));
     return true;
   }
 
   public static boolean getPushSubscriptionToken(CallbackContext callbackContext) {
     String token = OneSignal.getUser().getPushSubscription().getToken();
-    try {
-        JSONObject subscriptionProperty = new JSONObject();
-        subscriptionProperty.put("value", token.isEmpty() ? JSONObject.NULL : token);
-        CallbackHelper.callbackSuccess(callbackContext, subscriptionProperty);
-    } catch (JSONException e) {
-        e.printStackTrace();
-    }
+    CallbackHelper.callbackSuccessString(callbackContext, OneSignalUtils.getStringOrNull(token));
     return true;
   }
   
@@ -191,29 +179,13 @@ public class OneSignalController {
 
   public static boolean getOnesignalId(CallbackContext callbackContext) {
     String onesignalId = OneSignal.getUser().getOnesignalId();
-    try {
-      JSONObject onesignalIdObject = new JSONObject ();
-      if (!onesignalId.isEmpty()) {
-        onesignalIdObject.put("value", onesignalId);
-      }
-      CallbackHelper.callbackSuccess(callbackContext, onesignalIdObject);
-    } catch (JSONException e){
-      e.printStackTrace();
-    }
+    CallbackHelper.callbackSuccessString(callbackContext, OneSignalUtils.getStringOrNull(onesignalId));
     return true;
   }
 
   public static boolean getExternalId(CallbackContext callbackContext) {
     String externalId = OneSignal.getUser().getExternalId();
-    try {
-      JSONObject externalIdObject = new JSONObject ();
-      if (!externalId.isEmpty()) {
-        externalIdObject.put("value", externalId);
-      }
-      CallbackHelper.callbackSuccess(callbackContext, externalIdObject);
-    } catch (JSONException e){
-      e.printStackTrace();
-    }
+    CallbackHelper.callbackSuccessString(callbackContext, OneSignalUtils.getStringOrNull(externalId));
     return true;
   }
 

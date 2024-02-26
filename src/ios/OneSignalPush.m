@@ -72,6 +72,12 @@ void successCallbackNSInteger(NSString* callbackId, int param) {
     [pluginCommandDelegate sendPluginResult:commandResult callbackId:callbackId];
 }
 
+void successCallbackString(NSString* callbackId, NSString* param) {
+    CDVPluginResult* commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:param];
+    commandResult.keepCallback = @1;
+    [pluginCommandDelegate sendPluginResult:commandResult callbackId:callbackId];
+}
+
 void failureCallback(NSString* callbackId, NSDictionary* data) {
     CDVPluginResult* commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:data];
     commandResult.keepCallback = @1;
@@ -208,23 +214,11 @@ static Class delegateClass = nil;
 }
 
 - (void)getOnesignalId:(CDVInvokedUrlCommand *)command {
-    NSString *onesignalId = OneSignal.User.onesignalId;
-    
-    NSDictionary *result = @{
-        @"value" : (onesignalId ? onesignalId : [NSNull null])
-    };
-    
-    successCallback(command.callbackId, result);
+    successCallbackString(command.callbackId, OneSignal.User.onesignalId);
 }
 
 - (void)getExternalId:(CDVInvokedUrlCommand *)command {
-    NSString *externalId = OneSignal.User.externalId;
-    
-    NSDictionary *result = @{
-        @"value" : (externalId ? externalId : [NSNull null])
-    };
-    
-    successCallback(command.callbackId, result);
+    successCallbackString(command.callbackId, OneSignal.User.externalId);
 }
 
 - (void)setProvidesNotificationSettingsView:(CDVInvokedUrlCommand *)command {
@@ -343,16 +337,11 @@ static Class delegateClass = nil;
 }
 
 - (void)getPushSubscriptionId:(CDVInvokedUrlCommand*)command {
-    NSMutableDictionary *result = [NSMutableDictionary new];
-    result[@"value"] = getStringOrNSNull(OneSignal.User.pushSubscription.id);
-    successCallback(command.callbackId, result);
+    successCallbackString(command.callbackId, OneSignal.User.pushSubscription.id);
 }
 
 - (void)getPushSubscriptionToken:(CDVInvokedUrlCommand*)command {
-
-    NSMutableDictionary *result = [NSMutableDictionary new];
-    result[@"value"] = getStringOrNSNull(OneSignal.User.pushSubscription.token);
-    successCallback(command.callbackId, result);
+    successCallbackString(command.callbackId, OneSignal.User.pushSubscription.token);
 }
 
 - (void)getPushSubscriptionOptedIn:(CDVInvokedUrlCommand*)command {
