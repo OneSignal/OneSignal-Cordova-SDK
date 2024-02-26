@@ -30,7 +30,8 @@ export default class Notifications {
     private _permission?: boolean;
 
     /**
-     * Sets initial permission value and adds observer for changes
+     * Sets initial permission value and adds observer for changes.
+     * This internal method is kept to support the deprecated method {@link hasPermission}.
      */
     _setPropertyAndObserver():void {
         const getPermissionCallback = (granted: boolean) => {

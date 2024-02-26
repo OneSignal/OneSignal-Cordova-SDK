@@ -27,7 +27,8 @@ export default class PushSubscription {
     }
 
     /**
-     * Sets initial Push Subscription properties and adds observer for changes
+     * Sets initial Push Subscription properties and adds observer for changes.
+     * This internal method is kept to support the deprecated methods {@link id}, {@link token}, {@link optedIn}.
      */
     _setPropertiesAndObserver():void {
         /**
