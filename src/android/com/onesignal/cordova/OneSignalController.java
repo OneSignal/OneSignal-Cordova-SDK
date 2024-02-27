@@ -229,7 +229,12 @@ public class OneSignalController {
   }
 
   public static boolean requestPermission(CallbackContext callbackContext, JSONArray data) {
-    final CallbackContext jsPromptForPushNotificationsCallback = callbackContext;
+    // if permission already exists, return early as the method call will not resolve
+    if (OneSignal.getNotifications().getPermission()) {
+      CallbackHelper.callbackSuccessBoolean(callbackContext, true);
+      return true;
+    }
+
     boolean fallbackToSettings = false;
     try {
       fallbackToSettings = data.getBoolean(0);

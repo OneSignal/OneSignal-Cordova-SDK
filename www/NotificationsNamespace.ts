@@ -87,19 +87,12 @@ export default class Notifications {
      * @returns {Promise<boolean>}
      */
     requestPermission(fallbackToSettings?: boolean): Promise<boolean> {
-        return this.getPermissionAsync()
-            .then(hasPermission => {
-                // If permission already exists, return early
-                if (hasPermission) {
-                    return true;
-                }
-                let fallback = fallbackToSettings ?? false;
+        let fallback = fallbackToSettings ?? false;
 
-                return new Promise<boolean>((resolve, reject) => {
-                    window.cordova.exec(resolve, reject, "OneSignalPush", "requestPermission", [fallback]);
-                });
-            });
-    }; 
+        return new Promise<boolean>((resolve, reject) => {
+            window.cordova.exec(resolve, reject, "OneSignalPush", "requestPermission", [fallback]);
+        });
+    };
 
     /**
      * Whether attempting to request notification permission will show a prompt. Returns true if the device has not been prompted for push notification permission already.
