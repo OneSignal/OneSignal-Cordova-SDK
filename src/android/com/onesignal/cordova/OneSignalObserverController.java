@@ -14,13 +14,18 @@ import com.onesignal.user.subscriptions.IPushSubscriptionObserver;
 import com.onesignal.user.subscriptions.PushSubscriptionChangedState;
 import com.onesignal.user.subscriptions.PushSubscriptionState;
 import com.onesignal.notifications.IPermissionObserver;
+import com.onesignal.user.state.UserState;
+import com.onesignal.user.state.UserChangedState;
+import com.onesignal.user.state.IUserStateObserver;
 
 public class OneSignalObserverController {
   private static CallbackContext jsPermissionObserverCallBack;
   private static CallbackContext jsSubscriptionObserverCallBack;
+  private static CallbackContext jsUserObserverCallBack;
 
   private static IPermissionObserver permissionObserver;
   private static IPushSubscriptionObserver pushSubscriptionObserver;
+  private static IUserStateObserver userStateObserver;
 
   public static boolean addPermissionObserver(CallbackContext callbackContext) {
     jsPermissionObserverCallBack = callbackContext;
@@ -63,6 +68,57 @@ public class OneSignalObserverController {
       OneSignal.getUser().getPushSubscription().addObserver(pushSubscriptionObserver);
     }
     return true;      
+  }
+
+  public static boolean addUserStateObserver(CallbackContext callbackContext) {
+    jsUserObserverCallBack = callbackContext;
+    if (userStateObserver == null) {
+      userStateObserver = new IUserStateObserver() {
+        @Override
+        public void onUserStateChange(UserChangedState state) {
+          UserState current = state.getCurrent();
+
+          if (!(current instanceof UserState)) {
+            return;
+          }
+
+          try {
+            JSONObject hash = new JSONObject();
+            hash.put("current", createUserIds(current));
+
+            CallbackHelper.callbackSuccess(jsUserObserverCallBack, hash);
+            
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        }
+      };
+      OneSignal.getUser().addObserver(userStateObserver);
+    }
+    return true;
+  }
+
+  /** Helper method to return JSONObject.NULL if string is empty or nil **/
+  private static Object getStringOrJSONObjectNull(String str) {
+    if (str != null && !str.isEmpty()) {
+        return str;
+    } else {
+        return JSONObject.NULL;
+    }
+  }
+
+  private static JSONObject createUserIds(UserState user) {
+    JSONObject userIds = new JSONObject();
+    try {
+        String externalId = user.getExternalId();
+        String onesignalId = user.getOnesignalId();
+
+        userIds.put("externalId", getStringOrJSONObjectNull(externalId));
+        userIds.put("onesignalId", getStringOrJSONObjectNull(onesignalId));
+    } catch (JSONException e) {
+        e.printStackTrace();
+    }
+    return userIds;
   }
 
   private static JSONObject createPushSubscriptionProperties(PushSubscriptionState pushSubscription) {

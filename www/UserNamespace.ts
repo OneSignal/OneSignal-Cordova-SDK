@@ -3,9 +3,27 @@ import PushSubscription from "./PushSubscriptionNamespace";
 // Suppress TS warnings about window.cordova
 declare let window: any; // turn off type checking
 
+// Represents the current user state
+export interface UserState {
+    onesignalId         ?: string;
+    externalId          ?: string;
+}
+
+export interface UserChangedState {
+    current: UserState;
+}
+
 export default class User {
     // The push subscription associated to the current user.
     pushSubscription: PushSubscription = new PushSubscription();
+
+    private _userStateObserverList: ((event:UserChangedState)=>void)[] = [];
+
+    private _processFunctionList(array: ((event:UserChangedState)=>void)[], param: UserChangedState): void {
+        for (let i = 0; i < array.length; i++) {
+            array[i](param);
+        }
+    }
 
     /**
      * Explicitly set a 2-character language code for the user.
@@ -159,4 +177,56 @@ export default class User {
             window.cordova.exec(resolve, reject, "OneSignalPush", "getTags", []);
         });
     };
+    
+    /**
+     * Add a callback that fires when the OneSignal User state changes. 
+     * Important: When using the observer to retrieve the onesignalId, check the externalId as well to confirm the values are associated with the expected user.
+     * @param  {(event: UserChangedState)=>void} listener
+     * @returns void
+     */
+    addEventListener(event: "change", listener: (event: UserChangedState) => void) {
+        this._userStateObserverList.push(listener as (event: UserChangedState) => void);
+        const userCallBackProcessor = (state: UserChangedState) => {
+            this._processFunctionList(this._userStateObserverList, state);
+        };
+        window.cordova.exec(userCallBackProcessor, function(){}, "OneSignalPush", "addUserStateObserver", []);
+    }
+
+    /**
+     * Remove a User State observer that has been previously added.
+     * @param  {(event: UserChangedState)=>void} listener
+     * @returns void
+     */
+    removeEventListener(event: "change", listener: (event: UserChangedState) => void) {
+        let index = this._userStateObserverList.indexOf(listener);
+        if (index !== -1) {
+            this._userStateObserverList.splice(index, 1);
+        }
+    }
+
+    /**
+     * Get the nullable OneSignal Id associated with the current user.
+     * @returns {Promise<string | null>}
+     */
+    async getOnesignalId(): Promise<string | null> {
+        return new Promise<string | null>((resolve, reject) => {
+            const callback = (response: {value: string}) => {
+                resolve(response.value ? response.value : null)
+            };
+            window.cordova.exec(callback, reject, "OneSignalPush", "getOnesignalId", []);
+        });
+    }
+
+    /**
+     * Get the nullable External Id associated with the current user.
+     * @returns {Promise<string | null>}
+     */
+    async getExternalId(): Promise<string | null> {
+        return new Promise<string | null>((resolve, reject) => {
+            const callback = (response: {value: string}) => {
+                resolve(response.value ? response.value : null)
+            };
+            window.cordova.exec(callback, reject, "OneSignalPush", "getExternalId", []);
+        });
+    }
 }

@@ -45,6 +45,7 @@ NSString* inAppMessageDidDisplayCallbackId;
 NSString* inAppMessageWillDismissCallbackId;
 NSString* inAppMessageDidDismissCallbackId;
 NSString* inAppMessageClickedCallbackId;
+NSString* userObserverCallbackId;
 
 OSNotificationClickEvent *actionNotification;
 OSNotification *notification;
@@ -102,6 +103,16 @@ void initOneSignalObject(NSDictionary* launchOptions) {
     OneSignalWrapper.sdkVersion = @"050006";
     [OneSignal initialize:nil withLaunchOptions:launchOptions];
     initialLaunchFired = true;
+}
+
+/** Helper method to return NSNull if string is empty or nil **/
+NSString* getStringOrNSNull(NSString* string) {
+    // length method can be used on nil and strings
+    if (string.length > 0) {
+        return string;
+    } else {
+        return [NSNull null];
+    }
 }
 
 @implementation UIApplication(OneSignalCordovaPush)
@@ -163,6 +174,41 @@ static Class delegateClass = nil;
 
 - (void)onPushSubscriptionDidChangeWithState:(OSPushSubscriptionChangedState *)state {
     successCallback(subscriptionObserverCallbackId, [state jsonRepresentation]);
+}
+
+- (void)onUserStateDidChangeWithState:(OSUserChangedState * _Nonnull)state {
+    NSString *onesignalId = state.current.onesignalId;
+    NSString *externalId = state.current.externalId;
+
+    NSMutableDictionary *result = [NSMutableDictionary new];
+    
+    NSMutableDictionary *currentObject = [NSMutableDictionary new];
+    
+    currentObject[@"onesignalId"] = getStringOrNSNull(onesignalId);
+    currentObject[@"externalId"] = getStringOrNSNull(externalId);
+    result[@"current"] = currentObject;
+
+    successCallback(userObserverCallbackId, result);
+}
+
+- (void)getOnesignalId:(CDVInvokedUrlCommand *)command {
+    NSString *onesignalId = OneSignal.User.onesignalId;
+    
+    NSDictionary *result = @{
+        @"value" : (onesignalId ? onesignalId : [NSNull null])
+    };
+    
+    successCallback(command.callbackId, result);
+}
+
+- (void)getExternalId:(CDVInvokedUrlCommand *)command {
+    NSString *externalId = OneSignal.User.externalId;
+    
+    NSDictionary *result = @{
+        @"value" : (externalId ? externalId : [NSNull null])
+    };
+    
+    successCallback(command.callbackId, result);
 }
 
 - (void)setProvidesNotificationSettingsView:(CDVInvokedUrlCommand *)command {
@@ -270,6 +316,14 @@ static Class delegateClass = nil;
     subscriptionObserverCallbackId = command.callbackId;
     if (first)
         [OneSignal.User.pushSubscription addObserver:self];
+}
+
+- (void)addUserStateObserver:(CDVInvokedUrlCommand*)command {
+    bool first = userObserverCallbackId == nil;
+    userObserverCallbackId = command.callbackId;
+    if (first) {
+        [OneSignal.User addObserver:self];
+    }
 }
 
 - (void)getPushSubscriptionId:(CDVInvokedUrlCommand*)command {
