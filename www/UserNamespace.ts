@@ -210,10 +210,7 @@ export default class User {
      */
     async getOnesignalId(): Promise<string | null> {
         return new Promise<string | null>((resolve, reject) => {
-            const callback = (response: {value: string}) => {
-                resolve(response.value ? response.value : null)
-            };
-            window.cordova.exec(callback, reject, "OneSignalPush", "getOnesignalId", []);
+            window.cordova.exec(resolve, reject, "OneSignalPush", "getOnesignalId", []);
         });
     }
 
@@ -223,10 +220,7 @@ export default class User {
      */
     async getExternalId(): Promise<string | null> {
         return new Promise<string | null>((resolve, reject) => {
-            const callback = (response: {value: string}) => {
-                resolve(response.value ? response.value : null)
-            };
-            window.cordova.exec(callback, reject, "OneSignalPush", "getExternalId", []);
+            window.cordova.exec(resolve, reject, "OneSignalPush", "getExternalId", []);
         });
     }
 }

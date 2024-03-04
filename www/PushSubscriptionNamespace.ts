@@ -27,15 +27,16 @@ export default class PushSubscription {
     }
 
     /**
-     * Sets initial Push Subscription properties and adds observer for changes
+     * Sets initial Push Subscription properties and adds observer for changes.
+     * This internal method is kept to support the deprecated methods {@link id}, {@link token}, {@link optedIn}.
      */
     _setPropertiesAndObserver():void {
         /**
          * Receive push Id
          * @param obj 
          */
-        const getIdCallback = (obj: {value: string}) => {
-            this._id = obj.value;
+        const getIdCallback = (id: string) => {
+            this._id = id;
         };
         window.cordova.exec(getIdCallback, function(){}, "OneSignalPush", "getPushSubscriptionId");
 
@@ -43,17 +44,17 @@ export default class PushSubscription {
          * Receive token
          * @param obj 
          */
-        const getTokenCallback = (obj: {value: string}) => {
-            this._token = obj.value;
+        const getTokenCallback = (token: string) => {
+            this._token = token;
         };
         window.cordova.exec(getTokenCallback, function(){}, "OneSignalPush", "getPushSubscriptionToken");
         
         /**
          * Receive opted-in status
-         * @param obj 
+         * @param granted 
          */
-        const getOptedInCallback = (obj: {value: boolean}) => {
-            this._optedIn = obj.value;
+        const getOptedInCallback = (granted: boolean) => {
+            this._optedIn = granted;
         };
         window.cordova.exec(getOptedInCallback, function(){}, "OneSignalPush", "getPushSubscriptionOptedIn");
         
@@ -62,24 +63,63 @@ export default class PushSubscription {
             this._token = subscriptionChange.current.token;
             this._optedIn = subscriptionChange.current.optedIn;
         });
-        
     }
     
+    /**
+     * @deprecated This method is deprecated. It has been replaced by {@link getIdAsync}.
+     */
     get id(): string | null | undefined {
+        console.warn("OneSignal: This method has been deprecated. Use getIdAsync instead for getting push subscription id.");
         return this._id;
     }
     
+    /**
+     * @deprecated This method is deprecated. It has been replaced by {@link getTokenAsync}.
+     */
     get token(): string | null | undefined {
+        console.warn("OneSignal: This method has been deprecated. Use getTokenAsync instead for getting push subscription token.");
         return this._token;
     }
+
+    /**
+     * @deprecated This method is deprecated. It has been replaced by {@link getOptedInAsync}.
+     */
+    get optedIn(): boolean {
+        console.warn("OneSignal: This method has been deprecated. Use getOptedInAsync instead for getting push subscription opted in status.");
+        return this._optedIn || false;
+    }
+
+    /**
+     * The readonly push subscription ID.
+     * @returns {Promise<string | null>}
+     */
+    getIdAsync(): Promise<string | null> {
+        return new Promise<string | null>((resolve, reject) => {
+            window.cordova.exec(resolve, reject, "OneSignalPush", "getPushSubscriptionId");
+        });
+    }
+    
+    /**
+     * The readonly push token.
+     * @returns {Promise<string | null>}
+     */
+    getTokenAsync(): Promise<string | null> {
+        return new Promise<string | null>((resolve, reject) => {
+            window.cordova.exec(resolve, reject, "OneSignalPush", "getPushSubscriptionToken");
+        });
+    }
+    
     /**
      * Gets a boolean value indicating whether the current user is opted in to push notifications.
      * This returns true when the app has notifications permission and optOut() is NOT called.
      * Note: Does not take into account the existence of the subscription ID and push token.
      * This boolean may return true but push notifications may still not be received by the user.
+     * @returns {Promise<boolean>}
      */
-    get optedIn(): boolean {
-        return this._optedIn || false;
+    getOptedInAsync(): Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
+            window.cordova.exec(resolve, reject, "OneSignalPush", "getPushSubscriptionOptedIn");
+        });
     }
 
     /**

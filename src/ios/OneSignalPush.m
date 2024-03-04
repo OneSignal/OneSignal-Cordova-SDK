@@ -72,6 +72,12 @@ void successCallbackNSInteger(NSString* callbackId, int param) {
     [pluginCommandDelegate sendPluginResult:commandResult callbackId:callbackId];
 }
 
+void successCallbackString(NSString* callbackId, NSString* param) {
+    CDVPluginResult* commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:param];
+    commandResult.keepCallback = @1;
+    [pluginCommandDelegate sendPluginResult:commandResult callbackId:callbackId];
+}
+
 void failureCallback(NSString* callbackId, NSDictionary* data) {
     CDVPluginResult* commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:data];
     commandResult.keepCallback = @1;
@@ -173,7 +179,23 @@ static Class delegateClass = nil;
 }
 
 - (void)onPushSubscriptionDidChangeWithState:(OSPushSubscriptionChangedState *)state {
-    successCallback(subscriptionObserverCallbackId, [state jsonRepresentation]);
+    NSMutableDictionary *result = [NSMutableDictionary new];
+    
+    //Previous state
+    NSMutableDictionary *previousObject = [NSMutableDictionary new];
+    previousObject[@"token"] = getStringOrNSNull(state.previous.token);
+    previousObject[@"id"] = getStringOrNSNull(state.previous.id);
+    previousObject[@"optedIn"] = @(state.previous.optedIn);
+    result[@"previous"] = previousObject;
+    
+    //Current state
+    NSMutableDictionary *currentObject = [NSMutableDictionary new];
+    currentObject[@"token"] = getStringOrNSNull(state.current.token);
+    currentObject[@"id"] = getStringOrNSNull(state.current.id);
+    currentObject[@"optedIn"] = @(state.current.optedIn);
+    result[@"current"] = currentObject;
+    
+    successCallback(subscriptionObserverCallbackId, result);
 }
 
 - (void)onUserStateDidChangeWithState:(OSUserChangedState * _Nonnull)state {
@@ -192,23 +214,11 @@ static Class delegateClass = nil;
 }
 
 - (void)getOnesignalId:(CDVInvokedUrlCommand *)command {
-    NSString *onesignalId = OneSignal.User.onesignalId;
-    
-    NSDictionary *result = @{
-        @"value" : (onesignalId ? onesignalId : [NSNull null])
-    };
-    
-    successCallback(command.callbackId, result);
+    successCallbackString(command.callbackId, OneSignal.User.onesignalId);
 }
 
 - (void)getExternalId:(CDVInvokedUrlCommand *)command {
-    NSString *externalId = OneSignal.User.externalId;
-    
-    NSDictionary *result = @{
-        @"value" : (externalId ? externalId : [NSNull null])
-    };
-    
-    successCallback(command.callbackId, result);
+    successCallbackString(command.callbackId, OneSignal.User.externalId);
 }
 
 - (void)setProvidesNotificationSettingsView:(CDVInvokedUrlCommand *)command {
@@ -327,31 +337,16 @@ static Class delegateClass = nil;
 }
 
 - (void)getPushSubscriptionId:(CDVInvokedUrlCommand*)command {
-    NSString *pushId = OneSignal.User.pushSubscription.id;
-    if (pushId) {
-        NSDictionary *result = @{
-            @"value" : pushId
-        };
-        successCallback(command.callbackId, result);
-    }
+    successCallbackString(command.callbackId, OneSignal.User.pushSubscription.id);
 }
 
 - (void)getPushSubscriptionToken:(CDVInvokedUrlCommand*)command {
-    NSString *token = OneSignal.User.pushSubscription.token;
-    if (token) {
-        NSDictionary *result = @{
-            @"value" : token
-        };
-        successCallback(command.callbackId, result);
-    }
+    successCallbackString(command.callbackId, OneSignal.User.pushSubscription.token);
 }
 
 - (void)getPushSubscriptionOptedIn:(CDVInvokedUrlCommand*)command {
     bool optedIn = OneSignal.User.pushSubscription.optedIn;
-    NSDictionary *result = @{
-        @"value" : @(optedIn)
-    };
-    successCallback(command.callbackId, result);
+    successCallbackBoolean(command.callbackId, optedIn);
 }
 
 - (void)optInPushSubscription:(CDVInvokedUrlCommand*)command {
@@ -405,10 +400,7 @@ static Class delegateClass = nil;
 
 - (void)getPermissionInternal:(CDVInvokedUrlCommand*)command {
     bool isPermitted = [OneSignal.Notifications permission];
-    NSDictionary *result = @{
-            @"value" : @(isPermitted)
-    };
-    successCallback(command.callbackId, result);
+    successCallbackBoolean(command.callbackId, isPermitted);
 }
 
 - (void)canRequestPermission:(CDVInvokedUrlCommand*)command {

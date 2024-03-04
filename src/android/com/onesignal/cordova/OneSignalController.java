@@ -82,42 +82,20 @@ public class OneSignalController {
 
   public static boolean getPushSubscriptionId(CallbackContext callbackContext) {
     String pushId = OneSignal.getUser().getPushSubscription().getId();
-    try {
-      JSONObject subscriptionProperty = new JSONObject ();
-      subscriptionProperty.put("value", pushId);
-
-      CallbackHelper.callbackSuccess(callbackContext, subscriptionProperty);
-    } catch (JSONException e){
-      e.printStackTrace();
-    }
+    CallbackHelper.callbackSuccessString(callbackContext, OneSignalUtils.getStringOrNull(pushId));
     return true;
   }
 
   public static boolean getPushSubscriptionToken(CallbackContext callbackContext) {
     String token = OneSignal.getUser().getPushSubscription().getToken();
-    try {
-      JSONObject subscriptionProperty = new JSONObject ();
-      subscriptionProperty.put("value", token);
-
-      CallbackHelper.callbackSuccess(callbackContext, subscriptionProperty);
-    } catch (JSONException e){
-      e.printStackTrace();
-    }
+    CallbackHelper.callbackSuccessString(callbackContext, OneSignalUtils.getStringOrNull(token));
     return true;
   }
   
   public static boolean getPushSubscriptionOptedIn(CallbackContext callbackContext) {
     boolean optedIn = OneSignal.getUser().getPushSubscription().getOptedIn();
-    try {
-    JSONObject subscriptionProperty = new JSONObject ();
-    subscriptionProperty.put("value", optedIn);
-
-    CallbackHelper.callbackSuccess(callbackContext, subscriptionProperty);
-  } catch (JSONException e){
-    e.printStackTrace();
-  }
-  return true;
-    
+    CallbackHelper.callbackSuccessBoolean(callbackContext, optedIn);
+    return true;
   }
 
   /** 
@@ -201,29 +179,13 @@ public class OneSignalController {
 
   public static boolean getOnesignalId(CallbackContext callbackContext) {
     String onesignalId = OneSignal.getUser().getOnesignalId();
-    try {
-      JSONObject onesignalIdObject = new JSONObject ();
-      if (!onesignalId.isEmpty()) {
-        onesignalIdObject.put("value", onesignalId);
-      }
-      CallbackHelper.callbackSuccess(callbackContext, onesignalIdObject);
-    } catch (JSONException e){
-      e.printStackTrace();
-    }
+    CallbackHelper.callbackSuccessString(callbackContext, OneSignalUtils.getStringOrNull(onesignalId));
     return true;
   }
 
   public static boolean getExternalId(CallbackContext callbackContext) {
     String externalId = OneSignal.getUser().getExternalId();
-    try {
-      JSONObject externalIdObject = new JSONObject ();
-      if (!externalId.isEmpty()) {
-        externalIdObject.put("value", externalId);
-      }
-      CallbackHelper.callbackSuccess(callbackContext, externalIdObject);
-    } catch (JSONException e){
-      e.printStackTrace();
-    }
+    CallbackHelper.callbackSuccessString(callbackContext, OneSignalUtils.getStringOrNull(externalId));
     return true;
   }
 
@@ -267,7 +229,12 @@ public class OneSignalController {
   }
 
   public static boolean requestPermission(CallbackContext callbackContext, JSONArray data) {
-    final CallbackContext jsPromptForPushNotificationsCallback = callbackContext;
+    // if permission already exists, return early as the method call will not resolve
+    if (OneSignal.getNotifications().getPermission()) {
+      CallbackHelper.callbackSuccessBoolean(callbackContext, true);
+      return true;
+    }
+
     boolean fallbackToSettings = false;
     try {
       fallbackToSettings = data.getBoolean(0);
@@ -288,14 +255,7 @@ public class OneSignalController {
 
   public static boolean getPermissionInternal(CallbackContext callbackContext) {
     boolean granted = OneSignal.getNotifications().getPermission();
-    try {
-      JSONObject permissionObj = new JSONObject ();
-      permissionObj.put("value", granted);
-
-      CallbackHelper.callbackSuccess(callbackContext, permissionObj);
-    } catch (JSONException e){
-      e.printStackTrace();
-    }
+    CallbackHelper.callbackSuccessBoolean(callbackContext, granted);
     return true;
   }
 

@@ -28,6 +28,12 @@ public class CallbackHelper {
         callbackContext.sendPluginResult(pluginResult);
     }
 
+    public static void callbackSuccessString(CallbackContext callbackContext, String param) {
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, param);
+        pluginResult.setKeepCallback(true);
+        callbackContext.sendPluginResult(pluginResult);
+    }
+
     public static void callbackError(CallbackContext callbackContext, JSONObject jsonObject) {
         if (jsonObject == null) // in case there are no data
             jsonObject = new JSONObject();

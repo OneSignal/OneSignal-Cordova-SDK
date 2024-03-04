@@ -55,6 +55,7 @@
     <source-file src="src/android/com/onesignal/cordova/OneSignalOutcomeController.java" target-dir="src/com/onesignal/cordova/" />
     <source-file src="src/android/com/onesignal/cordova/OneSignalInAppMessagingController.java" target-dir="src/com/onesignal/cordova/" />
     <source-file src="src/android/com/onesignal/cordova/CallbackHelper.java" target-dir="src/com/onesignal/cordova/" />
+    <source-file src="src/android/com/onesignal/cordova/OneSignalUtils.java" target-dir="src/com/onesignal/cordova/" />
   </platform>
 
   <!-- ios -->

@@ -98,23 +98,14 @@ public class OneSignalObserverController {
     return true;
   }
 
-  /** Helper method to return JSONObject.NULL if string is empty or nil **/
-  private static Object getStringOrJSONObjectNull(String str) {
-    if (str != null && !str.isEmpty()) {
-        return str;
-    } else {
-        return JSONObject.NULL;
-    }
-  }
-
   private static JSONObject createUserIds(UserState user) {
     JSONObject userIds = new JSONObject();
     try {
         String externalId = user.getExternalId();
         String onesignalId = user.getOnesignalId();
 
-        userIds.put("externalId", getStringOrJSONObjectNull(externalId));
-        userIds.put("onesignalId", getStringOrJSONObjectNull(onesignalId));
+        userIds.put("externalId", OneSignalUtils.getStringOrJSONObjectNull(externalId));
+        userIds.put("onesignalId", OneSignalUtils.getStringOrJSONObjectNull(onesignalId));
     } catch (JSONException e) {
         e.printStackTrace();
     }
@@ -124,11 +115,14 @@ public class OneSignalObserverController {
   private static JSONObject createPushSubscriptionProperties(PushSubscriptionState pushSubscription) {
     JSONObject pushSubscriptionProperties = new JSONObject();
     try {
-      pushSubscriptionProperties.put("id", pushSubscription.getId());
-      pushSubscriptionProperties.put("token", pushSubscription.getToken());
-      pushSubscriptionProperties.put("optedIn", pushSubscription.getOptedIn());
+        String id = pushSubscription.getId();
+        String token = pushSubscription.getToken();
+
+        pushSubscriptionProperties.put("id", OneSignalUtils.getStringOrJSONObjectNull(id));
+        pushSubscriptionProperties.put("token", OneSignalUtils.getStringOrJSONObjectNull(token));
+        pushSubscriptionProperties.put("optedIn", pushSubscription.getOptedIn());
     } catch (JSONException e) {
-      e.printStackTrace();
+        e.printStackTrace();
     }
     return pushSubscriptionProperties;
   }

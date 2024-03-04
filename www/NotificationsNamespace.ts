@@ -30,11 +30,12 @@ export default class Notifications {
     private _permission?: boolean;
 
     /**
-     * Sets initial permission value and adds observer for changes
+     * Sets initial permission value and adds observer for changes.
+     * This internal method is kept to support the deprecated method {@link hasPermission}.
      */
     _setPropertyAndObserver():void {
-        const getPermissionCallback = (obj: {value: boolean}) => {
-            this._permission = obj.value;
+        const getPermissionCallback = (granted: boolean) => {
+            this._permission = granted;
         };
         window.cordova.exec(getPermissionCallback, function(){}, "OneSignalPush", "getPermissionInternal");
 
@@ -43,8 +44,21 @@ export default class Notifications {
         });
     }
 
+    /**
+     * @deprecated This method is deprecated. It has been replaced by {@link getPermissionAsync}.
+     */
     hasPermission(): boolean {
         return this._permission || false;
+    }
+
+    /**
+     * Whether this app has push notification permission. Returns true if the user has accepted permissions,
+     * or if the app has ephemeral or provisional permission.
+     */
+    async getPermissionAsync(): Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
+            window.cordova.exec(resolve, reject, "OneSignalPush", "getPermissionInternal");       
+        });
     }
 
     /** iOS Only.
@@ -73,10 +87,6 @@ export default class Notifications {
      * @returns {Promise<boolean>}
      */
     requestPermission(fallbackToSettings?: boolean): Promise<boolean> {
-        // if permission already exists, return early as the native call will not resolve
-        if (this.hasPermission()) {
-            return Promise.resolve(true);
-        }
         let fallback = fallbackToSettings ?? false;
 
         return new Promise<boolean>((resolve, reject) => {
