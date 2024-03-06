@@ -16,7 +16,19 @@ public class CallbackHelper {
         callbackContext.sendPluginResult(pluginResult);
     }
 
+    public static void callbackSuccessInt(CallbackContext callbackContext, int param) {
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, param);
+        pluginResult.setKeepCallback(true);
+        callbackContext.sendPluginResult(pluginResult);
+    }
+
     public static void callbackSuccessBoolean(CallbackContext callbackContext, boolean param) {
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, param);
+        pluginResult.setKeepCallback(true);
+        callbackContext.sendPluginResult(pluginResult);
+    }
+
+    public static void callbackSuccessString(CallbackContext callbackContext, String param) {
         PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, param);
         pluginResult.setKeepCallback(true);
         callbackContext.sendPluginResult(pluginResult);

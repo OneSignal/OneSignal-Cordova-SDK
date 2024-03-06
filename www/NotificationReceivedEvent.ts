@@ -1,25 +1,20 @@
-import OSNotification from './OSNotification';
-declare let cordova: any;
+import { OSNotification } from './OSNotification';
 
-export default class NotificationReceivedEvent {
+declare let cordova: any;
+// Suppress TS warnings about window.cordova
+
+declare let window: any; // turn off type checking
+
+export class NotificationWillDisplayEvent {
     private notification: OSNotification;
 
-    constructor(receivedEvent: OSNotification) {
-        this.notification = new OSNotification(receivedEvent);
+    constructor(displayEvent: OSNotification) {
+        this.notification = new OSNotification(displayEvent);
     }
 
-    complete(notification?: OSNotification): void {
-        if (!notification) {
-            // if the notificationReceivedEvent is null, we want to call the native-side
-            // complete/completion with null to silence the notification
-            cordova.exec(function(){}, function(){}, "OneSignalPush", "completeNotification", [this.notification.notificationId, false]);
-            return;
-        }
-
-        // if the notificationReceivedEvent is not null, we want to pass the specific event
-        // future: Android side: make the notification modifiable
-        // iOS & Android: the notification id is associated with the native-side complete handler / completion block
-        cordova.exec(function(){}, function(){}, "OneSignalPush", "completeNotification", [this.notification.notificationId, true]);
+    preventDefault(): void {
+        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "preventDefault", [this.notification.notificationId]);
+        return;
     }
 
     getNotification(): OSNotification {

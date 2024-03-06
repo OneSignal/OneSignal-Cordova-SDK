@@ -1,8 +1,6 @@
 package com.onesignal.cordova;
 
 import com.onesignal.OneSignal;
-import com.onesignal.OneSignal.EmailUpdateError;
-import com.onesignal.OneSignal.EmailUpdateHandler;
 
 import org.apache.cordova.CallbackContext;
 import org.json.JSONArray;
@@ -10,26 +8,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class OneSignalEmailController {
-    public static boolean setEmail(CallbackContext callbackContext, JSONArray data) {
-        final CallbackContext jsSetEmailContext = callbackContext;
+    public static boolean addEmail(JSONArray data) {
         try {
-            OneSignal.setEmail(data.getString(0), data.getString(1), new EmailUpdateHandler() {
-                @Override
-                public void onSuccess() {
-                    CallbackHelper.callbackSuccess(jsSetEmailContext, null);
-                }
-
-                @Override
-                public void onFailure(EmailUpdateError error) {
-                    try {
-                        JSONObject errorObject = new JSONObject("{'error' : '" + error.getMessage() + "'}");
-                        CallbackHelper.callbackError(jsSetEmailContext, errorObject);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-
+            OneSignal.getUser().addEmail(data.getString(0));
             return true;
         } catch (Throwable t) {
             t.printStackTrace();
@@ -37,52 +18,13 @@ public class OneSignalEmailController {
         }
     }
 
-    public static boolean setUnauthenticatedEmail(CallbackContext callbackContext, JSONArray data) {
-        final CallbackContext jsSetEmailContext = callbackContext;
+    public static boolean removeEmail(JSONArray data) {
         try {
-            OneSignal.setEmail(data.getString(0), null, new EmailUpdateHandler() {
-                @Override
-                public void onSuccess() {
-                    CallbackHelper.callbackSuccess(jsSetEmailContext, null);
-                }
-
-                @Override
-                public void onFailure(EmailUpdateError error) {
-                    try {
-                        JSONObject errorObject = new JSONObject("{'error' : '" + error.getMessage() + "'}");
-                        CallbackHelper.callbackError(jsSetEmailContext, errorObject);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-
+            OneSignal.getUser().removeEmail(data.getString(0));
             return true;
         } catch (Throwable t) {
             t.printStackTrace();
             return false;
         }
-    }
-
-    public static boolean logoutEmail(CallbackContext callbackContext) {
-        final CallbackContext jsSetEmailContext = callbackContext;
-        OneSignal.logoutEmail(new EmailUpdateHandler() {
-            @Override
-            public void onSuccess() {
-                CallbackHelper.callbackSuccess(jsSetEmailContext, null);
-            }
-
-            @Override
-            public void onFailure(EmailUpdateError error) {
-                try {
-                    JSONObject errorObject = new JSONObject("{'error' : '" + error.getMessage() + "'}");
-                    CallbackHelper.callbackError(jsSetEmailContext, errorObject);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        return true;
     }
 }

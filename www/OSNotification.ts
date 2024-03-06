@@ -1,9 +1,14 @@
-export default class OSNotification {
+declare let cordova: any;
+
+// Suppress TS warnings about window.cordova
+declare let window: any; // turn off type checking
+
+export class OSNotification {
     body                : string;
     sound               ?: string;
     title               ?: string;
     launchURL           ?: string;
-    rawPayload          : object;
+    rawPayload          : string;
     actionButtons       ?: object[];
     additionalData      : object;
     notificationId      : string;
@@ -57,7 +62,7 @@ export default class OSNotification {
             this.rawPayload = receivedEvent.rawPayload;
         }
 
-        /// If set, he launch URL will be opened when the user
+        /// If set, the launch URL will be opened when the user
         /// taps on your push notification. You can control
         /// whether or not it opens in an in-app webview or
         /// in Safari (with iOS).
@@ -68,7 +73,7 @@ export default class OSNotification {
         this.sound = receivedEvent.sound;
 
         /// Any buttons you want to add to the notification.
-        /// The notificationOpened handler will provide an
+        /// The notificationClick listener will provide an
         /// OSNotificationAction object, which will contain
         /// the ID of the Action the user tapped.
         if (receivedEvent.actionButtons) {
@@ -262,5 +267,14 @@ export default class OSNotification {
         if (receivedEvent.interruptionLevel) {
             this.interruptionLevel = receivedEvent.interruptionLevel;
         }
+    }
+
+    /**
+     * Display the notification.
+     * @returns void
+     */
+    display(): void {
+        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "displayNotification", [this.notificationId]);
+        return;
     }
 }

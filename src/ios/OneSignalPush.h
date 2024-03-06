@@ -29,79 +29,90 @@
 #import <Cordova/CDV.h>
 #import <Cordova/CDVPlugin.h>
 
-#import <OneSignal/OneSignal.h>
+#import <OneSignalFramework/OneSignalFramework.h>
 
-@interface OneSignalPush : CDVPlugin <OSPermissionObserver, OSSubscriptionObserver, OSEmailSubscriptionObserver, OSSMSSubscriptionObserver, OSInAppMessageLifecycleHandler>
+@interface OneSignalPush : CDVPlugin <OSNotificationPermissionObserver, OSNotificationLifecycleListener, OSNotificationClickListener, OSPushSubscriptionObserver, OSInAppMessageLifecycleListener, OSInAppMessageClickListener, OSUserStateObserver>
 
 - (void)setProvidesNotificationSettingsView:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)setNotificationWillShowInForegroundHandler:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)setNotificationOpenedHandler:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)completeNotification:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)addForegroundLifecycleListener:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)onWillDisplayNotification:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)onClickNotification:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)preventDefault:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)proceedWithWillDisplay:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)displayNotification:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)addNotificationClickListener:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)init:(CDVInvokedUrlCommand* _Nonnull)command;
 
-- (void)getDeviceState:(CDVInvokedUrlCommand* _Nonnull)command;
-
-- (void)addPermissionObserver:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)addSubscriptionObserver:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)addEmailSubscriptionObserver:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)addSMSSubscriptionObserver:(CDVInvokedUrlCommand* _Nonnull)command;
-
 - (void)setLogLevel:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)setAlertLevel:(CDVInvokedUrlCommand* _Nonnull)command;
 
+- (void)login:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)logout:(CDVInvokedUrlCommand* _Nonnull)command;
+
+- (void)addTags:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)removeTags:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)getTags:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)sendTags:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)deleteTags:(CDVInvokedUrlCommand* _Nonnull)command;
 
-- (void)promptForPushNotificationsWithUserResponse:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)addUserStateObserver:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)getOnesignalId:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)getExternalId:(CDVInvokedUrlCommand* _Nonnull)command;
+
+// Push Subscription
+- (void)addPushSubscriptionObserver:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)getPushSubscriptionId:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)getPushSubscriptionToken:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)getPushSubscriptionOptedIn:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)optInPushSubscription:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)optOutPushSubscription:(CDVInvokedUrlCommand* _Nonnull)command;
+
+// Notifications
+- (void)addPermissionObserver:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)requestPermission:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)getPermissionInternal:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)permissionNative:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)canRequestPermission:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)registerForProvisionalAuthorization:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)disablePush:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)postNotification:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)clearAllNotifications:(CDVInvokedUrlCommand* _Nonnull)command;
 
-// Start Android Only
-- (void)clearOneSignalNotifications:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)unsubscribeWhenNotificationsAreDisabled:(CDVInvokedUrlCommand* _Nonnull)command;
+// Android Only - Notifications
 - (void)removeNotification:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)removeGroupedNotifications:(CDVInvokedUrlCommand* _Nonnull)command;
-// End Android Only
 
-- (void)userProvidedPrivacyConsent:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)requiresUserPrivacyConsent:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)setRequiresUserPrivacyConsent:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)provideUserConsent:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)setPrivacyConsentRequired:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)setPrivacyConsentGiven:(CDVInvokedUrlCommand* _Nonnull)command;
 
-- (void)setExternalUserId:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)removeExternalUserId:(CDVInvokedUrlCommand* _Nonnull)command;
+// Aliases
+- (void)addAliases:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)removeAliases:(CDVInvokedUrlCommand* _Nonnull)command;
 
 // Email
-- (void)setEmail:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)setUnauthenticatedEmail:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)logoutEmail:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)addEmail:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)removeEmail:(CDVInvokedUrlCommand* _Nonnull)command;
 
 // SMS
-- (void)setSMSNumber:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)setUnauthenticatedSMSNumber:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)logoutSMSNumber:(CDVInvokedUrlCommand* _Nonnull)command;
-    
-// In App Message
-- (void)setLaunchURLsInApp:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)addSms:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)removeSms:(CDVInvokedUrlCommand* _Nonnull)command;
+
+// In-App Messages
 - (void)setInAppMessageClickHandler:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)setInAppMessageLifecycleHandler:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)onClickInAppMessage:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)setOnWillDisplayInAppMessageHandler:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)setOnDidDisplayInAppMessageHandler:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)setOnWillDismissInAppMessageHandler:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)setOnDidDismissInAppMessageHandler:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)addTriggers:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)removeTriggersForKeys:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)getTriggerValueForKey:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)pauseInAppMessages:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)removeTriggers:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)clearTriggers:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)setPaused:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)isPaused:(CDVInvokedUrlCommand* _Nonnull)command;
 
 // Outcomes
-- (void)sendOutcome:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)sendUniqueOutcome:(CDVInvokedUrlCommand* _Nonnull)command;
-- (void)sendOutcomeWithValue:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)addOutcome:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)addUniqueOutcome:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)addOutcomeWithValue:(CDVInvokedUrlCommand* _Nonnull)command;
 
 // Location
-- (void)promptLocation:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)requestLocationPermission:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)setLocationShared:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)isLocationShared:(CDVInvokedUrlCommand* _Nonnull)command;
 

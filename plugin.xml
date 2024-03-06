@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="onesignal-cordova-plugin"
-    version="3.3.1">
+    version="5.0.6">
 
   <name>OneSignal Push Notifications</name>
   <author>Josh Kasten, Bradley Hesse, Rodrigo Gomez-Palacio</author>
@@ -26,12 +26,20 @@
   </engines>
 
   <js-module src="dist/NotificationReceivedEvent.js" name="NotificationReceivedEvent" />
-  <js-module src="dist/Subscription.js" name="Subscription" />
   <js-module src="dist/OSNotification.js" name="OSNotification" />
+  <js-module src="dist/UserNamespace.js" name="UserNamespace" />
+  <js-module src="dist/PushSubscriptionNamespace.js" name="PushSubscriptionNamespace" />
+  <js-module src="dist/DebugNamespace.js" name="DebugNamespace" />
+  <js-module src="dist/InAppMessagesNamespace.js" name="InAppMessagesNamespace" />
+  <js-module src="dist/SessionNamespace.js" name="SessionNamespace" />
+  <js-module src="dist/LocationNamespace.js" name="LocationNamespace" />
+  <js-module src="dist/NotificationsNamespace.js" name="NotificationsNamespace" />
+  <js-module src="dist/LiveActivitiesNamespace.js" name="LiveActivitiesNamespace" />
 
   <platform name="android">
-    <framework src="com.onesignal:OneSignal:4.8.5" />
+    <framework src="com.onesignal:OneSignal:5.1.4" />
     <framework src="build-extras-onesignal.gradle" custom="true" type="gradleReference" />
+    <framework src="org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.7.10" />
 
     <config-file target="res/xml/config.xml" parent="/*">
       <feature name="OneSignalPush" >
@@ -47,6 +55,7 @@
     <source-file src="src/android/com/onesignal/cordova/OneSignalOutcomeController.java" target-dir="src/com/onesignal/cordova/" />
     <source-file src="src/android/com/onesignal/cordova/OneSignalInAppMessagingController.java" target-dir="src/com/onesignal/cordova/" />
     <source-file src="src/android/com/onesignal/cordova/CallbackHelper.java" target-dir="src/com/onesignal/cordova/" />
+    <source-file src="src/android/com/onesignal/cordova/OneSignalUtils.java" target-dir="src/com/onesignal/cordova/" />
   </platform>
 
   <!-- ios -->
@@ -76,7 +85,7 @@
             <source url="https://cdn.cocoapods.org/"/>
         </config>
         <pods use-frameworks="true">
-            <pod name="OneSignalXCFramework" spec="3.12.4" />
+            <pod name="OneSignalXCFramework" spec="5.1.0" />
         </pods>
     </podspec>
 

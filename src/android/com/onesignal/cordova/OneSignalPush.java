@@ -29,13 +29,26 @@ package com.onesignal.cordova;
 
 import android.util.Log;
 
-import com.onesignal.OSInAppMessageAction;
-import com.onesignal.OSInAppMessage;
-import com.onesignal.OSInAppMessageLifecycleHandler;
-import com.onesignal.OSNotification;
-import com.onesignal.OSNotificationOpenedResult;
-import com.onesignal.OSNotificationReceivedEvent;
 import com.onesignal.OneSignal;
+import com.onesignal.debug.internal.logging.Logging;
+import com.onesignal.common.OneSignalWrapper;
+
+import com.onesignal.inAppMessages.IInAppMessage;
+import com.onesignal.inAppMessages.IInAppMessageClickListener;
+import com.onesignal.inAppMessages.IInAppMessageClickEvent;
+import com.onesignal.inAppMessages.IInAppMessageClickResult;
+import com.onesignal.inAppMessages.IInAppMessageLifecycleListener;
+import com.onesignal.inAppMessages.IInAppMessageWillDisplayEvent;
+import com.onesignal.inAppMessages.IInAppMessageDidDisplayEvent;
+import com.onesignal.inAppMessages.IInAppMessageWillDismissEvent;
+import com.onesignal.inAppMessages.IInAppMessageDidDismissEvent;
+
+import com.onesignal.notifications.INotification;
+import com.onesignal.notifications.INotificationClickListener;
+import com.onesignal.notifications.INotificationClickEvent;
+import com.onesignal.notifications.INotificationClickResult;
+import com.onesignal.notifications.INotificationLifecycleListener;
+import com.onesignal.notifications.INotificationWillDisplayEvent;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -45,130 +58,268 @@ import org.json.JSONException;
 
 import java.util.HashMap;
 
-public class OneSignalPush extends CordovaPlugin {
+public class OneSignalPush extends CordovaPlugin implements INotificationLifecycleListener, INotificationClickListener, IInAppMessageLifecycleListener, IInAppMessageClickListener {
   private static final String TAG = "OneSignalPush";
 
-  private static final String SET_NOTIFICATION_WILL_SHOW_IN_FOREGROUND_HANDLER = "setNotificationWillShowInForegroundHandler";
-  private static final String SET_NOTIFICATION_OPENED_HANDLER = "setNotificationOpenedHandler";
+  private static final String ADD_FOREGROUND_LIFECYCLE_LISTENER = "addForegroundLifecycleListener";
+  private static final String PROCEED_WITH_WILL_DISPLAY = "proceedWithWillDisplay";
+  private static final String DISPLAY_NOTIFICATION = "displayNotification";
+  private static final String PREVENT_DEFAULT = "preventDefault";
+  private static final String ADD_NOTIFICATION_CLICK_LISTENER = "addNotificationClickListener";
+  
   private static final String SET_IN_APP_MESSAGE_CLICK_HANDLER = "setInAppMessageClickHandler";
-
-  private static final String SET_IN_APP_MESSAGE_LIFECYCLE_HANDLER = "setInAppMessageLifecycleHandler";
   private static final String SET_ON_WILL_DISPLAY_IN_APP_MESSAGE_HANDLER = "setOnWillDisplayInAppMessageHandler";
   private static final String SET_ON_DID_DISPLAY_IN_APP_MESSAGE_HANDLER = "setOnDidDisplayInAppMessageHandler";
   private static final String SET_ON_WILL_DISMISS_IN_APP_MESSAGE_HANDLER = "setOnWillDismissInAppMessageHandler";
   private static final String SET_ON_DID_DISMISS_IN_APP_MESSAGE_HANDLER = "setOnDidDismissInAppMessageHandler";
 
-  private static final String COMPLETE_NOTIFICATION = "completeNotification";
   private static final String INIT = "init";
-
-  private static final String GET_DEVICE_STATE = "getDeviceState";
 
   private static final String SET_LANGUAGE = "setLanguage";
 
-  private static final String ADD_PERMISSION_OBSERVER = "addPermissionObserver";
-  private static final String ADD_SUBSCRIPTION_OBSERVER = "addSubscriptionObserver";
-  private static final String ADD_EMAIL_SUBSCRIPTION_OBSERVER = "addEmailSubscriptionObserver";
-  private static final String ADD_SMS_SUBSCRIPTION_OBSERVER = "addSMSSubscriptionObserver";
+  private static final String LOGIN = "login";
+  private static final String LOGOUT = "logout";
 
+  private static final String ADD_PERMISSION_OBSERVER = "addPermissionObserver";
+  private static final String ADD_PUSH_SUBSCRIPTION_OBSERVER = "addPushSubscriptionObserver";
+  private static final String ADD_USER_STATE_OBSERVER = "addUserStateObserver";
+
+  private static final String GET_ONESIGNAL_ID = "getOnesignalId";
+  private static final String GET_EXTERNAL_ID = "getExternalId";
+
+  private static final String OPT_IN = "optInPushSubscription";
+  private static final String OPT_OUT = "optOutPushSubscription";
+   private static final String GET_ID = "getPushSubscriptionId";
+  private static final String GET_TOKEN = "getPushSubscriptionToken";
+  private static final String GET_OPTED_IN = "getPushSubscriptionOptedIn";
+  
+  private static final String ADD_ALIASES = "addAliases";
+  private static final String REMOVE_ALIASES = "removeAliases";
+
+  private static final String REMOVE_TAGS = "removeTags";
+  private static final String ADD_TAGS = "addTags";
   private static final String GET_TAGS = "getTags";
-  private static final String DELETE_TAGS = "deleteTags";
-  private static final String SEND_TAGS = "sendTags";
 
   private static final String REGISTER_FOR_PROVISIONAL_AUTHORIZATION = "registerForProvisionalAuthorization";
-  private static final String PROMPT_FOR_PUSH_NOTIFICATIONS_WITH_USER_RESPONSE = "promptForPushNotificationsWithUserResponse";
-  private static final String UNSUBSCRIBE_WHEN_NOTIFICATIONS_DISABLED = "unsubscribeWhenNotificationsAreDisabled";
+  private static final String REQUEST_PERMISSION = "requestPermission";
+  private static final String GET_PERMISSION_INTERNAL = "getPermissionInternal";
+  private static final String PERMISSION_NATIVE = "permissionNative";
+  private static final String CAN_REQUEST_PERMISSION = "canRequestPermission";
 
-  private static final String CLEAR_ONESIGNAL_NOTIFICATIONS = "clearOneSignalNotifications";
+  private static final String CLEAR_ALL_NOTIFICATIONS = "clearAllNotifications";
   private static final String REMOVE_NOTIFICATION = "removeNotification";
   private static final String REMOVE_GROUPED_NOTIFICATIONS = "removeGroupedNotifications";
 
-  private static final String DISABLE_PUSH = "disablePush";
-  private static final String POST_NOTIFICATION = "postNotification";
-  private static final String SET_LAUNCH_URLS_IN_APP = "setLaunchURLsInApp";
+  private static final String ADD_EMAIL = "addEmail";
+  private static final String REMOVE_EMAIL = "removeEmail";
 
-  private static final String SET_EMAIL = "setEmail";
-  private static final String SET_UNAUTHENTICATED_EMAIL = "setUnauthenticatedEmail";
-  private static final String LOGOUT_EMAIL = "logoutEmail";
-
-  private static final String SET_SMS_NUMBER = "setSMSNumber";
-  private static final String SET_UNAUTHENTICATED_SMS_NUMBER = "setUnauthenticatedSMSNumber";
-  private static final String LOGOUT_SMS_NUMBER = "logoutSMSNumber";
+  private static final String ADD_SMS = "addSms";
+  private static final String REMOVE_SMS = "removeSms";
 
   private static final String SET_LOG_LEVEL = "setLogLevel";
+  private static final String SET_ALERT_LEVEL = "setAlertLevel";
 
   private static final String SET_LOCATION_SHARED = "setLocationShared";
   private static final String IS_LOCATION_SHARED = "isLocationShared";
-  private static final String PROMPT_LOCATION = "promptLocation";
+  private static final String REQUEST_LOCATION_PERMISSION = "requestLocationPermission";
 
-  private static final String USER_PROVIDED_CONSENT = "userProvidedPrivacyConsent";
-  private static final String REQUIRES_CONSENT = "requiresUserPrivacyConsent";
-  private static final String SET_REQUIRES_CONSENT = "setRequiresUserPrivacyConsent";
-  private static final String PROVIDE_USER_CONSENT = "provideUserConsent";
-
-  private static final String SET_EXTERNAL_USER_ID = "setExternalUserId";
-  private static final String REMOVE_EXTERNAL_USER_ID = "removeExternalUserId";
+  private static final String SET_PRIVACY_CONSENT_REQUIRED = "setPrivacyConsentRequired";
+  private static final String SET_PRIVACY_CONSENT_GIVEN = "setPrivacyConsentGiven";
 
   private static final String ADD_TRIGGERS = "addTriggers";
-  private static final String REMOVE_TRIGGERS_FOR_KEYS = "removeTriggersForKeys";
-  private static final String GET_TRIGGER_VALUE_FOR_KEY = "getTriggerValueForKey";
+  private static final String REMOVE_TRIGGERS = "removeTriggers";
+  private static final String CLEAR_TRIGGERS = "clearTriggers";
+  private static final String SET_PAUSED = "setPaused";
+  private static final String IS_PAUSED = "isPaused";
 
-  private static final String PAUSE_IN_APP_MESSAGES = "pauseInAppMessages";
-  private static final String IN_APP_MESSAGING_PAUSED = "isInAppMessagingPaused";
+  private static final String ADD_OUTCOME = "addOutcome";
+  private static final String ADD_UNIQUE_OUTCOME = "addUniqueOutcome";
+  private static final String ADD_OUTCOME_WITH_VALUE = "addOutcomeWithValue";
 
-  private static final String SEND_OUTCOME = "sendOutcome";
-  private static final String SEND_UNIQUE_OUTCOME = "sendUniqueOutcome";
-  private static final String SEND_OUTCOME_WITH_VALUE = "sendOutcomeWithValue";
+  private static final String ENTER_LIVE_ACTIVITY = "enterLiveActivity";
+  private static final String EXIT_LIVE_ACTIVITY = "exitLiveActivity";
 
-  private static final HashMap<String, OSNotificationReceivedEvent> notificationReceivedEventCache = new HashMap<>();
+  private static final HashMap<String, INotificationWillDisplayEvent> notificationWillDisplayCache = new HashMap<>();
+  private static final HashMap<String, INotificationWillDisplayEvent> preventDefaultCache = new HashMap<>();
 
   private static CallbackContext jsInAppMessageWillDisplayCallback;
   private static CallbackContext jsInAppMessageDidDisplayCallBack;
   private static CallbackContext jsInAppMessageWillDismissCallback;
   private static CallbackContext jsInAppMessageDidDismissCallBack;
+  private static CallbackContext jsInAppMessageClickedCallback;
+  private static CallbackContext jsNotificationInForegroundCallBack;
+  private static CallbackContext jsNotificationClickedCallback;
 
-  public boolean setNotificationWillShowInForegroundHandler(CallbackContext callbackContext) {
-    OneSignal.setNotificationWillShowInForegroundHandler(new CordovaNotificationInForegroundHandler(callbackContext));
+  /**
+   * N O T I F I C A T I O N    L I F E C Y C L E
+   */
+
+  public boolean addForegroundLifecycleListener(CallbackContext callbackContext) {
+    jsNotificationInForegroundCallBack = callbackContext;
     return true;
   }
 
-  public boolean setNotificationOpenedHandler(CallbackContext callbackContext) {
-    OneSignal.setNotificationOpenedHandler(new CordovaNotificationOpenHandler(callbackContext));
+  @Override
+  public void onWillDisplay(INotificationWillDisplayEvent event) {
+    if (jsNotificationInForegroundCallBack != null) {
+      try {
+        INotification notification = event.getNotification();
+        notificationWillDisplayCache.put(notification.getNotificationId(), (INotificationWillDisplayEvent) event);
+
+        event.preventDefault();
+
+        JSONObject foregroundData = serializeNotification(notification);
+        CallbackHelper.callbackSuccess(jsNotificationInForegroundCallBack, foregroundData);
+      } catch (JSONException e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
+  private boolean proceedWithWillDisplay(JSONArray data) {
+    try{
+      String notificationId = data.getString(0);
+      INotificationWillDisplayEvent event = notificationWillDisplayCache.get(notificationId);
+      if (event == null) {
+          Logging.error("Could not find onWillDisplayNotification event for notification with id: " + notificationId, null);
+          return true;
+      }
+      if (this.preventDefaultCache.containsKey(notificationId)) {
+          return true;
+      }
+      event.getNotification().display();
+      return true;
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
     return true;
   }
+
+  private boolean displayNotification(JSONArray data) {
+    try {
+      String notificationId = data.getString(0);
+        INotificationWillDisplayEvent event = notificationWillDisplayCache.get(notificationId);
+        if (event == null) {
+            Logging.error("Could not find onWillDisplayNotification event for notification with id: " + notificationId, null);
+            return true;
+        }
+        event.getNotification().display();
+      return true;
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return true;
+  }
+
+  private boolean preventDefault(JSONArray data) {
+    try {
+      String notificationId = data.getString(0);
+      INotificationWillDisplayEvent event = notificationWillDisplayCache.get(notificationId);
+      if (event == null) {
+          Logging.error("Could not find onWillDisplayNotification event for notification with id: " + notificationId, null);
+          return true;
+      }
+      event.preventDefault();
+      this.preventDefaultCache.put(notificationId, event);
+      return true;
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return true;
+  }
+
+  /**
+   * N O T I F I C A T I O N    C L I C K    L I S T E N E R
+   */
+
+  public boolean addNotificationClickListener(CallbackContext callbackContext) {
+    jsNotificationClickedCallback = callbackContext;
+    return true;
+  }
+
+  @Override
+  public void onClick(INotificationClickEvent event) {
+    try {
+      if (jsNotificationClickedCallback != null) {
+        CallbackHelper.callbackSuccess(jsNotificationClickedCallback, serializeNotificationClickEvent(event));
+      }
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * I N    A P P    M E S S A G E    C L I C K    L I S T E N E R
+   */
 
   public boolean setInAppMessageClickHandler(CallbackContext callbackContext) {
-    OneSignal.setInAppMessageClickHandler(new CordovaInAppMessageClickHandler(callbackContext));
+    jsInAppMessageClickedCallback = callbackContext;
     return true;
   }
 
-  public boolean setInAppMessageLifecycleHandler() {
-    OneSignal.setInAppMessageLifecycleHandler(new OSInAppMessageLifecycleHandler() {
-      @Override
-      public void onWillDisplayInAppMessage(OSInAppMessage message) {
-        if (jsInAppMessageWillDisplayCallback != null) {
-          CallbackHelper.callbackSuccess(jsInAppMessageWillDisplayCallback, message.toJSONObject());
-        }
+  @Override
+  public void onClick(IInAppMessageClickEvent event) {
+    try {
+      if (jsInAppMessageClickedCallback != null) {
+        CallbackHelper.callbackSuccess(jsInAppMessageClickedCallback, serializeInAppMessageClickEvent(event));
       }
-      @Override
-      public void onDidDisplayInAppMessage(OSInAppMessage message) {
-        if (jsInAppMessageDidDisplayCallBack != null) {
-          CallbackHelper.callbackSuccess(jsInAppMessageDidDisplayCallBack, message.toJSONObject());
-        }
+    }
+    catch (JSONException e) {
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * I N    A P P    M E S S A G E    L I F E C Y C L E
+   */
+
+  @Override
+  public void onWillDisplay(IInAppMessageWillDisplayEvent event) {
+    if (jsInAppMessageWillDisplayCallback != null) {
+      try {
+        JSONObject onWillDisplayResult = new JSONObject();
+        onWillDisplayResult.put("message", serializeInAppMessage(event.getMessage()));
+        CallbackHelper.callbackSuccess(jsInAppMessageWillDisplayCallback, onWillDisplayResult);
+      } catch (JSONException e) {
+        e.printStackTrace();
       }
-      @Override
-      public void onWillDismissInAppMessage(OSInAppMessage message) {
-        if (jsInAppMessageWillDismissCallback != null) {
-          CallbackHelper.callbackSuccess(jsInAppMessageWillDismissCallback, message.toJSONObject());
-        }
+    }
+  }
+  @Override
+  public void onDidDisplay(IInAppMessageDidDisplayEvent event) {
+    if (jsInAppMessageDidDisplayCallBack != null) {
+      try {
+        JSONObject onDidDisplayResult = new JSONObject();
+        onDidDisplayResult.put("message", serializeInAppMessage(event.getMessage()));
+        CallbackHelper.callbackSuccess(jsInAppMessageDidDisplayCallBack, onDidDisplayResult);
+      } catch (JSONException e) {
+        e.printStackTrace();
       }
-      @Override
-      public void onDidDismissInAppMessage(OSInAppMessage message) {
-        if (jsInAppMessageDidDismissCallBack != null) {
-          CallbackHelper.callbackSuccess(jsInAppMessageDidDismissCallBack, message.toJSONObject());
-        }
+    }
+  }
+  @Override
+  public void onWillDismiss(IInAppMessageWillDismissEvent event) {
+    if (jsInAppMessageWillDismissCallback != null) {
+      try {
+        JSONObject onWillDismissResult = new JSONObject();
+        onWillDismissResult.put("message", serializeInAppMessage(event.getMessage()));
+        CallbackHelper.callbackSuccess(jsInAppMessageWillDismissCallback, onWillDismissResult);
+      } catch (JSONException e) {
+        e.printStackTrace();
       }
-    });
-    return true;
+    }
+  }
+  @Override
+  public void onDidDismiss(IInAppMessageDidDismissEvent event) {
+    if (jsInAppMessageDidDismissCallBack != null) {
+      try {
+        JSONObject onDidDismissResult = new JSONObject();
+        onDidDismissResult.put("message", serializeInAppMessage(event.getMessage()));
+        CallbackHelper.callbackSuccess(jsInAppMessageDidDismissCallBack, onDidDismissResult);
+      } catch (JSONException e) {
+        e.printStackTrace();
+      }
+    }
   }
 
   public boolean setOnWillDisplayInAppMessageHandler(CallbackContext callbackContext) {
@@ -191,18 +342,27 @@ public class OneSignalPush extends CordovaPlugin {
     return true;
   }
 
-  public boolean init(JSONArray data) {
+  /**
+   * I N I T I A L I Z A T I O N
+   */
+
+  public boolean init(CallbackContext callbackContext, JSONArray data) {
+    OneSignalWrapper.setSdkType("cordova");  
+    OneSignalWrapper.setSdkVersion("050006");
     try {
       String appId = data.getString(0);
+      OneSignal.initWithContext(this.cordova.getActivity(), appId);
 
-      OneSignal.sdkType = "cordova";
+      // add listeners
+      OneSignal.getInAppMessages().addLifecycleListener(this);
+      OneSignal.getInAppMessages().addClickListener(this);
+      OneSignal.getNotifications().addForegroundLifecycleListener(this);
+      OneSignal.getNotifications().addClickListener(this);
 
-      OneSignal.setAppId(appId);
-      OneSignal.initWithContext(this.cordova.getActivity());
-
+      CallbackHelper.callbackSuccessBoolean(callbackContext, true);
       return true;
     } catch (JSONException e) {
-      Log.e(TAG, "execute: Got JSON Exception " + e.getMessage());
+      Logging.error(TAG + "execute: Got JSON Exception " + e.getMessage(), null);
       return false;
     }
   }
@@ -212,20 +372,28 @@ public class OneSignalPush extends CordovaPlugin {
     boolean result = false;
 
     switch(action) {
-      case SET_NOTIFICATION_OPENED_HANDLER:
-        result = setNotificationOpenedHandler(callbackContext);
+      case ADD_NOTIFICATION_CLICK_LISTENER:
+        result = addNotificationClickListener(callbackContext);
         break;
 
-      case SET_NOTIFICATION_WILL_SHOW_IN_FOREGROUND_HANDLER:
-        result = setNotificationWillShowInForegroundHandler(callbackContext);
+      case ADD_FOREGROUND_LIFECYCLE_LISTENER:
+        result = addForegroundLifecycleListener(callbackContext);
+        break;
+
+      case PROCEED_WITH_WILL_DISPLAY:
+        result = proceedWithWillDisplay(data);
+        break;
+
+      case DISPLAY_NOTIFICATION:
+        result = displayNotification(data);
+        break;
+
+      case PREVENT_DEFAULT:
+        result = preventDefault(data);
         break;
 
       case SET_IN_APP_MESSAGE_CLICK_HANDLER:
         result = setInAppMessageClickHandler(callbackContext);
-        break;
-
-      case SET_IN_APP_MESSAGE_LIFECYCLE_HANDLER:
-        result = setInAppMessageLifecycleHandler();
         break;
 
       case SET_ON_WILL_DISPLAY_IN_APP_MESSAGE_HANDLER:
@@ -244,64 +412,104 @@ public class OneSignalPush extends CordovaPlugin {
         result = setOnDidDismissInAppMessageHandler(callbackContext);
         break;
 
-      case COMPLETE_NOTIFICATION:
-        result = completeNotification(data);
-        break;
-
       case INIT:
-        result = init(data);
-        break;
-
-      case GET_DEVICE_STATE:
-        result = OneSignalController.getDeviceState(callbackContext);
+        result = init(callbackContext, data);
         break;
 
       case SET_LANGUAGE:
-        result = OneSignalController.setLanguage(callbackContext, data);
+        result = OneSignalController.setLanguage(data);
+        break;
+
+      case LOGIN:
+        result = OneSignalController.login(data);
+        break;
+      
+      case LOGOUT:
+        result = OneSignalController.logout();
         break;
 
       case ADD_PERMISSION_OBSERVER:
         result = OneSignalObserverController.addPermissionObserver(callbackContext);
         break;
 
-      case ADD_SUBSCRIPTION_OBSERVER:
-        result = OneSignalObserverController.addSubscriptionObserver(callbackContext);
+      case ADD_PUSH_SUBSCRIPTION_OBSERVER:
+        result = OneSignalObserverController.addPushSubscriptionObserver(callbackContext);
         break;
 
-      case ADD_EMAIL_SUBSCRIPTION_OBSERVER:
-        result = OneSignalObserverController.addEmailSubscriptionObserver(callbackContext);
+      case ADD_USER_STATE_OBSERVER:
+        result = OneSignalObserverController.addUserStateObserver(callbackContext);
         break;
 
-      case ADD_SMS_SUBSCRIPTION_OBSERVER:
-        result = OneSignalObserverController.addSMSSubscriptionObserver(callbackContext);
+      case GET_ONESIGNAL_ID:
+        result = OneSignalController.getOnesignalId(callbackContext);
+        break;
+
+      case GET_EXTERNAL_ID:
+        result = OneSignalController.getExternalId(callbackContext);
+        break;
+
+      case OPT_IN:
+        result = OneSignalController.optInPushSubscription();
+        break;
+
+      case OPT_OUT:
+        result = OneSignalController.optOutPushSubscription();
+        break;
+      
+      case GET_ID:
+        result = OneSignalController.getPushSubscriptionId(callbackContext);
+        break;
+
+      case GET_TOKEN:
+        result = OneSignalController.getPushSubscriptionToken(callbackContext);
+        break;
+
+      case GET_OPTED_IN:
+        result = OneSignalController.getPushSubscriptionOptedIn(callbackContext);
+        break;
+
+      case ADD_ALIASES:
+        result = OneSignalController.addAliases(data);
+        break;
+
+      case REMOVE_ALIASES:
+        result = OneSignalController.removeAliases(data);
+        break;
+
+      case ADD_TAGS:
+        result = OneSignalController.addTags(data);
+        break;
+
+      case REMOVE_TAGS:
+        result = OneSignalController.removeTags(data);
         break;
 
       case GET_TAGS:
         result = OneSignalController.getTags(callbackContext);
         break;
 
-      case SEND_TAGS:
-        result = OneSignalController.sendTags(data);
-        break;
-
-      case DELETE_TAGS:
-        result = OneSignalController.deleteTags(data);
-        break;
-
       case REGISTER_FOR_PROVISIONAL_AUTHORIZATION:
         result = OneSignalController.registerForProvisionalAuthorization();
         break;
 
-      case PROMPT_FOR_PUSH_NOTIFICATIONS_WITH_USER_RESPONSE:
-        result = OneSignalController.promptForPushNotificationsWithUserResponse(callbackContext, data);
+      case REQUEST_PERMISSION:
+        result = OneSignalController.requestPermission(callbackContext, data);
         break;
 
-      case UNSUBSCRIBE_WHEN_NOTIFICATIONS_DISABLED:
-        result = OneSignalController.unsubscribeWhenNotificationsAreDisabled(data);
+      case GET_PERMISSION_INTERNAL:
+        result = OneSignalController.getPermissionInternal(callbackContext);
         break;
 
-      case CLEAR_ONESIGNAL_NOTIFICATIONS:
-        result = OneSignalController.clearOneSignalNotifications();
+      case PERMISSION_NATIVE:
+        result = OneSignalController.permissionNative(callbackContext);
+        break;
+
+      case CAN_REQUEST_PERMISSION:
+        result = OneSignalController.canRequestPermission(callbackContext);
+        break;
+      
+      case CLEAR_ALL_NOTIFICATIONS:
+        result = OneSignalController.clearAllNotifications();
         break;
 
       case REMOVE_NOTIFICATION:
@@ -312,48 +520,32 @@ public class OneSignalPush extends CordovaPlugin {
         result = OneSignalController.removeGroupedNotifications(data);
         break;
 
-      case DISABLE_PUSH:
-        result = OneSignalController.disablePush(data);
-        break;
-
-      case POST_NOTIFICATION:
-        result = OneSignalController.postNotification(callbackContext, data);
-        break;
-
-      case SET_LAUNCH_URLS_IN_APP:
-        result = OneSignalController.setLaunchURLsInApp();
-        break;
-
       case SET_LOG_LEVEL:
         OneSignalController.setLogLevel(data);
         break;
 
-      case SET_EMAIL:
-        result = OneSignalEmailController.setEmail(callbackContext, data);
+      case SET_ALERT_LEVEL:
+        OneSignalController.setAlertLevel(data);
         break;
 
-      case SET_UNAUTHENTICATED_EMAIL:
-        result = OneSignalEmailController.setUnauthenticatedEmail(callbackContext, data);
+      case ADD_EMAIL:
+        result = OneSignalEmailController.addEmail(data);
         break;
 
-      case LOGOUT_EMAIL:
-        result = OneSignalEmailController.logoutEmail(callbackContext);
+      case REMOVE_EMAIL:
+        result = OneSignalEmailController.removeEmail(data);
         break;
 
-      case SET_SMS_NUMBER:
-        result = OneSignalSMSController.setSMSNumber(callbackContext, data);
+      case ADD_SMS:
+        result = OneSignalSMSController.addSms(data);
         break;
 
-      case SET_UNAUTHENTICATED_SMS_NUMBER:
-        result = OneSignalSMSController.setUnauthenticatedEmail(callbackContext, data);
+      case REMOVE_SMS:
+        result = OneSignalSMSController.removeSms(data);
         break;
 
-      case LOGOUT_SMS_NUMBER:
-        result = OneSignalSMSController.logoutSMSNumber(callbackContext);
-        break;
-
-      case PROMPT_LOCATION:
-        OneSignalController.promptLocation();
+      case REQUEST_LOCATION_PERMISSION:
+        OneSignalController.requestLocationPermission();
         break;
 
       case SET_LOCATION_SHARED:
@@ -364,175 +556,133 @@ public class OneSignalPush extends CordovaPlugin {
         result = OneSignalController.isLocationShared(callbackContext);
         break;
 
-      case USER_PROVIDED_CONSENT:
-        result = OneSignalController.userProvidedConsent(callbackContext);
+      case SET_PRIVACY_CONSENT_REQUIRED:
+        result = OneSignalController.setPrivacyConsentRequired(data);
         break;
 
-      case REQUIRES_CONSENT:
-        result = OneSignalController.requiresUserPrivacyConsent(callbackContext);
-        break;
-
-      case SET_REQUIRES_CONSENT:
-        result = OneSignalController.setRequiresConsent(callbackContext, data);
-        break;
-
-      case PROVIDE_USER_CONSENT:
-        result = OneSignalController.provideUserConsent(data);
-        break;
-
-      case SET_EXTERNAL_USER_ID:
-        result = OneSignalController.setExternalUserId(callbackContext, data);
-        break;
-
-      case REMOVE_EXTERNAL_USER_ID:
-        result = OneSignalController.removeExternalUserId(callbackContext);
+      case SET_PRIVACY_CONSENT_GIVEN:
+        result = OneSignalController.setPrivacyConsentGiven(data);
         break;
 
       case ADD_TRIGGERS:
         result = OneSignalInAppMessagingController.addTriggers(data);
         break;
 
-      case REMOVE_TRIGGERS_FOR_KEYS:
-        result = OneSignalInAppMessagingController.removeTriggersForKeys(data);
+      case REMOVE_TRIGGERS:
+        result = OneSignalInAppMessagingController.removeTriggers(data);
         break;
 
-      case GET_TRIGGER_VALUE_FOR_KEY:
-        result = OneSignalInAppMessagingController.getTriggerValueForKey(callbackContext, data);
+      case CLEAR_TRIGGERS:
+        result = OneSignalInAppMessagingController.clearTriggers();
         break;
 
-      case PAUSE_IN_APP_MESSAGES:
-        result = OneSignalInAppMessagingController.pauseInAppMessages(data);
+      case SET_PAUSED:
+        result = OneSignalInAppMessagingController.setPaused(data);
         break;
 
-      case IN_APP_MESSAGING_PAUSED:
-        result = OneSignalInAppMessagingController.isInAppMessagingPaused(callbackContext);
+      case IS_PAUSED:
+        result = OneSignalInAppMessagingController.isPaused(callbackContext);
         break;
 
-      case SEND_OUTCOME:
-        result = OneSignalOutcomeController.sendOutcome(callbackContext, data);
+      case ADD_OUTCOME:
+        result = OneSignalOutcomeController.addOutcome(data);
         break;
 
-      case SEND_UNIQUE_OUTCOME:
-        result = OneSignalOutcomeController.sendUniqueOutcome(callbackContext, data);
+      case ADD_UNIQUE_OUTCOME:
+        result = OneSignalOutcomeController.addUniqueOutcome(data);
         break;
 
-      case SEND_OUTCOME_WITH_VALUE:
-        result = OneSignalOutcomeController.sendOutcomeWithValue(callbackContext, data);
+      case ADD_OUTCOME_WITH_VALUE:
+        result = OneSignalOutcomeController.addOutcomeWithValue(data);
+        break;
+
+      case ENTER_LIVE_ACTIVITY:
+        result = OneSignalController.enterLiveActivity();
+        break;
+
+      case EXIT_LIVE_ACTIVITY:
+        result = OneSignalController.exitLiveActivity();
         break;
 
       default:
-        Log.e(TAG, "Invalid action : " + action);
+        Logging.error(TAG + "Invalid action : " + action, null);
         CallbackHelper.callbackError(callbackContext, "Invalid action : " + action);
     }
 
     return result;
   }
 
-  private boolean completeNotification(JSONArray data) {
-    try {
-      String notificationId = data.getString(0);
-      boolean shouldDisplay = data.getBoolean(1);
-
-      OSNotificationReceivedEvent notificationReceivedEvent = notificationReceivedEventCache.get(notificationId);
-
-      if (notificationReceivedEvent == null) {
-        OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR, "Could not find notification completion block with id: " + notificationId);
-        return false;
-      }
-
-      if (shouldDisplay)
-        notificationReceivedEvent.complete(notificationReceivedEvent.getNotification());
-      else
-        notificationReceivedEvent.complete(null);
-
-      return true;
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-    return false;
-  }
-
   /**
-   * Handlers
+   * S E R I A L I Z E R S
    */
 
-  private static class CordovaNotificationInForegroundHandler implements OneSignal.OSNotificationWillShowInForegroundHandler {
+  private JSONObject serializeNotification(INotification notification) throws JSONException {
+      JSONObject foregroundData = new JSONObject();
 
-    private CallbackContext jsNotificationInForegroundCallBack;
+      foregroundData.put("body", notification.getBody());
+      foregroundData.put("sound", notification.getSound());
+      foregroundData.put("title", notification.getTitle());
+      foregroundData.put("launchURL", notification.getLaunchURL());
+      foregroundData.put("rawPayload", notification.getRawPayload());
+      foregroundData.put("actionButtons", notification.getActionButtons());
+      foregroundData.put("additionalData", notification.getAdditionalData());
+      foregroundData.put("notificationId", notification.getNotificationId());
+      foregroundData.put("groupKey", notification.getGroupKey());
+      foregroundData.put("groupMessage", notification.getGroupMessage());
+      foregroundData.put("groupedNotifications", notification.getGroupedNotifications());
+      foregroundData.put("ledColor", notification.getLedColor());
+      foregroundData.put("priority", notification.getPriority());
+      foregroundData.put("smallIcon", notification.getSmallIcon());
+      foregroundData.put("largeIcon", notification.getLargeIcon());
+      foregroundData.put("bigPicture", notification.getBigPicture());
+      foregroundData.put("collapseId", notification.getCollapseId());
+      foregroundData.put("fromProjectNumber", notification.getFromProjectNumber());
+      foregroundData.put("smallIconAccentColor", notification.getSmallIconAccentColor());
+      foregroundData.put("lockScreenVisibility", notification.getLockScreenVisibility());
+      foregroundData.put("androidNotificationId", notification.getAndroidNotificationId());
 
-    public CordovaNotificationInForegroundHandler(CallbackContext inCallbackContext) {
-      jsNotificationInForegroundCallBack = inCallbackContext;
-    }
-
-    @Override
-    public void notificationWillShowInForeground(OSNotificationReceivedEvent notificationReceivedEvent) {
-      try {
-        OSNotification notification = notificationReceivedEvent.getNotification();
-        notificationReceivedEventCache.put(notification.getNotificationId(), notificationReceivedEvent);
-
-        CallbackHelper.callbackSuccess(jsNotificationInForegroundCallBack, notification.toJSONObject());
-      } catch (Throwable t) {
-        t.printStackTrace();
-      }
-    }
+      return foregroundData;
   }
 
-  private static class CordovaNotificationOpenHandler implements OneSignal.OSNotificationOpenedHandler {
-
-    private CallbackContext jsNotificationOpenedCallBack;
-
-    public CordovaNotificationOpenHandler(CallbackContext inCallbackContext) {
-      jsNotificationOpenedCallBack = inCallbackContext;
-    }
-
-    @Override
-    public void notificationOpened(OSNotificationOpenedResult result) {
-      try {
-        if (jsNotificationOpenedCallBack != null)
-          CallbackHelper.callbackSuccess(jsNotificationOpenedCallBack, result.toJSONObject());
-      } catch (Throwable t) {
-        t.printStackTrace();
-      }
-    }
+  private JSONObject serializeInAppMessage(IInAppMessage message) throws JSONException {
+    JSONObject json = new JSONObject();
+    json.put("messageId", message.getMessageId());
+    return json;
   }
 
-  private static class CordovaInAppMessageClickHandler implements OneSignal.OSInAppMessageClickHandler {
+  private JSONObject serializeInAppMessageClickEvent(IInAppMessageClickEvent event) throws JSONException {
+    JSONObject json = new JSONObject();
+    JSONObject clickResultJson = new JSONObject();
 
-    private CallbackContext jsInAppMessageClickedCallback;
+    IInAppMessageClickResult result = event.getResult();
+    clickResultJson.put("actionId", result.getActionId());
+    clickResultJson.put("urlTarget", result.getUrlTarget());
+    clickResultJson.put("url", result.getUrl());
+    clickResultJson.put("closingMessage", result.getClosingMessage());
 
-    public CordovaInAppMessageClickHandler(CallbackContext inCallbackContext) {
-      jsInAppMessageClickedCallback = inCallbackContext;
-    }
+    json.put("result", clickResultJson);
+    json.put("message", serializeInAppMessage(event.getMessage()));
+    return json;
+  }
 
-    @Override
-    public void inAppMessageClicked(OSInAppMessageAction result) {
-      try {
-        JSONObject resultJSON = result.toJSONObject();
-        JSONObject actionJSON = new JSONObject();
+  private JSONObject serializeNotificationClickEvent(INotificationClickEvent event) throws JSONException {
+    JSONObject json = new JSONObject();
+    JSONObject clickResultJson = new JSONObject();
 
-        // Convert key names to camelCase, which is the expected type
-        if (resultJSON.has("first_click")) {
-          actionJSON.put("firstClick", resultJSON.getBoolean("first_click"));
-        }
-        if (resultJSON.has("closes_message")) {
-          actionJSON.put("closesMessage", resultJSON.getBoolean("closes_message"));
-        }
-        actionJSON.put("clickName", resultJSON.optString("click_name", null));
-        actionJSON.put("clickUrl", resultJSON.optString("click_url", null));
-        actionJSON.put("outcomes", resultJSON.optJSONArray("outcomes"));
-        actionJSON.put("tags", resultJSON.optJSONObject("tags"));
+    INotificationClickResult clickResult =  event.getResult();
+    clickResultJson.put("actionId", clickResult.getActionId());
+    clickResultJson.put("url", clickResult.getUrl());
 
-        CallbackHelper.callbackSuccess(jsInAppMessageClickedCallback, actionJSON);
-      }
-      catch (JSONException e) {
-        e.printStackTrace();
-      }
-    }
+    json.put("notification", serializeNotification(event.getNotification()));
+    json.put("result", clickResultJson);
+    return json;
   }
 
   @Override
   public void onDestroy() {
-    OneSignal.setNotificationOpenedHandler(null);
-    OneSignal.setNotificationWillShowInForegroundHandler(null);
+    OneSignal.getNotifications().removeClickListener(this);
+    OneSignal.getNotifications().removeForegroundLifecycleListener(this);
+    OneSignal.getInAppMessages().removeClickListener(this);
+    OneSignal.getInAppMessages().removeLifecycleListener(this);
   }
 }
