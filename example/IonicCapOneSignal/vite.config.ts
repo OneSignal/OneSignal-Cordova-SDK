@@ -8,6 +8,14 @@ export default defineConfig({
     react(),
     legacy()
   ],
+  optimizeDeps: {
+    include: ['dist'],
+  },
+  build: {
+    commonjsOptions: {
+      include: [/dist/, /node_modules/],
+    },
+  },
   test: {
     globals: true,
     environment: 'jsdom',

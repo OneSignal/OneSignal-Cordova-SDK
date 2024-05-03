@@ -32,22 +32,37 @@ import '@ionic/react/css/palettes/dark.system.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import { useEffect } from 'react';
+import OneSignal, { LogLevel } from 'onesignal-cordova-plugin';
 
 setupIonicReact();
 
-const App: React.FC = () => (
-  <IonApp>
-    <IonReactRouter>
-      <IonRouterOutlet>
-        <Route exact path="/home">
-          <Home />
-        </Route>
-        <Route exact path="/">
-          <Redirect to="/home" />
-        </Route>
-      </IonRouterOutlet>
-    </IonReactRouter>
-  </IonApp>
-);
+const App: React.FC = () => {
+  
+  useEffect(() => {
+    OneSignal.Debug.setLogLevel(LogLevel.Verbose);
+
+    OneSignal.initialize("77e32082-ea27-42e3-a898-c72e141824ef");
+
+    OneSignal.Notifications.requestPermission(true).then((success: Boolean) => {
+      console.log("Notification permission granted: " + success);
+    })
+  }, []);
+
+  return (
+    <IonApp>
+      <IonReactRouter>
+        <IonRouterOutlet>
+          <Route exact path="/home">
+            <Home />
+          </Route>
+          <Route exact path="/">
+            <Redirect to="/home" />
+          </Route>
+        </IonRouterOutlet>
+      </IonReactRouter>
+    </IonApp>
+  );
+}
 
 export default App;
