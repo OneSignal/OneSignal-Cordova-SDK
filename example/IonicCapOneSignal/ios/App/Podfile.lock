@@ -63,6 +63,7 @@ DEPENDENCIES:
   - "CapacitorKeyboard (from `../../node_modules/@capacitor/keyboard`)"
   - "CapacitorStatusBar (from `../../node_modules/@capacitor/status-bar`)"
   - CordovaPluginsStatic (from `../capacitor-cordova-ios-plugins`)
+  - OneSignalXCFramework (< 6.0, >= 5.0)
 
 SPEC REPOS:
   trunk:
@@ -94,6 +95,6 @@ SPEC CHECKSUMS:
   CordovaPluginsStatic: 0c92d460153b745e1dfbe367288a104177b55e46
   OneSignalXCFramework: f6533cc1f7a5ddded80ee5fe183901a99ad46f4f
 
-PODFILE CHECKSUM: 40d5787d6b044ea6478021c94659cb8dcb657110
+PODFILE CHECKSUM: c53c4ae8125a20193a7e94262437a687b59eaebb
 
 COCOAPODS: 1.15.2
