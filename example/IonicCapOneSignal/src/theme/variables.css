@@ -1,0 +1,67 @@
+:root {
+    --ion-color-onesignal: #e54b4d;
+    --ion-color-onesignal-rgb: 229, 75, 77;
+    --ion-color-onesignal-contrast: #ffffff;
+    --ion-color-onesignal-contrast-rgb: 0, 0, 0;
+    --ion-color-onesignal-shade: #ca4244;
+    --ion-color-onesignal-tint: #e85d5f;
+}
+
+.ion-color-onesignal {
+    --ion-color-base: var(--ion-color-onesignal);
+    --ion-color-base-rgb: var(--ion-color-onesignal-rgb);
+    --ion-color-contrast: var(--ion-color-onesignal-contrast);
+    --ion-color-contrast-rgb: var(--ion-color-onesignal-contrast-rgb);
+    --ion-color-shade: var(--ion-color-onesignal-shade);
+    --ion-color-tint: var(--ion-color-onesignal-tint);
+}
+
+ion-content {
+    flex: 0 0 auto;
+    width: 100%;
+    margin: 0;
+}
+
+.content-container {
+    padding: 10px;
+    height: 90vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.os-console {
+    background-color: #E5E8EB;
+    flex: 0 0 auto;
+    min-height: 150px;
+    max-height: 150px;
+    padding: 10px;
+    overflow-y: auto;
+    font-size: 10px;
+}
+
+.input-container {
+    background-color: #E5E8EB;
+    margin-top: 3px;
+    --padding-start: 10px;
+    --padding-top: 10px;
+    --padding-bottom: 10px;
+    --padding-end: 10px;
+}
+
+.button-components {
+    flex-grow: 1;
+    margin-bottom: 10px;
+    text-transform: 'uppercase';
+}
+
+.button-container {
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.clear-button {
+    position: absolute;
+    right: 0;
+    top: 70;
+}

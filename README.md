@@ -39,8 +39,21 @@ See this repository's [release tags](https://github.com/OneSignal/OneSignal-Cord
 Please visit this repository's [Github issue tracker](https://github.com/OneSignal/OneSignal-Cordova-SDK/issues) for feature requests and bug reports related specificly to the SDK.
 For account issues and support please contact OneSignal support from the [OneSignal.com](https://onesignal.com) dashboard.
 
-#### Demo Project
-To make things easier, we have published demo projects for [Cordova](https://github.com/OneSignal/OneSignal-Cordova-Example) and [Ionic](https://github.com/OneSignal/OneSignal-Ionic-Example)
+#### Demo Projects
+To make things easier, we have published an Ionic Capacitor React demo app in the `/example` folder of this repository.
+
+To test it out, run:
+
+```
+ionic capacitor run android
+
+ionic capacitor run ios
+
+```
+
+Legacy (Player Model) demo projects:
+* [Cordova](https://github.com/OneSignal/OneSignal-Cordova-Example)
+* [Ionic](https://github.com/OneSignal/OneSignal-Ionic-Example)
 
 #### Supports:
 * Cordova, Ionic, Ionic Capacitor, and Phonegap

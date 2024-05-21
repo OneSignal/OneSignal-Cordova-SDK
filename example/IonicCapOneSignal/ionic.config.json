@@ -1,0 +1,7 @@
+{
+  "name": "IonicCapOneSignal",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}
