@@ -138,6 +138,10 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
 
   private static final String ENTER_LIVE_ACTIVITY = "enterLiveActivity";
   private static final String EXIT_LIVE_ACTIVITY = "exitLiveActivity";
+  private static final String SET_PUSH_TO_START_TOKEN = "setPushToStartToken";
+  private static final String REMOVE_PUSH_TO_START_TOKEN = "removePushToStartToken";
+  private static final String SETUP_DEFAULT_ACTIVITY = "setupDefaultLiveActivity";
+  private static final String START_DEFAULT_LIVE_ACTIVITY = "startDefaultLiveActivity";
 
   private static final HashMap<String, INotificationWillDisplayEvent> notificationWillDisplayCache = new HashMap<>();
   private static final HashMap<String, INotificationWillDisplayEvent> preventDefaultCache = new HashMap<>();
@@ -602,6 +606,22 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
 
       case EXIT_LIVE_ACTIVITY:
         result = OneSignalController.exitLiveActivity();
+        break;
+
+      case SET_PUSH_TO_START_TOKEN:
+        result = OneSignalController.setPushToStartToken();
+        break;
+
+      case REMOVE_PUSH_TO_START_TOKEN:
+        result = OneSignalController.removePushToStartToken();
+        break;
+
+      case SETUP_DEFAULT_ACTIVITY:
+        result = OneSignalController.setupDefaultLiveActivity();
+        break;
+
+      case START_DEFAULT_LIVE_ACTIVITY:
+        result = OneSignalController.startDefaultLiveActivity();
         break;
 
       default:

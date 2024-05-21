@@ -325,4 +325,24 @@ public class OneSignalController {
     // doesn't apply to Android
     return true;
   }
+
+  public static boolean setPushToStartToken() {
+    // doesn't apply to Android
+    return true;
+  }
+
+  public static boolean removePushToStartToken() {
+    // doesn't apply to Android
+    return true;
+  }
+
+  public static boolean setupDefaultLiveActivity() {
+    // doesn't apply to Android
+    return true;
+  }
+
+  public static boolean startDefaultLiveActivity() {
+    // doesn't apply to Android
+    return true;
+  }
 }
