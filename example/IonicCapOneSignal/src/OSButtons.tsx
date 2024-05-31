@@ -428,6 +428,72 @@ class OSButtons extends React.Component<Props> {
         ];
     }
 
+    createLiveActivitiesFields() {
+        const { loggingFunction } = this.props;
+
+        const startDefaultLiveActivityButton = renderButtonView(
+            'Start Default',
+            async () => {
+                const activityId = this.props.inputFieldValue;
+                loggingFunction('Start Default Live Activity: ', activityId);
+                await OneSignal.LiveActivities.startDefault(
+                    activityId,
+                    { title: 'Welcome!' },
+                    {
+                        message: {en: 'Hello World!'},
+                        intValue: 3,
+                        doubleValue: 3.14,
+                        boolValue: true,
+                    },
+                );
+            },
+        );
+
+        const getEnterLiveActivityButton = renderButtonView(
+            'Enter Live Activity',
+            async () => {
+                const activityId = this.props.inputFieldValue;
+                loggingFunction('Enter Live Activity: ', activityId);
+                await OneSignal.LiveActivities.enter(activityId, "FAKE_TOKEN");
+            },
+        );
+
+        const getExitLiveActivityButton = renderButtonView(
+            'Exit Live Activity',
+            async () => {
+                const activityId = this.props.inputFieldValue;
+                loggingFunction('Exit Live Activity: ', activityId);
+                await OneSignal.LiveActivities.exit(activityId);
+            }
+        );
+
+        const getSetupPushToStartButton = renderButtonView(
+            'Setup Push To Start',
+            () => {
+                const activityType = this.props.inputFieldValue;
+                loggingFunction('Setting up push to start: ', activityType);
+                OneSignal.LiveActivities.setPushToStartToken(activityType, "FAKE_TOKEN");
+            }
+        );
+
+        const getRemovePushToStartButton = renderButtonView(
+            'Remove Push To Start',
+            () => {
+                const activityType = this.props.inputFieldValue;
+                loggingFunction('Remove push to start: ', activityType);
+                OneSignal.LiveActivities.removePushToStartToken(activityType);
+            }
+        );
+
+        return [
+            startDefaultLiveActivityButton,
+            getEnterLiveActivityButton,
+            getExitLiveActivityButton,
+            getSetupPushToStartButton,
+            getRemovePushToStartButton,
+        ];
+    }
+
     createPrivacyConsentFields() {
         const { loggingFunction } = this.props;
 
@@ -486,6 +552,8 @@ class OSButtons extends React.Component<Props> {
                 <div>{this.createUserFields()}</div>
                 <IonText className='ion-text-center'><h5>Push Subscription</h5></IonText>
                 <div>{this.createPushSubscriptionFields()}</div>
+                <IonText className='ion-text-center'><h5>Live Activities</h5></IonText>
+                <div>{this.createLiveActivitiesFields()}</div>
                 <IonText className='ion-text-center'><h5>Privacy Consent</h5></IonText>
                 <div>{this.createPrivacyConsentFields()}</div>
             </IonContent>

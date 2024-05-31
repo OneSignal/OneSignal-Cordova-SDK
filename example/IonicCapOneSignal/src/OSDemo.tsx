@@ -35,8 +35,9 @@ class OSDemo extends React.Component<Props, State> {
   }
 
   async componentDidMount() {
-    OneSignal.initialize(APP_ID);
     OneSignal.Debug.setLogLevel(LogLevel.Verbose);
+    OneSignal.initialize(APP_ID);
+    OneSignal.LiveActivities.setupDefault();
 
     OneSignal.Notifications.addEventListener(
       'foregroundWillDisplay',

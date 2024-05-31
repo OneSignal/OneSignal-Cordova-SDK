@@ -30,6 +30,7 @@
 
 #import "OneSignalPush.h"
 #import <OneSignalFramework/OneSignalFramework.h>
+#import "OneSignalLiveActivities/OneSignalLiveActivities-Swift.h"
 
 NSString* notificationWillShowInForegoundCallbackId;
 NSString* notificationClickedCallbackId;
@@ -634,4 +635,61 @@ static Class delegateClass = nil;
     }];
 }
 
+- (void)setPushToStartToken:(CDVInvokedUrlCommand *)command {
+    NSString *activityType = command.arguments[0];
+    NSString *token = command.arguments[1];
+    NSError* err=nil;
+
+    if (@available(iOS 17.2, *)) {
+        [OneSignalLiveActivitiesManagerImpl setPushToStartToken:activityType withToken:token error:&err];
+        if (err) {
+            [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"activityType must be the name of your ActivityAttributes struct"]];
+        }
+    } else {
+        [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"cannot setPushToStartToken on iOS < 17.2"]];
+    }
+}
+
+- (void)removePushToStartToken:(CDVInvokedUrlCommand *)command {
+    NSString *activityType = command.arguments[0];
+    NSError* err=nil;
+
+    if (@available(iOS 17.2, *)) {
+        [OneSignalLiveActivitiesManagerImpl removePushToStartToken:activityType error:&err];
+        if (err) {
+            [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"activityType must be the name of your ActivityAttributes struct"]];
+        }
+    } else {
+        [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"cannot removePushToStartToken on iOS < 17.2"]];
+    }
+}
+
+- (void)setupDefaultLiveActivity:(CDVInvokedUrlCommand *)command {
+    NSDictionary *options = command.arguments[0];
+    LiveActivitySetupOptions *laOptions = nil;
+
+    if (options != [NSNull null]) {
+        laOptions = [LiveActivitySetupOptions alloc];
+        [laOptions setEnablePushToStart:[options[@"enablePushToStart"] boolValue]];
+        [laOptions setEnablePushToUpdate:[options[@"enablePushToUpdate"] boolValue]];
+    }
+
+    if (@available(iOS 16.1, *)) {
+        [OneSignalLiveActivitiesManagerImpl setupDefaultWithOptions:laOptions];
+    } else {
+        [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"cannot setupDefault on iOS < 16.1"]];
+    }
+}
+
+- (void)startDefaultLiveActivity:(CDVInvokedUrlCommand *)command {
+    NSString *activityId = command.arguments[0];
+    NSDictionary *attributes = command.arguments[1];
+    NSDictionary *content = command.arguments[2];
+
+    if (@available(iOS 16.1, *)) {
+        [OneSignalLiveActivitiesManagerImpl startDefault:activityId attributes:attributes content:content];
+    } else {
+        [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"cannot startDefault on iOS < 16.1"]];
+    }
+}
 @end

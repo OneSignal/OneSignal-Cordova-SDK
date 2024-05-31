@@ -121,5 +121,9 @@
 // Live Activity
 - (void)enterLiveActivity:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)exitLiveActivity:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)setPushToStartToken:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)removePushToStartToken:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)setupDefaultLiveActivity:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)startDefaultLiveActivity:(CDVInvokedUrlCommand* _Nonnull)command;
 
 @end
