@@ -12,10 +12,10 @@ PODS:
     - Capacitor
   - CordovaPluginsStatic (6.0.0):
     - CapacitorCordova
-    - OneSignalXCFramework (= 5.2.0)
-  - OneSignalXCFramework (5.2.0):
-    - OneSignalXCFramework/OneSignalComplete (= 5.2.0)
-  - OneSignalXCFramework/OneSignal (5.2.0):
+    - OneSignalXCFramework (= 5.2.1)
+  - OneSignalXCFramework (5.2.1):
+    - OneSignalXCFramework/OneSignalComplete (= 5.2.1)
+  - OneSignalXCFramework/OneSignal (5.2.1):
     - OneSignalXCFramework/OneSignalCore
     - OneSignalXCFramework/OneSignalExtension
     - OneSignalXCFramework/OneSignalLiveActivities
@@ -23,38 +23,38 @@ PODS:
     - OneSignalXCFramework/OneSignalOSCore
     - OneSignalXCFramework/OneSignalOutcomes
     - OneSignalXCFramework/OneSignalUser
-  - OneSignalXCFramework/OneSignalComplete (5.2.0):
+  - OneSignalXCFramework/OneSignalComplete (5.2.1):
     - OneSignalXCFramework/OneSignal
     - OneSignalXCFramework/OneSignalInAppMessages
     - OneSignalXCFramework/OneSignalLocation
-  - OneSignalXCFramework/OneSignalCore (5.2.0)
-  - OneSignalXCFramework/OneSignalExtension (5.2.0):
+  - OneSignalXCFramework/OneSignalCore (5.2.1)
+  - OneSignalXCFramework/OneSignalExtension (5.2.1):
     - OneSignalXCFramework/OneSignalCore
     - OneSignalXCFramework/OneSignalOutcomes
-  - OneSignalXCFramework/OneSignalInAppMessages (5.2.0):
+  - OneSignalXCFramework/OneSignalInAppMessages (5.2.1):
     - OneSignalXCFramework/OneSignalCore
     - OneSignalXCFramework/OneSignalNotifications
     - OneSignalXCFramework/OneSignalOSCore
     - OneSignalXCFramework/OneSignalOutcomes
     - OneSignalXCFramework/OneSignalUser
-  - OneSignalXCFramework/OneSignalLiveActivities (5.2.0):
+  - OneSignalXCFramework/OneSignalLiveActivities (5.2.1):
     - OneSignalXCFramework/OneSignalCore
     - OneSignalXCFramework/OneSignalOSCore
     - OneSignalXCFramework/OneSignalUser
-  - OneSignalXCFramework/OneSignalLocation (5.2.0):
+  - OneSignalXCFramework/OneSignalLocation (5.2.1):
     - OneSignalXCFramework/OneSignalCore
     - OneSignalXCFramework/OneSignalNotifications
     - OneSignalXCFramework/OneSignalOSCore
     - OneSignalXCFramework/OneSignalUser
-  - OneSignalXCFramework/OneSignalNotifications (5.2.0):
+  - OneSignalXCFramework/OneSignalNotifications (5.2.1):
     - OneSignalXCFramework/OneSignalCore
     - OneSignalXCFramework/OneSignalExtension
     - OneSignalXCFramework/OneSignalOutcomes
-  - OneSignalXCFramework/OneSignalOSCore (5.2.0):
+  - OneSignalXCFramework/OneSignalOSCore (5.2.1):
     - OneSignalXCFramework/OneSignalCore
-  - OneSignalXCFramework/OneSignalOutcomes (5.2.0):
+  - OneSignalXCFramework/OneSignalOutcomes (5.2.1):
     - OneSignalXCFramework/OneSignalCore
-  - OneSignalXCFramework/OneSignalUser (5.2.0):
+  - OneSignalXCFramework/OneSignalUser (5.2.1):
     - OneSignalXCFramework/OneSignalCore
     - OneSignalXCFramework/OneSignalNotifications
     - OneSignalXCFramework/OneSignalOSCore
@@ -97,8 +97,8 @@ SPEC CHECKSUMS:
   CapacitorHaptics: 9ebc9363f0e9b8eb4295088a0b474530acf1859b
   CapacitorKeyboard: deacbd09d8d1029c3681197fb05d206b721d5f73
   CapacitorStatusBar: 2e4369f99166125435641b1908d05f561eaba6f6
-  CordovaPluginsStatic: 3355cb91038bf10f85a071f96c435dcabc8cc8ae
-  OneSignalXCFramework: bdf74fdc06888f9466dc21e826fe1549ed143095
+  CordovaPluginsStatic: c1dda96f1a059192d079f0160a5b2e27ed7a537f
+  OneSignalXCFramework: fbafb3b4964a37f8b0ff273419d1c0e5ac0e07d6
 
 PODFILE CHECKSUM: 178e2a2e451311a871c2b4db713ac4b63d0ebeeb
 
