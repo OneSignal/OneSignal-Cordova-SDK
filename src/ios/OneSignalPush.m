@@ -636,6 +636,7 @@ static Class delegateClass = nil;
 }
 
 - (void)setPushToStartToken:(CDVInvokedUrlCommand *)command {
+    #if !TARGET_OS_MACCATALYST
     NSString *activityType = command.arguments[0];
     NSString *token = command.arguments[1];
     NSError* err=nil;
@@ -648,9 +649,11 @@ static Class delegateClass = nil;
     } else {
         [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"cannot setPushToStartToken on iOS < 17.2"]];
     }
+    #endif
 }
 
 - (void)removePushToStartToken:(CDVInvokedUrlCommand *)command {
+    #if !TARGET_OS_MACCATALYST
     NSString *activityType = command.arguments[0];
     NSError* err=nil;
 
@@ -662,9 +665,11 @@ static Class delegateClass = nil;
     } else {
         [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"cannot removePushToStartToken on iOS < 17.2"]];
     }
+    #endif
 }
 
 - (void)setupDefaultLiveActivity:(CDVInvokedUrlCommand *)command {
+    #if !TARGET_OS_MACCATALYST
     NSDictionary *options = command.arguments[0];
     LiveActivitySetupOptions *laOptions = nil;
 
@@ -679,9 +684,11 @@ static Class delegateClass = nil;
     } else {
         [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"cannot setupDefault on iOS < 16.1"]];
     }
+    #endif
 }
 
 - (void)startDefaultLiveActivity:(CDVInvokedUrlCommand *)command {
+    #if !TARGET_OS_MACCATALYST
     NSString *activityId = command.arguments[0];
     NSDictionary *attributes = command.arguments[1];
     NSDictionary *content = command.arguments[2];
@@ -691,5 +698,6 @@ static Class delegateClass = nil;
     } else {
         [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"cannot startDefault on iOS < 16.1"]];
     }
+    #endif
 }
 @end
