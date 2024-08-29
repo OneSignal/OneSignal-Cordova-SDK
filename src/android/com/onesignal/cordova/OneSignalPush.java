@@ -237,6 +237,7 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
    */
 
   public boolean addNotificationClickListener(CallbackContext callbackContext) {
+    OneSignal.getNotifications().addClickListener(this);
     jsNotificationClickedCallback = callbackContext;
     return true;
   }
@@ -361,7 +362,6 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
       OneSignal.getInAppMessages().addLifecycleListener(this);
       OneSignal.getInAppMessages().addClickListener(this);
       OneSignal.getNotifications().addForegroundLifecycleListener(this);
-      OneSignal.getNotifications().addClickListener(this);
 
       CallbackHelper.callbackSuccessBoolean(callbackContext, true);
       return true;
