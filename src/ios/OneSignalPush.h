@@ -48,6 +48,8 @@
 
 - (void)login:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)logout:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)updateUserJwt:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)addUserJwtInvalidatedListener:(CDVInvokedUrlCommand* _Nonnull)command;
 
 - (void)addTags:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)removeTags:(CDVInvokedUrlCommand* _Nonnull)command;

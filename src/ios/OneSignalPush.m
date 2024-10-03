@@ -47,6 +47,7 @@ NSString* inAppMessageWillDismissCallbackId;
 NSString* inAppMessageDidDismissCallbackId;
 NSString* inAppMessageClickedCallbackId;
 NSString* userObserverCallbackId;
+NSString* addUserJwtInvalidatedListenerCallbackId;
 
 OSNotificationClickEvent *actionNotification;
 OSNotification *notification;
@@ -367,11 +368,23 @@ static Class delegateClass = nil;
 }
 
 - (void)login:(CDVInvokedUrlCommand*)command {
-    [OneSignal login:command.arguments[0]];
+    [OneSignal login:command.arguments[0] withToken:command.argments[1]];
 }
 
 - (void)logout:(CDVInvokedUrlCommand*)command {
     [OneSignal logout];
+}
+
+- (void)updateUserJwt:(CDVInvokedUrlCommand*)command {
+    [OneSignal updateUserJwt:command.arguments[0] withToken:command.arguments[1]];
+}
+
+- (void)addUserJwtInvalidatedListener:(CDVInvokedUrlCommand*)command {
+    bool first = addUserJwtInvalidatedListenerCallbackId  == nil;
+    addUserJwtInvalidatedListenerCallbackId = command.callbackId;
+    if (first) {
+        [OneSignal addUserJwtInvalidatedListener:self];
+    }          
 }
 
 - (void)addTags:(CDVInvokedUrlCommand*)command {

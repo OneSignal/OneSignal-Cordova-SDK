@@ -79,6 +79,8 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
 
   private static final String LOGIN = "login";
   private static final String LOGOUT = "logout";
+  private static final String UPDATE_USER_JWT = "updateUserJwt";
+  private static final String ADD_USER_JWT_INVALIDATED_LISTENER = "addUserJwtInvalidatedListener";
 
   private static final String ADD_PERMISSION_OBSERVER = "addPermissionObserver";
   private static final String ADD_PUSH_SUBSCRIPTION_OBSERVER = "addPushSubscriptionObserver";
@@ -153,6 +155,7 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
   private static CallbackContext jsInAppMessageClickedCallback;
   private static CallbackContext jsNotificationInForegroundCallBack;
   private static CallbackContext jsNotificationClickedCallback;
+  private static CallbackContext jsUserJwtInvalidatedListenerCallBack;
 
   /**
    * N O T I F I C A T I O N    L I F E C Y C L E
@@ -355,6 +358,27 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
   }
 
   /**
+   J W T
+   */
+
+  public boolean addUserJwtInvalidatedListener(CallbackContext callbackContext) {
+    jsUserJwtInvalidatedListenerCallBack = callbackContext;
+    return true;
+  }
+
+  @Override
+  public void onUserJwtInvalidated(UserJwtInvalidatedEvent event) {
+    try {
+      if (jsUserJwtInvalidatedListenerCallBack != null) {
+        CallbackHelper.callbackSuccess(jsUserJwtInvalidatedListenerCallBack, event);
+      }
+    }
+    catch (JSONException e) {
+      e.printStackTrace();
+    } 
+  }
+
+  /**
    * I N I T I A L I Z A T I O N
    */
 
@@ -437,6 +461,14 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
       
       case LOGOUT:
         result = OneSignalController.logout();
+        break;
+
+      case UPDATE_USER_JWT:
+        result= OneSignalController.updateUserJwt(data);
+        break;
+
+      case ADD_USER_JWT_INVALIDATED_LISTENER:
+        result = addUserJwtInvalidatedListener(callbackContext);
         break;
 
       case ADD_PERMISSION_OBSERVER:

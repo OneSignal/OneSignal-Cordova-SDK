@@ -56,7 +56,8 @@ public class OneSignalController {
   public static boolean login(JSONArray data) {
     try {
       String externalId = data.getString(0);
-      OneSignal.login(externalId);
+      String jwtToken = data.getString(1);
+      OneSignal.login(externalId, jwtToken);
       return true;
     }
     catch (JSONException e) {
@@ -68,6 +69,19 @@ public class OneSignalController {
   public static boolean logout() {
     OneSignal.logout();
     return true;
+  }
+
+  public static updateUserJwt(JSONArray data) {
+    try {
+      String externalId = data.getString(0);
+      String jwtToken = data.getString(1);
+      OneSignal.updateUserJwt(externalId, jwtToken);
+      return true;
+    }
+    catch (JSONException e) {
+      e.printStackTrace();
+      return false;
+    }
   }
 
   public static boolean optInPushSubscription() {
