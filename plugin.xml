@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="onesignal-cordova-plugin"
-    version="3.3.2">
+    version="3.3.3">
 
   <name>OneSignal Push Notifications</name>
   <author>Josh Kasten, Bradley Hesse, Rodrigo Gomez-Palacio</author>
@@ -30,7 +30,7 @@
   <js-module src="dist/OSNotification.js" name="OSNotification" />
 
   <platform name="android">
-    <framework src="com.onesignal:OneSignal:4.8.8" />
+    <framework src="com.onesignal:OneSignal:4.8.10" />
     <framework src="build-extras-onesignal.gradle" custom="true" type="gradleReference" />
 
     <config-file target="res/xml/config.xml" parent="/*">
@@ -76,7 +76,7 @@
             <source url="https://cdn.cocoapods.org/"/>
         </config>
         <pods use-frameworks="true">
-            <pod name="OneSignalXCFramework" spec="3.12.9" />
+            <pod name="OneSignalXCFramework" spec="3.12.10" />
         </pods>
     </podspec>
 
