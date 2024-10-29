@@ -20,17 +20,15 @@ If you run into any challenges or have concerns, please contact our support team
 
 ---
 
-[OneSignal](https://onesignal.com/) is a free email, sms, push notification, and in-app message service for mobile apps. This plugin makes it easy to integrate your [Cordova](http://cordova.apache.org/) based (e.g. [Ionic](http://ionicframework.com/), [PhoneGap](https://phonegap.com/), and PhoneGap Build app with OneSignal. 
+[OneSignal](https://onesignal.com/) is a free email, sms, push notification, and in-app message service for mobile apps. This plugin makes it easy to integrate your [Cordova](http://cordova.apache.org/) based (e.g. [Ionic](http://ionicframework.com/)) app with OneSignal. 
 
 <p align="center"><img src="https://app.onesignal.com/images/android_and_ios_notification_image.gif" width="500" alt="Cordova Notification"></p>
 
 #### Installation and Setup
-See the [Documentation](https://documentation.onesignal.com/docs) for installation and setup instructions:
-- Cordova: https://documentation.onesignal.com/docs/cordova-sdk-setup
-- Ionic: https://documentation.onesignal.com/docs/ionic-sdk-setup
+See the [Documentation](https://documentation.onesignal.com/docs/cordova-sdk-setup) for installation and setup instructions. 
 
 #### API
-See OneSignal's [Client SDK Reference](https://documentation.onesignal.com/docs/sdk-reference) page for a list of all available methods.
+See OneSignal's [Mobile SDK Reference](https://documentation.onesignal.com/docs/mobile-sdk-reference) page for a list of all available methods.
 
 #### Change Log
 See this repository's [release tags](https://github.com/OneSignal/OneSignal-Cordova-SDK/releases) for a complete change log of every released version.
@@ -56,6 +54,6 @@ Legacy (Player Model) demo projects:
 * [Ionic](https://github.com/OneSignal/OneSignal-Ionic-Example)
 
 #### Supports:
-* Cordova, Ionic, Ionic Capacitor, and Phonegap
-* Android 4.1 (API Level 16) through 12 (API Level 31), and Amazon FireOS
-* iOS 9 - 15
+* Cordova, Ionic, Ionic Capacitor
+* Android 4.1 (API Level 16) through 14 (API Level 34), and Amazon FireOS
+* iOS 9 - 18
