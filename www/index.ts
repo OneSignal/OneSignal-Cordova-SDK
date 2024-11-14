@@ -36,6 +36,10 @@ import LiveActivities from "./LiveActivitiesNamespace";
 // Suppress TS warnings about window.cordova
 declare let window: any; // turn off type checking
 
+export interface UserJwtInvalidatedEvent {
+    externalId          ?: string;
+}
+
 export class OneSignalPlugin {
     User: User = new User();
     Debug: Debug = new Debug();
@@ -46,6 +50,14 @@ export class OneSignalPlugin {
     LiveActivities: LiveActivities = new LiveActivities();
 
     private _appID = "";
+
+    private _userJwtInvalidatedEventListenerList: ((event:UserJwtInvalidatedEvent)=>void)[] = [];
+
+    private _processFunctionList(array: ((event:any)=>void)[], param: any): void {
+        for (let i = 0; i < array.length; i++) {
+            array[i](param);
+        }
+    }
 
     /**
      * Initializes the OneSignal SDK. This should be called during startup of the application.
@@ -64,21 +76,55 @@ export class OneSignalPlugin {
     };
 
     /**
-     * Login to OneSignal under the user identified by the [externalId] provided. The act of logging a user into the OneSignal SDK will switch the [user] context to that specific user.
-     * @param  {string} externalId
+     * Log in to OneSignal under the user identified by the [externalId] provided. The act of logging a user into the OneSignal SDK will switch the [user] context to that specific user.
+     * @param {string} externalId
+     * @param {string} jwtToken
      * @returns void
      */
-    login(externalId: string): void {
-        window.cordova.exec(function () { }, function () { }, "OneSignalPush", "login", [externalId]);
+    login(externalId: string, jwtToken: string): void {
+        window.cordova.exec(function () { }, function () { }, "OneSignalPush", "login", [externalId, jwtToken]);
     }
 
     /**
-     * Logout the user previously logged in via [login]. The [user] property now references a new device-scoped user.
-     * @param  {string} externalId
+     * Log out the user previously logged in via [login]. The [user] property now references a new device-scoped user.
      * @returns void
      */
     logout(): void {
         window.cordova.exec(function () { }, function () { }, "OneSignalPush", "logout");
+    }
+
+    /**
+     * Update the JWT token for a user.
+     * @param {string} externalId 
+     * @param {string} jwtToken 
+     */
+    updateUserJwt(externalId: string, jwtToken: string): void {
+        window.cordova.exec(function () { }, function () { }, "OneSignalPush", "updateUserJwt", [externalId, jwtToken]);
+    }
+
+    /**
+     * Add a callback that fires when the user's JWT is invalidated.
+     * @param event 
+     * @param listener 
+     */
+    addEventListener(event: "userJwtInvalidated", listener: (event: UserJwtInvalidatedEvent) => void) {
+        this._userJwtInvalidatedEventListenerList.push(listener as (event: UserJwtInvalidatedEvent) => void);
+        const userJwtInvalidatedCallBackProcessor = (event: UserJwtInvalidatedEvent) => {
+            this._processFunctionList(this._userJwtInvalidatedEventListenerList, event);
+        };
+        window.cordova.exec(userJwtInvalidatedCallBackProcessor, function(){}, "OneSignalPush", "addUserJwtInvalidatedListener", []);
+    }
+
+    /**
+     * Remove a UserJwtInvalidated Listener that has been previously added.
+     * @param event
+     * @param listener 
+     */
+    removeEventListener(event: "userJwtInvalidated", listener: (event: UserJwtInvalidatedEvent) => void) {
+        let index = this._userJwtInvalidatedEventListenerList.indexOf(listener);
+        if (index !== -1) {
+            this._userJwtInvalidatedEventListenerList.splice(index, 1);
+        }
     }
 
    /**
