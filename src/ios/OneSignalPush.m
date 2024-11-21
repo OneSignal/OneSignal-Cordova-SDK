@@ -368,7 +368,10 @@ static Class delegateClass = nil;
 }
 
 - (void)login:(CDVInvokedUrlCommand*)command {
-    [OneSignal login:command.arguments[0] withToken:command.arguments[1]];
+    NSString *externalId = command.arguments[0];
+    NSString *jwtToken = command.arguments.count > 1 ? command.arguments[1] : nil;
+    
+    [OneSignal login:externalId withToken:jwtToken];
 }
 
 - (void)logout:(CDVInvokedUrlCommand*)command {

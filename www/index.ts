@@ -78,11 +78,12 @@ export class OneSignalPlugin {
     /**
      * Log in to OneSignal under the user identified by the [externalId] provided. The act of logging a user into the OneSignal SDK will switch the [user] context to that specific user.
      * @param {string} externalId
-     * @param {string} jwtToken
+     * @param {string} jwtToken - Optional
      * @returns void
      */
-    login(externalId: string, jwtToken: string): void {
-        window.cordova.exec(function () { }, function () { }, "OneSignalPush", "login", [externalId, jwtToken]);
+    login(externalId: string, jwtToken?: string): void {
+        const args = jwtToken ? [externalId, jwtToken] : [externalId];
+        window.cordova.exec(function () { }, function () { }, "OneSignalPush", "login", args);
     }
 
     /**
