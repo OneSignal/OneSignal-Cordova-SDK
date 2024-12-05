@@ -98,10 +98,10 @@ export class OneSignalPlugin {
     /**
      * Update the JWT token for a user.
      * @param {string} externalId 
-     * @param {string} jwtToken 
+     * @param {string} token 
      */
-    updateUserJwt(externalId: string, jwtToken: string): void {
-        window.cordova.exec(function () { }, function () { }, "OneSignalPush", "updateUserJwt", [externalId, jwtToken]);
+    updateUserJwt(externalId: string, token: string): void {
+        window.cordova.exec(function () { }, function () { }, "OneSignalPush", "updateUserJwt", [externalId, token]);
     }
 
     /**
