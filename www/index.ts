@@ -82,6 +82,7 @@ export class OneSignalPlugin {
      * @returns void
      */
     login(externalId: string, jwtToken?: string): void {
+        // if no jwt token, pass null
         const args = jwtToken ? [externalId, jwtToken] : [externalId];
         window.cordova.exec(function () { }, function () { }, "OneSignalPush", "login", args);
     }

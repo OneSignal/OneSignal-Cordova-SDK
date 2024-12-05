@@ -369,6 +369,7 @@ static Class delegateClass = nil;
 
 - (void)login:(CDVInvokedUrlCommand*)command {
     NSString *externalId = command.arguments[0];
+    // check if jwt token provided
     NSString *jwtToken = command.arguments.count > 1 ? command.arguments[1] : nil;
     
     [OneSignal login:externalId withToken:jwtToken];
