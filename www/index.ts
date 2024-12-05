@@ -37,7 +37,7 @@ import LiveActivities from "./LiveActivitiesNamespace";
 declare let window: any; // turn off type checking
 
 export interface UserJwtInvalidatedEvent {
-    externalId          ?: string;
+    externalId: string;
 }
 
 export class OneSignalPlugin {
