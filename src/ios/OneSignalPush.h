@@ -31,7 +31,7 @@
 
 #import <OneSignalFramework/OneSignalFramework.h>
 
-@interface OneSignalPush : CDVPlugin <OSNotificationPermissionObserver, OSNotificationLifecycleListener, OSNotificationClickListener, OSPushSubscriptionObserver, OSInAppMessageLifecycleListener, OSInAppMessageClickListener, OSUserStateObserver>
+@interface OneSignalPush : CDVPlugin <OSNotificationPermissionObserver, OSNotificationLifecycleListener, OSNotificationClickListener, OSPushSubscriptionObserver, OSInAppMessageLifecycleListener, OSInAppMessageClickListener, OSUserStateObserver, OSUserJwtInvalidatedListener>
 
 - (void)setProvidesNotificationSettingsView:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)addForegroundLifecycleListener:(CDVInvokedUrlCommand* _Nonnull)command;
@@ -48,6 +48,8 @@
 
 - (void)login:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)logout:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)updateUserJwt:(CDVInvokedUrlCommand* _Nonnull)command;
+- (void)addUserJwtInvalidatedListener:(CDVInvokedUrlCommand* _Nonnull)command;
 
 - (void)addTags:(CDVInvokedUrlCommand* _Nonnull)command;
 - (void)removeTags:(CDVInvokedUrlCommand* _Nonnull)command;
