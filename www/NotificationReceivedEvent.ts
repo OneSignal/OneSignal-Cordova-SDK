@@ -1,4 +1,4 @@
-import { OSNotification } from './OSNotification';
+import { OSNotification } from "./OSNotification";
 
 declare let cordova: any;
 // Suppress TS warnings about window.cordova
@@ -6,18 +6,24 @@ declare let cordova: any;
 declare let window: any; // turn off type checking
 
 export class NotificationWillDisplayEvent {
-    private notification: OSNotification;
+  private notification: OSNotification;
 
-    constructor(displayEvent: OSNotification) {
-        this.notification = new OSNotification(displayEvent);
-    }
+  constructor(displayEvent: OSNotification) {
+    this.notification = new OSNotification(displayEvent);
+  }
 
-    preventDefault(): void {
-        window.cordova.exec(function(){}, function(){}, "OneSignalPush", "preventDefault", [this.notification.notificationId]);
-        return;
-    }
+  preventDefault(shouldDiscard: boolean = false): void {
+    window.cordova.exec(
+      function () {},
+      function () {},
+      "OneSignalPush",
+      "preventDefault",
+      [this.notification.notificationId, shouldDiscard]
+    );
+    return;
+  }
 
-    getNotification(): OSNotification {
-        return this.notification;
-    }
+  getNotification(): OSNotification {
+    return this.notification;
+  }
 }
