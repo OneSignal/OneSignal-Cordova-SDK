@@ -27,36 +27,32 @@
 
 package com.onesignal.cordova;
 
-import android.util.Log;
-
-import com.onesignal.OneSignal;
-import com.onesignal.debug.internal.logging.Logging;
-import com.onesignal.common.OneSignalWrapper;
-
-import com.onesignal.inAppMessages.IInAppMessage;
-import com.onesignal.inAppMessages.IInAppMessageClickListener;
-import com.onesignal.inAppMessages.IInAppMessageClickEvent;
-import com.onesignal.inAppMessages.IInAppMessageClickResult;
-import com.onesignal.inAppMessages.IInAppMessageLifecycleListener;
-import com.onesignal.inAppMessages.IInAppMessageWillDisplayEvent;
-import com.onesignal.inAppMessages.IInAppMessageDidDisplayEvent;
-import com.onesignal.inAppMessages.IInAppMessageWillDismissEvent;
-import com.onesignal.inAppMessages.IInAppMessageDidDismissEvent;
-
-import com.onesignal.notifications.INotification;
-import com.onesignal.notifications.INotificationClickListener;
-import com.onesignal.notifications.INotificationClickEvent;
-import com.onesignal.notifications.INotificationClickResult;
-import com.onesignal.notifications.INotificationLifecycleListener;
-import com.onesignal.notifications.INotificationWillDisplayEvent;
+import java.util.HashMap;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
-import org.json.JSONObject;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
-import java.util.HashMap;
+import com.onesignal.OneSignal;
+import com.onesignal.common.OneSignalWrapper;
+import com.onesignal.debug.internal.logging.Logging;
+import com.onesignal.inAppMessages.IInAppMessage;
+import com.onesignal.inAppMessages.IInAppMessageClickEvent;
+import com.onesignal.inAppMessages.IInAppMessageClickListener;
+import com.onesignal.inAppMessages.IInAppMessageClickResult;
+import com.onesignal.inAppMessages.IInAppMessageDidDismissEvent;
+import com.onesignal.inAppMessages.IInAppMessageDidDisplayEvent;
+import com.onesignal.inAppMessages.IInAppMessageLifecycleListener;
+import com.onesignal.inAppMessages.IInAppMessageWillDismissEvent;
+import com.onesignal.inAppMessages.IInAppMessageWillDisplayEvent;
+import com.onesignal.notifications.INotification;
+import com.onesignal.notifications.INotificationClickEvent;
+import com.onesignal.notifications.INotificationClickListener;
+import com.onesignal.notifications.INotificationClickResult;
+import com.onesignal.notifications.INotificationLifecycleListener;
+import com.onesignal.notifications.INotificationWillDisplayEvent;
 
 public class OneSignalPush extends CordovaPlugin implements INotificationLifecycleListener, INotificationClickListener, IInAppMessageLifecycleListener, IInAppMessageClickListener {
   private static final String TAG = "OneSignalPush";
@@ -218,12 +214,14 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
   private boolean preventDefault(JSONArray data) {
     try {
       String notificationId = data.getString(0);
+      boolean shouldDiscard = data.getBoolean(1);
+
       INotificationWillDisplayEvent event = notificationWillDisplayCache.get(notificationId);
       if (event == null) {
           Logging.error("Could not find onWillDisplayNotification event for notification with id: " + notificationId, null);
           return true;
       }
-      event.preventDefault();
+      event.preventDefault(shouldDiscard);
       this.preventDefaultCache.put(notificationId, event);
       return true;
     } catch (JSONException e) {
