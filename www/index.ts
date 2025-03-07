@@ -25,79 +25,105 @@
  * THE SOFTWARE.
  */
 
-import User from "./UserNamespace";
 import Debug from "./DebugNamespace";
-import Session from "./SessionNamespace";
-import Location from "./LocationNamespace";
 import InAppMessages from "./InAppMessagesNamespace";
-import Notifications from "./NotificationsNamespace";
 import LiveActivities from "./LiveActivitiesNamespace";
-
-// Suppress TS warnings about window.cordova
-declare let window: any; // turn off type checking
+import Location from "./LocationNamespace";
+import Notifications from "./NotificationsNamespace";
+import Session from "./SessionNamespace";
+import User from "./UserNamespace";
 
 export class OneSignalPlugin {
-    User: User = new User();
-    Debug: Debug = new Debug();
-    Session: Session = new Session();
-    Location: Location = new Location();
-    InAppMessages: InAppMessages = new InAppMessages();
-    Notifications: Notifications = new Notifications();
-    LiveActivities: LiveActivities = new LiveActivities();
+  User: User = new User();
+  Debug: Debug = new Debug();
+  Session: Session = new Session();
+  Location: Location = new Location();
+  InAppMessages: InAppMessages = new InAppMessages();
+  Notifications: Notifications = new Notifications();
+  LiveActivities: LiveActivities = new LiveActivities();
 
-    private _appID = "";
+  private _appID = "";
 
-    /**
-     * Initializes the OneSignal SDK. This should be called during startup of the application.
-     * @param  {string} appId
-     * @returns void
-     */
-    initialize(appId: string): void {
-        this._appID = appId;
+  /**
+   * Initializes the OneSignal SDK. This should be called during startup of the application.
+   * @param  {string} appId
+   * @returns void
+   */
+  initialize(appId: string): void {
+    this._appID = appId;
 
-        const observerCallback = () => {
-            this.User.pushSubscription._setPropertiesAndObserver();
-            this.Notifications._setPropertyAndObserver();
-        }
-
-        window.cordova.exec(observerCallback, function(){}, "OneSignalPush", "init", [this._appID]);
+    const observerCallback = () => {
+      this.User.pushSubscription._setPropertiesAndObserver();
+      this.Notifications._setPropertyAndObserver();
     };
 
-    /**
-     * Login to OneSignal under the user identified by the [externalId] provided. The act of logging a user into the OneSignal SDK will switch the [user] context to that specific user.
-     * @param  {string} externalId
-     * @returns void
-     */
-    login(externalId: string): void {
-        window.cordova.exec(function () { }, function () { }, "OneSignalPush", "login", [externalId]);
-    }
+    window.cordova.exec(
+      observerCallback,
+      function () {},
+      "OneSignalPush",
+      "init",
+      [this._appID]
+    );
+  }
 
-    /**
-     * Logout the user previously logged in via [login]. The [user] property now references a new device-scoped user.
-     * @param  {string} externalId
-     * @returns void
-     */
-    logout(): void {
-        window.cordova.exec(function () { }, function () { }, "OneSignalPush", "logout");
-    }
+  /**
+   * Login to OneSignal under the user identified by the [externalId] provided. The act of logging a user into the OneSignal SDK will switch the [user] context to that specific user.
+   * @param  {string} externalId
+   * @returns void
+   */
+  login(externalId: string): void {
+    window.cordova.exec(
+      function () {},
+      function () {},
+      "OneSignalPush",
+      "login",
+      [externalId]
+    );
+  }
 
-   /**
-     * Determines whether a user must consent to privacy prior to their user data being sent up to OneSignal. This should be set to true prior to the invocation of initialization to ensure compliance.
-     * @param  {boolean} required
-     * @returns void
-     */
-    setConsentRequired(required: boolean): void {
-        window.cordova.exec(function () { }, function () { }, "OneSignalPush", "setPrivacyConsentRequired", [required]);
-    };
+  /**
+   * Logout the user previously logged in via [login]. The [user] property now references a new device-scoped user.
+   * @param  {string} externalId
+   * @returns void
+   */
+  logout(): void {
+    window.cordova.exec(
+      function () {},
+      function () {},
+      "OneSignalPush",
+      "logout"
+    );
+  }
 
-    /**
-     * Indicates whether privacy consent has been granted. This field is only relevant when the application has opted into data privacy protections.
-     * @param  {boolean} granted
-     * @returns void
-     */
-    setConsentGiven(granted: boolean): void {
-        window.cordova.exec(function () { }, function () { }, "OneSignalPush", "setPrivacyConsentGiven", [granted]);
-    };
+  /**
+   * Determines whether a user must consent to privacy prior to their user data being sent up to OneSignal. This should be set to true prior to the invocation of initialization to ensure compliance.
+   * @param  {boolean} required
+   * @returns void
+   */
+  setConsentRequired(required: boolean): void {
+    window.cordova.exec(
+      function () {},
+      function () {},
+      "OneSignalPush",
+      "setPrivacyConsentRequired",
+      [required]
+    );
+  }
+
+  /**
+   * Indicates whether privacy consent has been granted. This field is only relevant when the application has opted into data privacy protections.
+   * @param  {boolean} granted
+   * @returns void
+   */
+  setConsentGiven(granted: boolean): void {
+    window.cordova.exec(
+      function () {},
+      function () {},
+      "OneSignalPush",
+      "setPrivacyConsentGiven",
+      [granted]
+    );
+  }
 }
 
 //-------------------------------------------------------------------
@@ -105,44 +131,39 @@ export class OneSignalPlugin {
 const OneSignal = new OneSignalPlugin();
 
 if (!window.plugins) {
-    window.plugins = {};
+  window.plugins = {};
 }
-
 if (!window.plugins.OneSignal) {
-    window.plugins.OneSignal = OneSignal;
+  window.plugins.OneSignal = OneSignal;
 }
 
 // Exporting
-
 export { LogLevel } from "./DebugNamespace";
-export { OSNotification } from './OSNotification';
-export { OSNotificationPermission } from "./NotificationsNamespace";
 export { NotificationWillDisplayEvent } from "./NotificationReceivedEvent";
+export { OSNotificationPermission } from "./NotificationsNamespace";
+export { OSNotification } from "./OSNotification";
 
 export {
-    PushSubscriptionState,
-    PushSubscriptionChangedState
-} from "./PushSubscriptionNamespace"
+  PushSubscriptionChangedState,
+  PushSubscriptionState,
+} from "./PushSubscriptionNamespace";
 
 export {
-    NotificationClickEvent,
-    NotificationClickResult,
+  NotificationClickEvent,
+  NotificationClickResult,
 } from "./models/NotificationClicked";
 
 export {
-    OSInAppMessage,
-    InAppMessageWillDisplayEvent,
-    InAppMessageDidDisplayEvent,
-    InAppMessageWillDismissEvent,
-    InAppMessageDidDismissEvent,
-    InAppMessageClickEvent,
-    InAppMessageClickResult,
-    InAppMessageActionUrlType,
+  InAppMessageActionUrlType,
+  InAppMessageClickEvent,
+  InAppMessageClickResult,
+  InAppMessageDidDismissEvent,
+  InAppMessageDidDisplayEvent,
+  InAppMessageWillDismissEvent,
+  InAppMessageWillDisplayEvent,
+  OSInAppMessage,
 } from "./models/InAppMessage";
 
-export {
-    UserState,
-    UserChangedState,
-} from "./UserNamespace";
+export { UserChangedState, UserState } from "./UserNamespace";
 
 export default OneSignal;
