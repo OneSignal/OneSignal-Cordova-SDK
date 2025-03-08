@@ -62,7 +62,7 @@ class OSDemo extends React.Component<Props, State> {
           // Call to display the notification after 5 second delay
           notif.display();
         }, 10000);
-      }
+      },
     );
 
     OneSignal.Notifications.addEventListener("click", (event) => {
@@ -93,7 +93,7 @@ class OSDemo extends React.Component<Props, State> {
       "change",
       (subscription) => {
         this.OSLog("OneSignal: subscription changed:", subscription);
-      }
+      },
     );
 
     OneSignal.Notifications.addEventListener("permissionChange", (granted) => {
@@ -105,7 +105,7 @@ class OSDemo extends React.Component<Props, State> {
     });
   }
 
-  OSLog = (message: string, optionalArg: any = null) => {
+  OSLog = (message: string, optionalArg: unknown = null) => {
     if (optionalArg !== null) {
       message = message + JSON.stringify(optionalArg);
     }
