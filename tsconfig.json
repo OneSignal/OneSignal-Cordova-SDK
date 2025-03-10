@@ -1,20 +1,15 @@
 {
-    "compilerOptions": {
-        "outDir": "dist",
-        "target": "es5",
-        "moduleResolution": "node",
-        "noImplicitAny": true,
-        "lib": [
-            "es6",
-            "dom",
-        ],
-        "declaration": true,
-        "allowSyntheticDefaultImports": true,
-        "esModuleInterop": true,
-        "strict": true,
-        "noUnusedLocals": true,
-    },
-    "include": [
-        "www"
-    ]
+  "compilerOptions": {
+    "outDir": "dist",
+    "target": "es5",
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "lib": ["es6", "dom"],
+    "declaration": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "strict": true,
+    "noUnusedLocals": true
+  },
+  "include": ["www"]
 }
