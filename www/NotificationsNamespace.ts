@@ -311,5 +311,3 @@ export default class Notifications {
     );
   }
 }
-
-window.plugins!.OneSignal;
