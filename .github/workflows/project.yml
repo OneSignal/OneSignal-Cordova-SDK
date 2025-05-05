@@ -1,0 +1,19 @@
+name: Issue Last Updated
+
+on:
+  issue_comment:
+    types: [created, deleted]
+
+jobs:
+  last-updated:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update Project Last Updated
+        uses: github/update-project-action@v3
+        with:
+          github_token: ${{ secrets.GH_PROJECTS_TOKEN }}
+          organization: github
+          project_number: 10
+          content_id: ${{ github.event.client_payload.command.resource.id }}
+          field: Last Updated
+          value: ${{ (now() | date('yyyy-MM-ddTHH:mm:ssZ')) }}
