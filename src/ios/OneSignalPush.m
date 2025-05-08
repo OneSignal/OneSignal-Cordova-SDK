@@ -267,9 +267,9 @@ static Class delegateClass = nil;
 }
 
 - (void)addForegroundLifecycleListener:(CDVInvokedUrlCommand*)command {
-    bool first = notificationWillShowInForegoundCallbackId  == nil;
+    bool handlerNotSet = notificationWillShowInForegoundCallbackId  == nil;
     notificationWillShowInForegoundCallbackId = command.callbackId;
-    if (first) {
+    if (handlerNotSet) {
         [OneSignal.Notifications addForegroundLifecycleListener:self];
     }
 }
@@ -281,9 +281,9 @@ static Class delegateClass = nil;
 }
 
 - (void)addNotificationClickListener:(CDVInvokedUrlCommand*)command {
-    bool first = notificationClickedCallbackId  == nil;
+    bool handlerNotSet = notificationClickedCallbackId  == nil;
     notificationClickedCallbackId = command.callbackId;
-    if (first) {
+    if (handlerNotSet) {
         [OneSignal.Notifications addClickListener:self];
     }
 }
@@ -320,24 +320,24 @@ static Class delegateClass = nil;
 }
 
 - (void)addPermissionObserver:(CDVInvokedUrlCommand*)command {
-    bool first = permissionObserverCallbackId == nil;
+    bool handlerNotSet = permissionObserverCallbackId == nil;
     permissionObserverCallbackId = command.callbackId;
-    if (first) {
+    if (handlerNotSet) {
         [OneSignal.Notifications addPermissionObserver:self];
     }
 }
 
 - (void)addPushSubscriptionObserver:(CDVInvokedUrlCommand*)command {
-    bool first = subscriptionObserverCallbackId == nil;
+    bool handlerNotSet = subscriptionObserverCallbackId == nil;
     subscriptionObserverCallbackId = command.callbackId;
-    if (first)
+    if (handlerNotSet)
         [OneSignal.User.pushSubscription addObserver:self];
 }
 
 - (void)addUserStateObserver:(CDVInvokedUrlCommand*)command {
-    bool first = userObserverCallbackId == nil;
+    bool handlerNotSet = userObserverCallbackId == nil;
     userObserverCallbackId = command.callbackId;
-    if (first) {
+    if (handlerNotSet) {
         [OneSignal.User addObserver:self];
     }
 }
@@ -505,9 +505,9 @@ static Class delegateClass = nil;
 }
 
 - (void)setInAppMessageClickHandler:(CDVInvokedUrlCommand*)command {
-    bool first = inAppMessageClickedCallbackId  == nil;
+    bool handlerNotSet = inAppMessageClickedCallbackId  == nil;
     inAppMessageClickedCallbackId = command.callbackId;
-    if (first) {
+    if (handlerNotSet) {
         [OneSignal.InAppMessages addClickListener:self];
     }
 }
