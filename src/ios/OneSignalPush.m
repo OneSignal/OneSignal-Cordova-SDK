@@ -53,7 +53,7 @@ OSNotification *notification;
 
 id <CDVCommandDelegate> pluginCommandDelegate;
 
-bool initialLaunchFired = false;
+bool initDone = false;
 
 void successCallback(NSString* callbackId, NSDictionary* data) {
     CDVPluginResult* commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
@@ -109,7 +109,6 @@ void initOneSignalObject(NSDictionary* launchOptions) {
     OneSignalWrapper.sdkType = @"cordova";
     OneSignalWrapper.sdkVersion = @"050211";
     [OneSignal initialize:nil withLaunchOptions:launchOptions];
-    initialLaunchFired = true;
 }
 
 /** Helper method to return NSNull if string is empty or nil **/
@@ -268,9 +267,9 @@ static Class delegateClass = nil;
 }
 
 - (void)addForegroundLifecycleListener:(CDVInvokedUrlCommand*)command {
-    bool first = notificationWillShowInForegoundCallbackId  == nil;
+    bool handlerNotSet = notificationWillShowInForegoundCallbackId  == nil;
     notificationWillShowInForegoundCallbackId = command.callbackId;
-    if (first) {
+    if (handlerNotSet) {
         [OneSignal.Notifications addForegroundLifecycleListener:self];
     }
 }
@@ -282,14 +281,21 @@ static Class delegateClass = nil;
 }
 
 - (void)addNotificationClickListener:(CDVInvokedUrlCommand*)command {
-    bool first = notificationClickedCallbackId  == nil;
+    bool handlerNotSet = notificationClickedCallbackId  == nil;
     notificationClickedCallbackId = command.callbackId;
-    if (first) {
+    if (handlerNotSet) {
         [OneSignal.Notifications addClickListener:self];
     }
 }
 
+/// Initializes OneSignal with the given appId; called by app developers.
 - (void)init:(CDVInvokedUrlCommand*)command {
+    if (initDone) {
+        [OneSignalLog onesignalLog:ONE_S_LL_DEBUG message:[NSString stringWithFormat:@"Already initialized the OneSignal Cordova SDK"]];
+        successCallbackBoolean(command.callbackId, true);
+        return;
+    }
+    initDone = true;
     _notificationWillDisplayCache = [NSMutableDictionary new];
     _preventDefaultCache = [NSMutableDictionary new];
 
@@ -300,9 +306,8 @@ static Class delegateClass = nil;
 
     [OneSignal initialize:appIdStr withLaunchOptions:nil];
 
-    // In-App Message listeners
+    // Automatically add this listener as each lifecycle is registered by the developer separately
     [OneSignal.InAppMessages addLifecycleListener:self];
-    [OneSignal.InAppMessages addClickListener:self];
 
     if (actionNotification)
         processNotificationClicked(actionNotification);
@@ -315,24 +320,24 @@ static Class delegateClass = nil;
 }
 
 - (void)addPermissionObserver:(CDVInvokedUrlCommand*)command {
-    bool first = permissionObserverCallbackId == nil;
+    bool handlerNotSet = permissionObserverCallbackId == nil;
     permissionObserverCallbackId = command.callbackId;
-    if (first) {
+    if (handlerNotSet) {
         [OneSignal.Notifications addPermissionObserver:self];
     }
 }
 
 - (void)addPushSubscriptionObserver:(CDVInvokedUrlCommand*)command {
-    bool first = subscriptionObserverCallbackId == nil;
+    bool handlerNotSet = subscriptionObserverCallbackId == nil;
     subscriptionObserverCallbackId = command.callbackId;
-    if (first)
+    if (handlerNotSet)
         [OneSignal.User.pushSubscription addObserver:self];
 }
 
 - (void)addUserStateObserver:(CDVInvokedUrlCommand*)command {
-    bool first = userObserverCallbackId == nil;
+    bool handlerNotSet = userObserverCallbackId == nil;
     userObserverCallbackId = command.callbackId;
-    if (first) {
+    if (handlerNotSet) {
         [OneSignal.User addObserver:self];
     }
 }
@@ -500,7 +505,11 @@ static Class delegateClass = nil;
 }
 
 - (void)setInAppMessageClickHandler:(CDVInvokedUrlCommand*)command {
+    bool handlerNotSet = inAppMessageClickedCallbackId  == nil;
     inAppMessageClickedCallbackId = command.callbackId;
+    if (handlerNotSet) {
+        [OneSignal.InAppMessages addClickListener:self];
+    }
 }
 
 - (void)setOnWillDisplayInAppMessageHandler:(CDVInvokedUrlCommand*)command {

@@ -150,6 +150,8 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
   private static CallbackContext jsNotificationInForegroundCallBack;
   private static CallbackContext jsNotificationClickedCallback;
 
+  private static boolean initDone;
+
   /**
    * N O T I F I C A T I O N    L I F E C Y C L E
    */
@@ -237,14 +239,12 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
   private boolean hasAddedNotificationClickListener = false;
 
   public boolean addNotificationClickListener(CallbackContext callbackContext) {
-      if (this.hasAddedNotificationClickListener) {
-        return false;
-      }
-
+    jsNotificationClickedCallback = callbackContext;
+    if (!this.hasAddedNotificationClickListener) {
       OneSignal.getNotifications().addClickListener(this);
-      jsNotificationClickedCallback = callbackContext;
       hasAddedNotificationClickListener = true;
-      return true;
+    }
+    return true;
   }
 
   @Override
@@ -357,6 +357,12 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
    */
 
   public boolean init(CallbackContext callbackContext, JSONArray data) {
+    if (initDone) {
+      Logging.debug("Already initialized the OneSignal Cordova SDK", null);
+      return true;
+    }
+
+    initDone = true;
     OneSignalWrapper.setSdkType("cordova");  
     OneSignalWrapper.setSdkVersion("050211");
     try {
@@ -705,6 +711,12 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
 
   @Override
   public void onDestroy() {
+    if (!initDone) {
+      Logging.debug("OneSignal Cordova SDK not initialized yet. Could not remove listeners.", null);
+      return;
+    }
+
+    hasAddedNotificationClickListener = false;
     OneSignal.getNotifications().removeClickListener(this);
     OneSignal.getNotifications().removeForegroundLifecycleListener(this);
     OneSignal.getInAppMessages().removeClickListener(this);
