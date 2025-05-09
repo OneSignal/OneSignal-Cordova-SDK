@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Add issue to project
-        uses: github/add-to-project-action@v1
+        uses: actions/add-to-project@v1
         with:
           # SDK Cross-Platform Project
           project-url: https://github.com/orgs/OneSignal/projects/10
