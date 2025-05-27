@@ -364,7 +364,7 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
 
     initDone = true;
     OneSignalWrapper.setSdkType("cordova");  
-    OneSignalWrapper.setSdkVersion("050213");
+    OneSignalWrapper.setSdkVersion("050214");
     try {
       String appId = data.getString(0);
       OneSignal.initWithContext(this.cordova.getActivity(), appId);
