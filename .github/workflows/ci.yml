@@ -11,11 +11,19 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: "17"
           distribution: "temurin"
+
+      - name: Install example app dependencies
+        run: cd example/IonicCapOneSignal && npm ci
 
       - name: Make gradlew executable
         run: chmod +x example/IonicCapOneSignal/android/gradlew
