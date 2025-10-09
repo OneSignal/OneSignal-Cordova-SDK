@@ -1,0 +1,27 @@
+name: Run Checks
+on:
+  pull_request:
+    branches:
+      - "**"
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Make gradlew executable
+        run: chmod +x example/IonicCapOneSignal/android/gradlew
+
+      - name: Check SDK Java formatting
+        run: ./example/IonicCapOneSignal/android/gradlew spotlessCheck
+
+      - name: Check example app Java formatting
+        run: cd example/IonicCapOneSignal/android && ./gradlew spotlessCheck
