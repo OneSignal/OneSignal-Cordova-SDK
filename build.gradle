@@ -17,7 +17,7 @@ apply plugin: 'com.diffplug.spotless'
 
 spotless {
   java {
-    target 'src/android/**/*.java'
+    target 'src/android/**/*.java', 'example/IonicCapOneSignal/android/app/src/**/*.java'
     targetExclude '**/build/**'
     googleJavaFormat('1.17.0')
     removeUnusedImports()
