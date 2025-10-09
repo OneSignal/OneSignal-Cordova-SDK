@@ -6,7 +6,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v5
@@ -17,11 +17,19 @@ jobs:
           java-version: "17"
           distribution: "temurin"
 
-      - name: Install clang-format
+      - name: Enable Homebrew
+        uses: Homebrew/actions/setup-homebrew@main
+
+      - uses: tecolicom/actions-use-homebrew-tools@v1
+        with:
+          tools: clang-format
+          cache: yes
+
+      - name: Use Homebrew clang-format 21.1.3
         run: |
-          curl -fsSL https://apt.llvm.org/llvm.sh | sudo bash -s -- 21
-          sudo apt-get install -y clang-format-21
-          sudo ln -sf /usr/bin/clang-format-21 /usr/bin/clang-format
+          brew link --overwrite --force clang-format >/dev/null
+          export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
+          clang-format --version
 
       - name: Make gradlew executable
         run: chmod +x example/IonicCapOneSignal/android/gradlew
