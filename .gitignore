@@ -2,3 +2,7 @@ node_modules
 dist
 
 .vscode
+
+# Gradle
+.gradle/
+build/

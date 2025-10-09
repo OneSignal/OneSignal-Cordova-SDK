@@ -1,39 +1,27 @@
 /**
  * Modified MIT License
  *
- * Copyright 2021 OneSignal
+ * <p>Copyright 2021 OneSignal
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
+ * <p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+ * and associated documentation files (the "Software"), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * 1. The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * <p>1. The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
  *
- * 2. All copies of substantial portions of the Software may only be used in connection
- * with services provided by OneSignal.
+ * <p>2. All copies of substantial portions of the Software may only be used in connection with
+ * services provided by OneSignal.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * <p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-
 package com.onesignal.cordova;
-
-import java.util.HashMap;
-
-import org.apache.cordova.CallbackContext;
-import org.apache.cordova.CordovaPlugin;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import com.onesignal.OneSignal;
 import com.onesignal.common.OneSignalWrapper;
@@ -53,8 +41,18 @@ import com.onesignal.notifications.INotificationClickListener;
 import com.onesignal.notifications.INotificationClickResult;
 import com.onesignal.notifications.INotificationLifecycleListener;
 import com.onesignal.notifications.INotificationWillDisplayEvent;
+import java.util.HashMap;
+import org.apache.cordova.CallbackContext;
+import org.apache.cordova.CordovaPlugin;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-public class OneSignalPush extends CordovaPlugin implements INotificationLifecycleListener, INotificationClickListener, IInAppMessageLifecycleListener, IInAppMessageClickListener {
+public class OneSignalPush extends CordovaPlugin
+    implements INotificationLifecycleListener,
+        INotificationClickListener,
+        IInAppMessageLifecycleListener,
+        IInAppMessageClickListener {
   private static final String TAG = "OneSignalPush";
 
   private static final String ADD_FOREGROUND_LIFECYCLE_LISTENER = "addForegroundLifecycleListener";
@@ -62,12 +60,16 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
   private static final String DISPLAY_NOTIFICATION = "displayNotification";
   private static final String PREVENT_DEFAULT = "preventDefault";
   private static final String ADD_NOTIFICATION_CLICK_LISTENER = "addNotificationClickListener";
-  
+
   private static final String SET_IN_APP_MESSAGE_CLICK_HANDLER = "setInAppMessageClickHandler";
-  private static final String SET_ON_WILL_DISPLAY_IN_APP_MESSAGE_HANDLER = "setOnWillDisplayInAppMessageHandler";
-  private static final String SET_ON_DID_DISPLAY_IN_APP_MESSAGE_HANDLER = "setOnDidDisplayInAppMessageHandler";
-  private static final String SET_ON_WILL_DISMISS_IN_APP_MESSAGE_HANDLER = "setOnWillDismissInAppMessageHandler";
-  private static final String SET_ON_DID_DISMISS_IN_APP_MESSAGE_HANDLER = "setOnDidDismissInAppMessageHandler";
+  private static final String SET_ON_WILL_DISPLAY_IN_APP_MESSAGE_HANDLER =
+      "setOnWillDisplayInAppMessageHandler";
+  private static final String SET_ON_DID_DISPLAY_IN_APP_MESSAGE_HANDLER =
+      "setOnDidDisplayInAppMessageHandler";
+  private static final String SET_ON_WILL_DISMISS_IN_APP_MESSAGE_HANDLER =
+      "setOnWillDismissInAppMessageHandler";
+  private static final String SET_ON_DID_DISMISS_IN_APP_MESSAGE_HANDLER =
+      "setOnDidDismissInAppMessageHandler";
 
   private static final String INIT = "init";
 
@@ -85,10 +87,10 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
 
   private static final String OPT_IN = "optInPushSubscription";
   private static final String OPT_OUT = "optOutPushSubscription";
-   private static final String GET_ID = "getPushSubscriptionId";
+  private static final String GET_ID = "getPushSubscriptionId";
   private static final String GET_TOKEN = "getPushSubscriptionToken";
   private static final String GET_OPTED_IN = "getPushSubscriptionOptedIn";
-  
+
   private static final String ADD_ALIASES = "addAliases";
   private static final String REMOVE_ALIASES = "removeAliases";
 
@@ -96,7 +98,8 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
   private static final String ADD_TAGS = "addTags";
   private static final String GET_TAGS = "getTags";
 
-  private static final String REGISTER_FOR_PROVISIONAL_AUTHORIZATION = "registerForProvisionalAuthorization";
+  private static final String REGISTER_FOR_PROVISIONAL_AUTHORIZATION =
+      "registerForProvisionalAuthorization";
   private static final String REQUEST_PERMISSION = "requestPermission";
   private static final String GET_PERMISSION_INTERNAL = "getPermissionInternal";
   private static final String PERMISSION_NATIVE = "permissionNative";
@@ -139,8 +142,10 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
   private static final String SETUP_DEFAULT_ACTIVITY = "setupDefaultLiveActivity";
   private static final String START_DEFAULT_LIVE_ACTIVITY = "startDefaultLiveActivity";
 
-  private static final HashMap<String, INotificationWillDisplayEvent> notificationWillDisplayCache = new HashMap<>();
-  private static final HashMap<String, INotificationWillDisplayEvent> preventDefaultCache = new HashMap<>();
+  private static final HashMap<String, INotificationWillDisplayEvent> notificationWillDisplayCache =
+      new HashMap<>();
+  private static final HashMap<String, INotificationWillDisplayEvent> preventDefaultCache =
+      new HashMap<>();
 
   private static CallbackContext jsInAppMessageWillDisplayCallback;
   private static CallbackContext jsInAppMessageDidDisplayCallBack;
@@ -152,10 +157,7 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
 
   private static boolean initDone;
 
-  /**
-   * N O T I F I C A T I O N    L I F E C Y C L E
-   */
-
+  /** N O T I F I C A T I O N L I F E C Y C L E */
   public boolean addForegroundLifecycleListener(CallbackContext callbackContext) {
     jsNotificationInForegroundCallBack = callbackContext;
     return true;
@@ -166,7 +168,8 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
     if (jsNotificationInForegroundCallBack != null) {
       try {
         INotification notification = event.getNotification();
-        notificationWillDisplayCache.put(notification.getNotificationId(), (INotificationWillDisplayEvent) event);
+        notificationWillDisplayCache.put(
+            notification.getNotificationId(), (INotificationWillDisplayEvent) event);
 
         event.preventDefault();
 
@@ -179,15 +182,18 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
   }
 
   private boolean proceedWithWillDisplay(JSONArray data) {
-    try{
+    try {
       String notificationId = data.getString(0);
       INotificationWillDisplayEvent event = notificationWillDisplayCache.get(notificationId);
       if (event == null) {
-          Logging.error("Could not find onWillDisplayNotification event for notification with id: " + notificationId, null);
-          return true;
+        Logging.error(
+            "Could not find onWillDisplayNotification event for notification with id: "
+                + notificationId,
+            null);
+        return true;
       }
       if (this.preventDefaultCache.containsKey(notificationId)) {
-          return true;
+        return true;
       }
       event.getNotification().display();
       return true;
@@ -200,12 +206,15 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
   private boolean displayNotification(JSONArray data) {
     try {
       String notificationId = data.getString(0);
-        INotificationWillDisplayEvent event = notificationWillDisplayCache.get(notificationId);
-        if (event == null) {
-            Logging.error("Could not find onWillDisplayNotification event for notification with id: " + notificationId, null);
-            return true;
-        }
-        event.getNotification().display();
+      INotificationWillDisplayEvent event = notificationWillDisplayCache.get(notificationId);
+      if (event == null) {
+        Logging.error(
+            "Could not find onWillDisplayNotification event for notification with id: "
+                + notificationId,
+            null);
+        return true;
+      }
+      event.getNotification().display();
       return true;
     } catch (JSONException e) {
       e.printStackTrace();
@@ -220,8 +229,11 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
 
       INotificationWillDisplayEvent event = notificationWillDisplayCache.get(notificationId);
       if (event == null) {
-          Logging.error("Could not find onWillDisplayNotification event for notification with id: " + notificationId, null);
-          return true;
+        Logging.error(
+            "Could not find onWillDisplayNotification event for notification with id: "
+                + notificationId,
+            null);
+        return true;
       }
       event.preventDefault(shouldDiscard);
       this.preventDefaultCache.put(notificationId, event);
@@ -232,10 +244,7 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
     return true;
   }
 
-  /**
-   * N O T I F I C A T I O N    C L I C K    L I S T E N E R
-   */
-
+  /** N O T I F I C A T I O N C L I C K L I S T E N E R */
   private boolean hasAddedNotificationClickListener = false;
 
   public boolean addNotificationClickListener(CallbackContext callbackContext) {
@@ -251,17 +260,15 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
   public void onClick(INotificationClickEvent event) {
     try {
       if (jsNotificationClickedCallback != null) {
-        CallbackHelper.callbackSuccess(jsNotificationClickedCallback, serializeNotificationClickEvent(event));
+        CallbackHelper.callbackSuccess(
+            jsNotificationClickedCallback, serializeNotificationClickEvent(event));
       }
     } catch (JSONException e) {
       e.printStackTrace();
     }
   }
 
-  /**
-   * I N    A P P    M E S S A G E    C L I C K    L I S T E N E R
-   */
-
+  /** I N A P P M E S S A G E C L I C K L I S T E N E R */
   public boolean setInAppMessageClickHandler(CallbackContext callbackContext) {
     jsInAppMessageClickedCallback = callbackContext;
     return true;
@@ -271,18 +278,15 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
   public void onClick(IInAppMessageClickEvent event) {
     try {
       if (jsInAppMessageClickedCallback != null) {
-        CallbackHelper.callbackSuccess(jsInAppMessageClickedCallback, serializeInAppMessageClickEvent(event));
+        CallbackHelper.callbackSuccess(
+            jsInAppMessageClickedCallback, serializeInAppMessageClickEvent(event));
       }
-    }
-    catch (JSONException e) {
+    } catch (JSONException e) {
       e.printStackTrace();
     }
   }
 
-  /**
-   * I N    A P P    M E S S A G E    L I F E C Y C L E
-   */
-
+  /** I N A P P M E S S A G E L I F E C Y C L E */
   @Override
   public void onWillDisplay(IInAppMessageWillDisplayEvent event) {
     if (jsInAppMessageWillDisplayCallback != null) {
@@ -295,6 +299,7 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
       }
     }
   }
+
   @Override
   public void onDidDisplay(IInAppMessageDidDisplayEvent event) {
     if (jsInAppMessageDidDisplayCallBack != null) {
@@ -307,6 +312,7 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
       }
     }
   }
+
   @Override
   public void onWillDismiss(IInAppMessageWillDismissEvent event) {
     if (jsInAppMessageWillDismissCallback != null) {
@@ -319,6 +325,7 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
       }
     }
   }
+
   @Override
   public void onDidDismiss(IInAppMessageDidDismissEvent event) {
     if (jsInAppMessageDidDismissCallBack != null) {
@@ -352,10 +359,7 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
     return true;
   }
 
-  /**
-   * I N I T I A L I Z A T I O N
-   */
-
+  /** I N I T I A L I Z A T I O N */
   public boolean init(CallbackContext callbackContext, JSONArray data) {
     if (initDone) {
       Logging.debug("Already initialized the OneSignal Cordova SDK", null);
@@ -363,7 +367,7 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
     }
 
     initDone = true;
-    OneSignalWrapper.setSdkType("cordova");  
+    OneSignalWrapper.setSdkType("cordova");
     OneSignalWrapper.setSdkVersion("050215");
     try {
       String appId = data.getString(0);
@@ -386,7 +390,7 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
   public boolean execute(String action, JSONArray data, CallbackContext callbackContext) {
     boolean result = false;
 
-    switch(action) {
+    switch (action) {
       case ADD_NOTIFICATION_CLICK_LISTENER:
         result = addNotificationClickListener(callbackContext);
         break;
@@ -438,7 +442,7 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
       case LOGIN:
         result = OneSignalController.login(data);
         break;
-      
+
       case LOGOUT:
         result = OneSignalController.logout();
         break;
@@ -470,7 +474,7 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
       case OPT_OUT:
         result = OneSignalController.optOutPushSubscription();
         break;
-      
+
       case GET_ID:
         result = OneSignalController.getPushSubscriptionId(callbackContext);
         break;
@@ -522,7 +526,7 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
       case CAN_REQUEST_PERMISSION:
         result = OneSignalController.canRequestPermission(callbackContext);
         break;
-      
+
       case CLEAR_ALL_NOTIFICATIONS:
         result = OneSignalController.clearAllNotifications();
         break;
@@ -643,36 +647,33 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
     return result;
   }
 
-  /**
-   * S E R I A L I Z E R S
-   */
-
+  /** S E R I A L I Z E R S */
   private JSONObject serializeNotification(INotification notification) throws JSONException {
-      JSONObject foregroundData = new JSONObject();
+    JSONObject foregroundData = new JSONObject();
 
-      foregroundData.put("body", notification.getBody());
-      foregroundData.put("sound", notification.getSound());
-      foregroundData.put("title", notification.getTitle());
-      foregroundData.put("launchURL", notification.getLaunchURL());
-      foregroundData.put("rawPayload", notification.getRawPayload());
-      foregroundData.put("actionButtons", notification.getActionButtons());
-      foregroundData.put("additionalData", notification.getAdditionalData());
-      foregroundData.put("notificationId", notification.getNotificationId());
-      foregroundData.put("groupKey", notification.getGroupKey());
-      foregroundData.put("groupMessage", notification.getGroupMessage());
-      foregroundData.put("groupedNotifications", notification.getGroupedNotifications());
-      foregroundData.put("ledColor", notification.getLedColor());
-      foregroundData.put("priority", notification.getPriority());
-      foregroundData.put("smallIcon", notification.getSmallIcon());
-      foregroundData.put("largeIcon", notification.getLargeIcon());
-      foregroundData.put("bigPicture", notification.getBigPicture());
-      foregroundData.put("collapseId", notification.getCollapseId());
-      foregroundData.put("fromProjectNumber", notification.getFromProjectNumber());
-      foregroundData.put("smallIconAccentColor", notification.getSmallIconAccentColor());
-      foregroundData.put("lockScreenVisibility", notification.getLockScreenVisibility());
-      foregroundData.put("androidNotificationId", notification.getAndroidNotificationId());
+    foregroundData.put("body", notification.getBody());
+    foregroundData.put("sound", notification.getSound());
+    foregroundData.put("title", notification.getTitle());
+    foregroundData.put("launchURL", notification.getLaunchURL());
+    foregroundData.put("rawPayload", notification.getRawPayload());
+    foregroundData.put("actionButtons", notification.getActionButtons());
+    foregroundData.put("additionalData", notification.getAdditionalData());
+    foregroundData.put("notificationId", notification.getNotificationId());
+    foregroundData.put("groupKey", notification.getGroupKey());
+    foregroundData.put("groupMessage", notification.getGroupMessage());
+    foregroundData.put("groupedNotifications", notification.getGroupedNotifications());
+    foregroundData.put("ledColor", notification.getLedColor());
+    foregroundData.put("priority", notification.getPriority());
+    foregroundData.put("smallIcon", notification.getSmallIcon());
+    foregroundData.put("largeIcon", notification.getLargeIcon());
+    foregroundData.put("bigPicture", notification.getBigPicture());
+    foregroundData.put("collapseId", notification.getCollapseId());
+    foregroundData.put("fromProjectNumber", notification.getFromProjectNumber());
+    foregroundData.put("smallIconAccentColor", notification.getSmallIconAccentColor());
+    foregroundData.put("lockScreenVisibility", notification.getLockScreenVisibility());
+    foregroundData.put("androidNotificationId", notification.getAndroidNotificationId());
 
-      return foregroundData;
+    return foregroundData;
   }
 
   private JSONObject serializeInAppMessage(IInAppMessage message) throws JSONException {
@@ -681,7 +682,8 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
     return json;
   }
 
-  private JSONObject serializeInAppMessageClickEvent(IInAppMessageClickEvent event) throws JSONException {
+  private JSONObject serializeInAppMessageClickEvent(IInAppMessageClickEvent event)
+      throws JSONException {
     JSONObject json = new JSONObject();
     JSONObject clickResultJson = new JSONObject();
 
@@ -696,11 +698,12 @@ public class OneSignalPush extends CordovaPlugin implements INotificationLifecyc
     return json;
   }
 
-  private JSONObject serializeNotificationClickEvent(INotificationClickEvent event) throws JSONException {
+  private JSONObject serializeNotificationClickEvent(INotificationClickEvent event)
+      throws JSONException {
     JSONObject json = new JSONObject();
     JSONObject clickResultJson = new JSONObject();
 
-    INotificationClickResult clickResult =  event.getResult();
+    INotificationClickResult clickResult = event.getResult();
     clickResultJson.put("actionId", clickResult.getActionId());
     clickResultJson.put("url", clickResult.getUrl());
 

@@ -1,13 +1,8 @@
 package com.onesignal.cordova;
 
-import android.util.Log;
-
 import com.onesignal.OneSignal;
-
-import org.apache.cordova.CallbackContext;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 public class OneSignalOutcomeController {
 

@@ -1,25 +1,21 @@
 package com.onesignal.cordova;
 
-import com.onesignal.OneSignal;
 import com.onesignal.Continue;
+import com.onesignal.OneSignal;
 import com.onesignal.debug.LogLevel;
-
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import org.apache.cordova.CallbackContext;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.HashMap;
-import java.util.Map;
-
 public class OneSignalController {
 
-  /**
-   * Misc
-   */
+  /** Misc */
   public static void setLogLevel(JSONArray data) {
     try {
       int logLevel = data.getInt(0);
@@ -41,13 +37,12 @@ public class OneSignalController {
       t.printStackTrace();
     }
   }
-  
+
   public static boolean setLanguage(JSONArray data) {
     try {
       OneSignal.getUser().setLanguage(data.getString(0));
       return true;
-    }
-    catch (Throwable t) {
+    } catch (Throwable t) {
       t.printStackTrace();
       return false;
     }
@@ -58,8 +53,7 @@ public class OneSignalController {
       String externalId = data.getString(0);
       OneSignal.login(externalId);
       return true;
-    }
-    catch (JSONException e) {
+    } catch (JSONException e) {
       e.printStackTrace();
       return false;
     }
@@ -91,27 +85,25 @@ public class OneSignalController {
     CallbackHelper.callbackSuccessString(callbackContext, OneSignalUtils.getStringOrNull(token));
     return true;
   }
-  
+
   public static boolean getPushSubscriptionOptedIn(CallbackContext callbackContext) {
     boolean optedIn = OneSignal.getUser().getPushSubscription().getOptedIn();
     CallbackHelper.callbackSuccessBoolean(callbackContext, optedIn);
     return true;
   }
 
-  /** 
-  * Aliases
-  */
+  /** Aliases */
   public static boolean addAliases(JSONArray data) {
-    try{
+    try {
       JSONObject aliasObject = data.getJSONObject(0);
       Map<String, String> aliasesToAdd = new HashMap<>();
       Iterator<String> labels = aliasObject.keys();
 
       while (labels.hasNext()) {
-          String label = labels.next();
-          aliasesToAdd.put(label, aliasObject.getString(label));
+        String label = labels.next();
+        aliasesToAdd.put(label, aliasObject.getString(label));
       }
-      
+
       OneSignal.getUser().addAliases(aliasesToAdd);
       return true;
     } catch (Throwable t) {
@@ -123,10 +115,9 @@ public class OneSignalController {
   public static boolean removeAliases(JSONArray data) {
     try {
       Collection<String> aliasesToRemove = new ArrayList<String>();
-      
-      for (int i = 0; i < data.length(); i++)
-        aliasesToRemove.add(data.get(i).toString());
-      
+
+      for (int i = 0; i < data.length(); i++) aliasesToRemove.add(data.get(i).toString());
+
       OneSignal.getUser().removeAliases(aliasesToRemove);
       return true;
     } catch (Throwable t) {
@@ -135,9 +126,7 @@ public class OneSignalController {
     }
   }
 
-  /**
-   * Tags
-   */
+  /** Tags */
   public static boolean addTags(JSONArray data) {
     try {
       JSONObject tagsObject = data.getJSONObject(0);
@@ -145,10 +134,10 @@ public class OneSignalController {
       Iterator<String> keys = tagsObject.keys();
 
       while (keys.hasNext()) {
-          String key = keys.next();
-          tagsToAdd.put(key, tagsObject.get(key).toString());
+        String key = keys.next();
+        tagsToAdd.put(key, tagsObject.get(key).toString());
       }
-      
+
       OneSignal.getUser().addTags(tagsToAdd);
       return true;
     } catch (Throwable t) {
@@ -160,8 +149,7 @@ public class OneSignalController {
   public static boolean removeTags(JSONArray data) {
     try {
       Collection<String> list = new ArrayList<String>();
-      for (int i = 0; i < data.length(); i++)
-        list.add(data.get(i).toString());
+      for (int i = 0; i < data.length(); i++) list.add(data.get(i).toString());
       OneSignal.getUser().removeTags(list);
       return true;
     } catch (Throwable t) {
@@ -179,25 +167,24 @@ public class OneSignalController {
 
   public static boolean getOnesignalId(CallbackContext callbackContext) {
     String onesignalId = OneSignal.getUser().getOnesignalId();
-    CallbackHelper.callbackSuccessString(callbackContext, OneSignalUtils.getStringOrNull(onesignalId));
+    CallbackHelper.callbackSuccessString(
+        callbackContext, OneSignalUtils.getStringOrNull(onesignalId));
     return true;
   }
 
   public static boolean getExternalId(CallbackContext callbackContext) {
     String externalId = OneSignal.getUser().getExternalId();
-    CallbackHelper.callbackSuccessString(callbackContext, OneSignalUtils.getStringOrNull(externalId));
+    CallbackHelper.callbackSuccessString(
+        callbackContext, OneSignalUtils.getStringOrNull(externalId));
     return true;
   }
 
-  /**
-   * Notifications
-   */
+  /** Notifications */
   public static boolean clearAllNotifications() {
     try {
       OneSignal.getNotifications().clearAllNotifications();
       return true;
-    }
-    catch(Throwable t) {
+    } catch (Throwable t) {
       t.printStackTrace();
       return false;
     }
@@ -242,14 +229,18 @@ public class OneSignalController {
       e.printStackTrace();
     }
 
-    OneSignal.getNotifications().requestPermission(fallbackToSettings, Continue.with(r -> {
-      if (r.isSuccess()) {
-        CallbackHelper.callbackSuccessBoolean(callbackContext, r.getData());
-      } else {
-        // coroutine was not successful
-        CallbackHelper.callbackError(callbackContext, r.getThrowable().getMessage());
-      }
-    }));
+    OneSignal.getNotifications()
+        .requestPermission(
+            fallbackToSettings,
+            Continue.with(
+                r -> {
+                  if (r.isSuccess()) {
+                    CallbackHelper.callbackSuccessBoolean(callbackContext, r.getData());
+                  } else {
+                    // coroutine was not successful
+                    CallbackHelper.callbackError(callbackContext, r.getThrowable().getMessage());
+                  }
+                }));
     return true;
   }
 
@@ -271,9 +262,7 @@ public class OneSignalController {
     return true;
   }
 
-  /**
-   * Privacy consent
-   */
+  /** Privacy consent */
   public static boolean setPrivacyConsentRequired(JSONArray data) {
     try {
       OneSignal.setConsentRequired(data.getBoolean(0));
@@ -294,9 +283,7 @@ public class OneSignalController {
     }
   }
 
-  /**
-   * Location
-   */
+  /** Location */
   public static boolean requestLocationPermission() {
     OneSignal.getLocation().requestPermission(Continue.none());
     return true;
