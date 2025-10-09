@@ -17,8 +17,14 @@ jobs:
           java-version: "17"
           distribution: "temurin"
 
+      - name: Install clang-format
+        run: |
+          curl -fsSL https://apt.llvm.org/llvm.sh | sudo bash -s -- 21
+          sudo apt-get install -y clang-format-21
+          sudo ln -sf /usr/bin/clang-format-21 /usr/bin/clang-format
+
       - name: Make gradlew executable
         run: chmod +x example/IonicCapOneSignal/android/gradlew
 
-      - name: Check Java formatting
+      - name: Check Code formatting
         run: ./example/IonicCapOneSignal/android/gradlew spotlessCheck
