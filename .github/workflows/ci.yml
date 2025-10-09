@@ -1,0 +1,28 @@
+name: Run Tests
+on:
+  pull_request:
+    branches:
+      - "**"
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Format Java files (no commit)
+        uses: axel-op/googlejavaformat-action@v4
+        with:
+          args: "--replace"
+          skip-commit: true
+
+      - name: List unformatted files (fail if any)
+        run: |
+          # Check for files changed by the formatter
+          changed=$(git ls-files -m '*.java')
+          if [ -n "$changed" ]; then
+            echo "❌ These files were not properly formatted:"
+            echo "$changed"
+            exit 1
+          fi
