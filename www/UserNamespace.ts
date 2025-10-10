@@ -1,4 +1,4 @@
-import PushSubscription from "./PushSubscriptionNamespace";
+import PushSubscription from './PushSubscriptionNamespace';
 
 // Represents the current user state
 export interface UserState {
@@ -34,8 +34,8 @@ export default class User {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "setLanguage",
+      'OneSignalPush',
+      'setLanguage',
       [language],
     );
   }
@@ -55,8 +55,8 @@ export default class User {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "addAliases",
+      'OneSignalPush',
+      'addAliases',
       [jsonKeyValue],
     );
   }
@@ -70,8 +70,8 @@ export default class User {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "addAliases",
+      'OneSignalPush',
+      'addAliases',
       [aliases],
     );
   }
@@ -85,8 +85,8 @@ export default class User {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "removeAliases",
+      'OneSignalPush',
+      'removeAliases',
       [label],
     );
   }
@@ -100,8 +100,8 @@ export default class User {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "removeAliases",
+      'OneSignalPush',
+      'removeAliases',
       labels,
     );
   }
@@ -119,8 +119,8 @@ export default class User {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "addEmail",
+      'OneSignalPush',
+      'addEmail',
       [email],
     );
   }
@@ -134,8 +134,8 @@ export default class User {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "removeEmail",
+      'OneSignalPush',
+      'removeEmail',
       [email],
     );
   }
@@ -153,8 +153,8 @@ export default class User {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "addSms",
+      'OneSignalPush',
+      'addSms',
       [smsNumber],
     );
   }
@@ -168,8 +168,8 @@ export default class User {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "removeSms",
+      'OneSignalPush',
+      'removeSms',
       [smsNumber],
     );
   }
@@ -189,8 +189,8 @@ export default class User {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "addTags",
+      'OneSignalPush',
+      'addTags',
       [jsonKeyValue],
     );
   }
@@ -204,15 +204,15 @@ export default class User {
     const convertedTags = tags as { [key: string]: unknown };
     Object.keys(tags).forEach(function (key) {
       // forces values to be string types
-      if (typeof convertedTags[key] !== "string") {
+      if (typeof convertedTags[key] !== 'string') {
         convertedTags[key] = JSON.stringify(convertedTags[key]);
       }
     });
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "addTags",
+      'OneSignalPush',
+      'addTags',
       [convertedTags],
     );
   }
@@ -226,8 +226,8 @@ export default class User {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "removeTags",
+      'OneSignalPush',
+      'removeTags',
       [key],
     );
   }
@@ -241,8 +241,8 @@ export default class User {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "removeTags",
+      'OneSignalPush',
+      'removeTags',
       keys,
     );
   }
@@ -252,7 +252,7 @@ export default class User {
    */
   getTags(): Promise<{ [key: string]: string }> {
     return new Promise<{ [key: string]: string }>((resolve, reject) => {
-      window.cordova.exec(resolve, reject, "OneSignalPush", "getTags", []);
+      window.cordova.exec(resolve, reject, 'OneSignalPush', 'getTags', []);
     });
   }
 
@@ -263,7 +263,7 @@ export default class User {
    * @returns void
    */
   addEventListener(
-    event: "change",
+    event: 'change',
     listener: (event: UserChangedState) => void,
   ) {
     this._userStateObserverList.push(
@@ -275,8 +275,8 @@ export default class User {
     window.cordova.exec(
       userCallBackProcessor,
       function () {},
-      "OneSignalPush",
-      "addUserStateObserver",
+      'OneSignalPush',
+      'addUserStateObserver',
       [],
     );
   }
@@ -287,7 +287,7 @@ export default class User {
    * @returns void
    */
   removeEventListener(
-    event: "change",
+    event: 'change',
     listener: (event: UserChangedState) => void,
   ) {
     let index = this._userStateObserverList.indexOf(listener);
@@ -305,8 +305,8 @@ export default class User {
       window.cordova.exec(
         resolve,
         reject,
-        "OneSignalPush",
-        "getOnesignalId",
+        'OneSignalPush',
+        'getOnesignalId',
         [],
       );
     });
@@ -321,8 +321,8 @@ export default class User {
       window.cordova.exec(
         resolve,
         reject,
-        "OneSignalPush",
-        "getExternalId",
+        'OneSignalPush',
+        'getExternalId',
         [],
       );
     });

@@ -43,8 +43,8 @@ export default class PushSubscription {
     window.cordova.exec(
       getIdCallback,
       function () {},
-      "OneSignalPush",
-      "getPushSubscriptionId",
+      'OneSignalPush',
+      'getPushSubscriptionId',
     );
 
     /**
@@ -57,8 +57,8 @@ export default class PushSubscription {
     window.cordova.exec(
       getTokenCallback,
       function () {},
-      "OneSignalPush",
-      "getPushSubscriptionToken",
+      'OneSignalPush',
+      'getPushSubscriptionToken',
     );
 
     /**
@@ -71,11 +71,11 @@ export default class PushSubscription {
     window.cordova.exec(
       getOptedInCallback,
       function () {},
-      "OneSignalPush",
-      "getPushSubscriptionOptedIn",
+      'OneSignalPush',
+      'getPushSubscriptionOptedIn',
     );
 
-    this.addEventListener("change", (subscriptionChange) => {
+    this.addEventListener('change', (subscriptionChange) => {
       this._id = subscriptionChange.current.id;
       this._token = subscriptionChange.current.token;
       this._optedIn = subscriptionChange.current.optedIn;
@@ -87,7 +87,7 @@ export default class PushSubscription {
    */
   get id(): string | null | undefined {
     console.warn(
-      "OneSignal: This method has been deprecated. Use getIdAsync instead for getting push subscription id.",
+      'OneSignal: This method has been deprecated. Use getIdAsync instead for getting push subscription id.',
     );
     return this._id;
   }
@@ -97,7 +97,7 @@ export default class PushSubscription {
    */
   get token(): string | null | undefined {
     console.warn(
-      "OneSignal: This method has been deprecated. Use getTokenAsync instead for getting push subscription token.",
+      'OneSignal: This method has been deprecated. Use getTokenAsync instead for getting push subscription token.',
     );
     return this._token;
   }
@@ -107,7 +107,7 @@ export default class PushSubscription {
    */
   get optedIn(): boolean {
     console.warn(
-      "OneSignal: This method has been deprecated. Use getOptedInAsync instead for getting push subscription opted in status.",
+      'OneSignal: This method has been deprecated. Use getOptedInAsync instead for getting push subscription opted in status.',
     );
     return this._optedIn || false;
   }
@@ -121,8 +121,8 @@ export default class PushSubscription {
       window.cordova.exec(
         resolve,
         reject,
-        "OneSignalPush",
-        "getPushSubscriptionId",
+        'OneSignalPush',
+        'getPushSubscriptionId',
       );
     });
   }
@@ -136,8 +136,8 @@ export default class PushSubscription {
       window.cordova.exec(
         resolve,
         reject,
-        "OneSignalPush",
-        "getPushSubscriptionToken",
+        'OneSignalPush',
+        'getPushSubscriptionToken',
       );
     });
   }
@@ -154,8 +154,8 @@ export default class PushSubscription {
       window.cordova.exec(
         resolve,
         reject,
-        "OneSignalPush",
-        "getPushSubscriptionOptedIn",
+        'OneSignalPush',
+        'getPushSubscriptionOptedIn',
       );
     });
   }
@@ -166,7 +166,7 @@ export default class PushSubscription {
    * @returns void
    */
   addEventListener(
-    event: "change",
+    event: 'change',
     listener: (event: PushSubscriptionChangedState) => void,
   ) {
     this._subscriptionObserverList.push(
@@ -180,8 +180,8 @@ export default class PushSubscription {
     window.cordova.exec(
       subscriptionCallBackProcessor,
       function () {},
-      "OneSignalPush",
-      "addPushSubscriptionObserver",
+      'OneSignalPush',
+      'addPushSubscriptionObserver',
       [],
     );
   }
@@ -192,7 +192,7 @@ export default class PushSubscription {
    * @returns void
    */
   removeEventListener(
-    event: "change",
+    event: 'change',
     listener: (event: PushSubscriptionChangedState) => void,
   ) {
     let index = this._subscriptionObserverList.indexOf(listener);
@@ -209,8 +209,8 @@ export default class PushSubscription {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "optInPushSubscription",
+      'OneSignalPush',
+      'optInPushSubscription',
     );
   }
 
@@ -222,8 +222,8 @@ export default class PushSubscription {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "optOutPushSubscription",
+      'OneSignalPush',
+      'optOutPushSubscription',
     );
   }
 }

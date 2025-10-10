@@ -1,4 +1,4 @@
-import { OSNotification } from "./OSNotification";
+import { OSNotification } from './OSNotification';
 
 export class NotificationWillDisplayEvent {
   private notification: OSNotification;
@@ -19,9 +19,9 @@ export class NotificationWillDisplayEvent {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "preventDefault",
-      [this.notification.notificationId, discard]
+      'OneSignalPush',
+      'preventDefault',
+      [this.notification.notificationId, discard],
     );
     return;
   }

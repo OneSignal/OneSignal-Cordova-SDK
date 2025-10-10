@@ -51,7 +51,7 @@ export class OSNotification {
 
     /// A hashmap object representing the raw key/value
     /// properties of the push notification
-    if (typeof receivedEvent.rawPayload === "string") {
+    if (typeof receivedEvent.rawPayload === 'string') {
       this.rawPayload = JSON.parse(receivedEvent.rawPayload);
     } else {
       this.rawPayload = receivedEvent.rawPayload;
@@ -96,7 +96,7 @@ export class OSNotification {
     /// The priority used with GCM/FCM to describe how
     /// urgent the notification is. A higher priority
     /// means the notification will be delivered faster.
-    if (typeof receivedEvent.priority !== "undefined") {
+    if (typeof receivedEvent.priority !== 'undefined') {
       this.priority = receivedEvent.priority;
     }
 
@@ -275,9 +275,9 @@ export class OSNotification {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "displayNotification",
-      [this.notificationId]
+      'OneSignalPush',
+      'displayNotification',
+      [this.notificationId],
     );
     return;
   }

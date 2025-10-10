@@ -1,4 +1,9 @@
-export type InAppMessageEventName = "click" | "willDisplay" | "didDisplay" | "willDismiss" | "didDismiss";
+export type InAppMessageEventName =
+  | 'click'
+  | 'willDisplay'
+  | 'didDisplay'
+  | 'willDismiss'
+  | 'didDismiss';
 
 export type InAppMessageEventTypeMap = {
   click: InAppMessageClickEvent;
@@ -9,35 +14,35 @@ export type InAppMessageEventTypeMap = {
 };
 
 export interface InAppMessageClickEvent {
-    message             : OSInAppMessage
-    result              : InAppMessageClickResult
+  message: OSInAppMessage;
+  result: InAppMessageClickResult;
 }
 
 export interface InAppMessageClickResult {
-    closingMessage      : boolean;
-    actionId            ?: string;
-    url                 ?: string;
-    urlTarget           ?: InAppMessageActionUrlType;
+  closingMessage: boolean;
+  actionId?: string;
+  url?: string;
+  urlTarget?: InAppMessageActionUrlType;
 }
 
-export type InAppMessageActionUrlType = "browser" | "webview" | "replacement"
+export type InAppMessageActionUrlType = 'browser' | 'webview' | 'replacement';
 
 export interface InAppMessageWillDisplayEvent {
-    message : OSInAppMessage
+  message: OSInAppMessage;
 }
 
 export interface InAppMessageDidDisplayEvent {
-    message : OSInAppMessage
+  message: OSInAppMessage;
 }
 
 export interface InAppMessageWillDismissEvent {
-    message : OSInAppMessage
+  message: OSInAppMessage;
 }
 
 export interface InAppMessageDidDismissEvent {
-    message : OSInAppMessage
+  message: OSInAppMessage;
 }
 
 export interface OSInAppMessage {
-    messageId : string
+  messageId: string;
 }

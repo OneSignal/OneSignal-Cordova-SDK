@@ -12,8 +12,8 @@ export default class Session {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "addOutcome",
+      'OneSignalPush',
+      'addOutcome',
       [name],
     );
   }
@@ -27,8 +27,8 @@ export default class Session {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "addUniqueOutcome",
+      'OneSignalPush',
+      'addUniqueOutcome',
       [name],
     );
   }
@@ -43,8 +43,8 @@ export default class Session {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "addOutcomeWithValue",
+      'OneSignalPush',
+      'addOutcomeWithValue',
       [name, value],
     );
   }

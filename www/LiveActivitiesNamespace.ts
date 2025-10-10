@@ -1,4 +1,4 @@
-import { LiveActivitySetupOptions } from "./models/LiveActivities";
+import { LiveActivitySetupOptions } from './models/LiveActivities';
 
 export default class LiveActivities {
   /**
@@ -26,8 +26,8 @@ export default class LiveActivities {
     window.cordova.exec(
       onSuccess,
       onFailure,
-      "OneSignalPush",
-      "enterLiveActivity",
+      'OneSignalPush',
+      'enterLiveActivity',
       [activityId, token],
     );
   }
@@ -55,8 +55,8 @@ export default class LiveActivities {
     window.cordova.exec(
       onSuccess,
       onFailure,
-      "OneSignalPush",
-      "exitLiveActivity",
+      'OneSignalPush',
+      'exitLiveActivity',
       [activityId],
     );
   }
@@ -76,8 +76,8 @@ export default class LiveActivities {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "setPushToStartToken",
+      'OneSignalPush',
+      'setPushToStartToken',
       [activityType, token],
     );
   }
@@ -96,8 +96,8 @@ export default class LiveActivities {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "removePushToStartToken",
+      'OneSignalPush',
+      'removePushToStartToken',
       [activityType],
     );
   }
@@ -120,8 +120,8 @@ export default class LiveActivities {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "setupDefaultLiveActivity",
+      'OneSignalPush',
+      'setupDefaultLiveActivity',
       [options],
     );
   }
@@ -142,8 +142,8 @@ export default class LiveActivities {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "startDefaultLiveActivity",
+      'OneSignalPush',
+      'startDefaultLiveActivity',
       [activityId, attributes, content],
     );
   }

@@ -1,5 +1,10 @@
 {
   "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[objective-c]": {
     "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd"
   },

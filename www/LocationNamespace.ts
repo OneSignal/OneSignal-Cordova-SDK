@@ -11,9 +11,9 @@ export default class Location {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "requestLocationPermission",
-      []
+      'OneSignalPush',
+      'requestLocationPermission',
+      [],
     );
   }
 
@@ -26,9 +26,9 @@ export default class Location {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "setLocationShared",
-      [shared]
+      'OneSignalPush',
+      'setLocationShared',
+      [shared],
     );
   }
 
@@ -41,9 +41,9 @@ export default class Location {
       window.cordova.exec(
         resolve,
         reject,
-        "OneSignalPush",
-        "isLocationShared",
-        []
+        'OneSignalPush',
+        'isLocationShared',
+        [],
       );
     });
   }
