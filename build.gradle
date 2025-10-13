@@ -19,7 +19,7 @@ spotless {
   java {
     target 'src/android/**/*.java', 'example/IonicCapOneSignal/android/app/src/**/*.java'
     targetExclude '**/build/**'
-    googleJavaFormat('1.17.0')
+    palantirJavaFormat('2.28.0')
     removeUnusedImports()
     trimTrailingWhitespace()
     endWithNewline()

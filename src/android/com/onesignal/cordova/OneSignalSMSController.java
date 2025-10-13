@@ -4,23 +4,23 @@ import com.onesignal.OneSignal;
 import org.json.JSONArray;
 
 public class OneSignalSMSController {
-  public static boolean addSms(JSONArray data) {
-    try {
-      OneSignal.getUser().addSms(data.getString(0));
-      return true;
-    } catch (Throwable t) {
-      t.printStackTrace();
-      return false;
+    public static boolean addSms(JSONArray data) {
+        try {
+            OneSignal.getUser().addSms(data.getString(0));
+            return true;
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return false;
+        }
     }
-  }
 
-  public static boolean removeSms(JSONArray data) {
-    try {
-      OneSignal.getUser().removeSms(data.getString(0));
-      return true;
-    } catch (Throwable t) {
-      t.printStackTrace();
-      return false;
+    public static boolean removeSms(JSONArray data) {
+        try {
+            OneSignal.getUser().removeSms(data.getString(0));
+            return true;
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return false;
+        }
     }
-  }
 }

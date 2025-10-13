@@ -13,116 +13,111 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class OneSignalObserverController {
-  private static CallbackContext jsPermissionObserverCallBack;
-  private static CallbackContext jsSubscriptionObserverCallBack;
-  private static CallbackContext jsUserObserverCallBack;
+    private static CallbackContext jsPermissionObserverCallBack;
+    private static CallbackContext jsSubscriptionObserverCallBack;
+    private static CallbackContext jsUserObserverCallBack;
 
-  private static IPermissionObserver permissionObserver;
-  private static IPushSubscriptionObserver pushSubscriptionObserver;
-  private static IUserStateObserver userStateObserver;
+    private static IPermissionObserver permissionObserver;
+    private static IPushSubscriptionObserver pushSubscriptionObserver;
+    private static IUserStateObserver userStateObserver;
 
-  public static boolean addPermissionObserver(CallbackContext callbackContext) {
-    jsPermissionObserverCallBack = callbackContext;
-    if (permissionObserver == null) {
-      permissionObserver =
-          new IPermissionObserver() {
-            @Override
-            public void onNotificationPermissionChange(boolean permission) {
-              CallbackHelper.callbackSuccessBoolean(jsPermissionObserverCallBack, permission);
-            }
-          };
-      OneSignal.getNotifications().addPermissionObserver(permissionObserver);
+    public static boolean addPermissionObserver(CallbackContext callbackContext) {
+        jsPermissionObserverCallBack = callbackContext;
+        if (permissionObserver == null) {
+            permissionObserver = new IPermissionObserver() {
+                @Override
+                public void onNotificationPermissionChange(boolean permission) {
+                    CallbackHelper.callbackSuccessBoolean(jsPermissionObserverCallBack, permission);
+                }
+            };
+            OneSignal.getNotifications().addPermissionObserver(permissionObserver);
+        }
+        return true;
     }
-    ;
-    return true;
-  }
 
-  public static boolean addPushSubscriptionObserver(CallbackContext callbackContext) {
-    jsSubscriptionObserverCallBack = callbackContext;
-    if (pushSubscriptionObserver == null) {
-      pushSubscriptionObserver =
-          new IPushSubscriptionObserver() {
-            @Override
-            public void onPushSubscriptionChange(PushSubscriptionChangedState state) {
-              PushSubscriptionState pushSubscription = state.getCurrent();
+    public static boolean addPushSubscriptionObserver(CallbackContext callbackContext) {
+        jsSubscriptionObserverCallBack = callbackContext;
+        if (pushSubscriptionObserver == null) {
+            pushSubscriptionObserver = new IPushSubscriptionObserver() {
+                @Override
+                public void onPushSubscriptionChange(PushSubscriptionChangedState state) {
+                    PushSubscriptionState pushSubscription = state.getCurrent();
 
-              if (!(pushSubscription instanceof PushSubscriptionState)) {
-                return;
-              }
+                    if (!(pushSubscription instanceof PushSubscriptionState)) {
+                        return;
+                    }
 
-              try {
-                JSONObject hash = new JSONObject();
-                hash.put("current", createPushSubscriptionProperties(state.getCurrent()));
-                hash.put("previous", createPushSubscriptionProperties(state.getPrevious()));
+                    try {
+                        JSONObject hash = new JSONObject();
+                        hash.put("current", createPushSubscriptionProperties(state.getCurrent()));
+                        hash.put("previous", createPushSubscriptionProperties(state.getPrevious()));
 
-                CallbackHelper.callbackSuccess(jsSubscriptionObserverCallBack, hash);
+                        CallbackHelper.callbackSuccess(jsSubscriptionObserverCallBack, hash);
 
-              } catch (Exception e) {
-                e.printStackTrace();
-              }
-            }
-          };
-      OneSignal.getUser().getPushSubscription().addObserver(pushSubscriptionObserver);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            OneSignal.getUser().getPushSubscription().addObserver(pushSubscriptionObserver);
+        }
+        return true;
     }
-    return true;
-  }
 
-  public static boolean addUserStateObserver(CallbackContext callbackContext) {
-    jsUserObserverCallBack = callbackContext;
-    if (userStateObserver == null) {
-      userStateObserver =
-          new IUserStateObserver() {
-            @Override
-            public void onUserStateChange(UserChangedState state) {
-              UserState current = state.getCurrent();
+    public static boolean addUserStateObserver(CallbackContext callbackContext) {
+        jsUserObserverCallBack = callbackContext;
+        if (userStateObserver == null) {
+            userStateObserver = new IUserStateObserver() {
+                @Override
+                public void onUserStateChange(UserChangedState state) {
+                    UserState current = state.getCurrent();
 
-              if (!(current instanceof UserState)) {
-                return;
-              }
+                    if (!(current instanceof UserState)) {
+                        return;
+                    }
 
-              try {
-                JSONObject hash = new JSONObject();
-                hash.put("current", createUserIds(current));
+                    try {
+                        JSONObject hash = new JSONObject();
+                        hash.put("current", createUserIds(current));
 
-                CallbackHelper.callbackSuccess(jsUserObserverCallBack, hash);
+                        CallbackHelper.callbackSuccess(jsUserObserverCallBack, hash);
 
-              } catch (Exception e) {
-                e.printStackTrace();
-              }
-            }
-          };
-      OneSignal.getUser().addObserver(userStateObserver);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            OneSignal.getUser().addObserver(userStateObserver);
+        }
+        return true;
     }
-    return true;
-  }
 
-  private static JSONObject createUserIds(UserState user) {
-    JSONObject userIds = new JSONObject();
-    try {
-      String externalId = user.getExternalId();
-      String onesignalId = user.getOnesignalId();
+    private static JSONObject createUserIds(UserState user) {
+        JSONObject userIds = new JSONObject();
+        try {
+            String externalId = user.getExternalId();
+            String onesignalId = user.getOnesignalId();
 
-      userIds.put("externalId", OneSignalUtils.getStringOrJSONObjectNull(externalId));
-      userIds.put("onesignalId", OneSignalUtils.getStringOrJSONObjectNull(onesignalId));
-    } catch (JSONException e) {
-      e.printStackTrace();
+            userIds.put("externalId", OneSignalUtils.getStringOrJSONObjectNull(externalId));
+            userIds.put("onesignalId", OneSignalUtils.getStringOrJSONObjectNull(onesignalId));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return userIds;
     }
-    return userIds;
-  }
 
-  private static JSONObject createPushSubscriptionProperties(
-      PushSubscriptionState pushSubscription) {
-    JSONObject pushSubscriptionProperties = new JSONObject();
-    try {
-      String id = pushSubscription.getId();
-      String token = pushSubscription.getToken();
+    private static JSONObject createPushSubscriptionProperties(PushSubscriptionState pushSubscription) {
+        JSONObject pushSubscriptionProperties = new JSONObject();
+        try {
+            String id = pushSubscription.getId();
+            String token = pushSubscription.getToken();
 
-      pushSubscriptionProperties.put("id", OneSignalUtils.getStringOrJSONObjectNull(id));
-      pushSubscriptionProperties.put("token", OneSignalUtils.getStringOrJSONObjectNull(token));
-      pushSubscriptionProperties.put("optedIn", pushSubscription.getOptedIn());
-    } catch (JSONException e) {
-      e.printStackTrace();
+            pushSubscriptionProperties.put("id", OneSignalUtils.getStringOrJSONObjectNull(id));
+            pushSubscriptionProperties.put("token", OneSignalUtils.getStringOrJSONObjectNull(token));
+            pushSubscriptionProperties.put("optedIn", pushSubscription.getOptedIn());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return pushSubscriptionProperties;
     }
-    return pushSubscriptionProperties;
-  }
 }
