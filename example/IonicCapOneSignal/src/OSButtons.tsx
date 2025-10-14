@@ -1,6 +1,6 @@
+import { IonButton, IonContent, IonText } from '@ionic/react';
 import OneSignal from 'onesignal-cordova-plugin';
 import * as React from 'react';
-import { IonButton, IonContent, IonText } from '@ionic/react';
 export interface Props {
   loggingFunction: Function;
   inputFieldValue: string;
@@ -262,6 +262,28 @@ class OSButtons extends React.Component<Props> {
       OneSignal.logout();
     });
 
+    const trackEventButton = renderButtonView('Track Event', () => {
+      loggingFunction(`Tracking custom events`);
+      const platform = window.cordova?.platformId || 'unknown';
+      OneSignal.User.trackEvent(`Cordova-${platform}-noprops`);
+
+      OneSignal.User.trackEvent(`Cordova-${platform}`, {
+        someNum: 123,
+        someFloat: 3.14159,
+        someString: 'abc',
+        someBool: true,
+        someObject: {
+          abc: '123',
+          nested: {
+            def: '456',
+          },
+        },
+        someArray: [1, 2],
+        someMixedArray: [1, '2', { abc: '123' }],
+        someNull: null,
+      });
+    });
+
     const sendTagWithKeyButton = renderButtonView(
       'Send tag with key my_tag',
       async () => {
@@ -373,6 +395,7 @@ class OSButtons extends React.Component<Props> {
     return [
       loginButton,
       logoutButton,
+      trackEventButton,
       addEmailButton,
       removeEmailButton,
       sendTagWithKeyButton,
