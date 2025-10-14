@@ -1,3 +1,6 @@
 {
-  "recommendations": ["llvm-vs-code-extensions.vscode-clangd"]
+  "recommendations": [
+    "llvm-vs-code-extensions.vscode-clangd",
+    "redhat.vscode-yaml"
+  ]
 }
