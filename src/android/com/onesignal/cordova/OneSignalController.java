@@ -120,8 +120,9 @@ public class OneSignalController {
         try {
             Collection<String> aliasesToRemove = new ArrayList<String>();
 
-            for (int i = 0; i < data.length(); i++)
+            for (int i = 0; i < data.length(); i++) {
                 aliasesToRemove.add(data.get(i).toString());
+            }
 
             OneSignal.getUser().removeAliases(aliasesToRemove);
             return true;
@@ -156,7 +157,9 @@ public class OneSignalController {
     public static boolean removeTags(JSONArray data) {
         try {
             Collection<String> list = new ArrayList<String>();
-            for (int i = 0; i < data.length(); i++) list.add(data.get(i).toString());
+            for (int i = 0; i < data.length(); i++) {
+                list.add(data.get(i).toString());
+            }
             OneSignal.getUser().removeTags(list);
             return true;
         } catch (Throwable t) {

@@ -32,7 +32,6 @@ public class OneSignalObserverController {
             };
             OneSignal.getNotifications().addPermissionObserver(permissionObserver);
         }
-        ;
         return true;
     }
 

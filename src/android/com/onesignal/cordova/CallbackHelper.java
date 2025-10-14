@@ -9,8 +9,10 @@ public class CallbackHelper {
     // This is to prevent an issue where if two Javascript calls are made to OneSignal expecting a callback then only
     // one would fire.
     public static void callbackSuccess(CallbackContext callbackContext, JSONObject jsonObject) {
-        if (jsonObject == null) // in case there are no data
-        jsonObject = new JSONObject();
+        // in case there are no data
+        if (jsonObject == null) {
+            jsonObject = new JSONObject();
+        }
 
         PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jsonObject);
         pluginResult.setKeepCallback(true);
@@ -36,8 +38,11 @@ public class CallbackHelper {
     }
 
     public static void callbackError(CallbackContext callbackContext, JSONObject jsonObject) {
-        if (jsonObject == null) // in case there are no data
-        jsonObject = new JSONObject();
+        // in case there are no data
+        if (jsonObject == null) {
+
+            jsonObject = new JSONObject();
+        }
 
         PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, jsonObject);
         pluginResult.setKeepCallback(true);
