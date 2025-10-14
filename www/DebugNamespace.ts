@@ -19,8 +19,8 @@ export default class Debug {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "setLogLevel",
+      'OneSignalPush',
+      'setLogLevel',
       [logLevel],
     );
   }
@@ -34,8 +34,8 @@ export default class Debug {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "setAlertLevel",
+      'OneSignalPush',
+      'setAlertLevel',
       [visualLogLevel],
     );
   }

@@ -24,18 +24,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-import Debug from "./DebugNamespace";
-import InAppMessages from "./InAppMessagesNamespace";
-import LiveActivities from "./LiveActivitiesNamespace";
-import Location from "./LocationNamespace";
-import Notifications from "./NotificationsNamespace";
-import Session from "./SessionNamespace";
-import User from "./UserNamespace";
+import Debug from './DebugNamespace';
+import InAppMessages from './InAppMessagesNamespace';
+import LiveActivities from './LiveActivitiesNamespace';
+import Location from './LocationNamespace';
+import Notifications from './NotificationsNamespace';
+import Session from './SessionNamespace';
+import User from './UserNamespace';
 
 declare global {
   interface Window {
     plugins?: {
-      OneSignal?: import("./index").OneSignalPlugin;
+      OneSignal?: import('./index').OneSignalPlugin;
     };
   }
 }
@@ -49,7 +49,7 @@ export class OneSignalPlugin {
   Notifications: Notifications = new Notifications();
   LiveActivities: LiveActivities = new LiveActivities();
 
-  private _appID = "";
+  private _appID = '';
 
   /**
    * Initializes the OneSignal SDK. This should be called during startup of the application.
@@ -67,8 +67,8 @@ export class OneSignalPlugin {
     window.cordova.exec(
       observerCallback,
       function () {},
-      "OneSignalPush",
-      "init",
+      'OneSignalPush',
+      'init',
       [this._appID],
     );
   }
@@ -82,8 +82,8 @@ export class OneSignalPlugin {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "login",
+      'OneSignalPush',
+      'login',
       [externalId],
     );
   }
@@ -97,8 +97,8 @@ export class OneSignalPlugin {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "logout",
+      'OneSignalPush',
+      'logout',
     );
   }
 
@@ -111,8 +111,8 @@ export class OneSignalPlugin {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "setPrivacyConsentRequired",
+      'OneSignalPush',
+      'setPrivacyConsentRequired',
       [required],
     );
   }
@@ -126,8 +126,8 @@ export class OneSignalPlugin {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "setPrivacyConsentGiven",
+      'OneSignalPush',
+      'setPrivacyConsentGiven',
       [granted],
     );
   }
@@ -145,20 +145,20 @@ if (!window.plugins.OneSignal) {
 }
 
 // Exporting
-export { LogLevel } from "./DebugNamespace";
-export { NotificationWillDisplayEvent } from "./NotificationReceivedEvent";
-export { OSNotificationPermission } from "./NotificationsNamespace";
-export { OSNotification } from "./OSNotification";
+export { LogLevel } from './DebugNamespace';
+export { NotificationWillDisplayEvent } from './NotificationReceivedEvent';
+export { OSNotificationPermission } from './NotificationsNamespace';
+export { OSNotification } from './OSNotification';
 
 export {
   PushSubscriptionChangedState,
   PushSubscriptionState,
-} from "./PushSubscriptionNamespace";
+} from './PushSubscriptionNamespace';
 
 export {
   NotificationClickEvent,
   NotificationClickResult,
-} from "./models/NotificationClicked";
+} from './models/NotificationClicked';
 
 export {
   InAppMessageActionUrlType,
@@ -169,8 +169,8 @@ export {
   InAppMessageWillDismissEvent,
   InAppMessageWillDisplayEvent,
   OSInAppMessage,
-} from "./models/InAppMessage";
+} from './models/InAppMessage';
 
-export { UserChangedState, UserState } from "./UserNamespace";
+export { UserChangedState, UserState } from './UserNamespace';
 
 export default OneSignal;

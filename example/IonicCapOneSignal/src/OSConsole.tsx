@@ -1,29 +1,27 @@
 import React from 'react';
 
 export interface Props {
-    value: string;
+  value: string;
 }
 
-export interface State { }
+export interface State {}
 
 class OSConsole extends React.Component<Props, State> {
-    constructor(props: Props) {
-        super(props);
-    }
+  constructor(props: Props) {
+    super(props);
+  }
 
-    render() {
-        // Replace newline characters with JSX <br> elements
-        const formattedValue = this.props.value.split('\n').map((line, index) => (
-            <React.Fragment key={index}>
-                {line}
-                <br />
-            </React.Fragment>
-        ));
+  render() {
+    // Replace newline characters with JSX <br> elements
+    const formattedValue = this.props.value.split('\n').map((line, index) => (
+      <React.Fragment key={index}>
+        {line}
+        <br />
+      </React.Fragment>
+    ));
 
-        return (
-            <div>{formattedValue}</div>
-        );
-    }
+    return <div>{formattedValue}</div>;
+  }
 }
 
 export default OSConsole;

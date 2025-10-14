@@ -6,13 +6,13 @@ import {
   IonPage,
   IonTitle,
   IonToolbar,
-} from "@ionic/react";
-import OneSignal, { LogLevel } from "onesignal-cordova-plugin";
-import * as React from "react";
-import OSButtons, { renderButtonView } from "./OSButtons";
-import OSConsole from "./OSConsole";
+} from '@ionic/react';
+import OneSignal, { LogLevel } from 'onesignal-cordova-plugin';
+import * as React from 'react';
+import OSButtons, { renderButtonView } from './OSButtons';
+import OSConsole from './OSConsole';
 
-const APP_ID = "77e32082-ea27-42e3-a898-c72e141824ef";
+const APP_ID = '77e32082-ea27-42e3-a898-c72e141824ef';
 
 export interface Props {
   name: string;
@@ -37,8 +37,8 @@ class OSDemo extends React.Component<Props, State> {
 
     this.state = {
       name: props.name,
-      inputValue: "",
-      consoleValue: "",
+      inputValue: '',
+      consoleValue: '',
     };
   }
 
@@ -48,9 +48,9 @@ class OSDemo extends React.Component<Props, State> {
     OneSignal.LiveActivities.setupDefault();
 
     OneSignal.Notifications.addEventListener(
-      "foregroundWillDisplay",
+      'foregroundWillDisplay',
       (event) => {
-        this.OSLog("OneSignal: notification will show in foreground:", event);
+        this.OSLog('OneSignal: notification will show in foreground:', event);
         let notif = event.getNotification();
 
         event.preventDefault(false);
@@ -58,50 +58,50 @@ class OSDemo extends React.Component<Props, State> {
 
         // Async work with timeout
         setTimeout(() => {
-          console.log("OneSignal Log: notification will display:", notif);
+          console.log('OneSignal Log: notification will display:', notif);
           // Call to display the notification after 5 second delay
           notif.display();
         }, 10000);
       },
     );
 
-    OneSignal.Notifications.addEventListener("click", (event) => {
-      this.OSLog("OneSignal: notification clicked:", event);
+    OneSignal.Notifications.addEventListener('click', (event) => {
+      this.OSLog('OneSignal: notification clicked:', event);
     });
 
-    OneSignal.InAppMessages.addEventListener("click", (event) => {
-      this.OSLog("OneSignal IAM clicked:", event);
+    OneSignal.InAppMessages.addEventListener('click', (event) => {
+      this.OSLog('OneSignal IAM clicked:', event);
     });
 
-    OneSignal.InAppMessages.addEventListener("willDisplay", (event) => {
-      this.OSLog("OneSignal: will display IAM: ", event);
+    OneSignal.InAppMessages.addEventListener('willDisplay', (event) => {
+      this.OSLog('OneSignal: will display IAM: ', event);
     });
 
-    OneSignal.InAppMessages.addEventListener("didDisplay", (event) => {
-      this.OSLog("OneSignal: did display IAM: ", event);
+    OneSignal.InAppMessages.addEventListener('didDisplay', (event) => {
+      this.OSLog('OneSignal: did display IAM: ', event);
     });
 
-    OneSignal.InAppMessages.addEventListener("willDismiss", (event) => {
-      this.OSLog("OneSignal: will dismiss IAM: ", event);
+    OneSignal.InAppMessages.addEventListener('willDismiss', (event) => {
+      this.OSLog('OneSignal: will dismiss IAM: ', event);
     });
 
-    OneSignal.InAppMessages.addEventListener("didDismiss", (event) => {
-      this.OSLog("OneSignal: did dismiss IAM: ", event);
+    OneSignal.InAppMessages.addEventListener('didDismiss', (event) => {
+      this.OSLog('OneSignal: did dismiss IAM: ', event);
     });
 
     OneSignal.User.pushSubscription.addEventListener(
-      "change",
+      'change',
       (subscription) => {
-        this.OSLog("OneSignal: subscription changed:", subscription);
+        this.OSLog('OneSignal: subscription changed:', subscription);
       },
     );
 
-    OneSignal.Notifications.addEventListener("permissionChange", (granted) => {
-      this.OSLog("OneSignal: permission changed:", granted);
+    OneSignal.Notifications.addEventListener('permissionChange', (granted) => {
+      this.OSLog('OneSignal: permission changed:', granted);
     });
 
-    OneSignal.User.addEventListener("change", (event) => {
-      this.OSLog("OneSignal: user changed: ", event);
+    OneSignal.User.addEventListener('change', (event) => {
+      this.OSLog('OneSignal: user changed: ', event);
     });
   }
 
@@ -133,7 +133,7 @@ class OSDemo extends React.Component<Props, State> {
 
   // Update state when text input loses focus
   handleBlur = () => {
-    const inputValue = String(this.inputRef.current?.value ?? "");
+    const inputValue = String(this.inputRef.current?.value ?? '');
     this.setState({ inputValue });
   };
 
@@ -153,10 +153,10 @@ class OSDemo extends React.Component<Props, State> {
             <IonButton
               fill="clear"
               className="clear-button"
-              onClick={() => this.setState({ consoleValue: "" })}
+              onClick={() => this.setState({ consoleValue: '' })}
             >
-              {renderButtonView("X", () => {
-                this.setState({ consoleValue: "" });
+              {renderButtonView('X', () => {
+                this.setState({ consoleValue: '' });
               })}
             </IonButton>
             <IonInput

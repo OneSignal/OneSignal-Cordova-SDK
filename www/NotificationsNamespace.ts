@@ -1,10 +1,10 @@
-import { NotificationWillDisplayEvent } from "./NotificationReceivedEvent";
-import { OSNotification } from "./OSNotification";
+import { NotificationWillDisplayEvent } from './NotificationReceivedEvent';
+import { OSNotification } from './OSNotification';
 import {
   NotificationClickEvent,
   NotificationEventName,
   NotificationEventTypeMap,
-} from "./models/NotificationClicked";
+} from './models/NotificationClicked';
 
 export enum OSNotificationPermission {
   NotDetermined = 0,
@@ -45,11 +45,11 @@ export default class Notifications {
     window.cordova.exec(
       getPermissionCallback,
       function () {},
-      "OneSignalPush",
-      "getPermissionInternal",
+      'OneSignalPush',
+      'getPermissionInternal',
     );
 
-    this.addEventListener("permissionChange", (result) => {
+    this.addEventListener('permissionChange', (result) => {
       this._permission = result;
     });
   }
@@ -70,8 +70,8 @@ export default class Notifications {
       window.cordova.exec(
         resolve,
         reject,
-        "OneSignalPush",
-        "getPermissionInternal",
+        'OneSignalPush',
+        'getPermissionInternal',
       );
     });
   }
@@ -92,8 +92,8 @@ export default class Notifications {
       window.cordova.exec(
         resolve,
         reject,
-        "OneSignalPush",
-        "permissionNative",
+        'OneSignalPush',
+        'permissionNative',
         [],
       );
     });
@@ -114,8 +114,8 @@ export default class Notifications {
       window.cordova.exec(
         resolve,
         reject,
-        "OneSignalPush",
-        "requestPermission",
+        'OneSignalPush',
+        'requestPermission',
         [fallback],
       );
     });
@@ -130,8 +130,8 @@ export default class Notifications {
       window.cordova.exec(
         resolve,
         reject,
-        "OneSignalPush",
-        "canRequestPermission",
+        'OneSignalPush',
+        'canRequestPermission',
         [],
       );
     });
@@ -155,8 +155,8 @@ export default class Notifications {
     window.cordova.exec(
       handler,
       function () {},
-      "OneSignalPush",
-      "registerForProvisionalAuthorization",
+      'OneSignalPush',
+      'registerForProvisionalAuthorization',
       [],
     );
   }
@@ -171,7 +171,7 @@ export default class Notifications {
     event: K,
     listener: (event: NotificationEventTypeMap[K]) => void,
   ): void {
-    if (event === "click") {
+    if (event === 'click') {
       this._notificationClickedListeners.push(
         listener as (event: NotificationClickEvent) => void,
       );
@@ -181,11 +181,11 @@ export default class Notifications {
       window.cordova.exec(
         clickParsingHandler,
         function () {},
-        "OneSignalPush",
-        "addNotificationClickListener",
+        'OneSignalPush',
+        'addNotificationClickListener',
         [],
       );
-    } else if (event === "foregroundWillDisplay") {
+    } else if (event === 'foregroundWillDisplay') {
       this._notificationWillDisplayListeners.push(
         listener as (event: NotificationWillDisplayEvent) => void,
       );
@@ -196,19 +196,19 @@ export default class Notifications {
         window.cordova.exec(
           function () {},
           function () {},
-          "OneSignalPush",
-          "proceedWithWillDisplay",
+          'OneSignalPush',
+          'proceedWithWillDisplay',
           [notification.notificationId],
         );
       };
       window.cordova.exec(
         foregroundParsingHandler,
         function () {},
-        "OneSignalPush",
-        "addForegroundLifecycleListener",
+        'OneSignalPush',
+        'addForegroundLifecycleListener',
         [],
       );
-    } else if (event === "permissionChange") {
+    } else if (event === 'permissionChange') {
       this._permissionObserverList.push(listener as (event: boolean) => void);
       const permissionCallBackProcessor = (state: boolean) => {
         this._processFunctionList(this._permissionObserverList, state);
@@ -216,8 +216,8 @@ export default class Notifications {
       window.cordova.exec(
         permissionCallBackProcessor,
         function () {},
-        "OneSignalPush",
-        "addPermissionObserver",
+        'OneSignalPush',
+        'addPermissionObserver',
         [],
       );
     } else {
@@ -235,21 +235,21 @@ export default class Notifications {
     event: K,
     listener: (obj: NotificationEventTypeMap[K]) => void,
   ): void {
-    if (event === "click") {
+    if (event === 'click') {
       let index = this._notificationClickedListeners.indexOf(
         listener as (event: NotificationClickEvent) => void,
       );
       if (index !== -1) {
         this._notificationClickedListeners.splice(index, 1);
       }
-    } else if (event === "foregroundWillDisplay") {
+    } else if (event === 'foregroundWillDisplay') {
       let index = this._notificationWillDisplayListeners.indexOf(
         listener as (event: NotificationWillDisplayEvent) => void,
       );
       if (index !== -1) {
         this._notificationWillDisplayListeners.splice(index, 1);
       }
-    } else if (event === "permissionChange") {
+    } else if (event === 'permissionChange') {
       let index = this._permissionObserverList.indexOf(
         listener as (event: boolean) => void,
       );
@@ -269,8 +269,8 @@ export default class Notifications {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "clearAllNotifications",
+      'OneSignalPush',
+      'clearAllNotifications',
       [],
     );
   }
@@ -289,8 +289,8 @@ export default class Notifications {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "removeNotification",
+      'OneSignalPush',
+      'removeNotification',
       [id],
     );
   }
@@ -305,8 +305,8 @@ export default class Notifications {
     window.cordova.exec(
       function () {},
       function () {},
-      "OneSignalPush",
-      "removeGroupedNotifications",
+      'OneSignalPush',
+      'removeGroupedNotifications',
       [id],
     );
   }

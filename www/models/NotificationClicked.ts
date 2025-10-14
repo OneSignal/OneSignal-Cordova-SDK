@@ -1,7 +1,10 @@
 import { OSNotification } from '../OSNotification';
 import { NotificationWillDisplayEvent } from '../NotificationReceivedEvent';
 
-export type NotificationEventName = "click" | "foregroundWillDisplay" | "permissionChange";
+export type NotificationEventName =
+  | 'click'
+  | 'foregroundWillDisplay'
+  | 'permissionChange';
 
 export type NotificationEventTypeMap = {
   click: NotificationClickEvent;
@@ -12,8 +15,8 @@ export type NotificationEventTypeMap = {
 /// An instance of this class represents a user interaction with
 /// your push notification, ie. if they tap a button
 export interface NotificationClickEvent {
-    result          : NotificationClickResult;
-    notification    : OSNotification;
+  result: NotificationClickResult;
+  notification: OSNotification;
 }
 
 /// Represents an action taken on a push notification, such as
@@ -21,6 +24,6 @@ export interface NotificationClickEvent {
 /// or if your `inFocusDisplayType` is set to true - if they
 /// tapped 'close'.
 export interface NotificationClickResult {
-    actionId   ?: string;
-    url        ?: string;
+  actionId?: string;
+  url?: string;
 }

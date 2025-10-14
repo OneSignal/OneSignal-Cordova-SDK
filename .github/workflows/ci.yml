@@ -31,8 +31,13 @@ jobs:
           export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
           clang-format --version
 
-      - name: Make gradlew executable
-        run: chmod +x example/IonicCapOneSignal/android/gradlew
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Check Code formatting
-        run: ./example/IonicCapOneSignal/android/gradlew spotlessCheck
+        run: npm run format:check
