@@ -2,6 +2,10 @@
   <img src="https://media.onesignal.com/cms/Website%20Layout/logo-red.svg"/>
 </p>
 
+## Setup
+
+Install clang-format (21.1.3) e.g. `brew install clang-format`.
+
 ### OneSignal Cordova Push Notification Plugin
 
 [![npm version](https://img.shields.io/npm/v/onesignal-cordova-plugin.svg)](https://www.npmjs.com/package/onesignal-cordova-plugin) [![npm downloads](https://img.shields.io/npm/dm/onesignal-cordova-plugin.svg)](https://www.npmjs.com/package/onesignal-cordova-plugin)

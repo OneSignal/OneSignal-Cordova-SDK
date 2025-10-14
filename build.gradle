@@ -24,5 +24,12 @@ spotless {
     trimTrailingWhitespace()
     endWithNewline()
   }
+
+  cpp {
+    target 'src/ios/**/*.m', 'src/ios/**/*.h'
+    clangFormat('21.1.3')
+    trimTrailingWhitespace()
+    endWithNewline()
+  }
 }
 
