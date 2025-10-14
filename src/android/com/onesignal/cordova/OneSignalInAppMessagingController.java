@@ -1,18 +1,15 @@
 package com.onesignal.cordova;
 
 import com.onesignal.OneSignal;
-
-import org.apache.cordova.CallbackContext;
-import org.apache.cordova.PluginResult;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import org.apache.cordova.CallbackContext;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class OneSignalInAppMessagingController {
 
@@ -52,7 +49,7 @@ public class OneSignalInAppMessagingController {
         }
     }
 
-    public static boolean clearTriggers(){
+    public static boolean clearTriggers() {
         try {
             OneSignal.getInAppMessages().clearTriggers();
             return true;
@@ -77,5 +74,4 @@ public class OneSignalInAppMessagingController {
         CallbackHelper.callbackSuccessBoolean(callbackContext, inAppMessagingPaused);
         return true;
     }
-
 }

@@ -7,7 +7,9 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "format:java": "./example/IonicCapOneSignal/android/gradlew spotlessApply",
+    "format:java:check": "./example/IonicCapOneSignal/android/gradlew spotlessCheck"
   },
   "keywords": [
     "push",
