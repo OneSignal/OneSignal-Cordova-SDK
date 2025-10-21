@@ -19,5 +19,5 @@
 
     "types": ["vitest/globals", "cordova"]
   },
-  "include": ["www"]
+  "include": ["www", "mocks"]
 }
