@@ -1,4 +1,4 @@
-import {
+import type {
   InAppMessageClickEvent,
   InAppMessageDidDismissEvent,
   InAppMessageDidDisplayEvent,

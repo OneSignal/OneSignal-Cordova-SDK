@@ -1,5 +1,5 @@
-import { OSNotification } from '../OSNotification';
-import { NotificationWillDisplayEvent } from '../NotificationReceivedEvent';
+import type { NotificationWillDisplayEvent } from '../NotificationReceivedEvent';
+import type { OSNotification } from '../OSNotification';
 
 export type NotificationEventName =
   | 'click'

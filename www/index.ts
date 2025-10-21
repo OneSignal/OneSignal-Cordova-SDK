@@ -150,17 +150,17 @@ export { NotificationWillDisplayEvent } from './NotificationReceivedEvent';
 export { OSNotificationPermission } from './NotificationsNamespace';
 export { OSNotification } from './OSNotification';
 
-export {
+export type {
   PushSubscriptionChangedState,
   PushSubscriptionState,
 } from './PushSubscriptionNamespace';
 
-export {
+export type {
   NotificationClickEvent,
   NotificationClickResult,
 } from './models/NotificationClicked';
 
-export {
+export type {
   InAppMessageActionUrlType,
   InAppMessageClickEvent,
   InAppMessageClickResult,
@@ -171,6 +171,6 @@ export {
   OSInAppMessage,
 } from './models/InAppMessage';
 
-export { UserChangedState, UserState } from './UserNamespace';
+export type { UserChangedState, UserState } from './UserNamespace';
 
 export default OneSignal;
