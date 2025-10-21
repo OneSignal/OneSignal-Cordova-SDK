@@ -1,6 +1,6 @@
 # Setup
 
-First install the packages e.g. `npm i`
+First install the packages e.g. `bun i`
 
 ## Android
 
