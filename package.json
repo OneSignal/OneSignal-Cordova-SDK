@@ -17,7 +17,7 @@
     "format:check:prettier": "prettier --check \"**/*.{ts,tsx}\" --ignore-path .gitignore",
     "format:check": "concurrently \"npm:format:check:spotless\" \"npm:format:check:prettier\"",
     "test": "vitest",
-    "test:run": "vitest run"
+    "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
     "@types/cordova": "^11.0.3",

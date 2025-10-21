@@ -43,4 +43,4 @@ jobs:
         run: bun run format:check
 
       - name: Run tests
-        run: bun run test:run
+        run: bun run test:coverage
