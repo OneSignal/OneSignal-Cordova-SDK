@@ -20,7 +20,9 @@
     "format": "concurrently \"npm:format:spotless\" \"npm:format:prettier\"",
     "format:check:spotless": "./example/IonicCapOneSignal/android/gradlew spotlessCheck",
     "format:check:prettier": "prettier --check \"**/*.{ts,tsx}\" --ignore-path .gitignore",
-    "format:check": "concurrently \"npm:format:check:spotless\" \"npm:format:check:prettier\""
+    "format:check": "concurrently \"npm:format:check:spotless\" \"npm:format:check:prettier\"",
+    "test": "vitest",
+    "test:run": "vitest run"
   },
   "keywords": [
     "push",
