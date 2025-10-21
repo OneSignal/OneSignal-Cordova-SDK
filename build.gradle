@@ -32,5 +32,12 @@ spotless {
     trimTrailingWhitespace()
     endWithNewline()
   }
+
+  format 'xml', {
+    target '**/*.xml'
+    trimTrailingWhitespace()
+    indentWithSpaces(4)
+    endWithNewline()
+  }
 }
 
