@@ -6,6 +6,12 @@
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist/",
+    "plugin.xml",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc",
     "format:spotless": "./example/IonicCapOneSignal/android/gradlew spotlessApply",
@@ -77,6 +83,6 @@
   "devDependencies": {
     "@types/cordova": "^11.0.3",
     "concurrently": "^9.2.1",
-    "prettier": "^3.0.0"
+    "prettier": "^3.6.2"
   }
 }
