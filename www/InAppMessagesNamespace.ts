@@ -128,8 +128,6 @@ export default class InAppMessages {
         'setOnDidDismissInAppMessageHandler',
         [],
       );
-    } else {
-      return;
     }
   }
 
@@ -161,7 +159,7 @@ export default class InAppMessages {
           listener as (event: InAppMessageDidDisplayEvent) => void,
         );
         if (index !== -1) {
-          this._willDisplayInAppMessageListeners.splice(index, 1);
+          this._didDisplayInAppMessageListeners.splice(index, 1);
         }
       } else if (event === 'willDismiss') {
         let index = this._willDismissInAppMessageListeners.indexOf(
@@ -177,8 +175,6 @@ export default class InAppMessages {
         if (index !== -1) {
           this._didDismissInAppMessageListeners.splice(index, 1);
         }
-      } else {
-        return;
       }
     }
   }
