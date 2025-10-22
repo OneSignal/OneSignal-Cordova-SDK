@@ -5,3 +5,4 @@ dist
 # Gradle
 .gradle/
 build/
+coverage/

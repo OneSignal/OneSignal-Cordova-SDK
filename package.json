@@ -6,12 +6,6 @@
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": [
-    "dist/",
-    "plugin.xml",
-    "README.md",
-    "LICENSE"
-  ],
   "scripts": {
     "build": "tsc",
     "format:spotless": "./example/IonicCapOneSignal/android/gradlew spotlessApply",
