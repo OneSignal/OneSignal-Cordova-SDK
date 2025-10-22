@@ -17,6 +17,14 @@
     <clobbers target="OneSignal" />
   </js-module>
 
+  <engines>
+    <engine name="cordova" version=">=6.4.0" />
+    <engine name="cordova-ios" version=">=4.3.0" />
+    <engine name="cordova-android" version=">=5.1.0" />
+    <engine name="apple-xcode" version=">=8.0.0" />
+    <engine name="apple-ios" version=">=7.0.0" />
+  </engines>
+
   <platform name="android">
     <framework src="com.onesignal:OneSignal:5.1.35" />
     <framework src="build-extras-onesignal.gradle" custom="true" type="gradleReference" />
