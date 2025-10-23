@@ -1,6 +1,7 @@
 export const mockExec = vi.fn();
 
 export function mockCordova(): void {
+  mockExec.mockReset();
   window.cordova = {
     exec: mockExec,
     platformId: 'android',

@@ -66,7 +66,7 @@ export default class Notifications {
    * Whether this app has push notification permission. Returns true if the user has accepted permissions,
    * or if the app has ephemeral or provisional permission.
    */
-  async getPermissionAsync(): Promise<boolean> {
+  getPermissionAsync(): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
       window.cordova.exec(
         resolve,

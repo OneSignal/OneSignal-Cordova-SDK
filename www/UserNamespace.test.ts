@@ -285,10 +285,6 @@ describe('User', () => {
 
   describe('getTags', () => {
     test('should return a Promise and call cordova.exec', () => {
-      mockExec.mockImplementation((resolve) => {
-        resolve({});
-      });
-
       const promise = user.getTags();
 
       expect(promise).toBeInstanceOf(Promise);
@@ -382,9 +378,6 @@ describe('User', () => {
 
   describe('getOnesignalId', () => {
     test('should return a Promise and call cordova.exec', () => {
-      mockExec.mockImplementation((resolve) => {
-        resolve(ONESIGNAL_ID);
-      });
       const promise = user.getOnesignalId();
 
       expect(promise).toBeInstanceOf(Promise);
@@ -419,10 +412,6 @@ describe('User', () => {
 
   describe('getExternalId', () => {
     test('should return a Promise and call cordova.exec', () => {
-      mockExec.mockImplementation((resolve) => {
-        resolve(EXTERNAL_ID);
-      });
-
       const promise = user.getExternalId();
 
       expect(promise).toBeInstanceOf(Promise);

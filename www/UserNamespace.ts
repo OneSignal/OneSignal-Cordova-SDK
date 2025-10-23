@@ -300,7 +300,7 @@ export default class User {
    * Get the nullable OneSignal Id associated with the current user.
    * @returns {Promise<string | null>}
    */
-  async getOnesignalId(): Promise<string | null> {
+  getOnesignalId(): Promise<string | null> {
     return new Promise<string | null>((resolve, reject) => {
       window.cordova.exec(
         resolve,
@@ -316,7 +316,7 @@ export default class User {
    * Get the nullable External Id associated with the current user.
    * @returns {Promise<string | null>}
    */
-  async getExternalId(): Promise<string | null> {
+  getExternalId(): Promise<string | null> {
     return new Promise<string | null>((resolve, reject) => {
       window.cordova.exec(
         resolve,
