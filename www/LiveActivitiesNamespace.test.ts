@@ -1,4 +1,4 @@
-import { TOKEN } from '../mocks/constants';
+import { SUB_TOKEN } from '../mocks/constants';
 import { mockCordova } from '../mocks/cordova';
 import LiveActivities from './LiveActivitiesNamespace';
 import type { LiveActivitySetupOptions } from './types/LiveActivities';
@@ -20,14 +20,14 @@ describe('LiveActivities', () => {
 
   describe('enter', () => {
     test('should call cordova.exec for enter with required parameters', () => {
-      liveActivities.enter(ACTIVITY_ID, TOKEN);
+      liveActivities.enter(ACTIVITY_ID, SUB_TOKEN);
 
       expect(window.cordova.exec).toHaveBeenCalledWith(
         expect.any(Function),
         expect.any(Function),
         'OneSignalPush',
         'enterLiveActivity',
-        [ACTIVITY_ID, TOKEN],
+        [ACTIVITY_ID, SUB_TOKEN],
       );
     });
 
@@ -35,14 +35,14 @@ describe('LiveActivities', () => {
       const onSuccess = vi.fn();
       const onFailure = vi.fn();
 
-      liveActivities.enter(ACTIVITY_ID, TOKEN, onSuccess, onFailure);
+      liveActivities.enter(ACTIVITY_ID, SUB_TOKEN, onSuccess, onFailure);
 
       expect(window.cordova.exec).toHaveBeenCalledWith(
         onSuccess,
         onFailure,
         'OneSignalPush',
         'enterLiveActivity',
-        [ACTIVITY_ID, TOKEN],
+        [ACTIVITY_ID, SUB_TOKEN],
       );
     });
   });
@@ -78,14 +78,14 @@ describe('LiveActivities', () => {
 
   describe('setPushToStartToken', () => {
     test('should call cordova.exec for setPushToStartToken', () => {
-      liveActivities.setPushToStartToken(ACTIVITY_TYPE, TOKEN);
+      liveActivities.setPushToStartToken(ACTIVITY_TYPE, SUB_TOKEN);
 
       expect(window.cordova.exec).toHaveBeenCalledWith(
         expect.any(Function),
         expect.any(Function),
         'OneSignalPush',
         'setPushToStartToken',
-        [ACTIVITY_TYPE, TOKEN],
+        [ACTIVITY_TYPE, SUB_TOKEN],
       );
     });
   });
