@@ -20,7 +20,6 @@ describe('PushSubscription', () => {
   beforeEach(() => {
     pushSubscription = new PushSubscription();
     mockCordova();
-    mockExec.mockClear();
   });
 
   test('should instantiate PushSubscription class', () => {
