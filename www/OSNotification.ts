@@ -3,7 +3,7 @@ export class OSNotification {
   sound?: string;
   title?: string;
   launchURL?: string;
-  rawPayload: string;
+  rawPayload: string | object;
   actionButtons?: object[];
   additionalData: object;
   notificationId: string;
@@ -279,6 +279,5 @@ export class OSNotification {
       'displayNotification',
       [this.notificationId],
     );
-    return;
   }
 }
