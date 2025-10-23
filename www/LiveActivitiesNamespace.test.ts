@@ -1,7 +1,7 @@
 import { TOKEN } from '../mocks/constants';
 import { mockCordova } from '../mocks/cordova';
 import LiveActivities from './LiveActivitiesNamespace';
-import type { LiveActivitySetupOptions } from './models/LiveActivities';
+import type { LiveActivitySetupOptions } from './types/LiveActivities';
 
 const ACTIVITY_ID = 'test-activity-id';
 const ACTIVITY_TYPE = 'test-activity-type';

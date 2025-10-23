@@ -6,7 +6,7 @@ import type {
   InAppMessageEventTypeMap,
   InAppMessageWillDismissEvent,
   InAppMessageWillDisplayEvent,
-} from './models/InAppMessage';
+} from './types/InAppMessage';
 
 export default class InAppMessages {
   private _inAppMessageClickListeners: ((

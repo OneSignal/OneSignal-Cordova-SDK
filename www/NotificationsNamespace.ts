@@ -4,7 +4,7 @@ import type {
   NotificationClickEvent,
   NotificationEventName,
   NotificationEventTypeMap,
-} from './models/NotificationClicked';
+} from './types/NotificationClicked';
 
 export enum OSNotificationPermission {
   NotDetermined = 0,

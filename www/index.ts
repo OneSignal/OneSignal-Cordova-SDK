@@ -158,7 +158,7 @@ export type {
 export type {
   NotificationClickEvent,
   NotificationClickResult,
-} from './models/NotificationClicked';
+} from './types/NotificationClicked';
 
 export type {
   InAppMessageActionUrlType,
@@ -169,7 +169,7 @@ export type {
   InAppMessageWillDismissEvent,
   InAppMessageWillDisplayEvent,
   OSInAppMessage,
-} from './models/InAppMessage';
+} from './types/InAppMessage';
 
 export type { UserChangedState, UserState } from './UserNamespace';
 

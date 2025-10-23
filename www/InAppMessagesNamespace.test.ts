@@ -5,7 +5,7 @@ import type {
   InAppMessageDidDismissEvent,
   InAppMessageDidDisplayEvent,
   InAppMessageWillDisplayEvent,
-} from './models/InAppMessage';
+} from './types/InAppMessage';
 
 describe('InAppMessages', () => {
   let inAppMessages: InAppMessages;

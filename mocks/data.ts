@@ -1,5 +1,5 @@
-import type { NotificationClickEvent } from '../www/models/NotificationClicked';
 import { OSNotification } from '../www/OSNotification';
+import type { NotificationClickEvent } from '../www/types/NotificationClicked';
 import { deepMerge } from './deepmerge';
 
 type OSNotificationProps = Omit<OSNotification, 'display'>;
