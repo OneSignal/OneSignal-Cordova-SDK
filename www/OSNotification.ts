@@ -35,7 +35,7 @@ export class OSNotification {
   relevanceScore?: number;
   interruptionLevel?: string;
 
-  constructor(receivedEvent: OSNotification) {
+  constructor(receivedEvent: Omit<OSNotification, 'display'>) {
     /// The OneSignal notification ID for this notification
     this.notificationId = receivedEvent.notificationId;
 

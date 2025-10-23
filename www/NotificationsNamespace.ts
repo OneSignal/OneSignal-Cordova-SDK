@@ -50,6 +50,7 @@ export default class Notifications {
     );
 
     this.addEventListener('permissionChange', (result) => {
+      console.log('permissionChange', result);
       this._permission = result;
     });
   }
@@ -220,8 +221,6 @@ export default class Notifications {
         'addPermissionObserver',
         [],
       );
-    } else {
-      return;
     }
   }
 
@@ -256,8 +255,6 @@ export default class Notifications {
       if (index !== -1) {
         this._permissionObserverList.splice(index, 1);
       }
-    } else {
-      return;
     }
   }
 

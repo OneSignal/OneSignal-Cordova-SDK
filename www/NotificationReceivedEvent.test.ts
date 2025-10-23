@@ -1,5 +1,5 @@
 import { mockCordova } from '../mocks/cordova';
-import { mockNotification } from '../mocks/mockNotification';
+import { mockNotification } from '../mocks/data';
 import { NotificationWillDisplayEvent } from './NotificationReceivedEvent';
 import { OSNotification } from './OSNotification';
 
