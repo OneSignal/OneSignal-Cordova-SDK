@@ -1,3 +1,5 @@
+import { noop } from './helpers';
+
 export class OSNotification {
   body: string;
   sound?: string;
@@ -272,12 +274,8 @@ export class OSNotification {
    * @returns void
    */
   display(): void {
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'displayNotification',
-      [this.notificationId],
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'displayNotification', [
+      this.notificationId,
+    ]);
   }
 }

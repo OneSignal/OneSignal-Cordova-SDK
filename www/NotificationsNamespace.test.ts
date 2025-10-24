@@ -4,7 +4,7 @@ import { NotificationWillDisplayEvent } from './NotificationReceivedEvent';
 import Notifications, {
   OSNotificationPermission,
 } from './NotificationsNamespace';
-
+import * as helpers from './helpers';
 describe('Notifications', () => {
   let notifications: Notifications;
 
@@ -284,6 +284,14 @@ describe('Notifications', () => {
       expect(mockListener).toHaveBeenCalledWith(true);
       expect(mockListener2).toHaveBeenCalledWith(true);
     });
+
+    test('should not add listener for unknown event type', () => {
+      const mockListener = vi.fn();
+      // @ts-expect-error - we want to test the addition of an unknown event type
+      notifications.addEventListener('unknown', mockListener);
+
+      expect(window.cordova.exec).not.toHaveBeenCalled();
+    });
   });
 
   describe('removeEventListener', () => {
@@ -301,6 +309,15 @@ describe('Notifications', () => {
 
       mockExec.mock.calls[0][0]('some-data');
       expect(mockListener).not.toHaveBeenCalled();
+    });
+
+    test('should not remove listener for unknown event type', () => {
+      vi.spyOn(helpers, 'removeListener').mockImplementation(() => {});
+      const mockListener = vi.fn();
+      // @ts-expect-error - we want to test the removal of an unknown event type
+      notifications.removeEventListener('unknown', mockListener);
+
+      expect(helpers.removeListener).not.toHaveBeenCalled();
     });
   });
 

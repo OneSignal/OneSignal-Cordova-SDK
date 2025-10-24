@@ -1,3 +1,4 @@
+import { noop } from './helpers';
 import type { LiveActivitySetupOptions } from './types/LiveActivities';
 
 export default class LiveActivities {
@@ -16,11 +17,11 @@ export default class LiveActivities {
     onFailure?: (data: unknown) => void,
   ): void {
     if (onSuccess == null) {
-      onSuccess = function () {};
+      onSuccess = noop;
     }
 
     if (onFailure == null) {
-      onFailure = function () {};
+      onFailure = noop;
     }
 
     window.cordova.exec(
@@ -45,11 +46,11 @@ export default class LiveActivities {
     onFailure?: (data: unknown) => void,
   ): void {
     if (onSuccess == null) {
-      onSuccess = function () {};
+      onSuccess = noop;
     }
 
     if (onFailure == null) {
-      onFailure = function () {};
+      onFailure = noop;
     }
 
     window.cordova.exec(
@@ -73,13 +74,10 @@ export default class LiveActivities {
    * @param {string} token: The activity type's pushToStart token.
    */
   setPushToStartToken(activityType: string, token: string) {
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'setPushToStartToken',
-      [activityType, token],
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'setPushToStartToken', [
+      activityType,
+      token,
+    ]);
   }
 
   /**
@@ -93,13 +91,9 @@ export default class LiveActivities {
    * to the live activity.
    */
   removePushToStartToken(activityType: string) {
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'removePushToStartToken',
-      [activityType],
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'removePushToStartToken', [
+      activityType,
+    ]);
   }
 
   /**
@@ -118,8 +112,8 @@ export default class LiveActivities {
    */
   setupDefault(options?: LiveActivitySetupOptions) {
     window.cordova.exec(
-      function () {},
-      function () {},
+      noop,
+      noop,
       'OneSignalPush',
       'setupDefaultLiveActivity',
       [options],
@@ -140,8 +134,8 @@ export default class LiveActivities {
    */
   startDefault(activityId: string, attributes: object, content: object) {
     window.cordova.exec(
-      function () {},
-      function () {},
+      noop,
+      noop,
       'OneSignalPush',
       'startDefaultLiveActivity',
       [activityId, attributes, content],

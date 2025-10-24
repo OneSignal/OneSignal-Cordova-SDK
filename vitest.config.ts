@@ -7,11 +7,17 @@ export default defineConfig({
     environment: 'happy-dom',
     include: ['**/*.test.ts', '**/*.test.tsx'],
     coverage: {
-      exclude: ['mocks/**'],
+      exclude: ['mocks/**', 'www/helpers.ts'],
       enabled: true,
       reporter: ['text-summary', 'lcov'],
       reportOnFailure: true,
       reportsDirectory: 'coverage',
+      thresholds: {
+        statements: 95,
+        branches: 95,
+        functions: 95,
+        lines: 95,
+      },
     },
   },
 });

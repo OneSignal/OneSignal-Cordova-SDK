@@ -1,3 +1,4 @@
+import { noop, removeListener } from './helpers';
 import { NotificationWillDisplayEvent } from './NotificationReceivedEvent';
 import { OSNotification } from './OSNotification';
 import type {
@@ -44,7 +45,7 @@ export default class Notifications {
     };
     window.cordova.exec(
       getPermissionCallback,
-      function () {},
+      noop,
       'OneSignalPush',
       'getPermissionInternal',
     );
@@ -151,11 +152,11 @@ export default class Notifications {
    * @returns void
    */
   registerForProvisionalAuthorization(
-    handler: (response: boolean) => void = () => {},
+    handler: (response: boolean) => void = noop,
   ): void {
     window.cordova.exec(
       handler,
-      function () {},
+      noop,
       'OneSignalPush',
       'registerForProvisionalAuthorization',
       [],
@@ -181,7 +182,7 @@ export default class Notifications {
       };
       window.cordova.exec(
         clickParsingHandler,
-        function () {},
+        noop,
         'OneSignalPush',
         'addNotificationClickListener',
         [],
@@ -195,8 +196,8 @@ export default class Notifications {
           listener(new NotificationWillDisplayEvent(notification));
         });
         window.cordova.exec(
-          function () {},
-          function () {},
+          noop,
+          noop,
           'OneSignalPush',
           'proceedWithWillDisplay',
           [notification.notificationId],
@@ -204,7 +205,7 @@ export default class Notifications {
       };
       window.cordova.exec(
         foregroundParsingHandler,
-        function () {},
+        noop,
         'OneSignalPush',
         'addForegroundLifecycleListener',
         [],
@@ -216,7 +217,7 @@ export default class Notifications {
       };
       window.cordova.exec(
         permissionCallBackProcessor,
-        function () {},
+        noop,
         'OneSignalPush',
         'addPermissionObserver',
         [],
@@ -235,26 +236,20 @@ export default class Notifications {
     listener: (obj: NotificationEventTypeMap[K]) => void,
   ): void {
     if (event === 'click') {
-      let index = this._notificationClickedListeners.indexOf(
+      removeListener(
+        this._notificationClickedListeners,
         listener as (event: NotificationClickEvent) => void,
       );
-      if (index !== -1) {
-        this._notificationClickedListeners.splice(index, 1);
-      }
     } else if (event === 'foregroundWillDisplay') {
-      let index = this._notificationWillDisplayListeners.indexOf(
+      removeListener(
+        this._notificationWillDisplayListeners,
         listener as (event: NotificationWillDisplayEvent) => void,
       );
-      if (index !== -1) {
-        this._notificationWillDisplayListeners.splice(index, 1);
-      }
     } else if (event === 'permissionChange') {
-      let index = this._permissionObserverList.indexOf(
+      removeListener(
+        this._permissionObserverList,
         listener as (event: boolean) => void,
       );
-      if (index !== -1) {
-        this._permissionObserverList.splice(index, 1);
-      }
     }
   }
 
@@ -264,8 +259,8 @@ export default class Notifications {
    */
   clearAll(): void {
     window.cordova.exec(
-      function () {},
-      function () {},
+      noop,
+      noop,
       'OneSignalPush',
       'clearAllNotifications',
       [],
@@ -283,13 +278,9 @@ export default class Notifications {
    * @returns void
    */
   removeNotification(id: number): void {
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'removeNotification',
-      [id],
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'removeNotification', [
+      id,
+    ]);
   }
 
   /**
@@ -300,8 +291,8 @@ export default class Notifications {
    */
   removeGroupedNotifications(id: string): void {
     window.cordova.exec(
-      function () {},
-      function () {},
+      noop,
+      noop,
       'OneSignalPush',
       'removeGroupedNotifications',
       [id],

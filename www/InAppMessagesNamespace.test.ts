@@ -1,4 +1,5 @@
 import { mockCordova, mockExec } from '../mocks/cordova';
+import * as helpers from './helpers';
 import InAppMessages from './InAppMessagesNamespace';
 import type {
   InAppMessageClickEvent,
@@ -6,7 +7,6 @@ import type {
   InAppMessageDidDisplayEvent,
   InAppMessageWillDisplayEvent,
 } from './types/InAppMessage';
-
 describe('InAppMessages', () => {
   let inAppMessages: InAppMessages;
 
@@ -81,6 +81,14 @@ describe('InAppMessages', () => {
         expect(mockListener).toHaveBeenCalledWith(data);
       },
     );
+
+    test('should not add listener for unknown event type', () => {
+      const mockListener = vi.fn();
+      // @ts-expect-error - we want to test the addition of an unknown event type
+      inAppMessages.addEventListener('unknown', mockListener);
+
+      expect(window.cordova.exec).not.toHaveBeenCalled();
+    });
   });
 
   describe('removeEventListener', () => {
@@ -100,6 +108,15 @@ describe('InAppMessages', () => {
 
       mockExec.mock.calls[0][0]('some-data');
       expect(mockListener).not.toHaveBeenCalled();
+    });
+
+    test('should not remove listener for unknown event type', () => {
+      vi.spyOn(helpers, 'removeListener').mockImplementation(() => {});
+      const mockListener = vi.fn();
+
+      // @ts-expect-error - we want to test the removal of an unknown event type
+      inAppMessages.removeEventListener('unknown', mockListener);
+      expect(helpers.removeListener).not.toHaveBeenCalled();
     });
   });
 

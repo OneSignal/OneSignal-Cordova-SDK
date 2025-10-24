@@ -1,3 +1,4 @@
+import { noop, removeListener } from './helpers';
 import type {
   InAppMessageClickEvent,
   InAppMessageDidDismissEvent,
@@ -53,7 +54,7 @@ export default class InAppMessages {
       };
       window.cordova.exec(
         inAppMessageClickListener,
-        function () {},
+        noop,
         'OneSignalPush',
         'setInAppMessageClickHandler',
         [],
@@ -72,7 +73,7 @@ export default class InAppMessages {
       };
       window.cordova.exec(
         willDisplayCallBackProcessor,
-        function () {},
+        noop,
         'OneSignalPush',
         'setOnWillDisplayInAppMessageHandler',
         [],
@@ -88,7 +89,7 @@ export default class InAppMessages {
       };
       window.cordova.exec(
         didDisplayCallBackProcessor,
-        function () {},
+        noop,
         'OneSignalPush',
         'setOnDidDisplayInAppMessageHandler',
         [],
@@ -107,7 +108,7 @@ export default class InAppMessages {
       };
       window.cordova.exec(
         willDismissInAppMessageProcessor,
-        function () {},
+        noop,
         'OneSignalPush',
         'setOnWillDismissInAppMessageHandler',
         [],
@@ -123,7 +124,7 @@ export default class InAppMessages {
       };
       window.cordova.exec(
         didDismissInAppMessageCallBackProcessor,
-        function () {},
+        noop,
         'OneSignalPush',
         'setOnDidDismissInAppMessageHandler',
         [],
@@ -142,40 +143,15 @@ export default class InAppMessages {
     listener: (obj: InAppMessageEventTypeMap[K]) => void,
   ): void {
     if (event === 'click') {
-      const index = this._inAppMessageClickListeners.indexOf(listener);
-      if (index !== -1) {
-        this._inAppMessageClickListeners.splice(index, 1);
-      }
-    } else {
-      if (event === 'willDisplay') {
-        let index = this._willDisplayInAppMessageListeners.indexOf(
-          listener as (event: InAppMessageWillDisplayEvent) => void,
-        );
-        if (index !== -1) {
-          this._willDisplayInAppMessageListeners.splice(index, 1);
-        }
-      } else if (event === 'didDisplay') {
-        let index = this._didDisplayInAppMessageListeners.indexOf(
-          listener as (event: InAppMessageDidDisplayEvent) => void,
-        );
-        if (index !== -1) {
-          this._didDisplayInAppMessageListeners.splice(index, 1);
-        }
-      } else if (event === 'willDismiss') {
-        let index = this._willDismissInAppMessageListeners.indexOf(
-          listener as (event: InAppMessageWillDismissEvent) => void,
-        );
-        if (index !== -1) {
-          this._willDismissInAppMessageListeners.splice(index, 1);
-        }
-      } else if (event === 'didDismiss') {
-        let index = this._didDismissInAppMessageListeners.indexOf(
-          listener as (event: InAppMessageDidDismissEvent) => void,
-        );
-        if (index !== -1) {
-          this._didDismissInAppMessageListeners.splice(index, 1);
-        }
-      }
+      removeListener(this._inAppMessageClickListeners, listener);
+    } else if (event === 'willDisplay') {
+      removeListener(this._willDisplayInAppMessageListeners, listener);
+    } else if (event === 'didDisplay') {
+      removeListener(this._didDisplayInAppMessageListeners, listener);
+    } else if (event === 'willDismiss') {
+      removeListener(this._willDismissInAppMessageListeners, listener);
+    } else if (event === 'didDismiss') {
+      removeListener(this._didDismissInAppMessageListeners, listener);
     }
   }
 
@@ -204,13 +180,7 @@ export default class InAppMessages {
       }
     });
 
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'addTriggers',
-      [triggers],
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'addTriggers', [triggers]);
   }
 
   /**
@@ -234,13 +204,7 @@ export default class InAppMessages {
       );
     }
 
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'removeTriggers',
-      [keys],
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'removeTriggers', [keys]);
   }
 
   /**
@@ -248,12 +212,7 @@ export default class InAppMessages {
    * @returns void
    */
   clearTriggers(): void {
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'clearTriggers',
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'clearTriggers');
   }
 
   /**
@@ -264,13 +223,7 @@ export default class InAppMessages {
    * @returns void
    */
   setPaused(pause: boolean): void {
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'setPaused',
-      [pause],
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'setPaused', [pause]);
   }
 
   /**
