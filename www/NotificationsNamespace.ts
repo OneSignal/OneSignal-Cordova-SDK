@@ -1,6 +1,6 @@
 import { NotificationWillDisplayEvent } from './NotificationReceivedEvent';
 import { OSNotification } from './OSNotification';
-import {
+import type {
   NotificationClickEvent,
   NotificationEventName,
   NotificationEventTypeMap,

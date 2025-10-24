@@ -25,17 +25,6 @@
     <engine name="apple-ios" version=">=7.0.0" />
   </engines>
 
-  <js-module src="dist/NotificationReceivedEvent.js" name="NotificationReceivedEvent" />
-  <js-module src="dist/OSNotification.js" name="OSNotification" />
-  <js-module src="dist/UserNamespace.js" name="UserNamespace" />
-  <js-module src="dist/PushSubscriptionNamespace.js" name="PushSubscriptionNamespace" />
-  <js-module src="dist/DebugNamespace.js" name="DebugNamespace" />
-  <js-module src="dist/InAppMessagesNamespace.js" name="InAppMessagesNamespace" />
-  <js-module src="dist/SessionNamespace.js" name="SessionNamespace" />
-  <js-module src="dist/LocationNamespace.js" name="LocationNamespace" />
-  <js-module src="dist/NotificationsNamespace.js" name="NotificationsNamespace" />
-  <js-module src="dist/LiveActivitiesNamespace.js" name="LiveActivitiesNamespace" />
-
   <platform name="android">
     <framework src="com.onesignal:OneSignal:5.1.35" />
     <framework src="build-extras-onesignal.gradle" custom="true" type="gradleReference" />

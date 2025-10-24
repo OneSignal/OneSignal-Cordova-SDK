@@ -1,4 +1,4 @@
-import { LiveActivitySetupOptions } from './models/LiveActivities';
+import type { LiveActivitySetupOptions } from './models/LiveActivities';
 
 export default class LiveActivities {
   /**
