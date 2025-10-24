@@ -1,14 +1,13 @@
 import { APP_ID } from '../mocks/constants';
+import { mockCordova, mockExec } from '../mocks/cordova';
 import { OneSignalPlugin } from './index';
-
-const mockExec = vi.fn();
 
 describe('OneSignalPlugin', () => {
   let plugin: OneSignalPlugin;
 
   beforeEach(() => {
     plugin = new OneSignalPlugin();
-    window.cordova = { exec: mockExec };
+    mockCordova();
   });
 
   test('should instantiate OneSignalPlugin', () => {

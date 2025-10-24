@@ -5,7 +5,7 @@
     "module": "esnext",
     "moduleResolution": "node",
     "noImplicitAny": true,
-    "lib": ["es6", "dom"],
+    "lib": ["es2020", "dom"],
     "declaration": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
@@ -19,5 +19,5 @@
 
     "types": ["vitest/globals", "cordova"]
   },
-  "include": ["www"]
+  "include": ["www", "mocks"]
 }

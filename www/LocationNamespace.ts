@@ -1,3 +1,5 @@
+import { noop } from './helpers';
+
 export default class Location {
   /**
    * Location
@@ -9,8 +11,8 @@ export default class Location {
    */
   requestPermission(): void {
     window.cordova.exec(
-      function () {},
-      function () {},
+      noop,
+      noop,
       'OneSignalPush',
       'requestLocationPermission',
       [],
@@ -23,13 +25,9 @@ export default class Location {
    * @returns void
    */
   setShared(shared: boolean): void {
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'setLocationShared',
-      [shared],
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'setLocationShared', [
+      shared,
+    ]);
   }
 
   /**

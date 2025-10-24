@@ -1,9 +1,11 @@
+import { noop } from './helpers';
+
 export class OSNotification {
   body: string;
   sound?: string;
   title?: string;
   launchURL?: string;
-  rawPayload: string;
+  rawPayload: string | object;
   actionButtons?: object[];
   additionalData: object;
   notificationId: string;
@@ -35,7 +37,7 @@ export class OSNotification {
   relevanceScore?: number;
   interruptionLevel?: string;
 
-  constructor(receivedEvent: OSNotification) {
+  constructor(receivedEvent: Omit<OSNotification, 'display'>) {
     /// The OneSignal notification ID for this notification
     this.notificationId = receivedEvent.notificationId;
 
@@ -272,13 +274,8 @@ export class OSNotification {
    * @returns void
    */
   display(): void {
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'displayNotification',
-      [this.notificationId],
-    );
-    return;
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'displayNotification', [
+      this.notificationId,
+    ]);
   }
 }

@@ -1,3 +1,5 @@
+import { noop } from './helpers';
+
 // An enum that declares different types of log levels you can use with the OneSignal SDK, going from the least verbose (none) to verbose (print all comments).
 export enum LogLevel {
   None = 0,
@@ -16,13 +18,7 @@ export default class Debug {
    * @returns void
    */
   setLogLevel(logLevel: LogLevel): void {
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'setLogLevel',
-      [logLevel],
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'setLogLevel', [logLevel]);
   }
 
   /**
@@ -31,12 +27,8 @@ export default class Debug {
    * @returns void
    */
   setAlertLevel(visualLogLevel: LogLevel): void {
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'setAlertLevel',
-      [visualLogLevel],
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'setAlertLevel', [
+      visualLogLevel,
+    ]);
   }
 }

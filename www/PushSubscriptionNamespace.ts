@@ -1,3 +1,5 @@
+import { noop, removeListener } from './helpers';
+
 // Represents the current user's push notification subscription state with OneSignal
 export interface PushSubscriptionState {
   id?: string;
@@ -42,7 +44,7 @@ export default class PushSubscription {
     };
     window.cordova.exec(
       getIdCallback,
-      function () {},
+      noop,
       'OneSignalPush',
       'getPushSubscriptionId',
     );
@@ -56,7 +58,7 @@ export default class PushSubscription {
     };
     window.cordova.exec(
       getTokenCallback,
-      function () {},
+      noop,
       'OneSignalPush',
       'getPushSubscriptionToken',
     );
@@ -70,12 +72,13 @@ export default class PushSubscription {
     };
     window.cordova.exec(
       getOptedInCallback,
-      function () {},
+      noop,
       'OneSignalPush',
       'getPushSubscriptionOptedIn',
     );
 
     this.addEventListener('change', (subscriptionChange) => {
+      console.log('subscriptionChange', subscriptionChange);
       this._id = subscriptionChange.current.id;
       this._token = subscriptionChange.current.token;
       this._optedIn = subscriptionChange.current.optedIn;
@@ -179,7 +182,7 @@ export default class PushSubscription {
     };
     window.cordova.exec(
       subscriptionCallBackProcessor,
-      function () {},
+      noop,
       'OneSignalPush',
       'addPushSubscriptionObserver',
       [],
@@ -195,10 +198,7 @@ export default class PushSubscription {
     event: 'change',
     listener: (event: PushSubscriptionChangedState) => void,
   ) {
-    let index = this._subscriptionObserverList.indexOf(listener);
-    if (index !== -1) {
-      this._subscriptionObserverList.splice(index, 1);
-    }
+    removeListener(this._subscriptionObserverList, listener);
   }
 
   /**
@@ -206,12 +206,7 @@ export default class PushSubscription {
    * @returns void
    */
   optIn(): void {
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'optInPushSubscription',
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'optInPushSubscription');
   }
 
   /**
@@ -219,11 +214,6 @@ export default class PushSubscription {
    * @returns void
    */
   optOut(): void {
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'optOutPushSubscription',
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'optOutPushSubscription');
   }
 }
