@@ -1,16 +1,10 @@
 PODS:
-  - Capacitor (6.0.0):
+  - Capacitor (6.2.1):
     - CapacitorCordova
-  - CapacitorApp (6.0.0):
+  - CapacitorApp (6.0.2):
     - Capacitor
-  - CapacitorCordova (6.0.0)
-  - CapacitorHaptics (6.0.0):
-    - Capacitor
-  - CapacitorKeyboard (6.0.0):
-    - Capacitor
-  - CapacitorStatusBar (6.0.0):
-    - Capacitor
-  - CordovaPluginsStatic (6.2.0):
+  - CapacitorCordova (6.2.1)
+  - CordovaPluginsStatic (6.2.1):
     - CapacitorCordova
     - OneSignalXCFramework (= 5.2.14)
   - OneSignalXCFramework (5.2.14):
@@ -64,9 +58,6 @@ DEPENDENCIES:
   - "Capacitor (from `../../node_modules/@capacitor/ios`)"
   - "CapacitorApp (from `../../node_modules/@capacitor/app`)"
   - "CapacitorCordova (from `../../node_modules/@capacitor/ios`)"
-  - "CapacitorHaptics (from `../../node_modules/@capacitor/haptics`)"
-  - "CapacitorKeyboard (from `../../node_modules/@capacitor/keyboard`)"
-  - "CapacitorStatusBar (from `../../node_modules/@capacitor/status-bar`)"
   - CordovaPluginsStatic (from `../capacitor-cordova-ios-plugins`)
   - OneSignalXCFramework (< 6.0, >= 5.0)
 
@@ -81,25 +72,16 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/app"
   CapacitorCordova:
     :path: "../../node_modules/@capacitor/ios"
-  CapacitorHaptics:
-    :path: "../../node_modules/@capacitor/haptics"
-  CapacitorKeyboard:
-    :path: "../../node_modules/@capacitor/keyboard"
-  CapacitorStatusBar:
-    :path: "../../node_modules/@capacitor/status-bar"
   CordovaPluginsStatic:
     :path: "../capacitor-cordova-ios-plugins"
 
 SPEC CHECKSUMS:
-  Capacitor: c527d208447590a004f0a4a2c42a5f361848fa8a
-  CapacitorApp: 30145f2ea2311e4f3744472119ec87d2ddf4c0a7
-  CapacitorCordova: 8c4bfdf69368512e85b1d8b724dd7546abeb30af
-  CapacitorHaptics: 0cea833e6a8bf489dd6acaaebf6d953b90086c59
-  CapacitorKeyboard: dc97fe50dcfdcbe12af56c49bbed150077d08043
-  CapacitorStatusBar: 129c68650d3f950e080e8e7e03d69c3b361dbe52
-  CordovaPluginsStatic: 806cbe3b29f31d9942066b1f32d546d488bbd495
+  Capacitor: c95400d761e376be9da6be5a05f226c0e865cebf
+  CapacitorApp: e1e6b7d05e444d593ca16fd6d76f2b7c48b5aea7
+  CapacitorCordova: 8d93e14982f440181be7304aa9559ca631d77fff
+  CordovaPluginsStatic: 7e336b6b27117b9a8219feae60e8e9523a4382bf
   OneSignalXCFramework: 7112f3e89563e41ebc23fe807788f11985ac541c
 
-PODFILE CHECKSUM: 178e2a2e451311a871c2b4db713ac4b63d0ebeeb
+PODFILE CHECKSUM: 09576ecb1e139231aeea79b0833928283457ffe9
 
 COCOAPODS: 1.16.2

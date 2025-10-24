@@ -1,6 +1,7 @@
 # Setup
 
-First install the packages e.g. `npm i`
+Link the root package e.g. `bun link`
+First install the packages e.g. `bun i`
 
 ## Android
 

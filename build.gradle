@@ -27,7 +27,8 @@ spotless {
 
   cpp {
     target 'src/ios/**/*.m', 'src/ios/**/*.h'
-    clangFormat('21.1.3')
+    def clangVersion = "clang-format --version".execute().text.trim().split(" ")[2]
+    clangFormat(clangVersion)
     trimTrailingWhitespace()
     endWithNewline()
   }
