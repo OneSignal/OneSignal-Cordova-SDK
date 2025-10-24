@@ -1,0 +1,292 @@
+name: Create Release PR
+
+on:
+  workflow_dispatch:
+    inputs:
+      release-type:
+        description: "Release type"
+        required: true
+        default: "stable"
+        type: choice
+        options:
+          - Current
+          - Beta
+          - Alpha
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Get current SDK version
+        id: current_version
+        run: |
+          CURRENT_VERSION=$(bun -e "console.log(require('./package.json').version)")
+          echo "current=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Get last release commit
+        id: last_commit
+        run: |
+          LAST_RELEASE_DATE=$(git show -s --format=%cI "${{ steps.current_version.outputs.current }}")
+          echo "date=$LAST_RELEASE_DATE" >> $GITHUB_OUTPUT
+
+      - name: Get merged PRs since last release
+        id: get_prs
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const lastReleaseDate = '${{ steps.last_commit.outputs.date }}';
+
+            // Get merged PRs
+            const { data: prs } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'closed',
+              base: 'main',
+              per_page: 100
+            });
+
+            // Filter and process PRs
+            const mergedPrs = prs
+              .filter(pr => pr.merged_at && new Date(pr.merged_at) > new Date(lastReleaseDate))
+              .map(pr => ({
+                number: pr.number,
+                title: pr.title,
+              }));
+            core.setOutput('prs', JSON.stringify(mergedPrs));
+
+            const hasFeatures = mergedPrs.some(pr => /^feat/i.test(pr.title));
+            core.setOutput('isFeature', hasFeatures);
+
+      - name: Calculate new version
+        id: new_version
+        run: |
+          CURRENT="${{ steps.current_version.outputs.current }}"
+          RELEASE_TYPE="${{ inputs.release-type }}"
+          IS_FEATURE='${{ steps.get_prs.outputs.isFeature }}'
+
+          # Extract base version and determine current pre-release type
+          if [[ "$CURRENT" =~ -alpha\. ]]; then
+            BASE_VERSION="${CURRENT%-alpha.*}"
+            PRERELEASE_NUM="${CURRENT##*-alpha.}"
+            PRERELEASE_TYPE="alpha"
+          elif [[ "$CURRENT" =~ -beta\. ]]; then
+            BASE_VERSION="${CURRENT%-beta.*}"
+            PRERELEASE_NUM="${CURRENT##*-beta.}"
+            PRERELEASE_TYPE="beta"
+          else
+            BASE_VERSION="$CURRENT"
+            PRERELEASE_TYPE="stable"
+          fi
+
+          # Helper function to bump version
+          bump_version() {
+            local base=$1
+            local is_feature=$2
+            local major=${base:0:2}
+            local minor=${base:2:2}
+            local patch=${base:4:2}
+
+            if [[ "$is_feature" == "true" ]]; then
+              minor=$(printf "%02d" $((10#$minor + 1)))
+              patch="00"
+            else
+              patch=$(printf "%02d" $((10#$patch + 1)))
+            fi
+
+            echo "${major}${minor}${patch}"
+          }
+
+          # Determine new version based on current and desired release types
+          if [[ "$RELEASE_TYPE" == "Alpha" ]]; then
+            if [[ "$PRERELEASE_TYPE" == "alpha" ]]; then
+              # Increment alpha number
+              NEW_VERSION="$BASE_VERSION-alpha.$((PRERELEASE_NUM + 1))"
+            else
+              # New alpha release from stable or beta
+              NEW_VERSION="$(bump_version "$BASE_VERSION" "$IS_FEATURE")-alpha.1"
+            fi
+          elif [[ "$RELEASE_TYPE" == "Beta" ]]; then
+            if [[ "$PRERELEASE_TYPE" == "beta" ]]; then
+              # Increment beta number
+              NEW_VERSION="$BASE_VERSION-beta.$((PRERELEASE_NUM + 1))"
+            elif [[ "$PRERELEASE_TYPE" == "alpha" ]]; then
+              # Promote alpha to beta
+              NEW_VERSION="$BASE_VERSION-beta.1"
+            else
+              # New beta release from stable
+              NEW_VERSION="$(bump_version "$BASE_VERSION" "$IS_FEATURE")-beta.1"
+            fi
+          else
+            # Release type is Current (stable)
+            if [[ "$PRERELEASE_TYPE" != "stable" ]]; then
+              # Promote pre-release to stable
+              NEW_VERSION="$BASE_VERSION"
+            else
+              # Bump stable version
+              NEW_VERSION="$(bump_version "$CURRENT" "$IS_FEATURE")"
+            fi
+          fi
+
+          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create release branch
+        run: |
+          git checkout -b rel/${{ steps.new_version.outputs.version }}
+          git push -u origin rel/${{ steps.new_version.outputs.version }}
+
+      - name: Create temp branch
+        if: inputs.release-type == 'Alpha' || inputs.release-type == 'Beta'
+        run: |
+          git checkout -b release-${{ steps.new_version.outputs.version }}
+          git push -u origin release-${{ steps.new_version.outputs.version }}
+
+      # Cordova specific steps
+      - name: Update sdk version
+        run: |
+          NEW_VERSION="${{ steps.new_version.outputs.version }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Convert version format for OneSignal wrapper (e.g., 5.2.15 -> 050215)
+          # For pre-releases, extract base version first (e.g., 5.2.15-alpha.1 -> 5.2.15)
+          BASE_VERSION=$(echo "$NEW_VERSION" | sed 's/-[a-z].*//')
+          WRAPPER_VERSION=$(echo "$BASE_VERSION" | sed 's/\.//g' | awk '{printf "%06d", $0}')
+
+          # Update package.json version
+          npm pkg set version="$NEW_VERSION"
+
+          # Update plugin.xml cordova plugin version (target <plugin> element specifically)
+          sed -i 's|<plugin \(xmlns="[^"]*" xmlns:android="[^"]*" id="[^"]*"\) version="[^"]*"|<plugin \1 version="'"$NEW_VERSION"'"|' plugin.xml
+
+          # Update OneSignalPush.java wrapper version
+          sed -i "s/OneSignalWrapper\.setSdkVersion(\"[^\"]*\")/OneSignalWrapper.setSdkVersion(\"$WRAPPER_VERSION\")/g" src/android/com/onesignal/cordova/OneSignalPush.java
+
+          # Update OneSignalPush.m wrapper version
+          sed -i "s/OneSignalWrapper\.sdkVersion = @\"[^\"]*\"/OneSignalWrapper.sdkVersion = @\"$WRAPPER_VERSION\"/g" src/ios/OneSignalPush.m
+
+          git add package.json plugin.xml src/android/com/onesignal/cordova/OneSignalPush.java src/ios/OneSignalPush.m
+
+          git commit -m "Release $NEW_VERSION"
+          git push
+
+      - name: Check native SDK version changes
+        id: native_deps
+        run: |
+          # Get the current plugin.xml
+          CURRENT_PLUGIN=$(cat plugin.xml)
+
+          # Extract current Android SDK version
+          ANDROID_VERSION=$(echo "$CURRENT_PLUGIN" | grep -oP 'com\.onesignal:OneSignal:\K[0-9.]+' | head -1)
+
+          # Extract current iOS SDK version
+          IOS_VERSION=$(echo "$CURRENT_PLUGIN" | grep -oP 'OneSignalXCFramework.*spec="\K[0-9.]+' | head -1)
+
+          # Get previous plugin.xml from HEAD~1 (before the commit we just made)
+          PREVIOUS_PLUGIN=$(git show HEAD~1:plugin.xml)
+
+          # Extract previous Android SDK version
+          PREVIOUS_ANDROID=$(echo "$PREVIOUS_PLUGIN" | grep -oP 'com\.onesignal:OneSignal:\K[0-9.]+' | head -1)
+
+          # Extract previous iOS SDK version
+          PREVIOUS_IOS=$(echo "$PREVIOUS_PLUGIN" | grep -oP 'OneSignalXCFramework.*spec="\K[0-9.]+' | head -1)
+
+          # Build output for native dependency changes
+          NATIVE_UPDATES=""
+          if [[ "$ANDROID_VERSION" != "$PREVIOUS_ANDROID" && ! -z "$PREVIOUS_ANDROID" ]]; then
+            printf -v NATIVE_UPDATES '%sANDROID_UPDATE=true\nANDROID_FROM=%s\nANDROID_TO=%s\n' "$NATIVE_UPDATES" "$PREVIOUS_ANDROID" "$ANDROID_VERSION"
+          fi
+
+          if [[ "$IOS_VERSION" != "$PREVIOUS_IOS" && ! -z "$PREVIOUS_IOS" ]]; then
+            printf -v NATIVE_UPDATES '%sIOS_UPDATE=true\nIOS_FROM=%s\nIOS_TO=%s\n' "$NATIVE_UPDATES" "$PREVIOUS_IOS" "$IOS_VERSION"
+          fi
+
+          # Output the variables
+          echo "$NATIVE_UPDATES" >> $GITHUB_OUTPUT
+
+      - name: Generate release notes
+        id: release_notes
+        uses: actions/github-script@v8
+        with:
+          script: |
+            // Trim whitespace from PR titles
+            const prs = JSON.parse('${{ steps.get_prs.outputs.prs }}').map(pr => ({
+              ...pr,
+              title: pr.title.trim()
+            }));
+
+            // Categorize PRs
+            const features = prs.filter(pr => /^feat/i.test(pr.title));
+            const fixes = prs.filter(pr => /^fix/i.test(pr.title));
+            const improvements = prs.filter(pr => /^(perf|refactor|chore)/i.test(pr.title));
+
+            // Helper function to build section
+            const buildSection = (title, prs) => {
+              if (prs.length === 0) return '';
+              let section = `### ${title}\n\n`;
+              prs.forEach(pr => {
+                section += `- ${pr.title} (#${pr.number})\n`;
+              });
+              return section + '\n';
+            };
+
+            let releaseNotes = `Channels: ${{ inputs.release-type }}\n\n`;
+            releaseNotes += buildSection('🚀 New Features', features);
+            releaseNotes += buildSection('🐛 Bug Fixes', fixes);
+            releaseNotes += buildSection('✨ Improvements', improvements);
+
+            // Check for native dependency changes
+            const hasAndroidUpdate = '${{ steps.native_deps.outputs.ANDROID_UPDATE }}' === 'true';
+            const hasIosUpdate = '${{ steps.native_deps.outputs.IOS_UPDATE }}' === 'true';
+
+            if (hasAndroidUpdate || hasIosUpdate) {
+              releaseNotes += '\n### 🛠️ Native Dependency Updates\n\n';
+              if (hasAndroidUpdate) {
+                releaseNotes += `- Update Android SDK from ${{ steps.native_deps.outputs.ANDROID_FROM }} to ${{ steps.native_deps.outputs.ANDROID_TO }}\n`;
+                releaseNotes += `- See [release notes](https://github.com/OneSignal/OneSignal-Android-SDK/releases) for full details\n`;
+              }
+              if (hasIosUpdate) {
+                releaseNotes += `- Update iOS SDK from ${{ steps.native_deps.outputs.IOS_FROM }} to ${{ steps.native_deps.outputs.IOS_TO }}\n`;
+                releaseNotes += `- See [release notes](https://github.com/OneSignal/OneSignal-iOS-SDK/releases) for full details\n`;
+              }
+              releaseNotes += '\n';
+            }
+
+            core.setOutput('notes', releaseNotes);
+
+      - name: Create release PR
+        run: |
+          NEW_VERSION="${{ steps.new_version.outputs.version }}"
+          RELEASE_TYPE="${{ inputs.release-type }}"
+
+          # Determine base branch based on release type
+          if [[ "$RELEASE_TYPE" == "Current" ]]; then
+            BASE_BRANCH="main"
+          else
+            BASE_BRANCH="rel/$NEW_VERSION"
+          fi
+
+          # Write release notes to file to avoid shell interpretation
+          cat > release_notes.md << 'EOF'
+          ${{ steps.release_notes.outputs.notes }}
+          EOF
+
+          gh pr create \
+            --title "Release $NEW_VERSION" \
+            --body-file release_notes.md \
+            --base "$BASE_BRANCH" \
+            --reviewer fadi-george,sherwinski,jkasten2
