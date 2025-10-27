@@ -6,12 +6,11 @@ on:
       release-type:
         description: "Release type"
         required: true
-        default: "stable"
+        default: "Current"
         type: choice
         options:
           - Current
           - Beta
-          - Alpha
 
 jobs:
   bump-version:
@@ -74,86 +73,39 @@ jobs:
 
       - name: Calculate new version
         id: new_version
+        shell: bash
         run: |
-          CURRENT="${{ steps.current_version.outputs.current }}"
-          RELEASE_TYPE="${{ inputs.release-type }}"
-          IS_FEATURE='${{ steps.get_prs.outputs.isFeature }}'
+          set -euo pipefail
+          CUR="${{ steps.current_version.outputs.current }}"
+          TYPE="${{ inputs.release-type }}"
+          IS_FEAT='${{ steps.get_prs.outputs.isFeature }}'
 
-          # Extract base version and determine current pre-release type
-          if [[ "$CURRENT" =~ -alpha\. ]]; then
-            BASE_VERSION="${CURRENT%-alpha.*}"
-            PRERELEASE_NUM="${CURRENT##*-alpha.}"
-            PRERELEASE_TYPE="alpha"
-          elif [[ "$CURRENT" =~ -beta\. ]]; then
-            BASE_VERSION="${CURRENT%-beta.*}"
-            PRERELEASE_NUM="${CURRENT##*-beta.}"
-            PRERELEASE_TYPE="beta"
-          else
-            BASE_VERSION="$CURRENT"
-            PRERELEASE_TYPE="stable"
-          fi
+          PRE=$([[ "$CUR" =~ -beta\. ]] && echo beta || echo stable)
+          INC=$([ "$IS_FEAT" = "true" ] && echo minor || echo patch)
+          BASE_NO_PRE="$(echo "$CUR" | sed 's/-.*//')"
 
-          # Helper function to bump version
-          bump_version() {
-            local base=$1
-            local is_feature=$2
-            local major=${base:0:2}
-            local minor=${base:2:2}
-            local patch=${base:4:2}
-
-            if [[ "$is_feature" == "true" ]]; then
-              minor=$(printf "%02d" $((10#$minor + 1)))
-              patch="00"
+          if [ "$TYPE" = "Beta" ]; then
+            if [ "$PRE" = "beta" ]; then
+              NEW="$(bunx semver -i prerelease --preid beta "$CUR")"
             else
-              patch=$(printf "%02d" $((10#$patch + 1)))
+              NEW="$(bunx semver -i "$INC" "$BASE_NO_PRE")-beta.1"
             fi
-
-            echo "${major}${minor}${patch}"
-          }
-
-          # Determine new version based on current and desired release types
-          if [[ "$RELEASE_TYPE" == "Alpha" ]]; then
-            if [[ "$PRERELEASE_TYPE" == "alpha" ]]; then
-              # Increment alpha number
-              NEW_VERSION="$BASE_VERSION-alpha.$((PRERELEASE_NUM + 1))"
+          elif [ "$TYPE" = "Current" ]; then
+            if [ "$PRE" = "beta" ]; then
+              NEW="$BASE_NO_PRE"              # promote beta -> stable
             else
-              # New alpha release from stable or beta
-              NEW_VERSION="$(bump_version "$BASE_VERSION" "$IS_FEATURE")-alpha.1"
-            fi
-          elif [[ "$RELEASE_TYPE" == "Beta" ]]; then
-            if [[ "$PRERELEASE_TYPE" == "beta" ]]; then
-              # Increment beta number
-              NEW_VERSION="$BASE_VERSION-beta.$((PRERELEASE_NUM + 1))"
-            elif [[ "$PRERELEASE_TYPE" == "alpha" ]]; then
-              # Promote alpha to beta
-              NEW_VERSION="$BASE_VERSION-beta.1"
-            else
-              # New beta release from stable
-              NEW_VERSION="$(bump_version "$BASE_VERSION" "$IS_FEATURE")-beta.1"
+              NEW="$(bunx semver -i "$INC" "$CUR")"
             fi
           else
-            # Release type is Current (stable)
-            if [[ "$PRERELEASE_TYPE" != "stable" ]]; then
-              # Promote pre-release to stable
-              NEW_VERSION="$BASE_VERSION"
-            else
-              # Bump stable version
-              NEW_VERSION="$(bump_version "$CURRENT" "$IS_FEATURE")"
-            fi
+            echo "release-type must be Beta or Current" >&2; exit 1
           fi
 
-          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "version=$NEW" >> "$GITHUB_OUTPUT"
 
       - name: Create release branch
         run: |
           git checkout -b rel/${{ steps.new_version.outputs.version }}
           git push -u origin rel/${{ steps.new_version.outputs.version }}
-
-      - name: Create temp branch
-        if: inputs.release-type == 'Alpha' || inputs.release-type == 'Beta'
-        run: |
-          git checkout -b release-${{ steps.new_version.outputs.version }}
-          git push -u origin release-${{ steps.new_version.outputs.version }}
 
       # Cordova specific steps
       - name: Update sdk version
@@ -165,7 +117,7 @@ jobs:
           # Convert version format for OneSignal wrapper (e.g., 5.2.15 -> 050215)
           # For pre-releases, extract base version first (e.g., 5.2.15-alpha.1 -> 5.2.15)
           BASE_VERSION=$(echo "$NEW_VERSION" | sed 's/-[a-z].*//')
-          WRAPPER_VERSION=$(echo "$BASE_VERSION" | sed 's/\.//g' | awk '{printf "%06d", $0}')
+          WRAPPER_VERSION=$(echo "$BASE_VERSION" | awk -F'.' '{printf "%02d%02d%02d", $1, $2, $3}')
 
           # Update package.json version
           npm pkg set version="$NEW_VERSION"
