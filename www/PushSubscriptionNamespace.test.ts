@@ -43,7 +43,6 @@ describe('PushSubscription', () => {
       const listener = mockExec.mock.calls.find(
         (call) => call[3] === 'addPushSubscriptionObserver',
       )?.[0];
-      console.log(listener);
       listener?.({ current: { id: SUB_ID, token: SUB_TOKEN, optedIn: true } });
       expect(pushSubscription.id).toBe(SUB_ID);
     });
@@ -66,7 +65,6 @@ describe('PushSubscription', () => {
       const listener = mockExec.mock.calls.find(
         (call) => call[3] === 'addPushSubscriptionObserver',
       )?.[0];
-      console.log(listener);
       listener?.({ current: { id: SUB_ID, token: SUB_TOKEN, optedIn: true } });
       expect(pushSubscription.token).toBe(SUB_TOKEN);
     });

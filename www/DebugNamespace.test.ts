@@ -14,48 +14,42 @@ describe('Debug', () => {
   });
 
   test.each([
-    [LogLevel.None, 'None'],
-    [LogLevel.Fatal, 'Fatal'],
-    [LogLevel.Error, 'Error'],
-    [LogLevel.Warn, 'Warn'],
-    [LogLevel.Info, 'Info'],
-    [LogLevel.Debug, 'Debug'],
-    [LogLevel.Verbose, 'Verbose'],
-  ])(
-    'should call cordova.exec for setLogLevel with %s',
-    (logLevel, levelName) => {
-      debug.setLogLevel(logLevel);
+    [LogLevel.None],
+    [LogLevel.Fatal],
+    [LogLevel.Error],
+    [LogLevel.Warn],
+    [LogLevel.Info],
+    [LogLevel.Debug],
+    [LogLevel.Verbose],
+  ])('should call cordova.exec for setLogLevel with %s', (logLevel) => {
+    debug.setLogLevel(logLevel);
 
-      expect(window.cordova.exec).toHaveBeenCalledWith(
-        expect.any(Function),
-        expect.any(Function),
-        'OneSignalPush',
-        'setLogLevel',
-        [logLevel],
-      );
-    },
-  );
+    expect(window.cordova.exec).toHaveBeenCalledWith(
+      expect.any(Function),
+      expect.any(Function),
+      'OneSignalPush',
+      'setLogLevel',
+      [logLevel],
+    );
+  });
 
   test.each([
-    [LogLevel.None, 'None'],
-    [LogLevel.Fatal, 'Fatal'],
-    [LogLevel.Error, 'Error'],
-    [LogLevel.Warn, 'Warn'],
-    [LogLevel.Info, 'Info'],
-    [LogLevel.Debug, 'Debug'],
-    [LogLevel.Verbose, 'Verbose'],
-  ])(
-    'should call cordova.exec for setAlertLevel with %s',
-    (logLevel, levelName) => {
-      debug.setAlertLevel(logLevel);
+    [LogLevel.None],
+    [LogLevel.Fatal],
+    [LogLevel.Error],
+    [LogLevel.Warn],
+    [LogLevel.Info],
+    [LogLevel.Debug],
+    [LogLevel.Verbose],
+  ])('should call cordova.exec for setAlertLevel with %s', (logLevel) => {
+    debug.setAlertLevel(logLevel);
 
-      expect(window.cordova.exec).toHaveBeenCalledWith(
-        expect.any(Function),
-        expect.any(Function),
-        'OneSignalPush',
-        'setAlertLevel',
-        [logLevel],
-      );
-    },
-  );
+    expect(window.cordova.exec).toHaveBeenCalledWith(
+      expect.any(Function),
+      expect.any(Function),
+      'OneSignalPush',
+      'setAlertLevel',
+      [logLevel],
+    );
+  });
 });

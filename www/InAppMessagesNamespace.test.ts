@@ -75,7 +75,7 @@ describe('InAppMessages', () => {
           [],
         );
 
-        // call to process listner
+        // call to process listener
         mockExec.mock.calls[0][0](data);
 
         expect(mockListener).toHaveBeenCalledWith(data);

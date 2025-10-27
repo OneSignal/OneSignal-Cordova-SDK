@@ -51,7 +51,6 @@ export default class Notifications {
     );
 
     this.addEventListener('permissionChange', (result) => {
-      console.log('permissionChange', result);
       this._permission = result;
     });
   }

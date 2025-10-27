@@ -78,7 +78,6 @@ export default class PushSubscription {
     );
 
     this.addEventListener('change', (subscriptionChange) => {
-      console.log('subscriptionChange', subscriptionChange);
       this._id = subscriptionChange.current.id;
       this._token = subscriptionChange.current.token;
       this._optedIn = subscriptionChange.current.optedIn;
