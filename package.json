@@ -24,6 +24,7 @@
     "@vitest/coverage-v8": "^4.0.2",
     "concurrently": "^9.2.1",
     "happy-dom": "^20.0.8",
+    "oxlint": "^1.24.0",
     "prettier": "^3.6.2",
     "typescript": "^5.9.3",
     "vite": "^7.1.12",
