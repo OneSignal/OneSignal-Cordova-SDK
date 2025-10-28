@@ -106,7 +106,10 @@ export default class InAppMessages {
         const didDisplayCallBackProcessor = (
           event: InAppMessageDidDisplayEvent,
         ) => {
-          this._processFunctionList(this._didDisplayInAppMessageListeners, event);
+          this._processFunctionList(
+            this._didDisplayInAppMessageListeners,
+            event,
+          );
         };
         window.cordova.exec(
           didDisplayCallBackProcessor,
@@ -151,7 +154,10 @@ export default class InAppMessages {
         const didDismissInAppMessageCallBackProcessor = (
           event: InAppMessageDidDismissEvent,
         ) => {
-          this._processFunctionList(this._didDismissInAppMessageListeners, event);
+          this._processFunctionList(
+            this._didDismissInAppMessageListeners,
+            event,
+          );
         };
         window.cordova.exec(
           didDismissInAppMessageCallBackProcessor,
