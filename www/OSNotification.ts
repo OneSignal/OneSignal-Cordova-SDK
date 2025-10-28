@@ -1,11 +1,15 @@
 import { noop } from './helpers';
 
+export type ReceivedEvent = Omit<OSNotification, 'display' | 'rawPayload'> & {
+  rawPayload: string | object;
+};
+
 export class OSNotification {
   body: string;
   sound?: string;
   title?: string;
   launchURL?: string;
-  rawPayload: string | object;
+  rawPayload: string;
   actionButtons?: object[];
   additionalData: object;
   notificationId: string;
@@ -37,7 +41,7 @@ export class OSNotification {
   relevanceScore?: number;
   interruptionLevel?: string;
 
-  constructor(receivedEvent: Omit<OSNotification, 'display'>) {
+  constructor(receivedEvent: ReceivedEvent) {
     /// The OneSignal notification ID for this notification
     this.notificationId = receivedEvent.notificationId;
 
@@ -56,6 +60,7 @@ export class OSNotification {
     if (typeof receivedEvent.rawPayload === 'string') {
       this.rawPayload = JSON.parse(receivedEvent.rawPayload);
     } else {
+      // @ts-expect-error - rawPayload is an object but will update typings in the future
       this.rawPayload = receivedEvent.rawPayload;
     }
 

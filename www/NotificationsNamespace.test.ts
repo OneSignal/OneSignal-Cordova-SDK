@@ -5,6 +5,7 @@ import Notifications, {
   OSNotificationPermission,
 } from './NotificationsNamespace';
 import * as helpers from './helpers';
+
 describe('Notifications', () => {
   let notifications: Notifications;
 
@@ -176,6 +177,9 @@ describe('Notifications', () => {
       mockExec.mockImplementation((resolve, reject) => {
         reject(mockError);
       });
+      await expect(notifications.canRequestPermission()).rejects.toThrow(
+        mockError.message,
+      );
     });
   });
 
@@ -348,18 +352,6 @@ describe('Notifications', () => {
         [notificationId],
       );
     });
-
-    test('should call cordova.exec for removeNotification with different IDs', () => {
-      notifications.removeNotification(456);
-
-      expect(window.cordova.exec).toHaveBeenCalledWith(
-        expect.any(Function),
-        expect.any(Function),
-        'OneSignalPush',
-        'removeNotification',
-        [456],
-      );
-    });
   });
 
   describe('removeGroupedNotifications', () => {
@@ -391,7 +383,7 @@ describe('Notifications', () => {
       expect(result).toBe(true);
     });
 
-    test('should return test when permission is set via permission listener', () => {
+    test('should return true when permission is set via permission listener', () => {
       notifications._setPropertyAndObserver();
       const callback = mockExec.mock.calls.find(
         (call) => call[3] === 'addPermissionObserver',

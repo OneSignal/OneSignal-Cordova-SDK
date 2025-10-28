@@ -217,7 +217,7 @@ describe('PushSubscription', () => {
   });
 
   describe('addEventListener', () => {
-    test('should add listener to observer list and call cordova.exec', () => {
+    test('add listener should call cordova.exec', () => {
       const mockListener = vi.fn();
 
       pushSubscription.addEventListener('change', mockListener);

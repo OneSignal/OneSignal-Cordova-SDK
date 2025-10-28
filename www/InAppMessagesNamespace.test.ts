@@ -7,6 +7,7 @@ import type {
   InAppMessageDidDisplayEvent,
   InAppMessageWillDisplayEvent,
 } from './types/InAppMessage';
+
 describe('InAppMessages', () => {
   let inAppMessages: InAppMessages;
 

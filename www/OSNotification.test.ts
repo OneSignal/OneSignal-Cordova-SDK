@@ -1,8 +1,7 @@
 import { mockCordova } from '../mocks/cordova';
-import { OSNotification } from './OSNotification';
+import { OSNotification, type ReceivedEvent } from './OSNotification';
 
-type RequireOptional<T> = Required<T>;
-type AllProperties = RequireOptional<Omit<OSNotification, 'display'>>;
+type AllProperties = Required<Omit<ReceivedEvent, 'display'>>;
 
 describe('OSNotification', () => {
   beforeEach(() => {
