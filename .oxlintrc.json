@@ -1,10 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": [
-    "unicorn",
-    "typescript",
-    "oxc"
-  ],
+  "plugins": ["unicorn", "typescript", "oxc"],
   "categories": {},
   "rules": {
     "for-direction": "warn",
@@ -50,7 +46,7 @@
     "no-unused-expressions": "warn",
     "no-unused-labels": "warn",
     "no-unused-private-class-members": "warn",
-    "no-unused-vars": "warn",
+    "no-unused-vars": "error",
     "no-useless-backreference": "warn",
     "no-useless-catch": "warn",
     "no-useless-escape": "warn",

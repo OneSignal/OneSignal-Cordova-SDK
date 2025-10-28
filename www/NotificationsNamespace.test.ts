@@ -20,7 +20,7 @@ describe('Notifications', () => {
 
   describe('getPermissionAsync', () => {
     test('should return a Promise and call cordova.exec for getPermissionAsync', () => {
-      mockExec.mockImplementation((resolve, reject) => {
+      mockExec.mockImplementation((resolve) => {
         resolve(true);
       });
 
@@ -38,7 +38,7 @@ describe('Notifications', () => {
     });
 
     test('should resolve Promise when cordova.exec succeeds', async () => {
-      mockExec.mockImplementation((resolve, reject) => {
+      mockExec.mockImplementation((resolve) => {
         resolve(true);
       });
 
@@ -50,7 +50,7 @@ describe('Notifications', () => {
     test('should reject Promise when cordova.exec fails', async () => {
       const mockError = new Error('Permission check failed');
 
-      mockExec.mockImplementation((resolve, reject) => {
+      mockExec.mockImplementation((_resolve, reject) => {
         reject(mockError);
       });
 
@@ -62,7 +62,7 @@ describe('Notifications', () => {
 
   describe('permissionNative', () => {
     test('should return a Promise and call cordova.exec for permissionNative', () => {
-      mockExec.mockImplementation((resolve, reject) => {
+      mockExec.mockImplementation((resolve) => {
         resolve(OSNotificationPermission.Authorized);
       });
 
@@ -81,7 +81,7 @@ describe('Notifications', () => {
     });
 
     test('should resolve with OSNotificationPermission enum value', async () => {
-      mockExec.mockImplementation((resolve, reject) => {
+      mockExec.mockImplementation((resolve) => {
         resolve(OSNotificationPermission.Authorized);
       });
 
@@ -93,7 +93,7 @@ describe('Notifications', () => {
     test('should reject Promise when cordova.exec fails', async () => {
       const mockError = new Error('Permission check failed');
 
-      mockExec.mockImplementation((resolve, reject) => {
+      mockExec.mockImplementation((_resolve, reject) => {
         reject(mockError);
       });
       await expect(notifications.permissionNative()).rejects.toThrow(
@@ -106,7 +106,7 @@ describe('Notifications', () => {
     test.each([[true], [false]])(
       'should call cordova.exec for requestPermission with fallbackToSettings %s',
       async (fallback) => {
-        mockExec.mockImplementation((resolve, reject) => {
+        mockExec.mockImplementation((resolve) => {
           resolve(true);
         });
 
@@ -123,7 +123,7 @@ describe('Notifications', () => {
     );
 
     test('should use default fallbackToSettings of false when not provided', () => {
-      mockExec.mockImplementation((resolve, reject) => {
+      mockExec.mockImplementation((resolve) => {
         resolve(true);
       });
 
@@ -143,7 +143,7 @@ describe('Notifications', () => {
 
   describe('canRequestPermission', () => {
     test('should return a Promise and call cordova.exec for canRequestPermission', () => {
-      mockExec.mockImplementation((resolve, reject) => {
+      mockExec.mockImplementation((resolve) => {
         resolve(true);
       });
 
@@ -162,7 +162,7 @@ describe('Notifications', () => {
     });
 
     test('should resolve with boolean value', async () => {
-      mockExec.mockImplementation((resolve, reject) => {
+      mockExec.mockImplementation((resolve) => {
         resolve(false);
       });
 

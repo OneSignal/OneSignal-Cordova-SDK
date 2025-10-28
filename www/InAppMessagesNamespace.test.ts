@@ -253,7 +253,7 @@ describe('InAppMessages', () => {
     });
 
     test('should resolve Promise when cordova.exec succeeds', async () => {
-      mockExec.mockImplementation((resolve, reject) => {
+      mockExec.mockImplementation((resolve) => {
         resolve(true);
       });
 
