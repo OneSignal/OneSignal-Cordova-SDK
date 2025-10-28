@@ -1,3 +1,4 @@
+import { noop, removeListener } from './helpers';
 import PushSubscription from './PushSubscriptionNamespace';
 
 // Represents the current user state
@@ -31,13 +32,7 @@ export default class User {
    * @returns void
    */
   setLanguage(language: string): void {
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'setLanguage',
-      [language],
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'setLanguage', [language]);
   }
 
   /**
@@ -52,13 +47,9 @@ export default class User {
    */
   addAlias(label: string, id: string): void {
     const jsonKeyValue = { [label]: id };
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'addAliases',
-      [jsonKeyValue],
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'addAliases', [
+      jsonKeyValue,
+    ]);
   }
 
   /**
@@ -67,13 +58,7 @@ export default class User {
    * @returns void
    */
   addAliases(aliases: object): void {
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'addAliases',
-      [aliases],
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'addAliases', [aliases]);
   }
 
   /**
@@ -82,13 +67,7 @@ export default class User {
    * @returns void
    */
   removeAlias(label: string): void {
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'removeAliases',
-      [label],
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'removeAliases', [label]);
   }
 
   /**
@@ -97,13 +76,7 @@ export default class User {
    * @returns void
    */
   removeAliases(labels: string[]): void {
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'removeAliases',
-      labels,
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'removeAliases', labels);
   }
 
   /**
@@ -116,13 +89,7 @@ export default class User {
    * @returns void
    */
   addEmail(email: string): void {
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'addEmail',
-      [email],
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'addEmail', [email]);
   }
 
   /**
@@ -131,13 +98,7 @@ export default class User {
    * @returns void
    */
   removeEmail(email: string): void {
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'removeEmail',
-      [email],
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'removeEmail', [email]);
   }
 
   /**
@@ -150,13 +111,7 @@ export default class User {
    * @returns void
    */
   addSms(smsNumber: string): void {
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'addSms',
-      [smsNumber],
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'addSms', [smsNumber]);
   }
 
   /**
@@ -165,13 +120,7 @@ export default class User {
    * @returns void
    */
   removeSms(smsNumber: string): void {
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'removeSms',
-      [smsNumber],
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'removeSms', [smsNumber]);
   }
 
   /**
@@ -186,13 +135,7 @@ export default class User {
    */
   addTag(key: string, value: string): void {
     const jsonKeyValue = { [key]: value };
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'addTags',
-      [jsonKeyValue],
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'addTags', [jsonKeyValue]);
   }
 
   /**
@@ -208,13 +151,9 @@ export default class User {
         convertedTags[key] = JSON.stringify(convertedTags[key]);
       }
     });
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'addTags',
-      [convertedTags],
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'addTags', [
+      convertedTags,
+    ]);
   }
 
   /**
@@ -223,13 +162,7 @@ export default class User {
    * @returns void
    */
   removeTag(key: string): void {
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'removeTags',
-      [key],
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'removeTags', [key]);
   }
 
   /**
@@ -238,13 +171,7 @@ export default class User {
    * @returns void
    */
   removeTags(keys: string[]): void {
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'removeTags',
-      keys,
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'removeTags', keys);
   }
 
   /** Returns the local tags for the current user.
@@ -274,7 +201,7 @@ export default class User {
     };
     window.cordova.exec(
       userCallBackProcessor,
-      function () {},
+      noop,
       'OneSignalPush',
       'addUserStateObserver',
       [],
@@ -290,17 +217,14 @@ export default class User {
     event: 'change',
     listener: (event: UserChangedState) => void,
   ) {
-    let index = this._userStateObserverList.indexOf(listener);
-    if (index !== -1) {
-      this._userStateObserverList.splice(index, 1);
-    }
+    removeListener(this._userStateObserverList, listener);
   }
 
   /**
    * Get the nullable OneSignal Id associated with the current user.
    * @returns {Promise<string | null>}
    */
-  async getOnesignalId(): Promise<string | null> {
+  getOnesignalId(): Promise<string | null> {
     return new Promise<string | null>((resolve, reject) => {
       window.cordova.exec(
         resolve,
@@ -316,7 +240,7 @@ export default class User {
    * Get the nullable External Id associated with the current user.
    * @returns {Promise<string | null>}
    */
-  async getExternalId(): Promise<string | null> {
+  getExternalId(): Promise<string | null> {
     return new Promise<string | null>((resolve, reject) => {
       window.cordova.exec(
         resolve,

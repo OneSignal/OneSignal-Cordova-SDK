@@ -25,6 +25,7 @@
  * THE SOFTWARE.
  */
 import Debug from './DebugNamespace';
+import { noop } from './helpers';
 import InAppMessages from './InAppMessagesNamespace';
 import LiveActivities from './LiveActivitiesNamespace';
 import Location from './LocationNamespace';
@@ -64,13 +65,9 @@ export class OneSignalPlugin {
       this.Notifications._setPropertyAndObserver();
     };
 
-    window.cordova.exec(
-      observerCallback,
-      function () {},
-      'OneSignalPush',
-      'init',
-      [this._appID],
-    );
+    window.cordova.exec(observerCallback, noop, 'OneSignalPush', 'init', [
+      this._appID,
+    ]);
   }
 
   /**
@@ -79,13 +76,7 @@ export class OneSignalPlugin {
    * @returns void
    */
   login(externalId: string): void {
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'login',
-      [externalId],
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'login', [externalId]);
   }
 
   /**
@@ -94,12 +85,7 @@ export class OneSignalPlugin {
    * @returns void
    */
   logout(): void {
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'logout',
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'logout');
   }
 
   /**
@@ -109,8 +95,8 @@ export class OneSignalPlugin {
    */
   setConsentRequired(required: boolean): void {
     window.cordova.exec(
-      function () {},
-      function () {},
+      noop,
+      noop,
       'OneSignalPush',
       'setPrivacyConsentRequired',
       [required],
@@ -123,13 +109,9 @@ export class OneSignalPlugin {
    * @returns void
    */
   setConsentGiven(granted: boolean): void {
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'setPrivacyConsentGiven',
-      [granted],
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'setPrivacyConsentGiven', [
+      granted,
+    ]);
   }
 }
 
@@ -158,7 +140,7 @@ export type {
 export type {
   NotificationClickEvent,
   NotificationClickResult,
-} from './models/NotificationClicked';
+} from './types/NotificationClicked';
 
 export type {
   InAppMessageActionUrlType,
@@ -169,7 +151,7 @@ export type {
   InAppMessageWillDismissEvent,
   InAppMessageWillDisplayEvent,
   OSInAppMessage,
-} from './models/InAppMessage';
+} from './types/InAppMessage';
 
 export type { UserChangedState, UserState } from './UserNamespace';
 

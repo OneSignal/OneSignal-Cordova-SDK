@@ -1,3 +1,5 @@
+import { noop } from './helpers';
+
 export default class Session {
   /**
    * Outcomes
@@ -9,13 +11,7 @@ export default class Session {
    * @returns void
    */
   addOutcome(name: string): void {
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'addOutcome',
-      [name],
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'addOutcome', [name]);
   }
 
   /**
@@ -24,13 +20,9 @@ export default class Session {
    * @returns void
    */
   addUniqueOutcome(name: string): void {
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'addUniqueOutcome',
-      [name],
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'addUniqueOutcome', [
+      name,
+    ]);
   }
 
   /**
@@ -40,12 +32,9 @@ export default class Session {
    * @returns void
    */
   addOutcomeWithValue(name: string, value: number): void {
-    window.cordova.exec(
-      function () {},
-      function () {},
-      'OneSignalPush',
-      'addOutcomeWithValue',
-      [name, value],
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'addOutcomeWithValue', [
+      name,
+      value,
+    ]);
   }
 }
