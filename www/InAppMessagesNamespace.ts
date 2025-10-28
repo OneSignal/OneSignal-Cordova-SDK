@@ -26,6 +26,13 @@ export default class InAppMessages {
     event: InAppMessageDidDismissEvent,
   ) => void)[] = [];
 
+  // Track whether native handlers have been registered to avoid duplicate registrations
+  private _clickHandlerRegistered = false;
+  private _willDisplayHandlerRegistered = false;
+  private _didDisplayHandlerRegistered = false;
+  private _willDismissHandlerRegistered = false;
+  private _didDismissHandlerRegistered = false;
+
   private _processFunctionList<T>(
     array: ((event: T) => void)[],
     param: T,
@@ -49,86 +56,111 @@ export default class InAppMessages {
       this._inAppMessageClickListeners.push(
         listener as (event: InAppMessageClickEvent) => void,
       );
-      const inAppMessageClickListener = (json: InAppMessageClickEvent) => {
-        this._processFunctionList(this._inAppMessageClickListeners, json);
-      };
-      window.cordova.exec(
-        inAppMessageClickListener,
-        noop,
-        'OneSignalPush',
-        'setInAppMessageClickHandler',
-        [],
-      );
+
+      // Only register the native handler once
+      if (!this._clickHandlerRegistered) {
+        this._clickHandlerRegistered = true;
+        const inAppMessageClickListener = (json: InAppMessageClickEvent) => {
+          this._processFunctionList(this._inAppMessageClickListeners, json);
+        };
+        window.cordova.exec(
+          inAppMessageClickListener,
+          noop,
+          'OneSignalPush',
+          'setInAppMessageClickHandler',
+          [],
+        );
+      }
     } else if (event === 'willDisplay') {
       this._willDisplayInAppMessageListeners.push(
         listener as (event: InAppMessageWillDisplayEvent) => void,
       );
-      const willDisplayCallBackProcessor = (
-        event: InAppMessageWillDisplayEvent,
-      ) => {
-        this._processFunctionList(
-          this._willDisplayInAppMessageListeners,
-          event,
+
+      // Only register the native handler once
+      if (!this._willDisplayHandlerRegistered) {
+        this._willDisplayHandlerRegistered = true;
+        const willDisplayCallBackProcessor = (
+          event: InAppMessageWillDisplayEvent,
+        ) => {
+          this._processFunctionList(
+            this._willDisplayInAppMessageListeners,
+            event,
+          );
+        };
+        window.cordova.exec(
+          willDisplayCallBackProcessor,
+          noop,
+          'OneSignalPush',
+          'setOnWillDisplayInAppMessageHandler',
+          [],
         );
-      };
-      window.cordova.exec(
-        willDisplayCallBackProcessor,
-        noop,
-        'OneSignalPush',
-        'setOnWillDisplayInAppMessageHandler',
-        [],
-      );
+      }
     } else if (event === 'didDisplay') {
       this._didDisplayInAppMessageListeners.push(
         listener as (event: InAppMessageDidDisplayEvent) => void,
       );
-      const didDisplayCallBackProcessor = (
-        event: InAppMessageDidDisplayEvent,
-      ) => {
-        this._processFunctionList(this._didDisplayInAppMessageListeners, event);
-      };
-      window.cordova.exec(
-        didDisplayCallBackProcessor,
-        noop,
-        'OneSignalPush',
-        'setOnDidDisplayInAppMessageHandler',
-        [],
-      );
+
+      // Only register the native handler once
+      if (!this._didDisplayHandlerRegistered) {
+        this._didDisplayHandlerRegistered = true;
+        const didDisplayCallBackProcessor = (
+          event: InAppMessageDidDisplayEvent,
+        ) => {
+          this._processFunctionList(this._didDisplayInAppMessageListeners, event);
+        };
+        window.cordova.exec(
+          didDisplayCallBackProcessor,
+          noop,
+          'OneSignalPush',
+          'setOnDidDisplayInAppMessageHandler',
+          [],
+        );
+      }
     } else if (event === 'willDismiss') {
       this._willDismissInAppMessageListeners.push(
         listener as (event: InAppMessageWillDismissEvent) => void,
       );
-      const willDismissInAppMessageProcessor = (
-        event: InAppMessageWillDismissEvent,
-      ) => {
-        this._processFunctionList(
-          this._willDismissInAppMessageListeners,
-          event,
+
+      // Only register the native handler once
+      if (!this._willDismissHandlerRegistered) {
+        this._willDismissHandlerRegistered = true;
+        const willDismissInAppMessageProcessor = (
+          event: InAppMessageWillDismissEvent,
+        ) => {
+          this._processFunctionList(
+            this._willDismissInAppMessageListeners,
+            event,
+          );
+        };
+        window.cordova.exec(
+          willDismissInAppMessageProcessor,
+          noop,
+          'OneSignalPush',
+          'setOnWillDismissInAppMessageHandler',
+          [],
         );
-      };
-      window.cordova.exec(
-        willDismissInAppMessageProcessor,
-        noop,
-        'OneSignalPush',
-        'setOnWillDismissInAppMessageHandler',
-        [],
-      );
+      }
     } else if (event === 'didDismiss') {
       this._didDismissInAppMessageListeners.push(
         listener as (event: InAppMessageDidDismissEvent) => void,
       );
-      const didDismissInAppMessageCallBackProcessor = (
-        event: InAppMessageDidDismissEvent,
-      ) => {
-        this._processFunctionList(this._didDismissInAppMessageListeners, event);
-      };
-      window.cordova.exec(
-        didDismissInAppMessageCallBackProcessor,
-        noop,
-        'OneSignalPush',
-        'setOnDidDismissInAppMessageHandler',
-        [],
-      );
+
+      // Only register the native handler once
+      if (!this._didDismissHandlerRegistered) {
+        this._didDismissHandlerRegistered = true;
+        const didDismissInAppMessageCallBackProcessor = (
+          event: InAppMessageDidDismissEvent,
+        ) => {
+          this._processFunctionList(this._didDismissInAppMessageListeners, event);
+        };
+        window.cordova.exec(
+          didDismissInAppMessageCallBackProcessor,
+          noop,
+          'OneSignalPush',
+          'setOnDidDismissInAppMessageHandler',
+          [],
+        );
+      }
     }
   }
 

@@ -17,6 +17,9 @@ export default class User {
 
   private _userStateObserverList: ((event: UserChangedState) => void)[] = [];
 
+  // Track whether native handler has been registered to avoid duplicate registrations
+  private _changeHandlerRegistered = false;
+
   private _processFunctionList(
     array: ((event: UserChangedState) => void)[],
     param: UserChangedState,
@@ -196,16 +199,21 @@ export default class User {
     this._userStateObserverList.push(
       listener as (event: UserChangedState) => void,
     );
-    const userCallBackProcessor = (state: UserChangedState) => {
-      this._processFunctionList(this._userStateObserverList, state);
-    };
-    window.cordova.exec(
-      userCallBackProcessor,
-      noop,
-      'OneSignalPush',
-      'addUserStateObserver',
-      [],
-    );
+
+    // Only register the native handler once
+    if (!this._changeHandlerRegistered) {
+      this._changeHandlerRegistered = true;
+      const userCallBackProcessor = (state: UserChangedState) => {
+        this._processFunctionList(this._userStateObserverList, state);
+      };
+      window.cordova.exec(
+        userCallBackProcessor,
+        noop,
+        'OneSignalPush',
+        'addUserStateObserver',
+        [],
+      );
+    }
   }
 
   /**

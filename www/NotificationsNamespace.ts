@@ -24,6 +24,11 @@ export default class Notifications {
     event: NotificationWillDisplayEvent,
   ) => void)[] = [];
 
+  // Track whether native handlers have been registered to avoid duplicate registrations
+  private _clickHandlerRegistered = false;
+  private _foregroundWillDisplayHandlerRegistered = false;
+  private _permissionChangeHandlerRegistered = false;
+
   private _processFunctionList<T>(
     array: ((event: T) => void)[],
     param: T,
@@ -177,51 +182,66 @@ export default class Notifications {
       this._notificationClickedListeners.push(
         listener as (event: NotificationClickEvent) => void,
       );
-      const clickParsingHandler = (json: NotificationClickEvent) => {
-        this._processFunctionList(this._notificationClickedListeners, json);
-      };
-      window.cordova.exec(
-        clickParsingHandler,
-        noop,
-        'OneSignalPush',
-        'addNotificationClickListener',
-        [],
-      );
+
+      // Only register the native handler once
+      if (!this._clickHandlerRegistered) {
+        this._clickHandlerRegistered = true;
+        const clickParsingHandler = (json: NotificationClickEvent) => {
+          this._processFunctionList(this._notificationClickedListeners, json);
+        };
+        window.cordova.exec(
+          clickParsingHandler,
+          noop,
+          'OneSignalPush',
+          'addNotificationClickListener',
+          [],
+        );
+      }
     } else if (event === 'foregroundWillDisplay') {
       this._notificationWillDisplayListeners.push(
         listener as (event: NotificationWillDisplayEvent) => void,
       );
-      const foregroundParsingHandler = (notification: OSNotification) => {
-        this._notificationWillDisplayListeners.forEach((listener) => {
-          listener(new NotificationWillDisplayEvent(notification));
-        });
+
+      // Only register the native handler once
+      if (!this._foregroundWillDisplayHandlerRegistered) {
+        this._foregroundWillDisplayHandlerRegistered = true;
+        const foregroundParsingHandler = (notification: OSNotification) => {
+          this._notificationWillDisplayListeners.forEach((listener) => {
+            listener(new NotificationWillDisplayEvent(notification));
+          });
+          window.cordova.exec(
+            noop,
+            noop,
+            'OneSignalPush',
+            'proceedWithWillDisplay',
+            [notification.notificationId],
+          );
+        };
         window.cordova.exec(
-          noop,
+          foregroundParsingHandler,
           noop,
           'OneSignalPush',
-          'proceedWithWillDisplay',
-          [notification.notificationId],
+          'addForegroundLifecycleListener',
+          [],
         );
-      };
-      window.cordova.exec(
-        foregroundParsingHandler,
-        noop,
-        'OneSignalPush',
-        'addForegroundLifecycleListener',
-        [],
-      );
+      }
     } else if (event === 'permissionChange') {
       this._permissionObserverList.push(listener as (event: boolean) => void);
-      const permissionCallBackProcessor = (state: boolean) => {
-        this._processFunctionList(this._permissionObserverList, state);
-      };
-      window.cordova.exec(
-        permissionCallBackProcessor,
-        noop,
-        'OneSignalPush',
-        'addPermissionObserver',
-        [],
-      );
+
+      // Only register the native handler once
+      if (!this._permissionChangeHandlerRegistered) {
+        this._permissionChangeHandlerRegistered = true;
+        const permissionCallBackProcessor = (state: boolean) => {
+          this._processFunctionList(this._permissionObserverList, state);
+        };
+        window.cordova.exec(
+          permissionCallBackProcessor,
+          noop,
+          'OneSignalPush',
+          'addPermissionObserver',
+          [],
+        );
+      }
     }
   }
 
