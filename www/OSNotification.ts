@@ -9,7 +9,7 @@ export class OSNotification {
   sound?: string;
   title?: string;
   launchURL?: string;
-  rawPayload: string;
+  rawPayload: object;
   actionButtons?: object[];
   additionalData: object;
   notificationId: string;
@@ -60,7 +60,6 @@ export class OSNotification {
     if (typeof receivedEvent.rawPayload === 'string') {
       this.rawPayload = JSON.parse(receivedEvent.rawPayload);
     } else {
-      // @ts-expect-error - rawPayload is an object but will update typings in the future
       this.rawPayload = receivedEvent.rawPayload;
     }
 
