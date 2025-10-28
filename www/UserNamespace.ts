@@ -17,6 +17,9 @@ export default class User {
 
   private _userStateObserverList: ((event: UserChangedState) => void)[] = [];
 
+  // Track whether native handler has been registered to avoid duplicate registrations
+  private _changeHandlerRegistered = false;
+
   private _processFunctionList(
     array: ((event: UserChangedState) => void)[],
     param: UserChangedState,
@@ -47,7 +50,9 @@ export default class User {
    */
   addAlias(label: string, id: string): void {
     const jsonKeyValue = { [label]: id };
-    window.cordova.exec(noop, noop, 'OneSignalPush', 'addAliases', [jsonKeyValue]);
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'addAliases', [
+      jsonKeyValue,
+    ]);
   }
 
   /**
@@ -149,7 +154,9 @@ export default class User {
         convertedTags[key] = JSON.stringify(convertedTags[key]);
       }
     });
-    window.cordova.exec(noop, noop, 'OneSignalPush', 'addTags', [convertedTags]);
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'addTags', [
+      convertedTags,
+    ]);
   }
 
   /**
@@ -185,12 +192,28 @@ export default class User {
    * @param  {(event: UserChangedState)=>void} listener
    * @returns void
    */
-  addEventListener(event: 'change', listener: (event: UserChangedState) => void) {
-    this._userStateObserverList.push(listener as (event: UserChangedState) => void);
-    const userCallBackProcessor = (state: UserChangedState) => {
-      this._processFunctionList(this._userStateObserverList, state);
-    };
-    window.cordova.exec(userCallBackProcessor, noop, 'OneSignalPush', 'addUserStateObserver', []);
+  addEventListener(
+    event: 'change',
+    listener: (event: UserChangedState) => void,
+  ) {
+    this._userStateObserverList.push(
+      listener as (event: UserChangedState) => void,
+    );
+
+    // Only register the native handler once
+    if (!this._changeHandlerRegistered) {
+      this._changeHandlerRegistered = true;
+      const userCallBackProcessor = (state: UserChangedState) => {
+        this._processFunctionList(this._userStateObserverList, state);
+      };
+      window.cordova.exec(
+        userCallBackProcessor,
+        noop,
+        'OneSignalPush',
+        'addUserStateObserver',
+        [],
+      );
+    }
   }
 
   /**
@@ -198,7 +221,10 @@ export default class User {
    * @param  {(event: UserChangedState)=>void} listener
    * @returns void
    */
-  removeEventListener(event: 'change', listener: (event: UserChangedState) => void) {
+  removeEventListener(
+    event: 'change',
+    listener: (event: UserChangedState) => void,
+  ) {
     removeListener(this._userStateObserverList, listener);
   }
 
@@ -208,7 +234,13 @@ export default class User {
    */
   getOnesignalId(): Promise<string | null> {
     return new Promise<string | null>((resolve, reject) => {
-      window.cordova.exec(resolve, reject, 'OneSignalPush', 'getOnesignalId', []);
+      window.cordova.exec(
+        resolve,
+        reject,
+        'OneSignalPush',
+        'getOnesignalId',
+        [],
+      );
     });
   }
 
@@ -218,7 +250,13 @@ export default class User {
    */
   getExternalId(): Promise<string | null> {
     return new Promise<string | null>((resolve, reject) => {
-      window.cordova.exec(resolve, reject, 'OneSignalPush', 'getExternalId', []);
+      window.cordova.exec(
+        resolve,
+        reject,
+        'OneSignalPush',
+        'getExternalId',
+        [],
+      );
     });
   }
 
