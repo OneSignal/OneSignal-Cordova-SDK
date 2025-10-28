@@ -17,9 +17,7 @@ export default class PushSubscription {
   private _token?: string | null;
   private _optedIn?: boolean;
 
-  private _subscriptionObserverList: ((
-    event: PushSubscriptionChangedState,
-  ) => void)[] = [];
+  private _subscriptionObserverList: ((event: PushSubscriptionChangedState) => void)[] = [];
 
   // Track whether native handler has been registered to avoid duplicate registrations
   private _changeHandlerRegistered = false;
@@ -45,12 +43,7 @@ export default class PushSubscription {
     const getIdCallback = (id: string) => {
       this._id = id;
     };
-    window.cordova.exec(
-      getIdCallback,
-      noop,
-      'OneSignalPush',
-      'getPushSubscriptionId',
-    );
+    window.cordova.exec(getIdCallback, noop, 'OneSignalPush', 'getPushSubscriptionId');
 
     /**
      * Receive token
@@ -59,12 +52,7 @@ export default class PushSubscription {
     const getTokenCallback = (token: string) => {
       this._token = token;
     };
-    window.cordova.exec(
-      getTokenCallback,
-      noop,
-      'OneSignalPush',
-      'getPushSubscriptionToken',
-    );
+    window.cordova.exec(getTokenCallback, noop, 'OneSignalPush', 'getPushSubscriptionToken');
 
     /**
      * Receive opted-in status
@@ -73,12 +61,7 @@ export default class PushSubscription {
     const getOptedInCallback = (granted: boolean) => {
       this._optedIn = granted;
     };
-    window.cordova.exec(
-      getOptedInCallback,
-      noop,
-      'OneSignalPush',
-      'getPushSubscriptionOptedIn',
-    );
+    window.cordova.exec(getOptedInCallback, noop, 'OneSignalPush', 'getPushSubscriptionOptedIn');
 
     this.addEventListener('change', (subscriptionChange) => {
       console.log('subscriptionChange', subscriptionChange);
@@ -124,12 +107,7 @@ export default class PushSubscription {
    */
   getIdAsync(): Promise<string | null> {
     return new Promise<string | null>((resolve, reject) => {
-      window.cordova.exec(
-        resolve,
-        reject,
-        'OneSignalPush',
-        'getPushSubscriptionId',
-      );
+      window.cordova.exec(resolve, reject, 'OneSignalPush', 'getPushSubscriptionId');
     });
   }
 
@@ -139,12 +117,7 @@ export default class PushSubscription {
    */
   getTokenAsync(): Promise<string | null> {
     return new Promise<string | null>((resolve, reject) => {
-      window.cordova.exec(
-        resolve,
-        reject,
-        'OneSignalPush',
-        'getPushSubscriptionToken',
-      );
+      window.cordova.exec(resolve, reject, 'OneSignalPush', 'getPushSubscriptionToken');
     });
   }
 
@@ -157,12 +130,7 @@ export default class PushSubscription {
    */
   getOptedInAsync(): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
-      window.cordova.exec(
-        resolve,
-        reject,
-        'OneSignalPush',
-        'getPushSubscriptionOptedIn',
-      );
+      window.cordova.exec(resolve, reject, 'OneSignalPush', 'getPushSubscriptionOptedIn');
     });
   }
 
@@ -171,20 +139,13 @@ export default class PushSubscription {
    * @param  {(event: PushSubscriptionChangedState)=>void} listener
    * @returns void
    */
-  addEventListener(
-    event: 'change',
-    listener: (event: PushSubscriptionChangedState) => void,
-  ) {
-    this._subscriptionObserverList.push(
-      listener as (event: PushSubscriptionChangedState) => void,
-    );
+  addEventListener(event: 'change', listener: (event: PushSubscriptionChangedState) => void) {
+    this._subscriptionObserverList.push(listener as (event: PushSubscriptionChangedState) => void);
 
     // Only register the native handler once
     if (!this._changeHandlerRegistered) {
       this._changeHandlerRegistered = true;
-      const subscriptionCallBackProcessor = (
-        state: PushSubscriptionChangedState,
-      ) => {
+      const subscriptionCallBackProcessor = (state: PushSubscriptionChangedState) => {
         this._processFunctionList(this._subscriptionObserverList, state);
       };
       window.cordova.exec(
@@ -202,10 +163,7 @@ export default class PushSubscription {
    * @param  {(event: PushSubscriptionChangedState)=>void} listener
    * @returns void
    */
-  removeEventListener(
-    event: 'change',
-    listener: (event: PushSubscriptionChangedState) => void,
-  ) {
+  removeEventListener(event: 'change', listener: (event: PushSubscriptionChangedState) => void) {
     removeListener(this._subscriptionObserverList, listener);
   }
 

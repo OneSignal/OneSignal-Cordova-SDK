@@ -10,21 +10,11 @@ import type {
 } from './types/InAppMessage';
 
 export default class InAppMessages {
-  private _inAppMessageClickListeners: ((
-    action: InAppMessageClickEvent,
-  ) => void)[] = [];
-  private _willDisplayInAppMessageListeners: ((
-    event: InAppMessageWillDisplayEvent,
-  ) => void)[] = [];
-  private _didDisplayInAppMessageListeners: ((
-    event: InAppMessageDidDisplayEvent,
-  ) => void)[] = [];
-  private _willDismissInAppMessageListeners: ((
-    event: InAppMessageWillDismissEvent,
-  ) => void)[] = [];
-  private _didDismissInAppMessageListeners: ((
-    event: InAppMessageDidDismissEvent,
-  ) => void)[] = [];
+  private _inAppMessageClickListeners: ((action: InAppMessageClickEvent) => void)[] = [];
+  private _willDisplayInAppMessageListeners: ((event: InAppMessageWillDisplayEvent) => void)[] = [];
+  private _didDisplayInAppMessageListeners: ((event: InAppMessageDidDisplayEvent) => void)[] = [];
+  private _willDismissInAppMessageListeners: ((event: InAppMessageWillDismissEvent) => void)[] = [];
+  private _didDismissInAppMessageListeners: ((event: InAppMessageDidDismissEvent) => void)[] = [];
 
   // Track whether native handlers have been registered to avoid duplicate registrations
   private _clickHandlerRegistered = false;
@@ -33,10 +23,7 @@ export default class InAppMessages {
   private _willDismissHandlerRegistered = false;
   private _didDismissHandlerRegistered = false;
 
-  private _processFunctionList<T>(
-    array: ((event: T) => void)[],
-    param: T,
-  ): void {
+  private _processFunctionList<T>(array: ((event: T) => void)[], param: T): void {
     for (let i = 0; i < array.length; i++) {
       array[i](param);
     }
@@ -53,9 +40,7 @@ export default class InAppMessages {
     listener: (event: InAppMessageEventTypeMap[K]) => void,
   ): void {
     if (event === 'click') {
-      this._inAppMessageClickListeners.push(
-        listener as (event: InAppMessageClickEvent) => void,
-      );
+      this._inAppMessageClickListeners.push(listener as (event: InAppMessageClickEvent) => void);
 
       // Only register the native handler once
       if (!this._clickHandlerRegistered) {
@@ -79,13 +64,8 @@ export default class InAppMessages {
       // Only register the native handler once
       if (!this._willDisplayHandlerRegistered) {
         this._willDisplayHandlerRegistered = true;
-        const willDisplayCallBackProcessor = (
-          event: InAppMessageWillDisplayEvent,
-        ) => {
-          this._processFunctionList(
-            this._willDisplayInAppMessageListeners,
-            event,
-          );
+        const willDisplayCallBackProcessor = (event: InAppMessageWillDisplayEvent) => {
+          this._processFunctionList(this._willDisplayInAppMessageListeners, event);
         };
         window.cordova.exec(
           willDisplayCallBackProcessor,
@@ -103,9 +83,7 @@ export default class InAppMessages {
       // Only register the native handler once
       if (!this._didDisplayHandlerRegistered) {
         this._didDisplayHandlerRegistered = true;
-        const didDisplayCallBackProcessor = (
-          event: InAppMessageDidDisplayEvent,
-        ) => {
+        const didDisplayCallBackProcessor = (event: InAppMessageDidDisplayEvent) => {
           this._processFunctionList(this._didDisplayInAppMessageListeners, event);
         };
         window.cordova.exec(
@@ -124,13 +102,8 @@ export default class InAppMessages {
       // Only register the native handler once
       if (!this._willDismissHandlerRegistered) {
         this._willDismissHandlerRegistered = true;
-        const willDismissInAppMessageProcessor = (
-          event: InAppMessageWillDismissEvent,
-        ) => {
-          this._processFunctionList(
-            this._willDismissInAppMessageListeners,
-            event,
-          );
+        const willDismissInAppMessageProcessor = (event: InAppMessageWillDismissEvent) => {
+          this._processFunctionList(this._willDismissInAppMessageListeners, event);
         };
         window.cordova.exec(
           willDismissInAppMessageProcessor,
@@ -148,9 +121,7 @@ export default class InAppMessages {
       // Only register the native handler once
       if (!this._didDismissHandlerRegistered) {
         this._didDismissHandlerRegistered = true;
-        const didDismissInAppMessageCallBackProcessor = (
-          event: InAppMessageDidDismissEvent,
-        ) => {
+        const didDismissInAppMessageCallBackProcessor = (event: InAppMessageDidDismissEvent) => {
           this._processFunctionList(this._didDismissInAppMessageListeners, event);
         };
         window.cordova.exec(
@@ -231,9 +202,7 @@ export default class InAppMessages {
    */
   removeTriggers(keys: string[]): void {
     if (!Array.isArray(keys)) {
-      console.error(
-        'OneSignal: removeTriggers: argument must be of type Array',
-      );
+      console.error('OneSignal: removeTriggers: argument must be of type Array');
     }
 
     window.cordova.exec(noop, noop, 'OneSignalPush', 'removeTriggers', [keys]);
