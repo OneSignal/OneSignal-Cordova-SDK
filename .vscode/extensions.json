@@ -1,5 +1,7 @@
 {
   "recommendations": [
+    "oxc.oxc-vscode",
+    "esbenp.prettier-vscode",
     "llvm-vs-code-extensions.vscode-clangd",
     "redhat.vscode-yaml",
     "ryanluker.vscode-coverage-gutters"
