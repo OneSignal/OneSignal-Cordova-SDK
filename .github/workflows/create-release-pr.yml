@@ -1,33 +1,35 @@
 name: Create Release PR
 
 on:
+  # For making a release pr from android / ios sdk actions
   workflow_call:
     inputs:
       cordova_version:
-        description: "New Cordova Version (e.g., 5.2.15 or 5.2.15-beta.1)"
+        description: 'New Cordova Version (e.g., 5.2.15 or 5.2.15-beta.1)'
         required: true
         type: string
       android_version:
-        description: "New Android SDK Version (e.g., 2.3.0). Leave blank to skip."
+        description: 'New Android SDK Version (e.g., 2.3.0). Leave blank to skip.'
         required: false
         type: string
       ios_version:
-        description: "New iOS SDK Version (e.g., 1.5.0). Leave blank to skip."
+        description: 'New iOS SDK Version (e.g., 1.5.0). Leave blank to skip.'
         required: false
         type: string
 
+  # For making a release pr from cordova github actions
   workflow_dispatch:
     inputs:
       cordova_version:
-        description: "New Cordova Version (e.g., 5.2.15 or 5.2.15-beta.1)"
+        description: 'New Cordova Version (e.g., 5.2.15 or 5.2.15-beta.1)'
         required: true
         type: string
       android_version:
-        description: "New Android SDK Version (e.g., 2.3.0). Leave blank to skip."
+        description: 'New Android SDK Version (e.g., 2.3.0). Leave blank to skip.'
         required: false
         type: string
       ios_version:
-        description: "New iOS SDK Version (e.g., 1.5.0). Leave blank to skip."
+        description: 'New iOS SDK Version (e.g., 1.5.0). Leave blank to skip.'
         required: false
         type: string
 
@@ -57,12 +59,19 @@ jobs:
           LAST_RELEASE_DATE=$(git show -s --format=%cI "$CURRENT_VERSION")
           echo "date=$LAST_RELEASE_DATE" >> $GITHUB_OUTPUT
 
+      - name: Release branch name
+        id: release_branch
+        run: |
+          BRANCH_VERSION=$(echo "${{ inputs.cordova_version }}" | sed 's/\(-[a-z]*\)\.[0-9]*$/\1/')
+          echo "releaseBranch=rel/$BRANCH_VERSION" >> $GITHUB_OUTPUT
+
       - name: Get merged PRs since last release
         id: get_prs
         uses: actions/github-script@v8
         with:
           script: |
             const lastReleaseDate = '${{ steps.last_commit.outputs.date }}';
+            const releaseBranch = '${{ steps.release_branch.outputs.releaseBranch }}';
 
             // Get merged PRs
             const { data: prs } = await github.rest.pulls.list({
@@ -72,9 +81,16 @@ jobs:
               base: 'main',
               per_page: 100
             });
+            const { data: relPrs } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'closed',
+              base: releaseBranch,
+              per_page: 100
+            });
 
             // Filter and process PRs
-            const mergedPrs = prs
+            const mergedPrs = [...prs, ...relPrs]
               .filter(pr => pr.merged_at && new Date(pr.merged_at) > new Date(lastReleaseDate))
               .map(pr => ({
                 number: pr.number,
@@ -82,13 +98,11 @@ jobs:
               }));
             core.setOutput('prs', JSON.stringify(mergedPrs));
 
-            const hasFeatures = mergedPrs.some(pr => /^feat/i.test(pr.title));
-            core.setOutput('isFeature', hasFeatures);
-
       - name: Create release branch
         run: |
-          git checkout -b rel/${{ inputs.cordova_version }}
-          git push -u origin rel/${{ inputs.cordova_version }}
+          releaseBranch="${{ steps.release_branch.outputs.releaseBranch }}"
+          git checkout -b "$releaseBranch"
+          git push -u origin "$releaseBranch"
 
       - name: Capture current native SDK versions
         id: current_versions
@@ -273,7 +287,7 @@ jobs:
           if [[ "$RELEASE_TYPE" == "Current" ]]; then
             BASE_BRANCH="main"
           else
-            BASE_BRANCH="rel/$NEW_VERSION"
+            BASE_BRANCH="${{ steps.release_branch.outputs.releaseBranch }}"
           fi
 
           # Write release notes to file to avoid shell interpretation
