@@ -317,7 +317,7 @@ jobs:
           EOF
 
           gh pr create \
-            --title "Release $NEW_VERSION" \
+            --title "chore: Release $NEW_VERSION" \
             --body-file release_notes.md \
             --base "$BASE_BRANCH" \
             --reviewer fadi-george,sherwinski,jkasten2
