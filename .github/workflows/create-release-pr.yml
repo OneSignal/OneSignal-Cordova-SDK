@@ -1,19 +1,38 @@
 name: Create Release PR
 
 on:
+  workflow_call:
+    inputs:
+      cordova_version:
+        description: "New Cordova Version (e.g., 5.2.15 or 5.2.15-beta.1)"
+        required: true
+        type: string
+      android_version:
+        description: "New Android SDK Version (e.g., 2.3.0). Leave blank to skip."
+        required: false
+        type: string
+      ios_version:
+        description: "New iOS SDK Version (e.g., 1.5.0). Leave blank to skip."
+        required: false
+        type: string
+
   workflow_dispatch:
     inputs:
-      release-type:
-        description: "Release type"
+      cordova_version:
+        description: "New Cordova Version (e.g., 5.2.15 or 5.2.15-beta.1)"
         required: true
-        default: "Current"
-        type: choice
-        options:
-          - Current
-          - Beta
+        type: string
+      android_version:
+        description: "New Android SDK Version (e.g., 2.3.0). Leave blank to skip."
+        required: false
+        type: string
+      ios_version:
+        description: "New iOS SDK Version (e.g., 1.5.0). Leave blank to skip."
+        required: false
+        type: string
 
 jobs:
-  bump-version:
+  update-version:
     runs-on: ubuntu-latest
 
     env:
@@ -31,16 +50,11 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Get current SDK version
-        id: current_version
-        run: |
-          CURRENT_VERSION=$(bun -e "console.log(require('./package.json').version)")
-          echo "current=$CURRENT_VERSION" >> $GITHUB_OUTPUT
-
       - name: Get last release commit
         id: last_commit
         run: |
-          LAST_RELEASE_DATE=$(git show -s --format=%cI "${{ steps.current_version.outputs.current }}")
+          CURRENT_VERSION=$(bun -e "console.log(require('./package.json').version)")
+          LAST_RELEASE_DATE=$(git show -s --format=%cI "$CURRENT_VERSION")
           echo "date=$LAST_RELEASE_DATE" >> $GITHUB_OUTPUT
 
       - name: Get merged PRs since last release
@@ -71,46 +85,71 @@ jobs:
             const hasFeatures = mergedPrs.some(pr => /^feat/i.test(pr.title));
             core.setOutput('isFeature', hasFeatures);
 
-      - name: Calculate new version
-        id: new_version
-        shell: bash
-        run: |
-          set -euo pipefail
-          CUR="${{ steps.current_version.outputs.current }}"
-          TYPE="${{ inputs.release-type }}"
-          IS_FEAT='${{ steps.get_prs.outputs.isFeature }}'
-
-          PRE=$([[ "$CUR" =~ -beta\. ]] && echo beta || echo stable)
-          INC=$([ "$IS_FEAT" = "true" ] && echo minor || echo patch)
-          BASE_NO_PRE="$(echo "$CUR" | sed 's/-.*//')"
-
-          if [ "$TYPE" = "Beta" ]; then
-            if [ "$PRE" = "beta" ]; then
-              NEW="$(bunx semver -i prerelease --preid beta "$CUR")"
-            else
-              NEW="$(bunx semver -i "$INC" "$BASE_NO_PRE")-beta.1"
-            fi
-          elif [ "$TYPE" = "Current" ]; then
-            if [ "$PRE" = "beta" ]; then
-              NEW="$BASE_NO_PRE"              # promote beta -> stable
-            else
-              NEW="$(bunx semver -i "$INC" "$CUR")"
-            fi
-          else
-            echo "release-type must be Beta or Current" >&2; exit 1
-          fi
-
-          echo "version=$NEW" >> "$GITHUB_OUTPUT"
-
       - name: Create release branch
         run: |
-          git checkout -b rel/${{ steps.new_version.outputs.version }}
-          git push -u origin rel/${{ steps.new_version.outputs.version }}
+          git checkout -b rel/${{ inputs.cordova_version }}
+          git push -u origin rel/${{ inputs.cordova_version }}
+
+      - name: Capture current native SDK versions
+        id: current_versions
+        run: |
+          # Extract current Android SDK version
+          ANDROID_VERSION=$(grep -oP 'com\.onesignal:OneSignal:\K[0-9.]+' plugin.xml | head -1)
+
+          # Extract current iOS SDK version
+          IOS_VERSION=$(grep -oP 'OneSignalXCFramework.*spec="\K[0-9.]+' plugin.xml | head -1)
+
+          echo "prev_android=$ANDROID_VERSION" >> $GITHUB_OUTPUT
+          echo "prev_ios=$IOS_VERSION" >> $GITHUB_OUTPUT
 
       # Cordova specific steps
+      - name: Update Android SDK version
+        if: inputs.android_version != ''
+        run: |
+          VERSION="${{ inputs.android_version }}"
+
+          # Validate version exists on GitHub
+          RELEASE=$(curl -s -H "Authorization: token ${{ github.token }}" \
+            "https://api.github.com/repos/OneSignal/OneSignal-Android-SDK/releases/tags/v${VERSION}")
+
+          if echo "$RELEASE" | grep -q "\"id\""; then
+            # Update plugin.xml with new version
+            sed -i "s|<framework src=\"com\.onesignal:OneSignal:[^\"]*\" />|<framework src=\"com.onesignal:OneSignal:${VERSION}\" />|" plugin.xml
+            echo "✓ Updated plugin.xml with Android SDK ${VERSION}"
+          else
+            echo "✗ Android SDK version ${VERSION} not found"
+            exit 1
+          fi
+
+      - name: Update iOS SDK version
+        if: inputs.ios_version != ''
+        run: |
+          VERSION="${{ inputs.ios_version }}"
+
+          # Validate version exists on GitHub
+          RELEASE=$(curl -s -H "Authorization: token ${{ github.token }}" \
+            "https://api.github.com/repos/OneSignal/OneSignal-iOS-SDK/releases/tags/v${VERSION}")
+
+          if echo "$RELEASE" | grep -q "\"id\""; then
+            # Update plugin.xml with new version
+            sed -i "s|<pod name=\"OneSignalXCFramework\" spec=\"[^\"]*\" />|<pod name=\"OneSignalXCFramework\" spec=\"${VERSION}\" />|" plugin.xml
+            echo "✓ Updated plugin.xml with iOS SDK ${VERSION}"
+
+            # Need to clear the Podfile.lock to force a re-install of the framework
+            rm -f example/IonicCapOneSignal/ios/App/Podfile.lock
+          else
+            echo "✗ iOS SDK version ${VERSION} not found"
+            exit 1
+          fi
+
+      - name: Capacitor update
+        run: |
+          bunx cap sync || exit 1
+          git add .
+
       - name: Update sdk version
         run: |
-          NEW_VERSION="${{ steps.new_version.outputs.version }}"
+          NEW_VERSION="${{ inputs.cordova_version }}"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
@@ -144,18 +183,11 @@ jobs:
 
           # Extract current Android SDK version
           ANDROID_VERSION=$(echo "$CURRENT_PLUGIN" | grep -oP 'com\.onesignal:OneSignal:\K[0-9.]+' | head -1)
+          PREVIOUS_ANDROID="${{ steps.current_versions.outputs.prev_android }}"
 
           # Extract current iOS SDK version
           IOS_VERSION=$(echo "$CURRENT_PLUGIN" | grep -oP 'OneSignalXCFramework.*spec="\K[0-9.]+' | head -1)
-
-          # Get previous plugin.xml from HEAD~1 (before the commit we just made)
-          PREVIOUS_PLUGIN=$(git show HEAD~1:plugin.xml)
-
-          # Extract previous Android SDK version
-          PREVIOUS_ANDROID=$(echo "$PREVIOUS_PLUGIN" | grep -oP 'com\.onesignal:OneSignal:\K[0-9.]+' | head -1)
-
-          # Extract previous iOS SDK version
-          PREVIOUS_IOS=$(echo "$PREVIOUS_PLUGIN" | grep -oP 'OneSignalXCFramework.*spec="\K[0-9.]+' | head -1)
+          PREVIOUS_IOS="${{ steps.current_versions.outputs.prev_ios }}"
 
           # Build output for native dependency changes
           NATIVE_UPDATES=""
@@ -169,6 +201,18 @@ jobs:
 
           # Output the variables
           echo "$NATIVE_UPDATES" >> $GITHUB_OUTPUT
+
+      - name: Get release type
+        id: release_type
+        run: |
+          NEW_VERSION="${{ inputs.cordova_version }}"
+          if [[ "$NEW_VERSION" =~ -alpha ]]; then
+            echo "release-type=Alpha" >> $GITHUB_OUTPUT
+          elif [[ "$NEW_VERSION" =~ -beta ]]; then
+            echo "release-type=Beta" >> $GITHUB_OUTPUT
+          else
+            echo "release-type=Current" >> $GITHUB_OUTPUT
+          fi
 
       - name: Generate release notes
         id: release_notes
@@ -196,7 +240,7 @@ jobs:
               return section + '\n';
             };
 
-            let releaseNotes = `Channels: ${{ inputs.release-type }}\n\n`;
+            let releaseNotes = `Channels: ${{ steps.release_type.outputs.release-type }}\n\n`;
             releaseNotes += buildSection('🚀 New Features', features);
             releaseNotes += buildSection('🐛 Bug Fixes', fixes);
             releaseNotes += buildSection('✨ Improvements', improvements);
@@ -222,8 +266,8 @@ jobs:
 
       - name: Create release PR
         run: |
-          NEW_VERSION="${{ steps.new_version.outputs.version }}"
-          RELEASE_TYPE="${{ inputs.release-type }}"
+          NEW_VERSION="${{ inputs.cordova_version }}"
+          RELEASE_TYPE="${{ steps.release_type.outputs.release-type }}"
 
           # Determine base branch based on release type
           if [[ "$RELEASE_TYPE" == "Current" ]]; then
