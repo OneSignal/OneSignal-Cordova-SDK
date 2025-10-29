@@ -7,19 +7,5 @@ on:
 
 jobs:
   lint-pr-title:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: amannn/action-semantic-pull-request@v6
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          types: |
-            feat
-            fix
-            perf
-            refactor
-            docs
-            test
-            chore
-            ci
-          requireScope: false
+    uses: OneSignal/sdk-actions/.github/workflows/lint-pr-title.yml@main
+    secrets: inherit
