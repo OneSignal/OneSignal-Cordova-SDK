@@ -22,7 +22,7 @@ on:
     # The branches below must be a subset of the branches above
     branches: ['main', 'user_model/main']
   schedule:
-    - cron: "37 19 * * 4"
+    - cron: '37 19 * * 4'
 
 jobs:
   analyze:
