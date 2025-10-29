@@ -41,9 +41,10 @@ jobs:
           fi
           echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
 
-      - name: Publish to npm
+      - name: Build & Publish
         run: |
           bun run build
+
           VERSION='${{ steps.get_version.outputs.version }}'
           if [[ $VERSION =~ alpha ]]; then
             bun publish --tag alpha
@@ -60,26 +61,8 @@ jobs:
         id: release_notes
         with:
           script: |
-            const currentVersion = '${{ steps.get_version.outputs.version }}';
-
-            // Find the merged release PR
-            const { data: prs } = await github.rest.pulls.list({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: 'closed',
-              base: context.payload.pull_request.base.ref,
-              per_page: 100
-            });
-
-            const releasePr = prs.find(pr =>
-              pr.title.includes(`chore: Release ${currentVersion}`) && pr.merged_at
-            );
-
-            if (!releasePr) {
-              core.setFailed(`No merged release PR found for version ${currentVersion}`);
-              return;
-            }
-
+            // Use the PR that triggered this workflow
+            const releasePr = context.payload.pull_request;
             const releaseNotes = releasePr.body.split('<!--')[0].trim();
             core.setOutput('notes', releaseNotes);
 
