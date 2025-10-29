@@ -46,7 +46,7 @@ describe('Location', () => {
 
   describe('isShared', () => {
     test('should return a Promise and call cordova.exec for isShared', () => {
-      mockExec.mockImplementation((resolve, reject) => {
+      mockExec.mockImplementation((resolve) => {
         resolve(true);
       });
 
@@ -64,7 +64,7 @@ describe('Location', () => {
     });
 
     test('should resolve Promise when cordova.exec succeeds', async () => {
-      mockExec.mockImplementation((resolve, reject) => {
+      mockExec.mockImplementation((resolve) => {
         resolve(true);
       });
 
@@ -75,7 +75,7 @@ describe('Location', () => {
     test('should reject Promise when cordova.exec fails', async () => {
       const mockError = new Error('Location permission denied');
 
-      mockExec.mockImplementation((resolve, reject) => {
+      mockExec.mockImplementation((_resolve, reject) => {
         reject(mockError);
       });
       await expect(location.isShared()).rejects.toThrow(mockError.message);
