@@ -22,6 +22,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
+    "@capacitor/cli": "^7.4.4",
     "@types/cordova": "^11.0.3",
     "@vitest/coverage-v8": "^4.0.2",
     "concurrently": "^9.2.1",
