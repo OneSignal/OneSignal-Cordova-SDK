@@ -288,11 +288,11 @@ jobs:
               releaseNotes += '\n### 🛠️ Native Dependency Updates\n\n';
               if (hasAndroidUpdate) {
                 releaseNotes += `- Update Android SDK from ${{ steps.native_deps.outputs.ANDROID_FROM }} to ${{ steps.native_deps.outputs.ANDROID_TO }}\n`;
-                releaseNotes += `- See [release notes](https://github.com/OneSignal/OneSignal-Android-SDK/releases) for full details\n`;
+                releaseNotes +=   - See [release notes](https://github.com/OneSignal/OneSignal-Android-SDK/releases) for full details\n`;
               }
               if (hasIosUpdate) {
                 releaseNotes += `- Update iOS SDK from ${{ steps.native_deps.outputs.IOS_FROM }} to ${{ steps.native_deps.outputs.IOS_TO }}\n`;
-                releaseNotes += `- See [release notes](https://github.com/OneSignal/OneSignal-iOS-SDK/releases) for full details\n`;
+                releaseNotes += `  - See [release notes](https://github.com/OneSignal/OneSignal-iOS-SDK/releases) for full details\n`;
               }
               releaseNotes += '\n';
             }
@@ -320,4 +320,4 @@ jobs:
             --title "chore: Release $NEW_VERSION" \
             --body-file release_notes.md \
             --base "$BASE_BRANCH" \
-            --reviewer fadi-george,sherwinski,jkasten2
+            --reviewer @OneSignal/eng-sdk-platform
