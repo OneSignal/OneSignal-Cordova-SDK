@@ -146,6 +146,13 @@ jobs:
           echo "prev_ios=$IOS_VERSION" >> $GITHUB_OUTPUT
 
       # Cordova specific steps
+      - name: Setup Capacitor
+        run: |
+          bun link
+          cd example/IonicCapOneSignal
+          bun install --frozen-lockfile
+          bun run build
+
       - name: Update Android SDK version
         if: inputs.android_version != ''
         run: |
@@ -159,6 +166,10 @@ jobs:
             # Update plugin.xml with new version
             sed -i "s|<framework src=\"com\.onesignal:OneSignal:[^\"]*\" />|<framework src=\"com.onesignal:OneSignal:${VERSION}\" />|" plugin.xml
             echo "✓ Updated plugin.xml with Android SDK ${VERSION}"
+
+            cd example/IonicCapOneSignal
+            bunx cap sync android
+            git add .
           else
             echo "✗ Android SDK version ${VERSION} not found"
             exit 1
@@ -178,21 +189,17 @@ jobs:
             sed -i "s|<pod name=\"OneSignalXCFramework\" spec=\"[^\"]*\" />|<pod name=\"OneSignalXCFramework\" spec=\"${VERSION}\" />|" plugin.xml
             echo "✓ Updated plugin.xml with iOS SDK ${VERSION}"
 
-            # Need to clear the Podfile.lock to force a re-install of the framework
-            rm -f example/IonicCapOneSignal/ios/App/Podfile.lock
+            # Need to regenerate the Podfile.lock
+            cd example/IonicCapOneSignal/ios/App
+            rm -f Podfile.lock
+            cd ../..
+            bunx cap sync ios
+            git add .
+
           else
             echo "✗ iOS SDK version ${VERSION} not found"
             exit 1
           fi
-
-      - name: Capacitor update
-        run: |
-          bun link
-          cd example/IonicCapOneSignal
-          bun install --frozen-lockfile
-          bun run build
-          bunx cap sync || exit 1
-          git add .
 
       - name: Update sdk version
         run: |
