@@ -119,7 +119,7 @@ void processNotificationClicked(OSNotificationClickEvent *event) {
 
 void initOneSignalObject(NSDictionary *launchOptions) {
   OneSignalWrapper.sdkType = @"cordova";
-  OneSignalWrapper.sdkVersion = @"050215";
+  OneSignalWrapper.sdkVersion = @"050216";
   [OneSignal initialize:nil withLaunchOptions:launchOptions];
 }
 
