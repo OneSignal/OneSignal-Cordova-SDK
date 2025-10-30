@@ -41,6 +41,9 @@ jobs:
           fi
           echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
 
+      - name: Configure NPM authentication
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
+
       - name: Build & Publish
         run: |
           bun run build
