@@ -35,7 +35,7 @@ on:
 
 jobs:
   update-version:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -137,15 +137,22 @@ jobs:
         id: current_versions
         run: |
           # Extract current Android SDK version
-          ANDROID_VERSION=$(grep -oP 'com\.onesignal:OneSignal:\K[0-9.]+' plugin.xml | head -1)
+          ANDROID_VERSION=$(sed -n 's/.*com\.onesignal:OneSignal:\([0-9.]*\).*/\1/p' plugin.xml | head -1)
 
           # Extract current iOS SDK version
-          IOS_VERSION=$(grep -oP 'OneSignalXCFramework.*spec="\K[0-9.]+' plugin.xml | head -1)
+          IOS_VERSION=$(sed -n 's/.*OneSignalXCFramework.*spec="\([0-9.]*\)".*/\1/p' plugin.xml | head -1)
 
           echo "prev_android=$ANDROID_VERSION" >> $GITHUB_OUTPUT
           echo "prev_ios=$IOS_VERSION" >> $GITHUB_OUTPUT
 
       # Cordova specific steps
+      - name: Setup Capacitor
+        run: |
+          bun link
+          cd example/IonicCapOneSignal
+          bun install --frozen-lockfile
+          bun run build
+
       - name: Update Android SDK version
         if: inputs.android_version != ''
         run: |
@@ -155,10 +162,15 @@ jobs:
           RELEASE=$(curl -s -H "Authorization: token ${{ github.token }}" \
             "https://api.github.com/repos/OneSignal/OneSignal-Android-SDK/releases/tags/${VERSION}")
 
-          if echo "$RELEASE" | grep -q "\"id\""; then
+          if sed -n '/\"id\"/p' <<< "$RELEASE" | grep -q .; then
             # Update plugin.xml with new version
-            sed -i "s|<framework src=\"com\.onesignal:OneSignal:[^\"]*\" />|<framework src=\"com.onesignal:OneSignal:${VERSION}\" />|" plugin.xml
+            # mac os sed syntax
+            sed -i '' 's|<framework src="com\.onesignal:OneSignal:[^"]*" />|<framework src="com.onesignal:OneSignal:'"$VERSION"'" />|' plugin.xml
             echo "✓ Updated plugin.xml with Android SDK ${VERSION}"
+
+            cd example/IonicCapOneSignal
+            bunx cap sync android
+            git add .
           else
             echo "✗ Android SDK version ${VERSION} not found"
             exit 1
@@ -173,26 +185,23 @@ jobs:
           RELEASE=$(curl -s -H "Authorization: token ${{ github.token }}" \
             "https://api.github.com/repos/OneSignal/OneSignal-iOS-SDK/releases/tags/${VERSION}")
 
-          if echo "$RELEASE" | grep -q "\"id\""; then
+          if sed -n '/\"id\"/p' <<< "$RELEASE" | grep -q .; then
             # Update plugin.xml with new version
-            sed -i "s|<pod name=\"OneSignalXCFramework\" spec=\"[^\"]*\" />|<pod name=\"OneSignalXCFramework\" spec=\"${VERSION}\" />|" plugin.xml
+            # mac os sed syntax
+            sed -i '' "s|<pod name=\"OneSignalXCFramework\" spec=\"[^\"]*\" />|<pod name=\"OneSignalXCFramework\" spec=\"${VERSION}\" />|" plugin.xml
             echo "✓ Updated plugin.xml with iOS SDK ${VERSION}"
 
-            # Need to clear the Podfile.lock to force a re-install of the framework
-            rm -f example/IonicCapOneSignal/ios/App/Podfile.lock
+            # Need to regenerate the Podfile.lock
+            cd example/IonicCapOneSignal/ios/App
+            rm -f Podfile.lock
+            cd ../..
+            bunx cap sync ios
+            git add .
+
           else
             echo "✗ iOS SDK version ${VERSION} not found"
             exit 1
           fi
-
-      - name: Capacitor update
-        run: |
-          bun link
-          cd example/IonicCapOneSignal
-          bun install --frozen-lockfile
-          bun run build
-          bunx cap sync || exit 1
-          git add .
 
       - name: Update sdk version
         run: |
@@ -209,13 +218,13 @@ jobs:
           npm pkg set version="$NEW_VERSION"
 
           # Update plugin.xml cordova plugin version (target <plugin> element specifically)
-          sed -i 's|<plugin \(xmlns="[^"]*" xmlns:android="[^"]*" id="[^"]*"\) version="[^"]*"|<plugin \1 version="'"$NEW_VERSION"'"|' plugin.xml
+          sed -i '' 's|<plugin \(xmlns="[^"]*" xmlns:android="[^"]*" id="[^"]*"\) version="[^"]*"|<plugin \1 version="'"$NEW_VERSION"'"|' plugin.xml
 
           # Update OneSignalPush.java wrapper version
-          sed -i "s/OneSignalWrapper\.setSdkVersion(\"[^\"]*\")/OneSignalWrapper.setSdkVersion(\"$WRAPPER_VERSION\")/g" src/android/com/onesignal/cordova/OneSignalPush.java
+          sed -i '' "s/OneSignalWrapper\.setSdkVersion(\"[^\"]*\")/OneSignalWrapper.setSdkVersion(\"$WRAPPER_VERSION\")/g" src/android/com/onesignal/cordova/OneSignalPush.java
 
           # Update OneSignalPush.m wrapper version
-          sed -i "s/OneSignalWrapper\.sdkVersion = @\"[^\"]*\"/OneSignalWrapper.sdkVersion = @\"$WRAPPER_VERSION\"/g" src/ios/OneSignalPush.m
+          sed -i '' "s/OneSignalWrapper\.sdkVersion = @\"[^\"]*\"/OneSignalWrapper.sdkVersion = @\"$WRAPPER_VERSION\"/g" src/ios/OneSignalPush.m
 
           git add package.json plugin.xml src/android/com/onesignal/cordova/OneSignalPush.java src/ios/OneSignalPush.m
 
@@ -229,11 +238,11 @@ jobs:
           CURRENT_PLUGIN=$(cat plugin.xml)
 
           # Extract current Android SDK version
-          ANDROID_VERSION=$(echo "$CURRENT_PLUGIN" | grep -oP 'com\.onesignal:OneSignal:\K[0-9.]+' | head -1)
+          ANDROID_VERSION=$(sed -n 's/.*com\.onesignal:OneSignal:\([0-9.]*\).*/\1/p' <<< "$CURRENT_PLUGIN" | head -1)
           PREVIOUS_ANDROID="${{ steps.current_versions.outputs.prev_android }}"
 
           # Extract current iOS SDK version
-          IOS_VERSION=$(echo "$CURRENT_PLUGIN" | grep -oP 'OneSignalXCFramework.*spec="\K[0-9.]+' | head -1)
+          IOS_VERSION=$(sed -n 's/.*OneSignalXCFramework.*spec="\([0-9.]*\)".*/\1/p' <<< "$CURRENT_PLUGIN" | head -1)
           PREVIOUS_IOS="${{ steps.current_versions.outputs.prev_ios }}"
 
           # Build output for native dependency changes
