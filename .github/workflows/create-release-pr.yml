@@ -269,10 +269,10 @@ jobs:
               title: pr.title.trim()
             }));
 
-            // Categorize PRs
+            // Categorize PRs (exclude internal changes like ci/chore)
             const features = prs.filter(pr => /^feat/i.test(pr.title));
             const fixes = prs.filter(pr => /^fix/i.test(pr.title));
-            const improvements = prs.filter(pr => /^(perf|refactor|chore)/i.test(pr.title));
+            const improvements = prs.filter(pr => /^(perf|refactor)/i.test(pr.title));
 
             // Helper function to build section
             const buildSection = (title, prs) => {

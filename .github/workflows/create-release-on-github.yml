@@ -8,6 +8,10 @@ on:
       - main
       - rel/**
 
+permissions:
+  id-token: write # Required for OIDC
+  contents: read
+
 jobs:
   publish-to-npm:
     runs-on: ubuntu-latest
@@ -28,6 +32,7 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install
         run: bun install --frozen-lockfile
@@ -44,9 +49,6 @@ jobs:
           fi
           echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
 
-      - name: Configure NPM authentication
-        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
-
       - name: Build & Publish
         run: |
           bun run build
@@ -59,17 +61,37 @@ jobs:
           else
             bun publish
           fi
-        env:
-          NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create release notes
         uses: actions/github-script@v8
         id: release_notes
         with:
           script: |
-            // Use the PR that triggered this workflow
-            const releasePr = context.payload.pull_request;
-            const releaseNotes = releasePr.body.split('<!--')[0].trim();
+            let releaseNotes = '';
+
+            if (context.payload.pull_request) {
+              // PR triggered: use PR body
+              const releasePr = context.payload.pull_request;
+              releaseNotes = releasePr.body.split('<!--')[0].trim();
+            } else {
+              // Workflow dispatch: find latest merged "chore: Release" PR
+              const prs = await github.rest.pulls.list({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'closed',
+                sort: 'updated',
+                direction: 'desc',
+                per_page: 50
+              });
+
+              const releasePr = prs.data.find(pr =>
+                pr.merged_at && pr.title.includes('chore: Release')
+              );
+
+              if (releasePr) {
+                releaseNotes = releasePr.body.split('<!--')[0].trim();
+              }
+            }
             core.setOutput('notes', releaseNotes);
 
       - name: Create GitHub Release
