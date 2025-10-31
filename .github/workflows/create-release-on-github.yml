@@ -10,7 +10,7 @@ on:
 
 permissions:
   id-token: write # Required for OIDC
-  contents: read
+  contents: write
 
 jobs:
   publish-to-npm:
@@ -28,14 +28,24 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
+        # for installation of dependencies
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Install
-        run: bun install --frozen-lockfile
+      - name: Install & Build
+        run: |
+          bun install --frozen-lockfile
+          bun run build
+
+        # for publishing
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Get version
         id: get_version
@@ -49,17 +59,20 @@ jobs:
           fi
           echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
 
-      - name: Build & Publish
+      - name: Publish
         run: |
-          bun run build
-
           VERSION='${{ steps.get_version.outputs.version }}'
-          if [[ $VERSION =~ alpha ]]; then
-            bun publish --tag alpha
-          elif [[ $VERSION =~ beta ]]; then
-            bun publish --tag beta
+          # Check if version already exists on npm
+          if npm view onesignal-cordova-plugin@$VERSION > /dev/null 2>&1; then
+            echo "Version $VERSION already published, skipping publish"
           else
-            bun publish
+            if [[ $VERSION =~ alpha ]]; then
+              npm publish --tag alpha
+            elif [[ $VERSION =~ beta ]]; then
+              npm publish --tag beta
+            else
+              npm publish
+            fi
           fi
 
       - name: Create release notes

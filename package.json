@@ -4,7 +4,7 @@
   "author": "Josh Kasten, Brad Hesse, Rodrigo Gomez-Palacio",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/onesignal/OneSignal-Cordova-SDK.git"
+    "url": "git+https://github.com/OneSignal/OneSignal-Cordova-SDK.git"
   },
   "type": "module",
   "types": "dist/index.d.ts",
@@ -36,7 +36,7 @@
   },
   "main": "dist/index.js",
   "bugs": {
-    "url": "https://github.com/onesignal/OneSignal-Cordova-SDK/issues"
+    "url": "https://github.com/OneSignal/OneSignal-Cordova-SDK/issues"
   },
   "cordova": {
     "id": "onesignal-cordova-plugin",
@@ -70,7 +70,7 @@
       "version": ">=4.3.0"
     }
   ],
-  "homepage": "https://github.com/onesignal/OneSignal-Cordova-SDK#readme",
+  "homepage": "https://github.com/OneSignal/OneSignal-Cordova-SDK#readme",
   "keywords": [
     "push",
     "notification",
