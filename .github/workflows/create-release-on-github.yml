@@ -1,5 +1,6 @@
 name: Publish to NPM
 on:
+  workflow_dispatch:
   pull_request:
     types:
       - closed
@@ -11,8 +12,10 @@ jobs:
   publish-to-npm:
     runs-on: ubuntu-latest
     if: |
-      github.event.pull_request.merged == true &&
-      contains(github.event.pull_request.title, 'chore: Release')
+      github.event_name == 'workflow_dispatch' || (
+        github.event.pull_request.merged == true &&
+        contains(github.event.pull_request.title, 'chore: Release')
+      )
 
     steps:
       - name: Checkout
@@ -57,7 +60,7 @@ jobs:
             bun publish
           fi
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create release notes
         uses: actions/github-script@v8
