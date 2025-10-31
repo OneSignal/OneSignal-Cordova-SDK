@@ -34,18 +34,19 @@ on:
         type: string
 
 jobs:
+  prep:
+    uses: OneSignal/sdk-actions/.github/workflows/prep-release.yml@main
+    with:
+      version: ${{ inputs.cordova_version }}
+
   update-version:
+    needs: prep
     runs-on: macos-latest
-
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
     steps:
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          fetch-depth: 0
-          fetch-tags: true
+          ref: ${{ needs.prep.outputs.release_branch }}
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -55,84 +56,6 @@ jobs:
       - name: Install
         run: bun install --frozen-lockfile
 
-      - name: Get release type
-        id: release_type
-        run: |
-          NEW_VERSION="${{ inputs.cordova_version }}"
-          if [[ "$NEW_VERSION" =~ -alpha ]]; then
-            echo "release-type=Alpha" >> $GITHUB_OUTPUT
-          elif [[ "$NEW_VERSION" =~ -beta ]]; then
-            echo "release-type=Beta" >> $GITHUB_OUTPUT
-          else
-            echo "release-type=Current" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Get last release commit
-        id: last_commit
-        run: |
-          CURRENT_VERSION=$(bun -e "console.log(require('./package.json').version)")
-          LAST_RELEASE_DATE=$(git show -s --format=%cI "$CURRENT_VERSION")
-          echo "date=$LAST_RELEASE_DATE" >> $GITHUB_OUTPUT
-
-      - name: Release branch name
-        id: release_branch
-        run: |
-          # Omit alpha/beta version e.g. 5.2.15-beta.1 -> 5.2.15-beta
-          BRANCH_VERSION=$(echo "${{ inputs.cordova_version }}" | sed 's/\(-[a-z]*\)\.[0-9]*$/\1/')
-          echo "releaseBranch=rel/$BRANCH_VERSION" >> $GITHUB_OUTPUT
-
-      - name: Create release branch
-        run: |
-          releaseBranch="${{ steps.release_branch.outputs.releaseBranch }}"
-          releaseType="${{ steps.release_type.outputs.release-type }}"
-
-          if ! git checkout -b "$releaseBranch" 2>/dev/null; then
-            # Branch already exists
-            if [[ "$releaseType" == "Current" ]]; then
-              echo "Error: Release branch already exists for Current release"
-              exit 1
-            fi
-            # For Alpha/Beta, use existing branch
-            git checkout "$releaseBranch"
-          fi
-          git push -u origin "$releaseBranch"
-
-      - name: Get merged PRs
-        id: get_prs
-        uses: actions/github-script@v8
-        with:
-          script: |
-            const lastReleaseDate = '${{ steps.last_commit.outputs.date }}';
-            const releaseBranch = '${{ steps.release_branch.outputs.releaseBranch }}';
-
-            // Get the creation date of the release branch (when it diverged from main)
-            const { data: branchInfo } = await github.rest.repos.getBranch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              branch: releaseBranch
-            });
-            const branchCreatedAt = branchInfo.commit.commit.committer.date;
-
-            // Get PRs merged to main since last release but BEFORE release branch was created
-            const { data: prs } = await github.rest.pulls.list({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: 'closed',
-              base: 'main',
-              per_page: 100
-            });
-
-            const mergedPrs = prs
-              .filter(pr =>
-                pr.merged_at &&
-                new Date(pr.merged_at) > new Date(lastReleaseDate) &&
-                new Date(pr.merged_at) <= new Date(branchCreatedAt)  // Only before branch creation
-              )
-              .map(pr => ({
-                number: pr.number,
-                title: pr.title,
-              }));
-            core.setOutput('prs', JSON.stringify(mergedPrs));
       - name: Get current native SDK versions
         id: current_versions
         run: |
@@ -142,8 +65,8 @@ jobs:
           # Extract current iOS SDK version
           IOS_VERSION=$(sed -n 's/.*OneSignalXCFramework.*spec="\([0-9.]*\)".*/\1/p' plugin.xml | head -1)
 
-          echo "prev_android=$ANDROID_VERSION" >> $GITHUB_OUTPUT
-          echo "prev_ios=$IOS_VERSION" >> $GITHUB_OUTPUT
+          echo "android_from=$ANDROID_VERSION" >> $GITHUB_OUTPUT
+          echo "ios_from=$IOS_VERSION" >> $GITHUB_OUTPUT
 
       # Cordova specific steps
       - name: Setup Capacitor
