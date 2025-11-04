@@ -49,6 +49,9 @@ jobs:
       ios_from: ${{ steps.current_versions.outputs.ios_from }}
 
     steps:
+      - name: Debug
+        run: |
+          echo "release_branch: ${{ needs.prep.outputs.release_branch }}"
       - name: Checkout
         uses: actions/checkout@v5
         with:
