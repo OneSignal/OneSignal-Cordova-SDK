@@ -168,8 +168,6 @@ jobs:
     uses: OneSignal/sdk-actions/.github/workflows/create-release.yml@main
     with:
       release_branch: ${{ needs.prep.outputs.release_branch }}
-      version_from: ${{ needs.update-version.outputs.cordova_from }}
-      version_to: ${{ inputs.cordova_version }}
       android_from: ${{ needs.update-version.outputs.android_from }}
       android_to: ${{ inputs.android_version }}
       ios_from: ${{ needs.update-version.outputs.ios_from }}
