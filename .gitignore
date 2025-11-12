@@ -1,5 +1,6 @@
 node_modules
 dist
+www
 .DS_Store
 .idea
 
@@ -7,6 +8,23 @@ dist
 .gradle/
 build/
 coverage/
+local.properties
 
-# Coverage
-coverage/
+# Xcode
+*.xcuserdatad/
+*.xcworkspace/xcuserdata/
+DerivedData/
+*.pbxuser
+*.xcworkspace/
+
+# iOS/Pods
+Pods/
+Podfile.lock
+
+# Lock files
+bun.lock
+*.lock
+
+# Build outputs
+android/build/
+android/.gradle/
