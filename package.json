@@ -2,6 +2,11 @@
   "version": "5.2.16",
   "name": "onesignal-cordova-plugin",
   "author": "Josh Kasten, Brad Hesse, Rodrigo Gomez-Palacio",
+  "files": [
+    "dist",
+    "plugin.xml",
+    "src"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OneSignal/OneSignal-Cordova-SDK.git"

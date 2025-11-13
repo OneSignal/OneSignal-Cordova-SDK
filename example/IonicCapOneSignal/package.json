@@ -6,8 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build:root": "cd ../.. && bun run build",
+    "update:pod": "cd ios/App && pod update OneSignalXCFramework",
     "build:example": "tsc && vite build",
     "build": "bun run build:root && bun run build:example",
+    "ionic:build": "bun run build",
     "preview": "vite preview"
   },
   "dependencies": {

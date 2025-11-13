@@ -3,6 +3,9 @@
 Link the root package e.g. `bun link`
 First install the packages e.g. `bun i`
 
+You may need to relink package incase the root has new changes.
+So just run `bun link` again.
+
 ## Android
 
 For Android, make sure to use Java 17 as other versions may be incompatible. E.g.
@@ -22,6 +25,8 @@ Then run `ionic capacitor run android` and select the device to run on. This sho
 ## iOS
 
 For iOS, you can run `ionic capacitor run ios`.
+
+If you are using xcode, run `ionic capacitor sync ios`.
 
 ## Testing
 

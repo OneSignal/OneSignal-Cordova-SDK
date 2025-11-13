@@ -22,6 +22,8 @@
 **OPTIONAL -** Feel free to add any other sections or sub-sections that can explain your PR better.
 
 # Testing
+Check that the examples do not error. The console in the example app should not be empty.
+
 ## Unit testing
 **OPTIONAL -**  Explain unit tests added, if not clear in the code.
 

@@ -1,6 +1,6 @@
 import { noop, removeListener } from './helpers';
 import { NotificationWillDisplayEvent } from './NotificationReceivedEvent';
-import { OSNotification } from './OSNotification';
+import type { OSNotification } from './OSNotification';
 import type {
   NotificationClickEvent,
   NotificationEventName,
