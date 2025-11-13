@@ -5,9 +5,7 @@
   "files": [
     "dist",
     "plugin.xml",
-    "src",
-    "README.md",
-    "LICENSE"
+    "src"
   ],
   "repository": {
     "type": "git",
