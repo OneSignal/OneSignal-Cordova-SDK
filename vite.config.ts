@@ -11,5 +11,10 @@ export default defineConfig({
       formats: ['cjs'],
       fileName: () => 'index.js',
     },
+    rollupOptions: {
+      output: {
+        exports: 'named',
+      },
+    },
   },
 });
