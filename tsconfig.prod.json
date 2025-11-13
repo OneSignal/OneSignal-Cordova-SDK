@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["cordova"]
+  },
+  "include": ["www"],
+  "exclude": ["**/*.test.ts", "**/*.test.tsx"]
+}
