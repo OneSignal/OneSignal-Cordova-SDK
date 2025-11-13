@@ -16,7 +16,7 @@
   "type": "module",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc --project tsconfig.prod.json",
+    "build": "vite build",
     "format:spotless": "./example/IonicCapOneSignal/android/gradlew spotlessApply",
     "format:prettier": "prettier --write \"**/*.{ts,tsx}\" --ignore-path .gitignore",
     "format": "concurrently \"npm:format:spotless\" \"npm:format:prettier\"",
