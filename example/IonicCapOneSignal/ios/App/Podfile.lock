@@ -76,10 +76,10 @@ EXTERNAL SOURCES:
     :path: "../capacitor-cordova-ios-plugins"
 
 SPEC CHECKSUMS:
-  Capacitor: 1e0d0e7330dea9f983b50da737d8918abcf273f8
-  CapacitorApp: 2a8c3a0b0814322e5e6e15fe595f02c3808f0f8b
+  Capacitor: c95400d761e376be9da6be5a05f226c0e865cebf
+  CapacitorApp: e1e6b7d05e444d593ca16fd6d76f2b7c48b5aea7
   CapacitorCordova: 8d93e14982f440181be7304aa9559ca631d77fff
-  CordovaPluginsStatic: 071b8a9a5ec0c9dea4185a923b6a9ae22f8341a6
+  CordovaPluginsStatic: 834e0d1c528e2d8e11ce023b156922da53d6b634
   OneSignalXCFramework: ea9e14a95b92ad48d9b35037cbae88a9542bdea3
 
 PODFILE CHECKSUM: 09576ecb1e139231aeea79b0833928283457ffe9
