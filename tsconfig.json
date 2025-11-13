@@ -2,21 +2,14 @@
   "compilerOptions": {
     "outDir": "dist",
     "target": "es5",
-    "module": "esnext",
     "moduleResolution": "node",
     "noImplicitAny": true,
-    "lib": ["es2020", "dom"],
+    "lib": ["es6", "dom"],
     "declaration": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "strict": true,
     "noUnusedLocals": true,
-
-    /**
-     * Should use import type syntax instead of regular import when getting types/interfaces from a module
-     */
-    "verbatimModuleSyntax": true,
-
     "types": ["vitest/globals", "cordova"]
   },
   "include": ["www", "mocks"]
