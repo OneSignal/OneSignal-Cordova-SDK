@@ -1,1 +1,12 @@
 *.zip
+example/
+www/
+
+.github/
+LICENSE
+CONTRIBUTING.md
+MIGRATION_GUIDE.md
+issue_template.md
+dev_testing.txt
+.prettierrc
+.oxlintrc.json
