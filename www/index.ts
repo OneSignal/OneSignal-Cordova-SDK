@@ -36,7 +36,7 @@ import User from './UserNamespace';
 declare global {
   interface Window {
     plugins?: {
-      OneSignal?: import('./index').OneSignalPlugin;
+      OneSignal?: typeof OneSignalPlugin;
     };
   }
 }
