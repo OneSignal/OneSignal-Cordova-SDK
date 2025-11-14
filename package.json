@@ -5,7 +5,8 @@
   "files": [
     "dist",
     "plugin.xml",
-    "src"
+    "src",
+    "build-extras-onesignal.gradle"
   ],
   "repository": {
     "type": "git",

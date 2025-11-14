@@ -22,6 +22,8 @@ adb --version
 
 Then run `ionic capacitor run android` and select the device to run on. This should open the emulator either standalone or in the Android Studio window.
 
+NOTE: If console (in the app) is empty then minimize the app then reopen it.
+
 ## iOS
 
 For iOS, you can run `ionic capacitor run ios`.
