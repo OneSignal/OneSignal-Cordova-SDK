@@ -5,10 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build:root": "cd ../.. && bun run build",
     "update:pod": "cd ios/App && pod update OneSignalXCFramework",
-    "build:example": "tsc && vite build",
-    "build": "bun run build:root && bun run build:example",
+    "build": "scripts/build.sh",
     "ionic:build": "bun run build",
     "preview": "vite preview"
   },
@@ -21,7 +19,7 @@
     "@ionic/react-router": "^8.7.7",
     "@types/react-router": "^5.1.20",
     "@types/react-router-dom": "^5.3.3",
-    "onesignal-cordova-plugin": "link:onesignal-cordova-plugin",
+    "onesignal-cordova-plugin": "file:../../onesignal-cordova-plugin.tgz",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router": "^5.3.4",

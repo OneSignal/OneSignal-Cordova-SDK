@@ -1,10 +1,6 @@
 # Setup
 
-Link the root package e.g. `bun link`
-First install the packages e.g. `bun i`
-
-You may need to relink package incase the root has new changes.
-So just run `bun link` again.
+First install the packages e.g. `bun i`.
 
 ## Android
 
