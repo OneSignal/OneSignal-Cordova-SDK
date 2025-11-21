@@ -13,7 +13,7 @@ dependencies {
     implementation "com.onesignal:OneSignal:5.1.38"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.7.10"
 }
-apply from: "../../../../build-extras-onesignal.gradle"
+apply from: "../../node_modules/onesignal-cordova-plugin/build-extras-onesignal.gradle"
 
 if (hasProperty('postBuildExtras')) {
   postBuildExtras()
