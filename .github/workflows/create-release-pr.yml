@@ -50,12 +50,14 @@ on:
 jobs:
   prep:
     uses: OneSignal/sdk-actions/.github/workflows/prep-release.yml@main
+    secrets:
+      GH_PUSH_TOKEN: ${{ secrets.GH_PUSH_TOKEN }}
     with:
       target_repo: OneSignal/OneSignal-Cordova-SDK
       version: ${{ inputs.cordova_version }}
 
   # Cordova specific steps
-  update-version:
+  update_version:
     needs: prep
     runs-on: macos-latest
     outputs:
@@ -69,6 +71,7 @@ jobs:
         with:
           repository: OneSignal/OneSignal-Cordova-SDK
           ref: ${{ needs.prep.outputs.release_branch }}
+          token: ${{ secrets.GH_PUSH_TOKEN || github.token }}
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -96,9 +99,7 @@ jobs:
 
       - name: Setup Capacitor
         run: |
-          bun link
           cd example/IonicCapOneSignal
-          bun install --frozen-lockfile
           bun run build
 
       - name: Update Android SDK version
@@ -180,8 +181,10 @@ jobs:
           git push
 
   create-pr:
-    needs: [prep, update-version]
+    needs: [prep, update_version]
     uses: OneSignal/sdk-actions/.github/workflows/create-release.yml@main
+    secrets:
+      GH_PUSH_TOKEN: ${{ secrets.GH_PUSH_TOKEN }}
     with:
       target_repo: OneSignal/OneSignal-Cordova-SDK
       release_branch: ${{ needs.prep.outputs.release_branch }}
