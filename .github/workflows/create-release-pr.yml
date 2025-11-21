@@ -3,6 +3,10 @@ name: Create Release PR
 on:
   # For making a release pr from android / ios sdk actions
   workflow_call:
+    secrets:
+      GH_PUSH_TOKEN:
+        required: false
+        description: 'GitHub token for pushing changes'
     inputs:
       cordova_version:
         description: 'New Cordova Version (e.g., 5.2.15 or 5.2.15-beta.1)'
@@ -47,6 +51,7 @@ jobs:
   prep:
     uses: OneSignal/sdk-actions/.github/workflows/prep-release.yml@main
     with:
+      target_repo: OneSignal/OneSignal-Cordova-SDK
       version: ${{ inputs.cordova_version }}
 
   # Cordova specific steps
@@ -62,6 +67,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
         with:
+          repository: OneSignal/OneSignal-Cordova-SDK
           ref: ${{ needs.prep.outputs.release_branch }}
 
       - name: Setup Bun
@@ -177,6 +183,7 @@ jobs:
     needs: [prep, update-version]
     uses: OneSignal/sdk-actions/.github/workflows/create-release.yml@main
     with:
+      target_repo: OneSignal/OneSignal-Cordova-SDK
       release_branch: ${{ needs.prep.outputs.release_branch }}
       target_branch: ${{ inputs.target_branch }}
       android_from: ${{ needs.update-version.outputs.android_from }}
