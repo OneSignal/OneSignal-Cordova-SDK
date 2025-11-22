@@ -9,12 +9,7 @@ export default defineConfig({
     lib: {
       entry: 'www/index.ts',
       formats: ['cjs'],
-      fileName: () => 'index.js',
-    },
-    rollupOptions: {
-      output: {
-        exports: 'named',
-      },
+      fileName: () => 'index',
     },
   },
 });

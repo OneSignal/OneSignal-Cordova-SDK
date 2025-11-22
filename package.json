@@ -13,9 +13,12 @@
     "url": "git+https://github.com/OneSignal/OneSignal-Cordova-SDK.git"
   },
   "type": "module",
+  "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "vite build",
+    "build": "bun run build:vite",
+    "build:tsc": "tsc --project tsconfig.prod.json",
+    "build:vite": "vite build",
     "format:spotless": "./example/IonicCapOneSignal/android/gradlew spotlessApply",
     "format:prettier": "prettier --write \"**/*.{ts,tsx}\" --ignore-path .gitignore",
     "format": "concurrently \"npm:format:spotless\" \"npm:format:prettier\"",
@@ -40,7 +43,6 @@
     "vite-plugin-dts": "^4.5.4",
     "vitest": "^4.0.2"
   },
-  "main": "dist/index.js",
   "bugs": {
     "url": "https://github.com/OneSignal/OneSignal-Cordova-SDK/issues"
   },
