@@ -12,10 +12,18 @@
     "type": "git",
     "url": "git+https://github.com/OneSignal/OneSignal-Cordova-SDK.git"
   },
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
   "scripts": {
-    "build": "bun run build:tsc",
+    "build": "bun run build:vite",
     "build:tsc": "tsc --project tsconfig.prod.json",
     "build:vite": "vite build",
     "format:spotless": "./example/IonicCapOneSignal/android/gradlew spotlessApply",

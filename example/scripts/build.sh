@@ -19,7 +19,7 @@ cd example/${EXAMPLE_NAME}
 if [ -n "$CI" ]; then
   bun install --frozen-lockfile
 else
-  rm -rf node_modules/onesignal-cordova-plugin
+  rm -rf node_modules/onesignal-cordova-plugin bun.lock
   bun i --fresh
 fi
 

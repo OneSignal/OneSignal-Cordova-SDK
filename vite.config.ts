@@ -8,8 +8,13 @@ export default defineConfig({
     emptyOutDir: true,
     lib: {
       entry: 'www/index.ts',
-      formats: ['cjs'],
-      fileName: () => 'index',
+      formats: ['es', 'cjs'],
+      fileName: (format) => `index.${format === 'es' ? 'mjs' : 'cjs'}`,
+    },
+    rollupOptions: {
+      output: {
+        exports: 'named',
+      },
     },
   },
 });
