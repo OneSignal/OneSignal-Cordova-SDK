@@ -9,7 +9,7 @@ export default defineConfig({
     lib: {
       entry: 'www/index.ts',
       formats: ['cjs'],
-      fileName: () => 'index',
+      fileName: () => 'index.js',
     },
   },
 });

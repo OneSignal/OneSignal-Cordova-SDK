@@ -5,9 +5,9 @@
   "homepage": "https://ionicframework.com/",
   "scripts": {
     "ng": "ng",
-    "build": "../scripts/build.sh IonicAngular",
+    "ionic:build": "../scripts/build.sh IonicAngular",
     "start": "ng serve",
-    "build:angular": "ng build",
+    "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint"

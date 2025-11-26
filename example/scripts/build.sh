@@ -20,7 +20,8 @@ if [ -n "$CI" ]; then
   bun install --frozen-lockfile
 else
   rm -rf node_modules/onesignal-cordova-plugin
-  bun i --fresh
+  bun pm cache rm
+  bun i
 fi
 
 # Build example
