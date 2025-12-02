@@ -1,11 +1,13 @@
 #!/bin/bash
+# Get example name from argument or environment variable
+EXAMPLE_NAME="${1:-${EXAMPLE}}"
+
+echo "Preparing example: ${EXAMPLE_NAME}"
+
 # Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Go to the root directory (two levels up from example/scripts/)
 cd "${SCRIPT_DIR}/../.."
-
-# Get example name from argument or environment variable
-EXAMPLE_NAME="${1:-${EXAMPLE}}"
 
 bun run build
 
@@ -25,7 +27,11 @@ else
 fi
 
 # Build example
+echo "Building example: ${EXAMPLE_NAME}"
 if [ "$EXAMPLE_NAME" = "IonicAngular" ]; then
+  # Clear Angular cache to ensure fresh build
+  rm -rf .angular/cache
+
   ng build
 elif [ "$EXAMPLE_NAME" = "IonicCapOneSignal" ]; then
   tsc && vite build
