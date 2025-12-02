@@ -12,7 +12,6 @@
     "type": "git",
     "url": "git+https://github.com/OneSignal/OneSignal-Cordova-SDK.git"
   },
-  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

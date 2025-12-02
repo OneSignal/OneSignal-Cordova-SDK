@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import OneSignal from 'onesignal-cordova-plugin';
 
 @Component({
   selector: 'app-home',
@@ -7,5 +8,14 @@ import { Component } from '@angular/core';
   standalone: false,
 })
 export class HomePage {
+  externalId = '';
+
   constructor() {}
+
+  login() {
+    if (this.externalId) {
+      OneSignal.login(this.externalId);
+      console.log('OneSignal login called with:', this.externalId);
+    }
+  }
 }
