@@ -17,5 +17,17 @@
       This example demonstrates the OneSignal Cordova SDK integration with Ionic
       Angular.
     </p>
+
+    <ion-item>
+      <ion-input
+        label="External ID"
+        labelPlacement="floating"
+        placeholder="Enter external user ID"
+        [(ngModel)]="externalId"
+      ></ion-input>
+    </ion-item>
+    <ion-button expand="block" (click)="login()" [disabled]="!externalId">
+      Login
+    </ion-button>
   </div>
 </ion-content>
