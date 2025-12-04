@@ -114,19 +114,23 @@ jobs:
           RELEASE=$(curl -s -H "Authorization: token ${{ github.token }}" \
             "https://api.github.com/repos/OneSignal/OneSignal-Android-SDK/releases/tags/${VERSION}")
 
-          if sed -n '/\"id\"/p' <<< "$RELEASE" | grep -q .; then
-            # Update plugin.xml with new version
-            # mac os sed syntax
-            sed -i '' 's|<framework src="com\.onesignal:OneSignal:[^"]*" />|<framework src="com.onesignal:OneSignal:'"$VERSION"'" />|' plugin.xml
-            echo "✓ Updated plugin.xml with Android SDK ${VERSION}"
-
-            cd example/IonicCapOneSignal
-            bunx cap sync android
-            git add .
-          else
-            echo "✗ Android SDK version ${VERSION} not found"
+          if [ -z "$RELEASE" ]; then
+            echo "✗ Android SDK version ${VERSION} not found on GitHub"
             exit 1
           fi
+
+          # Update plugin.xml with new version
+          # mac os sed syntax
+          sed -i '' 's|<framework src="com\.onesignal:OneSignal:[^"]*" />|<framework src="com.onesignal:OneSignal:'"$VERSION"'" />|' plugin.xml
+          echo "✓ Updated plugin.xml with Android SDK ${VERSION}"
+
+          cd example/IonicCapOneSignal
+          bunx cap sync android
+
+          # Only commit if there are changes
+          git add -A
+          git diff --staged --quiet && exit 0
+          git commit -m "Update Android SDK to ${VERSION}" && git push
 
       - name: Update iOS SDK version
         if: inputs.ios_version != ''
@@ -137,23 +141,26 @@ jobs:
           RELEASE=$(curl -s -H "Authorization: token ${{ github.token }}" \
             "https://api.github.com/repos/OneSignal/OneSignal-iOS-SDK/releases/tags/${VERSION}")
 
-          if sed -n '/\"id\"/p' <<< "$RELEASE" | grep -q .; then
-            # Update plugin.xml with new version
-            # mac os sed syntax
-            sed -i '' "s|<pod name=\"OneSignalXCFramework\" spec=\"[^\"]*\" />|<pod name=\"OneSignalXCFramework\" spec=\"${VERSION}\" />|" plugin.xml
-            echo "✓ Updated plugin.xml with iOS SDK ${VERSION}"
-
-            # Need to regenerate the Podfile.lock
-            cd example/IonicCapOneSignal/ios/App
-            rm -f Podfile.lock
-            cd ../..
-            bunx cap sync ios
-            git add .
-
-          else
+          if [ -z "$RELEASE" ]; then
             echo "✗ iOS SDK version ${VERSION} not found"
             exit 1
           fi
+
+          # Update plugin.xml with new version
+          # mac os sed syntax
+          sed -i '' "s|<pod name=\"OneSignalXCFramework\" spec=\"[^\"]*\" />|<pod name=\"OneSignalXCFramework\" spec=\"${VERSION}\" />|" plugin.xml
+          echo "✓ Updated plugin.xml with iOS SDK ${VERSION}"
+
+          # Need to regenerate the Podfile.lock
+          cd example/IonicCapOneSignal/ios/App
+          rm -f Podfile.lock
+          cd ../..
+          bunx cap sync ios
+
+          # Only commit if there are changes
+          git add -A
+          git diff --staged --quiet && exit 0
+          git commit -m "Update iOS SDK to ${VERSION}" && git push
 
       - name: Update sdk version
         run: |
@@ -178,10 +185,10 @@ jobs:
           # Update OneSignalPush.m wrapper version
           sed -i '' "s/OneSignalWrapper\.sdkVersion = @\"[^\"]*\"/OneSignalWrapper.sdkVersion = @\"$WRAPPER_VERSION\"/g" src/ios/OneSignalPush.m
 
-          git add package.json plugin.xml src/android/com/onesignal/cordova/OneSignalPush.java src/ios/OneSignalPush.m
-
-          git commit -m "Release $NEW_VERSION"
-          git push
+          # Only commit if there are changes
+          git add -A
+          git diff --staged --quiet && exit 0
+          git commit -m "Release $NEW_VERSION" && git push
 
   create-pr:
     needs: [prep, update_version]
