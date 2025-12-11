@@ -5,6 +5,7 @@
     "moduleResolution": "node",
     "noImplicitAny": true,
     "lib": ["es2020", "dom"],
+    "skipLibCheck": true,
     "declaration": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,

@@ -1,4 +1,6 @@
 #!/bin/bash
+set -e  # Exit on error
+
 # Get example name from argument or environment variable
 EXAMPLE_NAME="${1:-${EXAMPLE}}"
 
