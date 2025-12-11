@@ -15,9 +15,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "bun run build:vite",
-    "build:tsc": "tsc --project tsconfig.prod.json",
-    "build:vite": "vite build",
+    "build": "tsc --noEmit && vite build",
     "format:spotless": "./example/IonicCapOneSignal/android/gradlew spotlessApply",
     "format:prettier": "prettier --write \"**/*.{ts,tsx}\" --ignore-path .gitignore",
     "format": "concurrently \"npm:format:spotless\" \"npm:format:prettier\"",
