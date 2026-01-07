@@ -73,7 +73,7 @@
         <config>
             <source url="https://cdn.cocoapods.org/"/>
         </config>
-        <pods use-frameworks="true">
+        <pods>
             <pod name="OneSignalXCFramework" spec="5.2.15" />
         </pods>
     </podspec>
