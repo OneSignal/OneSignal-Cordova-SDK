@@ -13,6 +13,12 @@
 
   <license>MIT</license>
 
+  <preference name="USE_COCOAPODS" default="false" />
+
+  <hook type="after_plugin_install" src="hooks/ios/addSpmPackage.js" />
+  <hook type="after_plugin_install" src="hooks/ios/addCocoaPods.js" />
+  <hook type="before_plugin_uninstall" src="hooks/ios/removeSpmPackage.js" />
+
   <js-module src="dist/index.js" name="OneSignalPlugin">
     <clobbers target="OneSignal" />
   </js-module>
@@ -69,14 +75,10 @@
       <string>production</string>
     </config-file>
 
-    <podspec>
-        <config>
-            <source url="https://cdn.cocoapods.org/"/>
-        </config>
-        <pods use-frameworks="true">
-            <pod name="OneSignalXCFramework" spec="5.2.15" />
-        </pods>
-    </podspec>
+    <!-- 
+      iOS dependency is managed via Swift Package Manager (SPM) by default.
+      Set USE_COCOAPODS preference to "true" in config.xml to use CocoaPods instead.
+    -->
 
     <header-file src="src/ios/OneSignalPush.h" />
     <source-file src="src/ios/OneSignalPush.m" />

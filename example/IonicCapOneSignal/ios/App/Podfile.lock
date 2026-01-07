@@ -6,7 +6,6 @@ PODS:
   - CapacitorCordova (6.2.1)
   - CordovaPluginsStatic (6.2.1):
     - CapacitorCordova
-    - OneSignalXCFramework (= 5.2.15)
   - OneSignalXCFramework (5.2.15):
     - OneSignalXCFramework/OneSignalComplete (= 5.2.15)
   - OneSignalXCFramework/OneSignal (5.2.15):
@@ -79,7 +78,7 @@ SPEC CHECKSUMS:
   Capacitor: c95400d761e376be9da6be5a05f226c0e865cebf
   CapacitorApp: e1e6b7d05e444d593ca16fd6d76f2b7c48b5aea7
   CapacitorCordova: 8d93e14982f440181be7304aa9559ca631d77fff
-  CordovaPluginsStatic: 834e0d1c528e2d8e11ce023b156922da53d6b634
+  CordovaPluginsStatic: 39acd182fd92b5121d32e4e66f0a2eab469d88c7
   OneSignalXCFramework: ea9e14a95b92ad48d9b35037cbae88a9542bdea3
 
 PODFILE CHECKSUM: 09576ecb1e139231aeea79b0833928283457ffe9

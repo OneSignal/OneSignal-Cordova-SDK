@@ -4,6 +4,7 @@
   "author": "Josh Kasten, Brad Hesse, Rodrigo Gomez-Palacio",
   "files": [
     "dist",
+    "hooks",
     "plugin.xml",
     "src",
     "build-extras-onesignal.gradle"
@@ -26,6 +27,9 @@
     "lint:fix": "oxlint ./www /example/IonicCapOneSignal --fix && bun run format",
     "test": "vitest",
     "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "xcode": "^3.0.1"
   },
   "devDependencies": {
     "@capacitor/cli": "^7.4.4",
