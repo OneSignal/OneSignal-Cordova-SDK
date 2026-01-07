@@ -19,7 +19,7 @@
 
   <engines>
     <engine name="cordova" version=">=6.4.0" />
-    <engine name="cordova-ios" version=">=4.3.0" />
+    <engine name="cordova-ios" version=">=7.0.0" />
     <engine name="cordova-android" version=">=5.1.0" />
     <engine name="apple-xcode" version=">=8.0.0" />
     <engine name="apple-ios" version=">=7.0.0" />
@@ -77,6 +77,8 @@
             <pod name="OneSignalXCFramework" spec="5.2.15" />
         </pods>
     </podspec>
+
+    <swift-package-manager spec="src/ios/Package.swift" />
 
     <header-file src="src/ios/OneSignalPush.h" />
     <source-file src="src/ios/OneSignalPush.m" />
