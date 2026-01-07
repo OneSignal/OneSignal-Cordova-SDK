@@ -11,3 +11,7 @@ coverage/
 
 # Coverage
 coverage/
+
+# Swift Package Manager
+.build/
+.swiftpm/

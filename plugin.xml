@@ -48,7 +48,7 @@
   </platform>
 
   <!-- ios -->
-  <platform name="ios">
+  <platform name="ios" package="swift">
 
     <config-file target="config.xml" parent="/*">
       <feature name="OneSignalPush">
@@ -78,10 +78,9 @@
         </pods>
     </podspec>
 
-    <swift-package-manager spec="src/ios/Package.swift" />
-
     <header-file src="src/ios/OneSignalPush.h" />
     <source-file src="src/ios/OneSignalPush.m" />
+    <source-file src="src/ios/Package.swift" target="Package.swift" />
 
   </platform>
 
