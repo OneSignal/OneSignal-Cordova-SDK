@@ -61,7 +61,7 @@ class OSDemo extends React.Component<Props, State> {
           console.log('OneSignal Log: notification will display:', notif);
           // Call to display the notification after 5 second delay
           notif.display();
-        }, 10000);
+        }, 5000);
       },
     );
 

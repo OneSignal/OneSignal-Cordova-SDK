@@ -1,10 +1,10 @@
 PODS:
-  - Capacitor (6.2.1):
+  - Capacitor (7.4.5):
     - CapacitorCordova
-  - CapacitorApp (6.0.2):
+  - CapacitorApp (7.1.1):
     - Capacitor
-  - CapacitorCordova (6.2.1)
-  - CordovaPluginsStatic (6.2.1):
+  - CapacitorCordova (7.4.5)
+  - CordovaPluginsStatic (7.4.5):
     - CapacitorCordova
     - OneSignalXCFramework (= 5.2.15)
   - OneSignalXCFramework (5.2.15):
@@ -76,12 +76,12 @@ EXTERNAL SOURCES:
     :path: "../capacitor-cordova-ios-plugins"
 
 SPEC CHECKSUMS:
-  Capacitor: c95400d761e376be9da6be5a05f226c0e865cebf
-  CapacitorApp: e1e6b7d05e444d593ca16fd6d76f2b7c48b5aea7
-  CapacitorCordova: 8d93e14982f440181be7304aa9559ca631d77fff
-  CordovaPluginsStatic: 834e0d1c528e2d8e11ce023b156922da53d6b634
+  Capacitor: 12914e6f1b7835e161a74ebd19cb361efa37a7dd
+  CapacitorApp: 63b237168fc869e758481dba283315a85743ee78
+  CapacitorCordova: 31bbe4466000c6b86d9b7f1181ee286cff0205aa
+  CordovaPluginsStatic: f7bfd5526db87e06d891a0ed69df10de3c611fe4
   OneSignalXCFramework: ea9e14a95b92ad48d9b35037cbae88a9542bdea3
 
-PODFILE CHECKSUM: 09576ecb1e139231aeea79b0833928283457ffe9
+PODFILE CHECKSUM: a31c0839423113e26e8afc91cc07a41d59e58245
 
 COCOAPODS: 1.16.2
