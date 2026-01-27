@@ -89,7 +89,7 @@ const OSDemo: React.FC<Props> = ({ name: _name }) => {
     };
 
     const notificationClickListener = (event: NotificationClickEvent) => {
-      OSLog('OneSignal: notification clicked:', event);
+      OSLog('OneSignal: notification clicked:', event.notification.title);
     };
 
     const iamClickListener = (event: InAppMessageClickEvent) => {

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1530"
-   wasCreatedForAppExtension = "YES"
+   LastUpgradeVersion = "2620"
    version = "2.0">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -16,7 +15,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "CF1539FF2BEC768C00741F42"
+               BlueprintIdentifier = "E85003012F296DA20026AB25"
                BuildableName = "OneSignalNotificationServiceExtension.appex"
                BlueprintName = "OneSignalNotificationServiceExtension"
                ReferencedContainer = "container:App.xcodeproj">

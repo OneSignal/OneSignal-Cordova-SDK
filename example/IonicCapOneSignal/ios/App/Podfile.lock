@@ -59,7 +59,7 @@ DEPENDENCIES:
   - "CapacitorApp (from `../../node_modules/@capacitor/app`)"
   - "CapacitorCordova (from `../../node_modules/@capacitor/ios`)"
   - CordovaPluginsStatic (from `../capacitor-cordova-ios-plugins`)
-  - OneSignalXCFramework (< 6.0, >= 5.0)
+  - OneSignalXCFramework (< 6.0, >= 5.0.0)
 
 SPEC REPOS:
   trunk:
@@ -82,6 +82,6 @@ SPEC CHECKSUMS:
   CordovaPluginsStatic: f7bfd5526db87e06d891a0ed69df10de3c611fe4
   OneSignalXCFramework: ea9e14a95b92ad48d9b35037cbae88a9542bdea3
 
-PODFILE CHECKSUM: a31c0839423113e26e8afc91cc07a41d59e58245
+PODFILE CHECKSUM: 7d4b7b923aa85800527709ff92134a62d0b1d113
 
 COCOAPODS: 1.16.2

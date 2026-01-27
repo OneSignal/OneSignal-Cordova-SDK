@@ -4,6 +4,8 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>CFBundleDisplayName</key>
 	<string>IonicCapOneSignal</string>
 	<key>CFBundleExecutable</key>
@@ -22,18 +24,6 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>test always and when in use</string>
-	<key>NSLocationUsageDescription</key>
-	<string>Test Location</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Test Location2</string>
-	<key>NSSupportsLiveActivities</key>
-	<true/>
-	<key>OneSignal_disable_badge_clearing</key>
-	<false/>
-	<key>OneSignal_require_privacy_consent</key>
-	<false/>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>
