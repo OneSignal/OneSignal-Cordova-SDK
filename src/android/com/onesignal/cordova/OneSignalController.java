@@ -370,7 +370,10 @@ public class OneSignalController {
         while (keys.hasNext()) {
             String key = keys.next();
             Object value = json.get(key);
-            map.put(key, convertJsonValue(value));
+            // Skip null values as the native SDK doesn't accept them
+            if (value != JSONObject.NULL) {
+                map.put(key, convertJsonValue(value));
+            }
         }
 
         return map;
@@ -378,15 +381,17 @@ public class OneSignalController {
 
     /** Convert JSON value to native Java type */
     private static Object convertJsonValue(Object value) throws JSONException {
-        if (value == JSONObject.NULL) {
-            return null;
-        } else if (value instanceof JSONObject) {
+        if (value instanceof JSONObject) {
             return jsonObjectToMap((JSONObject) value);
         } else if (value instanceof JSONArray) {
             JSONArray jsonArray = (JSONArray) value;
             Collection<Object> list = new ArrayList<>();
             for (int i = 0; i < jsonArray.length(); i++) {
-                list.add(convertJsonValue(jsonArray.get(i)));
+                Object item = jsonArray.get(i);
+                // Skip null values in arrays
+                if (item != JSONObject.NULL) {
+                    list.add(convertJsonValue(item));
+                }
             }
             return list;
         } else {
