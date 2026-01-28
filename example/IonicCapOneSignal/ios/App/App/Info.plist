@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -28,8 +30,6 @@
 	<string>Test Location</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Test Location2</string>
-	<key>NSSupportsLiveActivities</key>
-	<true/>
 	<key>OneSignal_disable_badge_clearing</key>
 	<false/>
 	<key>OneSignal_require_privacy_consent</key>
