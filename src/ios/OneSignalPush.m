@@ -808,4 +808,19 @@ static Class delegateClass = nil;
   }
 #endif
 }
+
+/**
+ * Custom Events
+ */
+
+- (void)trackEvent:(CDVInvokedUrlCommand *)command {
+  NSString *eventName = command.arguments[0];
+  NSDictionary *properties = nil;
+
+  if (command.arguments.count > 1 && command.arguments[1] != [NSNull null]) {
+    properties = command.arguments[1];
+  }
+
+  [OneSignal.User trackEventWithName:eventName properties:properties];
+}
 @end

@@ -342,4 +342,56 @@ public class OneSignalController {
         // doesn't apply to Android
         return true;
     }
+
+    /** Custom Events */
+    public static boolean trackEvent(JSONArray data) {
+        try {
+            String eventName = data.getString(0);
+            Map<String, Object> properties = null;
+
+            if (data.length() > 1 && !data.isNull(1)) {
+                JSONObject propertiesObject = data.getJSONObject(1);
+                properties = jsonObjectToMap(propertiesObject);
+            }
+
+            OneSignal.getUser().trackEvent(eventName, properties);
+            return true;
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return false;
+        }
+    }
+
+    /** Convert JSONObject to Map, recursively converting nested objects and arrays */
+    private static Map<String, Object> jsonObjectToMap(JSONObject json) throws JSONException {
+        Map<String, Object> map = new HashMap<>();
+        Iterator<String> keys = json.keys();
+
+        while (keys.hasNext()) {
+            String key = keys.next();
+            Object value = json.get(key);
+            map.put(key, convertJsonValue(value));
+        }
+
+        return map;
+    }
+
+    /** Convert JSON value to native Java type */
+    private static Object convertJsonValue(Object value) throws JSONException {
+        if (value == JSONObject.NULL) {
+            return null;
+        } else if (value instanceof JSONObject) {
+            return jsonObjectToMap((JSONObject) value);
+        } else if (value instanceof JSONArray) {
+            JSONArray jsonArray = (JSONArray) value;
+            Collection<Object> list = new ArrayList<>();
+            for (int i = 0; i < jsonArray.length(); i++) {
+                list.add(convertJsonValue(jsonArray.get(i)));
+            }
+            return list;
+        } else {
+            // Primitive types (String, Integer, Double, Boolean, etc.)
+            return value;
+        }
+    }
 }

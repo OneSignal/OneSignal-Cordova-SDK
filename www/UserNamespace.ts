@@ -251,4 +251,21 @@ export default class User {
       );
     });
   }
+
+  /**
+   * Track a custom event with the provided name and optional properties.
+   * @param  {string} name - The name of the custom event
+   * @param  {object} [properties] - Optional properties to associate with the event
+   * @returns void
+   */
+  trackEvent(name: string, properties?: object): void {
+    const args = properties ? [name, properties] : [name];
+    window.cordova.exec(
+      function () {},
+      function () {},
+      'OneSignalPush',
+      'trackEvent',
+      args,
+    );
+  }
 }
