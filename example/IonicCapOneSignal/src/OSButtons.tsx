@@ -277,9 +277,10 @@ class OSButtons extends React.Component<Props> {
           nested: {
             def: '456',
           },
+          ghi: null,
         },
         someArray: [1, 2],
-        someMixedArray: [1, '2', { abc: '123' }],
+        someMixedArray: [1, '2', { abc: '123' }, null],
         someNull: null,
       });
     });

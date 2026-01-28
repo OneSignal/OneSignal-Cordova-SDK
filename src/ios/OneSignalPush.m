@@ -818,9 +818,42 @@ static Class delegateClass = nil;
   NSDictionary *properties = nil;
 
   if (command.arguments.count > 1 && command.arguments[1] != [NSNull null]) {
-    properties = command.arguments[1];
+    properties = [self removeNullValues:command.arguments[1]];
   }
 
   [OneSignal.User trackEventWithName:eventName properties:properties];
+}
+
+- (NSDictionary *)removeNullValues:(NSDictionary *)dict {
+  NSMutableDictionary *result = [NSMutableDictionary dictionary];
+  for (NSString *key in dict) {
+    id value = dict[key];
+    if (value == [NSNull null]) {
+      continue;
+    } else if ([value isKindOfClass:[NSDictionary class]]) {
+      result[key] = [self removeNullValues:value];
+    } else if ([value isKindOfClass:[NSArray class]]) {
+      result[key] = [self removeNullValuesFromArray:value];
+    } else {
+      result[key] = value;
+    }
+  }
+  return result;
+}
+
+- (NSArray *)removeNullValuesFromArray:(NSArray *)array {
+  NSMutableArray *result = [NSMutableArray array];
+  for (id value in array) {
+    if (value == [NSNull null]) {
+      continue;
+    } else if ([value isKindOfClass:[NSDictionary class]]) {
+      [result addObject:[self removeNullValues:value]];
+    } else if ([value isKindOfClass:[NSArray class]]) {
+      [result addObject:[self removeNullValuesFromArray:value]];
+    } else {
+      [result addObject:value];
+    }
+  }
+  return result;
 }
 @end
