@@ -139,6 +139,7 @@ public class OneSignalPush extends CordovaPlugin
     private static final String REMOVE_PUSH_TO_START_TOKEN = "removePushToStartToken";
     private static final String SETUP_DEFAULT_ACTIVITY = "setupDefaultLiveActivity";
     private static final String START_DEFAULT_LIVE_ACTIVITY = "startDefaultLiveActivity";
+    private static final String TRACK_EVENT = "trackEvent";
 
     private static final HashMap<String, INotificationWillDisplayEvent> notificationWillDisplayCache = new HashMap<>();
     private static final HashMap<String, INotificationWillDisplayEvent> preventDefaultCache = new HashMap<>();
@@ -640,11 +641,14 @@ public class OneSignalPush extends CordovaPlugin
                 result = OneSignalController.startDefaultLiveActivity();
                 break;
 
+            case TRACK_EVENT:
+                result = OneSignalController.trackEvent(data);
+                break;
+
             default:
                 Logging.error(TAG + "Invalid action : " + action, null);
                 CallbackHelper.callbackError(callbackContext, "Invalid action : " + action);
         }
-
         return result;
     }
 
