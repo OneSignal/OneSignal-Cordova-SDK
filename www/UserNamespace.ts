@@ -260,7 +260,7 @@ export default class User {
    */
   trackEvent(name: string, properties?: object): void {
     if (properties !== undefined && !isObjectSerializable(properties)) {
-      console.error('Properties must be JSON-serializable');
+      console.error('Properties must be a JSON-serializable object');
       return;
     }
     const args = properties ? [name, properties] : [name];
