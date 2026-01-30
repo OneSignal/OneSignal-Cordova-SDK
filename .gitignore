@@ -1,5 +1,6 @@
 node_modules
 dist
+.idea
 .DS_Store
 .idea
 
@@ -9,6 +10,7 @@ build/
 coverage/
 *.tgz
 
+.DS_Store
 # Coverage
 coverage/
 

@@ -1,4 +1,4 @@
-import { noop, removeListener } from './helpers';
+import { isObjectSerializable, noop, removeListener } from './helpers';
 import PushSubscription from './PushSubscriptionNamespace';
 
 // Represents the current user state
@@ -250,5 +250,20 @@ export default class User {
         [],
       );
     });
+  }
+
+  /**
+   * Track a custom event with the provided name and optional properties.
+   * @param  {string} name - The name of the custom event
+   * @param  {object} [properties] - Optional properties to associate with the event
+   * @returns void
+   */
+  trackEvent(name: string, properties?: object): void {
+    if (properties !== undefined && !isObjectSerializable(properties)) {
+      console.error('Properties must be a JSON-serializable object');
+      return;
+    }
+    const args = properties ? [name, properties] : [name];
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'trackEvent', args);
   }
 }

@@ -443,4 +443,67 @@ describe('User', () => {
       await expect(promise).rejects.toThrow('Failed to get external id');
     });
   });
+
+  describe('trackEvent', () => {
+    test('should call cordova.exec with only event name', () => {
+      const eventName = 'purchase';
+
+      user.trackEvent(eventName);
+
+      expect(window.cordova.exec).toHaveBeenCalledWith(
+        expect.any(Function),
+        expect.any(Function),
+        'OneSignalPush',
+        'trackEvent',
+        [eventName],
+      );
+    });
+
+    test('should call cordova.exec with event name and properties', () => {
+      const eventName = 'purchase';
+      const properties = { amount: 99.99, currency: 'USD' };
+
+      user.trackEvent(eventName, properties);
+
+      expect(window.cordova.exec).toHaveBeenCalledWith(
+        expect.any(Function),
+        expect.any(Function),
+        'OneSignalPush',
+        'trackEvent',
+        [eventName, properties],
+      );
+    });
+
+    test('should not call cordova.exec when properties are not serializable', () => {
+      const eventName = 'purchase';
+      const circularObj: Record<string, unknown> = { name: 'test' };
+      circularObj.self = circularObj;
+      const consoleSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+
+      user.trackEvent(eventName, circularObj);
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Properties must be a JSON-serializable object',
+      );
+      expect(window.cordova.exec).not.toHaveBeenCalled();
+      consoleSpy.mockRestore();
+    });
+
+    test('should not call cordova.exec when properties is an array', () => {
+      const eventName = 'purchase';
+      const consoleSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+
+      user.trackEvent(eventName, ['item1', 'item2'] as unknown as object);
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Properties must be a JSON-serializable object',
+      );
+      expect(window.cordova.exec).not.toHaveBeenCalled();
+      consoleSpy.mockRestore();
+    });
+  });
 });

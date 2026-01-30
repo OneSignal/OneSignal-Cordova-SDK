@@ -121,6 +121,9 @@
 - (void)addUniqueOutcome:(CDVInvokedUrlCommand *_Nonnull)command;
 - (void)addOutcomeWithValue:(CDVInvokedUrlCommand *_Nonnull)command;
 
+// Custom Events
+- (void)trackEvent:(CDVInvokedUrlCommand *_Nonnull)command;
+
 // Location
 - (void)requestLocationPermission:(CDVInvokedUrlCommand *_Nonnull)command;
 - (void)setLocationShared:(CDVInvokedUrlCommand *_Nonnull)command;
