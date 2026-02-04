@@ -74,7 +74,7 @@
             <source url="https://cdn.cocoapods.org/"/>
         </config>
         <pods use-frameworks="true">
-            <pod name="OneSignalXCFramework" spec="5.4.0" />
+            <pod name="OneSignalXCFramework" spec="5.4.1" />
         </pods>
     </podspec>
 
