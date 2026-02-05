@@ -4,11 +4,11 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "dev": "vite",
     "update:pod": "cd ios/App && pod update OneSignalXCFramework",
     "build": "../scripts/build.sh IonicCapOneSignal",
     "ionic:build": "bun run build",
-    "preview": "vite preview"
+    "ios": "ionic capacitor run ios",
+    "android": "ionic capacitor run android"
   },
   "dependencies": {
     "@capacitor/android": "7.4.5",
