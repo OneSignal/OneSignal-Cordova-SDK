@@ -1,7 +1,7 @@
 {
-  "name": "ionic-app-base",
+  "name": "demo",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,7 +12,11 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@capacitor/app": "8.0.1",
     "@capacitor/core": "8.1.0",
+    "@capacitor/haptics": "8.0.0",
+    "@capacitor/keyboard": "8.0.0",
+    "@capacitor/status-bar": "8.0.1",
     "@ionic/react": "^8.5.0",
     "@ionic/react-router": "^8.5.0",
     "@types/react-router": "^5.1.20",
@@ -24,6 +28,7 @@
     "react-router-dom": "^5.3.4"
   },
   "devDependencies": {
+    "@capacitor/cli": "8.1.0",
     "@testing-library/dom": ">=7.21.4",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^16.2.0",
@@ -44,5 +49,6 @@
     "typescript-eslint": "^8.24.0",
     "vite": "^5.0.0",
     "vitest": "^0.34.6"
-  }
+  },
+  "description": "An Ionic project"
 }
