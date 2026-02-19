@@ -403,23 +403,42 @@ Ionic + Capacitor notes:
 
 App Section layout:
 
-1. App ID display/input near top of section.
+1. App ID display (readonly showing the OneSignal App ID)
+
 2. Guidance banner directly below App ID:
    - Text: `Add your own App ID, then rebuild to fully test all functionality.`
-   - Link text: `Get your keys at onesignal.com`
+   - Link text: `Get your keys at onesignal.com` (clickable, opens browser)
    - Use a light background style so it stands out.
+
 3. Consent card with up to two toggles:
-   - `Consent Required` toggle is always visible and updates `setConsentRequired`.
-   - `Privacy Consent` toggle is only visible when Consent Required is ON and updates `setConsentGiven`.
-   - Use a divider between the two rows.
-   - This is non-blocking UI; user can still interact with the app.
-4. User status card shown above auth buttons:
-   - Row 1: `Status` label + value (`Anonymous` or `Logged In`)
-   - Row 2: `External ID` label + value (`-` when logged out)
+   a. `Consent Required` toggle (always visible):
+      - Label: `Consent Required`
+      - Description: `Require consent before SDK processes data`
+      - Calls `setConsentRequired(value)`
+   b. `Privacy Consent` toggle (only visible when Consent Required is ON):
+      - Label: `Privacy Consent`
+      - Description: `Consent given for data collection`
+      - Calls `setConsentGiven(value)`
+      - Separated from the above toggle by a horizontal divider
+      - NOT a blocking overlay — user can interact with app regardless of state
+
+4. User status card (always visible, ABOVE the login/logout buttons):
+   - Card with two rows separated by a divider
+   - Row 1: `Status` label on the left, value on the right
+   - Row 2: `External ID` label on the left, value on the right
+   - When logged out:
+     - Status shows `Anonymous`
+     - External ID shows `–` (dash)
+   - When logged in:
+     - Status shows `Logged In` with green styling (`#2E7D32`)
+     - External ID shows the actual external user ID
+
 5. `LOGIN USER` button:
-   - Label changes to `SWITCH USER` when already logged in
-   - Opens modal with empty `External User Id` input
-6. `LOGOUT USER` button visible only when logged in.
+   - Shows `LOGIN USER` when no user is logged in
+   - Shows `SWITCH USER` when a user is logged in
+   - Opens modal with empty `External User Id` field
+
+6. `LOGOUT USER` button (only visible when a user is logged in)
 
 ### Prompt 2.2 - Push Section
 
@@ -920,25 +939,41 @@ Behavior:
 
 ### Prompt 8.5 - Theme
 
-Define shared tokens in `src/theme/tokens.ts` and apply consistently.
+Define shared design tokens as CSS custom properties on `:root` in `Home.css`. Do not use a `tokens.ts` file.
 
 Colors:
 
-- primary red: `#E54B4D`
-- success green and subtle success background
-- neutral backgrounds/cards/dividers
-- warning background
+- `--color-primary: #E54B4D`
+- `--color-success: #34A853`
+- `--color-success-subtle: #E6F4EA`
+- `--color-background: #F8F9FA`
+- `--color-card: #FFFFFF`
+- `--color-divider: #E8EAED`
+- `--color-warning-bg: #FFF8E1`
+- `--color-text-primary: #1F2733`
+- `--color-text-secondary: #6F7782`
 
 Spacing:
 
-- `cardGap = 8` (inside section)
-- `sectionGap = 12` (between sections)
+- `--space-card-gap: 8px`
+- `--space-section-gap: 12px`
+- `--space-page-padding: 12px`
 
-Also define:
+Typography:
 
-- shared radii for cards/buttons
-- typography scale for titles/labels/values
-- reusable style primitives used by section/components
+- `--font-size-section-header: 12px`
+- `--font-size-body-large: 16px`
+- `--font-size-body: 14px`
+- `--font-size-caption: 13px`
+- `--font-size-mono: 12px`
+
+Radii:
+
+- `--radius-card: 12px`
+- `--radius-button: 8px`
+- `--radius-modal: 16px`
+
+Use these variables throughout `Home.css`. Avoid inline `style` attributes in TSX — use CSS classes instead.
 
 ### Prompt 8.6 - Log View (Appium-Ready)
 

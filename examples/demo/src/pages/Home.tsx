@@ -28,7 +28,6 @@ import TriggersSection from '../components/sections/TriggersSection';
 import { useAppContext } from '../context/AppContext';
 import type { TooltipData } from '../services/TooltipHelper';
 import TooltipHelper from '../services/TooltipHelper';
-import { Theme } from '../theme/tokens';
 import './Home.css';
 
 type DialogState =
@@ -89,10 +88,6 @@ const Home: React.FC = () => {
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const [activeTooltip, setActiveTooltip] = useState<TooltipData | null>(null);
 
-  const statusLabel = useMemo(
-    () => (state.externalUserId ? 'Logged In' : 'Anonymous'),
-    [state.externalUserId],
-  );
   const aliasItems = useMemo(
     () =>
       state.aliasesList
@@ -143,14 +138,8 @@ const Home: React.FC = () => {
   return (
     <IonPage>
       <IonContent fullscreen>
-        <div
-          className="demo-app"
-          style={{ background: Theme.colors.lightBackground }}
-        >
-          <header
-            className="brand-header"
-            style={{ background: Theme.colors.oneSignalRed }}
-          >
+        <div className="demo-app">
+          <header className="brand-header">
             <div className="brand-title">
               <img className="brand-logo" src={oneSignalLogo} alt="OneSignal" />
               <span className="brand-subtitle">Sample App</span>
@@ -163,6 +152,7 @@ const Home: React.FC = () => {
               appId={state.appId}
               consentRequired={state.consentRequired}
               privacyConsentGiven={state.privacyConsentGiven}
+              externalUserId={state.externalUserId}
               onToggleConsent={(checked) =>
                 runAction(`Consent required: ${checked}`, () =>
                   setConsentRequired(checked),
@@ -173,37 +163,9 @@ const Home: React.FC = () => {
                   setConsentGiven(checked),
                 )
               }
+              onLogin={() => setDialog({ type: 'login' })}
+              onLogout={() => runAction('Logged out', logoutUser)}
             />
-
-            <section className="section">
-              <h2>USER</h2>
-              <div className="card kv-card">
-                <div className="kv-row">
-                  <span>Status</span>
-                  <span>{statusLabel}</span>
-                </div>
-                <div className="divider" />
-                <div className="kv-row">
-                  <span>External ID</span>
-                  <span>{state.externalUserId ?? '-'}</span>
-                </div>
-              </div>
-              <ActionButton
-                onClick={() => setDialog({ type: 'login' })}
-                type="button"
-              >
-                {state.externalUserId ? 'SWITCH USER' : 'LOGIN USER'}
-              </ActionButton>
-              {state.externalUserId ? (
-                <ActionButton
-                  variant="outline"
-                  type="button"
-                  onClick={() => runAction('Logged out', logoutUser)}
-                >
-                  LOGOUT USER
-                </ActionButton>
-              ) : null}
-            </section>
 
             <PushSection
               pushSubscriptionId={state.pushSubscriptionId ?? null}

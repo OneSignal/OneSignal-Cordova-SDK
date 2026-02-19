@@ -38,7 +38,7 @@ const PushSection: FC<PushSectionProps> = ({
       </div>
     </div>
     {!hasNotificationPermission ? (
-      <ActionButton variant="outline" type="button" onClick={onPromptPush}>
+      <ActionButton type="button" onClick={onPromptPush}>
         PROMPT PUSH
       </ActionButton>
     ) : null}
