@@ -1,4 +1,6 @@
 import type { FC } from 'react';
+import { IonIcon } from '@ionic/react';
+import { closeOutline } from 'ionicons/icons';
 
 export type PairItem = {
   key: string;
@@ -32,7 +34,7 @@ export const PairList: FC<PairListProps> = ({ items, onRemove }) => (
           </div>
           {onRemove ? (
             <button type="button" className="delete-btn" onClick={() => onRemove(item.key)}>
-              ✕
+              <IonIcon icon={closeOutline} />
             </button>
           ) : null}
         </div>

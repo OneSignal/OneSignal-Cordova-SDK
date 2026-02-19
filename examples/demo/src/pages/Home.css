@@ -7,7 +7,8 @@
 .brand-header {
   background: #eb4d52;
   color: #fff;
-  height: 84px;
+  min-height: 84px;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -16,7 +17,21 @@
 }
 
 .brand-title {
-  font-size: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.brand-logo {
+  width: 99px;
+  height: 22px;
+}
+
+.brand-subtitle {
+  font-size: 14px;
+  font-weight: 400;
+  color: #fff;
+  opacity: 0.9;
 }
 
 .logs-panel {
@@ -216,7 +231,9 @@
   border: 0;
   background: transparent;
   color: #ea4d53;
-  font-size: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   line-height: 1;
 }
 

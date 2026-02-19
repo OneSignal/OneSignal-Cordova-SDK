@@ -22,7 +22,7 @@
     "@ionic/react-router": "^8.5.0",
     "@types/react-router": "^5.1.20",
     "@types/react-router-dom": "^5.3.3",
-    "ionicons": "^7.4.0",
+    "ionicons": "^8.0.13",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-router": "^5.3.4",

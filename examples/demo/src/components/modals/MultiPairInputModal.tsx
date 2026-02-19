@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { FC } from 'react';
+import { IonIcon } from '@ionic/react';
+import { closeOutline } from 'ionicons/icons';
 import ModalShell from './ModalShell';
 
 type Row = { key: string; value: string };
@@ -78,7 +80,7 @@ const MultiPairInputModal: FC<MultiPairInputModalProps> = ({
                 className="delete-btn"
                 onClick={() => setRows((prev) => prev.filter((_, entryIndex) => entryIndex !== index))}
               >
-                ✕
+                <IonIcon icon={closeOutline} />
               </button>
             ) : null}
           </div>

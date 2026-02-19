@@ -119,10 +119,10 @@ Asset requirements:
 
 - Download app bar logo SVG:
   `https://raw.githubusercontent.com/OneSignal/sdk-shared/refs/heads/main/assets/onesignal_logo.svg`
-- Save to demo assets (for example `src/assets/onesignal_logo.svg`) and render via import:
-  `import OneSignalLogo from './assets/onesignal_logo.svg';`
+- Save to demo assets (for example `src/assets/onesignal_logo.svg`) and render it in the header component used by this demo (`src/pages/Home.tsx`) via import:
+  `import OneSignalLogo from '../assets/onesignal_logo.svg';`
 - Use the logo as the `OneSignal` wordmark and show separate `Sample App` text
-- Do not inline long SVG paths in `App.tsx`
+- Do not inline long SVG paths in `Home.tsx`/header JSX
 
 - Download padded icon PNG:
   `https://raw.githubusercontent.com/OneSignal/sdk-shared/refs/heads/main/assets/onesignal_logo_icon_padded.png`
@@ -166,7 +166,7 @@ Required runtime dependencies:
 - Ionic/UI packages:
   - `@ionic/react`
   - `@ionic/react-router`
-  - `ionicons`
+  - `ionicons` (use `IonIcon` from `@ionic/react` with icons from `ionicons/icons`)
 - React/router packages used by the demo:
   - `react`
   - `react-dom`
@@ -344,7 +344,7 @@ App Section layout:
 
 Push Section:
 
-- Section title includes info icon.
+- Section title includes info icon (use `IonIcon` (`@ionic/react`) + `ionicons/icons`).
 - Show Push Subscription ID (read-only).
 - `Push Enabled` toggle controls opt-in/opt-out.
   - Toggle is disabled when notification permission is not granted.
@@ -357,7 +357,7 @@ Push Section:
 
 Send Push Notification Section:
 
-- Section title includes info icon.
+- Section title includes info icon (use `IonIcon` (`@ionic/react`) + `ionicons/icons`).
 - Three actions:
   1. `SIMPLE` (simple title/body payload)
   2. `WITH IMAGE` (includes image payload for Android + iOS)
@@ -371,7 +371,7 @@ Send Push Notification Section:
 
 In-App Messaging Section:
 
-- Section title includes info icon.
+- Section title includes info icon (use `IonIcon` (`@ionic/react`) + `ionicons/icons`).
 - `Pause In-App Messages` toggle:
   - Label: `Pause In-App Messages`
   - Description: `Toggle in-app message display`
@@ -380,7 +380,7 @@ In-App Messaging Section:
 
 Send In-App Message Section:
 
-- Section title includes info icon.
+- Section title includes info icon (use `IonIcon` (`@ionic/react`) + `ionicons/icons`).
 - Four full-width buttons (stacked, not grid):
   1. `TOP BANNER` -> `iam_type = top_banner`
   2. `BOTTOM BANNER` -> `iam_type = bottom_banner`
@@ -388,7 +388,7 @@ Send In-App Message Section:
   4. `FULL SCREEN` -> `iam_type = full_screen`
 - Button behavior:
   - Full width, uppercase labels
-  - Left-aligned icon + text content
+  - Left-aligned icon + text content using `IonIcon` with icons from `ionicons/icons`
   - Uses app primary color styling
 - On tap:
   - Add/update trigger in SDK
@@ -400,7 +400,7 @@ Send In-App Message Section:
 
 Aliases Section:
 
-- Section title includes info icon.
+- Section title includes info icon (use `IonIcon` (`@ionic/react`) + `ionicons/icons`).
 - Read-only key/value list.
 - Hide special alias keys from display:
   - `external_id`
@@ -413,7 +413,7 @@ Aliases Section:
 
 Emails Section:
 
-- Section title includes info icon.
+- Section title includes info icon (use `IonIcon` (`@ionic/react`) + `ionicons/icons`).
 - List email values with remove action per row.
 - Empty state text: `No Emails Added`.
 - `ADD EMAIL` opens modal with empty field.
@@ -425,7 +425,7 @@ Emails Section:
 
 SMS Section:
 
-- Section title includes info icon.
+- Section title includes info icon (use `IonIcon` (`@ionic/react`) + `ionicons/icons`).
 - List phone numbers with remove action per row.
 - Empty state text: `No SMS Added`.
 - `ADD SMS` opens modal with empty field.
@@ -435,7 +435,7 @@ SMS Section:
 
 Tags Section:
 
-- Section title includes info icon.
+- Section title includes info icon (use `IonIcon` (`@ionic/react`) + `ionicons/icons`).
 - Show key/value entries in stacked layout (key over value).
 - Per-row remove action available.
 - Empty state text: `No Tags Added`.
@@ -449,7 +449,7 @@ Tags Section:
 
 Outcome Events Section:
 
-- Section title includes info icon.
+- Section title includes info icon (use `IonIcon` (`@ionic/react`) + `ionicons/icons`).
 - `SEND OUTCOME` opens modal with 3 choices:
   1. Normal Outcome (name input)
   2. Unique Outcome (name input)
@@ -459,7 +459,7 @@ Outcome Events Section:
 
 Triggers Section:
 
-- Section title includes info icon.
+- Section title includes info icon (use `IonIcon` (`@ionic/react`) + `ionicons/icons`).
 - Show key/value entries in stacked layout with row remove action.
 - Empty state text: `No Triggers Added`.
 - `ADD` and `ADD MULTIPLE` use the same modal patterns as Tags.
@@ -478,7 +478,7 @@ Important behavior:
 
 Track Event Section:
 
-- Section title includes info icon.
+- Section title includes info icon (use `IonIcon` (`@ionic/react`) + `ionicons/icons`).
 - `TRACK EVENT` opens modal with:
   - Required Event Name input
   - Optional JSON properties input with placeholder example
@@ -491,7 +491,7 @@ Track Event Section:
 
 Location Section:
 
-- Section title includes info icon.
+- Section title includes info icon (use `IonIcon` (`@ionic/react`) + `ionicons/icons`).
 - `Location Shared` toggle with descriptive subtitle.
 - `PROMPT LOCATION` button requests location permission.
 
@@ -780,7 +780,7 @@ Create reusable components in `src/components/`:
 `LogView.tsx`:
 
 - Sticky top debug panel with fixed height.
-- Clear button uses icon button style.
+- Clear button uses icon button style with `IonIcon` + `ionicons/icons`.
 - Auto-scroll to newest entries.
 
 `components/modals/*`:
