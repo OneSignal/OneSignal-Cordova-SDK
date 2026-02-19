@@ -15,3 +15,5 @@ mv onesignal-cordova-plugin-*.tgz onesignal-cordova-plugin.tgz
 cd "$ORIGINAL_DIR"
 bun pm cache rm
 bun i
+
+bun cap sync
