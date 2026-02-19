@@ -99,10 +99,9 @@
 .content {
   padding: 12px;
   padding-bottom: calc(12px + var(--ion-safe-area-bottom));
-}
-
-.section {
-  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .section h2 {

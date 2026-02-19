@@ -475,13 +475,15 @@ Send In-App Message Section:
 Aliases Section:
 
 - Section title includes info icon (use `MdInfoOutline` from `react-icons/md`).
-- Read-only key/value list.
+- List showing key-value pairs (read-only, no delete icons).
+- Each item shows: Label | ID.
 - Hide special alias keys from display:
   - `external_id`
   - `onesignal_id`
 - Empty state text: `No Aliases Added`.
-- `ADD` opens single pair modal with empty fields.
-- `ADD MULTIPLE` opens dynamic multi-row modal.
+- `ADD` opens `PairInputModal` with empty Label and ID fields on the same row (single add).
+- `ADD MULTIPLE` opens `MultiPairInputModal` (dynamic rows with add/remove).
+- No remove/delete functionality (aliases are add-only from the UI).
 
 ### Prompt 2.7 - Emails Section
 

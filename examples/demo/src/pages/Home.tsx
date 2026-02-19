@@ -87,7 +87,10 @@ const Home: React.FC = () => {
     [state.externalUserId],
   );
   const aliasItems = useMemo(
-    () => state.aliasesList.map(([label, id]) => ({ key: label, value: id })),
+    () =>
+      state.aliasesList
+        .filter(([label]) => label !== 'external_id' && label !== 'onesignal_id')
+        .map(([label, id]) => ({ key: label, value: id })),
     [state.aliasesList],
   );
   const tagItems = useMemo(

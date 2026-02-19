@@ -18,7 +18,7 @@ const AliasesSection: FC<AliasesSectionProps> = ({
   onAddMultipleAliases,
 }) => (
   <SectionCard title="ALIASES" onInfoTap={onInfoTap}>
-    <PairList items={aliasItems} emptyText="No aliases added" />
+    <PairList items={aliasItems} emptyText="No Aliases Added" />
     <ActionButton type="button" onClick={onAddAlias}>
       ADD
     </ActionButton>
