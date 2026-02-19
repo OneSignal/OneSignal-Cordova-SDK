@@ -10,7 +10,13 @@ interface MultiSelectRemoveModalProps {
   onSubmit: (keys: string[]) => void;
 }
 
-const MultiSelectRemoveModal: FC<MultiSelectRemoveModalProps> = ({ open, title, items, onClose, onSubmit }) => {
+const MultiSelectRemoveModal: FC<MultiSelectRemoveModalProps> = ({
+  open,
+  title,
+  items,
+  onClose,
+  onSubmit,
+}) => {
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
 
   useEffect(() => {
@@ -33,7 +39,9 @@ const MultiSelectRemoveModal: FC<MultiSelectRemoveModalProps> = ({ open, title, 
                   if (event.target.checked) {
                     setSelectedKeys((prev) => [...prev, key]);
                   } else {
-                    setSelectedKeys((prev) => prev.filter((selectedKey) => selectedKey !== key));
+                    setSelectedKeys((prev) =>
+                      prev.filter((selectedKey) => selectedKey !== key),
+                    );
                   }
                 }}
               />
@@ -42,8 +50,14 @@ const MultiSelectRemoveModal: FC<MultiSelectRemoveModalProps> = ({ open, title, 
           ))}
         </div>
         <div className="modal-actions">
-          <button type="button" onClick={onClose}>Cancel</button>
-          <button type="button" onClick={() => onSubmit(selectedKeys)} disabled={!selectedKeys.length}>
+          <button type="button" onClick={onClose}>
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={() => onSubmit(selectedKeys)}
+            disabled={!selectedKeys.length}
+          >
             Remove ({selectedKeys.length})
           </button>
         </div>

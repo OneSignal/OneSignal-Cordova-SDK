@@ -44,11 +44,21 @@ const PairInputModal: FC<PairInputModalProps> = ({
       >
         <h3>{title}</h3>
         <div className="inline-fields">
-          <input value={first} onChange={(event) => setFirst(event.target.value)} placeholder={firstPlaceholder} />
-          <input value={second} onChange={(event) => setSecond(event.target.value)} placeholder={secondPlaceholder} />
+          <input
+            value={first}
+            onChange={(event) => setFirst(event.target.value)}
+            placeholder={firstPlaceholder}
+          />
+          <input
+            value={second}
+            onChange={(event) => setSecond(event.target.value)}
+            placeholder={secondPlaceholder}
+          />
         </div>
         <div className="modal-actions">
-          <button type="button" onClick={onClose}>Cancel</button>
+          <button type="button" onClick={onClose}>
+            Cancel
+          </button>
           <button type="submit">{confirmLabel}</button>
         </div>
       </form>

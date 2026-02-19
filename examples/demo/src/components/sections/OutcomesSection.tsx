@@ -7,7 +7,10 @@ interface OutcomesSectionProps {
   onSendOutcome: () => void;
 }
 
-const OutcomesSection: FC<OutcomesSectionProps> = ({ onInfoTap, onSendOutcome }) => (
+const OutcomesSection: FC<OutcomesSectionProps> = ({
+  onInfoTap,
+  onSendOutcome,
+}) => (
   <SectionCard title="OUTCOME EVENTS" onInfoTap={onInfoTap}>
     <ActionButton type="button" onClick={onSendOutcome}>
       SEND OUTCOME

@@ -7,8 +7,10 @@
     "preandroid": "bun run setup",
     "preios": "bun run setup",
     "build": "tsc && vite build",
-    "android": "ionic cap run android -l --external",
-    "ios": "ionic cap run ios -l --external"
+    "android": "ionic cap sync android",
+    "ios": "ionic cap sync ios",
+    "android:hot": "ionic cap run android -l --external",
+    "ios:hot": "ionic cap run ios -l --external"
   },
   "dependencies": {
     "@capacitor/android": "8.1.0",

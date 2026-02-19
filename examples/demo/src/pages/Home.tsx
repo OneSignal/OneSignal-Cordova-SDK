@@ -485,10 +485,13 @@ const Home: React.FC = () => {
           secondPlaceholder="Value"
           onClose={closeDialog}
           onSubmit={(pairs) =>
-            runAction(`${Object.keys(pairs).length} trigger(s) added`, async () => {
-              await addTriggers(pairs);
-              closeDialog();
-            })
+            runAction(
+              `${Object.keys(pairs).length} trigger(s) added`,
+              async () => {
+                await addTriggers(pairs);
+                closeDialog();
+              },
+            )
           }
         />
 

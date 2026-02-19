@@ -58,7 +58,9 @@ class TooltipHelper {
                 }
                 const optionRecord = option as Record<string, unknown>;
                 const name =
-                  typeof optionRecord.name === 'string' ? optionRecord.name : '';
+                  typeof optionRecord.name === 'string'
+                    ? optionRecord.name
+                    : '';
                 const optionDescription =
                   typeof optionRecord.description === 'string'
                     ? optionRecord.description

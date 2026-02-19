@@ -82,7 +82,9 @@ const OutcomeModal: FC<OutcomeModalProps> = ({ open, onClose, onSubmit }) => {
           />
         ) : null}
         <div className="modal-actions outcome-actions">
-          <button type="button" onClick={onClose}>Cancel</button>
+          <button type="button" onClick={onClose}>
+            Cancel
+          </button>
           <button type="submit">Send</button>
         </div>
       </form>

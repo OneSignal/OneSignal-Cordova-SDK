@@ -12,7 +12,11 @@ interface TrackEventModalProps {
   onSubmit: (name: string, properties?: Record<string, unknown>) => void;
 }
 
-const TrackEventModal: FC<TrackEventModalProps> = ({ open, onClose, onSubmit }) => {
+const TrackEventModal: FC<TrackEventModalProps> = ({
+  open,
+  onClose,
+  onSubmit,
+}) => {
   const [name, setName] = useState('');
   const [properties, setProperties] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -49,7 +53,11 @@ const TrackEventModal: FC<TrackEventModalProps> = ({ open, onClose, onSubmit }) 
         }}
       >
         <h3>Track Event</h3>
-        <input value={name} onChange={(event) => setName(event.target.value)} placeholder="Event Name" />
+        <input
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+          placeholder="Event Name"
+        />
         <textarea
           value={properties}
           onChange={(event) => {
@@ -60,7 +68,9 @@ const TrackEventModal: FC<TrackEventModalProps> = ({ open, onClose, onSubmit }) 
         />
         {error ? <p className="error">{error}</p> : null}
         <div className="modal-actions">
-          <button type="button" onClick={onClose}>Cancel</button>
+          <button type="button" onClick={onClose}>
+            Cancel
+          </button>
           <button type="submit">Track</button>
         </div>
       </form>

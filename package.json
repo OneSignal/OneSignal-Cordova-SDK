@@ -16,14 +16,14 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc --noEmit && vite build",
-    "format:spotless": "./example/IonicCapOneSignal/android/gradlew spotlessApply",
+    "format:spotless": "./examples/demo/android/gradlew spotlessApply",
     "format:prettier": "prettier --write \"**/*.{ts,tsx}\" --ignore-path .gitignore",
     "format": "concurrently \"npm:format:spotless\" \"npm:format:prettier\"",
-    "format:check:spotless": "./example/IonicCapOneSignal/android/gradlew spotlessCheck",
+    "format:check:spotless": "./examples/demo/android/gradlew spotlessCheck",
     "format:check:prettier": "prettier --check \"**/*.{ts,tsx}\" --ignore-path .gitignore",
     "format:check": "concurrently \"npm:format:check:spotless\" \"npm:format:check:prettier\"",
-    "lint": "oxlint ./www ./example/IonicCapOneSignal && bun run format:check",
-    "lint:fix": "oxlint ./www /example/IonicCapOneSignal --fix && bun run format",
+    "lint": "oxlint ./www ./examples/demo && bun run format:check",
+    "lint:fix": "oxlint ./www ./examples/demo --fix && bun run format",
     "test": "vitest",
     "test:coverage": "vitest run --coverage"
   },

@@ -87,14 +87,17 @@ class OneSignalApiService {
         ...extra,
       };
 
-      const response = await fetch('https://onesignal.com/api/v1/notifications', {
-        method: 'POST',
-        headers: {
-          Accept: 'application/vnd.onesignal.v1+json',
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        'https://onesignal.com/api/v1/notifications',
+        {
+          method: 'POST',
+          headers: {
+            Accept: 'application/vnd.onesignal.v1+json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(body),
         },
-        body: JSON.stringify(body),
-      });
+      );
 
       return response.ok;
     } catch {

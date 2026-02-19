@@ -17,7 +17,11 @@ const EmailsSection: FC<EmailsSectionProps> = ({
   onRemoveEmail,
 }) => (
   <SectionCard title="EMAILS" onInfoTap={onInfoTap}>
-    <SingleList items={emails} emptyText="No emails added" onRemove={onRemoveEmail} />
+    <SingleList
+      items={emails}
+      emptyText="No emails added"
+      onRemove={onRemoveEmail}
+    />
     <ActionButton type="button" onClick={onAddEmail}>
       ADD EMAIL
     </ActionButton>

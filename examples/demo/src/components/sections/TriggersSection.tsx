@@ -24,7 +24,11 @@ const TriggersSection: FC<TriggersSectionProps> = ({
   onClearTriggers,
 }) => (
   <SectionCard title="TRIGGERS" onInfoTap={onInfoTap}>
-    <PairList items={triggerItems} emptyText="No Triggers Added" onRemove={onRemoveTrigger} />
+    <PairList
+      items={triggerItems}
+      emptyText="No Triggers Added"
+      onRemove={onRemoveTrigger}
+    />
     <ActionButton type="button" onClick={onAddTrigger}>
       ADD
     </ActionButton>
@@ -32,7 +36,11 @@ const TriggersSection: FC<TriggersSectionProps> = ({
       ADD MULTIPLE
     </ActionButton>
     {triggerItems.length ? (
-      <ActionButton variant="outline" type="button" onClick={onRemoveSelectedTriggers}>
+      <ActionButton
+        variant="outline"
+        type="button"
+        onClick={onRemoveSelectedTriggers}
+      >
         REMOVE SELECTED
       </ActionButton>
     ) : null}

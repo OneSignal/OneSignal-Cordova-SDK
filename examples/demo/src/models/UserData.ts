@@ -53,9 +53,7 @@ export function userDataFromJson(json: Record<string, unknown>): UserData {
   });
 
   const externalId =
-    typeof identity.external_id === 'string'
-      ? identity.external_id
-      : undefined;
+    typeof identity.external_id === 'string' ? identity.external_id : undefined;
 
   return {
     aliases,

@@ -32,7 +32,11 @@ const SendIamSection: FC<SendIamSectionProps> = ({
         <span>TOP BANNER</span>
       </span>
     </ActionButton>
-    <ActionButton className="iam-btn" type="button" onClick={onSendBottomBanner}>
+    <ActionButton
+      className="iam-btn"
+      type="button"
+      onClick={onSendBottomBanner}
+    >
       <span className="action-btn-content">
         <span className="action-btn-icon" aria-hidden>
           <MdOutlineVerticalAlignBottom />

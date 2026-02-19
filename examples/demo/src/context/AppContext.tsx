@@ -1,4 +1,12 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+} from 'react';
 import type { ReactNode } from 'react';
 import { Capacitor } from '@capacitor/core';
 import OneSignal from 'onesignal-cordova-plugin';
@@ -61,7 +69,10 @@ type AppAction =
       };
     }
   | { type: 'SET_EXTERNAL_USER_ID'; payload: string | undefined }
-  | { type: 'SET_PUSH_SUBSCRIPTION'; payload: { id: string | undefined; optedIn: boolean } }
+  | {
+      type: 'SET_PUSH_SUBSCRIPTION';
+      payload: { id: string | undefined; optedIn: boolean };
+    }
   | { type: 'SET_HAS_NOTIFICATION_PERMISSION'; payload: boolean }
   | { type: 'SET_CONSENT_REQUIRED'; payload: boolean }
   | { type: 'SET_PRIVACY_CONSENT_GIVEN'; payload: boolean }
@@ -124,7 +135,10 @@ function appReducer(state: AppState, action: AppAction): AppState {
     case 'ADD_ALIAS':
       return { ...state, aliasesList: [...state.aliasesList, action.payload] };
     case 'ADD_ALIASES':
-      return { ...state, aliasesList: [...state.aliasesList, ...action.payload] };
+      return {
+        ...state,
+        aliasesList: [...state.aliasesList, ...action.payload],
+      };
     case 'CLEAR_USER_DATA':
       return {
         ...state,
@@ -139,30 +153,55 @@ function appReducer(state: AppState, action: AppAction): AppState {
     case 'REMOVE_EMAIL':
       return {
         ...state,
-        emailsList: state.emailsList.filter((email) => email !== action.payload),
+        emailsList: state.emailsList.filter(
+          (email) => email !== action.payload,
+        ),
       };
     case 'ADD_SMS':
-      return { ...state, smsNumbersList: [...state.smsNumbersList, action.payload] };
+      return {
+        ...state,
+        smsNumbersList: [...state.smsNumbersList, action.payload],
+      };
     case 'REMOVE_SMS':
       return {
         ...state,
-        smsNumbersList: state.smsNumbersList.filter((sms) => sms !== action.payload),
+        smsNumbersList: state.smsNumbersList.filter(
+          (sms) => sms !== action.payload,
+        ),
       };
     case 'ADD_TAG':
-      return { ...state, tagsList: upsertPairs(state.tagsList, [action.payload]) };
+      return {
+        ...state,
+        tagsList: upsertPairs(state.tagsList, [action.payload]),
+      };
     case 'ADD_TAGS':
-      return { ...state, tagsList: upsertPairs(state.tagsList, action.payload) };
+      return {
+        ...state,
+        tagsList: upsertPairs(state.tagsList, action.payload),
+      };
     case 'REMOVE_SELECTED_TAGS': {
       const keys = new Set(action.payload);
-      return { ...state, tagsList: state.tagsList.filter(([key]) => !keys.has(key)) };
+      return {
+        ...state,
+        tagsList: state.tagsList.filter(([key]) => !keys.has(key)),
+      };
     }
     case 'ADD_TRIGGER':
-      return { ...state, triggersList: upsertPairs(state.triggersList, [action.payload]) };
+      return {
+        ...state,
+        triggersList: upsertPairs(state.triggersList, [action.payload]),
+      };
     case 'ADD_TRIGGERS':
-      return { ...state, triggersList: upsertPairs(state.triggersList, action.payload) };
+      return {
+        ...state,
+        triggersList: upsertPairs(state.triggersList, action.payload),
+      };
     case 'REMOVE_SELECTED_TRIGGERS': {
       const keys = new Set(action.payload);
-      return { ...state, triggersList: state.triggersList.filter(([key]) => !keys.has(key)) };
+      return {
+        ...state,
+        triggersList: state.triggersList.filter(([key]) => !keys.has(key)),
+      };
     }
     case 'CLEAR_TRIGGERS':
       return { ...state, triggersList: [] };
@@ -205,7 +244,10 @@ type AppContextValue = {
   addTriggers: (pairs: Record<string, string>) => Promise<void>;
   removeSelectedTriggers: (keys: string[]) => Promise<void>;
   clearTriggers: () => Promise<void>;
-  trackEvent: (name: string, properties?: Record<string, unknown>) => Promise<void>;
+  trackEvent: (
+    name: string,
+    properties?: Record<string, unknown>,
+  ) => Promise<void>;
   setLocationShared: (shared: boolean) => Promise<void>;
   requestLocationPermission: () => Promise<void>;
 };
@@ -381,19 +423,34 @@ export function AppContextProvider({ children }: Props) {
       if (!mountedRef.current) {
         return;
       }
-      dispatch({ type: 'SET_EXTERNAL_USER_ID', payload: externalId ?? undefined });
+      dispatch({
+        type: 'SET_EXTERNAL_USER_ID',
+        payload: externalId ?? undefined,
+      });
       addLog('User changed');
       dispatch({ type: 'SET_LOADING', payload: true });
       await fetchUserDataFromApi();
     };
 
-    OneSignal.Notifications.addEventListener('permissionChange', onPermissionChange);
-    OneSignal.User.pushSubscription.addEventListener('change', onPushSubscriptionChange);
+    OneSignal.Notifications.addEventListener(
+      'permissionChange',
+      onPermissionChange,
+    );
+    OneSignal.User.pushSubscription.addEventListener(
+      'change',
+      onPushSubscriptionChange,
+    );
     OneSignal.User.addEventListener('change', onUserChange);
 
     return () => {
-      OneSignal.Notifications.removeEventListener('permissionChange', onPermissionChange);
-      OneSignal.User.pushSubscription.removeEventListener('change', onPushSubscriptionChange);
+      OneSignal.Notifications.removeEventListener(
+        'permissionChange',
+        onPermissionChange,
+      );
+      OneSignal.User.pushSubscription.removeEventListener(
+        'change',
+        onPushSubscriptionChange,
+      );
       OneSignal.User.removeEventListener('change', onUserChange);
     };
   }, [addLog, fetchUserDataFromApi, refreshPushState]);
@@ -403,14 +460,17 @@ export function AppContextProvider({ children }: Props) {
     logManager.clear();
   }, []);
 
-  const loginUser = useCallback(async (externalUserId: string) => {
-    dispatch({ type: 'SET_LOADING', payload: true });
-    repository.loginUser(externalUserId);
-    preferences.setExternalUserId(externalUserId);
-    dispatch({ type: 'SET_EXTERNAL_USER_ID', payload: externalUserId });
-    dispatch({ type: 'CLEAR_USER_DATA' });
-    addLog(`Logged in as: ${externalUserId}`);
-  }, [addLog]);
+  const loginUser = useCallback(
+    async (externalUserId: string) => {
+      dispatch({ type: 'SET_LOADING', payload: true });
+      repository.loginUser(externalUserId);
+      preferences.setExternalUserId(externalUserId);
+      dispatch({ type: 'SET_EXTERNAL_USER_ID', payload: externalUserId });
+      dispatch({ type: 'CLEAR_USER_DATA' });
+      addLog(`Logged in as: ${externalUserId}`);
+    },
+    [addLog],
+  );
 
   const logoutUser = useCallback(async () => {
     dispatch({ type: 'SET_LOADING', payload: true });
@@ -423,19 +483,25 @@ export function AppContextProvider({ children }: Props) {
     addLog('Logged out');
   }, [addLog]);
 
-  const setConsentRequired = useCallback(async (required: boolean) => {
-    repository.setConsentRequired(required);
-    preferences.setConsentRequired(required);
-    dispatch({ type: 'SET_CONSENT_REQUIRED', payload: required });
-    addLog(`Consent required: ${required}`);
-  }, [addLog]);
+  const setConsentRequired = useCallback(
+    async (required: boolean) => {
+      repository.setConsentRequired(required);
+      preferences.setConsentRequired(required);
+      dispatch({ type: 'SET_CONSENT_REQUIRED', payload: required });
+      addLog(`Consent required: ${required}`);
+    },
+    [addLog],
+  );
 
-  const setConsentGiven = useCallback(async (granted: boolean) => {
-    repository.setConsentGiven(granted);
-    preferences.setConsentGiven(granted);
-    dispatch({ type: 'SET_PRIVACY_CONSENT_GIVEN', payload: granted });
-    addLog(`Consent given: ${granted}`);
-  }, [addLog]);
+  const setConsentGiven = useCallback(
+    async (granted: boolean) => {
+      repository.setConsentGiven(granted);
+      preferences.setConsentGiven(granted);
+      dispatch({ type: 'SET_PRIVACY_CONSENT_GIVEN', payload: granted });
+      addLog(`Consent given: ${granted}`);
+    },
+    [addLog],
+  );
 
   const promptPush = useCallback(async () => {
     const granted = await repository.requestPermission(true);
@@ -443,15 +509,18 @@ export function AppContextProvider({ children }: Props) {
     addLog(`Push permission prompt result: ${granted}`);
   }, [addLog]);
 
-  const setPushEnabled = useCallback(async (enabled: boolean) => {
-    if (enabled) {
-      repository.optInPush();
-    } else {
-      repository.optOutPush();
-    }
-    dispatch({ type: 'SET_PUSH_ENABLED', payload: enabled });
-    addLog(enabled ? 'Push enabled' : 'Push disabled');
-  }, [addLog]);
+  const setPushEnabled = useCallback(
+    async (enabled: boolean) => {
+      if (enabled) {
+        repository.optInPush();
+      } else {
+        repository.optOutPush();
+      }
+      dispatch({ type: 'SET_PUSH_ENABLED', payload: enabled });
+      addLog(enabled ? 'Push enabled' : 'Push disabled');
+    },
+    [addLog],
+  );
 
   const sendSimpleNotification = useCallback(async () => {
     const sent = await repository.sendNotification(NotificationType.Simple);
@@ -460,33 +529,49 @@ export function AppContextProvider({ children }: Props) {
 
   const sendImageNotification = useCallback(async () => {
     const sent = await repository.sendNotification(NotificationType.WithImage);
-    addLog(sent ? 'Notification sent: WithImage' : 'Failed to send notification');
+    addLog(
+      sent ? 'Notification sent: WithImage' : 'Failed to send notification',
+    );
   }, [addLog]);
 
-  const sendCustomNotification = useCallback(async (title: string, body: string) => {
-    const sent = await repository.sendCustomNotification(title, body);
-    addLog(sent ? `Notification sent: ${title}` : 'Failed to send notification');
-  }, [addLog]);
+  const sendCustomNotification = useCallback(
+    async (title: string, body: string) => {
+      const sent = await repository.sendCustomNotification(title, body);
+      addLog(
+        sent ? `Notification sent: ${title}` : 'Failed to send notification',
+      );
+    },
+    [addLog],
+  );
 
-  const setIamPaused = useCallback(async (paused: boolean) => {
-    repository.setPaused(paused);
-    preferences.setIamPaused(paused);
-    dispatch({ type: 'SET_IAM_PAUSED', payload: paused });
-    addLog(paused ? 'In-app messages paused' : 'In-app messages resumed');
-  }, [addLog]);
+  const setIamPaused = useCallback(
+    async (paused: boolean) => {
+      repository.setPaused(paused);
+      preferences.setIamPaused(paused);
+      dispatch({ type: 'SET_IAM_PAUSED', payload: paused });
+      addLog(paused ? 'In-app messages paused' : 'In-app messages resumed');
+    },
+    [addLog],
+  );
 
-  const addTrigger = useCallback(async (key: string, value: string) => {
-    repository.addTrigger(key, value);
-    dispatch({ type: 'ADD_TRIGGER', payload: [key, value] });
-    addLog(`Trigger added: ${key}`);
-  }, [addLog]);
+  const addTrigger = useCallback(
+    async (key: string, value: string) => {
+      repository.addTrigger(key, value);
+      dispatch({ type: 'ADD_TRIGGER', payload: [key, value] });
+      addLog(`Trigger added: ${key}`);
+    },
+    [addLog],
+  );
 
-  const addTriggers = useCallback(async (pairs: Record<string, string>) => {
-    repository.addTriggers(pairs);
-    const entries = toPairs(pairs);
-    dispatch({ type: 'ADD_TRIGGERS', payload: entries });
-    addLog(`${entries.length} trigger(s) added`);
-  }, [addLog]);
+  const addTriggers = useCallback(
+    async (pairs: Record<string, string>) => {
+      repository.addTriggers(pairs);
+      const entries = toPairs(pairs);
+      dispatch({ type: 'ADD_TRIGGERS', payload: entries });
+      addLog(`${entries.length} trigger(s) added`);
+    },
+    [addLog],
+  );
 
   const clearTriggers = useCallback(async () => {
     repository.clearTriggers();
@@ -494,171 +579,222 @@ export function AppContextProvider({ children }: Props) {
     addLog('All triggers cleared');
   }, [addLog]);
 
-  const removeSelectedTriggers = useCallback(async (keys: string[]) => {
-    repository.removeTriggers(keys);
-    dispatch({ type: 'REMOVE_SELECTED_TRIGGERS', payload: keys });
-    addLog(`${keys.length} trigger(s) removed`);
-  }, [addLog]);
+  const removeSelectedTriggers = useCallback(
+    async (keys: string[]) => {
+      repository.removeTriggers(keys);
+      dispatch({ type: 'REMOVE_SELECTED_TRIGGERS', payload: keys });
+      addLog(`${keys.length} trigger(s) removed`);
+    },
+    [addLog],
+  );
 
-  const sendIamTrigger = useCallback(async (iamType: string) => {
-    await addTrigger('iam_type', iamType);
-  }, [addTrigger]);
+  const sendIamTrigger = useCallback(
+    async (iamType: string) => {
+      await addTrigger('iam_type', iamType);
+    },
+    [addTrigger],
+  );
 
-  const addAlias = useCallback(async (label: string, id: string) => {
-    repository.addAlias(label, id);
-    dispatch({ type: 'ADD_ALIAS', payload: [label, id] });
-    addLog(`Alias added: ${label}`);
-  }, [addLog]);
+  const addAlias = useCallback(
+    async (label: string, id: string) => {
+      repository.addAlias(label, id);
+      dispatch({ type: 'ADD_ALIAS', payload: [label, id] });
+      addLog(`Alias added: ${label}`);
+    },
+    [addLog],
+  );
 
-  const addAliases = useCallback(async (pairs: Record<string, string>) => {
-    repository.addAliases(pairs);
-    const entries = toPairs(pairs);
-    dispatch({ type: 'ADD_ALIASES', payload: entries });
-    addLog(`${entries.length} alias(es) added`);
-  }, [addLog]);
+  const addAliases = useCallback(
+    async (pairs: Record<string, string>) => {
+      repository.addAliases(pairs);
+      const entries = toPairs(pairs);
+      dispatch({ type: 'ADD_ALIASES', payload: entries });
+      addLog(`${entries.length} alias(es) added`);
+    },
+    [addLog],
+  );
 
-  const addEmail = useCallback(async (email: string) => {
-    repository.addEmail(email);
-    dispatch({ type: 'ADD_EMAIL', payload: email });
-    addLog(`Email added: ${email}`);
-  }, [addLog]);
+  const addEmail = useCallback(
+    async (email: string) => {
+      repository.addEmail(email);
+      dispatch({ type: 'ADD_EMAIL', payload: email });
+      addLog(`Email added: ${email}`);
+    },
+    [addLog],
+  );
 
-  const removeEmail = useCallback(async (email: string) => {
-    repository.removeEmail(email);
-    dispatch({ type: 'REMOVE_EMAIL', payload: email });
-    addLog(`Email removed: ${email}`);
-  }, [addLog]);
+  const removeEmail = useCallback(
+    async (email: string) => {
+      repository.removeEmail(email);
+      dispatch({ type: 'REMOVE_EMAIL', payload: email });
+      addLog(`Email removed: ${email}`);
+    },
+    [addLog],
+  );
 
-  const addSms = useCallback(async (sms: string) => {
-    repository.addSms(sms);
-    dispatch({ type: 'ADD_SMS', payload: sms });
-    addLog(`SMS added: ${sms}`);
-  }, [addLog]);
+  const addSms = useCallback(
+    async (sms: string) => {
+      repository.addSms(sms);
+      dispatch({ type: 'ADD_SMS', payload: sms });
+      addLog(`SMS added: ${sms}`);
+    },
+    [addLog],
+  );
 
-  const removeSms = useCallback(async (sms: string) => {
-    repository.removeSms(sms);
-    dispatch({ type: 'REMOVE_SMS', payload: sms });
-    addLog(`SMS removed: ${sms}`);
-  }, [addLog]);
+  const removeSms = useCallback(
+    async (sms: string) => {
+      repository.removeSms(sms);
+      dispatch({ type: 'REMOVE_SMS', payload: sms });
+      addLog(`SMS removed: ${sms}`);
+    },
+    [addLog],
+  );
 
-  const addTag = useCallback(async (key: string, value: string) => {
-    repository.addTag(key, value);
-    dispatch({ type: 'ADD_TAG', payload: [key, value] });
-    addLog(`Tag added: ${key}`);
-  }, [addLog]);
+  const addTag = useCallback(
+    async (key: string, value: string) => {
+      repository.addTag(key, value);
+      dispatch({ type: 'ADD_TAG', payload: [key, value] });
+      addLog(`Tag added: ${key}`);
+    },
+    [addLog],
+  );
 
-  const addTags = useCallback(async (pairs: Record<string, string>) => {
-    repository.addTags(pairs);
-    const entries = toPairs(pairs);
-    dispatch({ type: 'ADD_TAGS', payload: entries });
-    addLog(`${entries.length} tag(s) added`);
-  }, [addLog]);
+  const addTags = useCallback(
+    async (pairs: Record<string, string>) => {
+      repository.addTags(pairs);
+      const entries = toPairs(pairs);
+      dispatch({ type: 'ADD_TAGS', payload: entries });
+      addLog(`${entries.length} tag(s) added`);
+    },
+    [addLog],
+  );
 
-  const removeSelectedTags = useCallback(async (keys: string[]) => {
-    repository.removeTags(keys);
-    dispatch({ type: 'REMOVE_SELECTED_TAGS', payload: keys });
-    addLog(`${keys.length} tag(s) removed`);
-  }, [addLog]);
+  const removeSelectedTags = useCallback(
+    async (keys: string[]) => {
+      repository.removeTags(keys);
+      dispatch({ type: 'REMOVE_SELECTED_TAGS', payload: keys });
+      addLog(`${keys.length} tag(s) removed`);
+    },
+    [addLog],
+  );
 
-  const sendOutcome = useCallback(async (name: string) => {
-    repository.sendOutcome(name);
-    addLog(`Outcome sent: ${name}`);
-  }, [addLog]);
+  const sendOutcome = useCallback(
+    async (name: string) => {
+      repository.sendOutcome(name);
+      addLog(`Outcome sent: ${name}`);
+    },
+    [addLog],
+  );
 
-  const sendUniqueOutcome = useCallback(async (name: string) => {
-    repository.sendUniqueOutcome(name);
-    addLog(`Unique outcome sent: ${name}`);
-  }, [addLog]);
+  const sendUniqueOutcome = useCallback(
+    async (name: string) => {
+      repository.sendUniqueOutcome(name);
+      addLog(`Unique outcome sent: ${name}`);
+    },
+    [addLog],
+  );
 
-  const sendOutcomeWithValue = useCallback(async (name: string, value: number) => {
-    repository.sendOutcomeWithValue(name, value);
-    addLog(`Outcome sent: ${name} = ${value}`);
-  }, [addLog]);
+  const sendOutcomeWithValue = useCallback(
+    async (name: string, value: number) => {
+      repository.sendOutcomeWithValue(name, value);
+      addLog(`Outcome sent: ${name} = ${value}`);
+    },
+    [addLog],
+  );
 
-  const trackEvent = useCallback(async (name: string, properties?: Record<string, unknown>) => {
-    repository.trackEvent(name, properties);
-    addLog(`Event tracked: ${name}`);
-  }, [addLog]);
+  const trackEvent = useCallback(
+    async (name: string, properties?: Record<string, unknown>) => {
+      repository.trackEvent(name, properties);
+      addLog(`Event tracked: ${name}`);
+    },
+    [addLog],
+  );
 
-  const setLocationShared = useCallback(async (shared: boolean) => {
-    repository.setLocationShared(shared);
-    preferences.setLocationShared(shared);
-    dispatch({ type: 'SET_LOCATION_SHARED', payload: shared });
-    addLog(shared ? 'Location sharing enabled' : 'Location sharing disabled');
-  }, [addLog]);
+  const setLocationShared = useCallback(
+    async (shared: boolean) => {
+      repository.setLocationShared(shared);
+      preferences.setLocationShared(shared);
+      dispatch({ type: 'SET_LOCATION_SHARED', payload: shared });
+      addLog(shared ? 'Location sharing enabled' : 'Location sharing disabled');
+    },
+    [addLog],
+  );
 
   const requestLocationPermission = useCallback(async () => {
     repository.requestLocationPermission();
     addLog('Location permission prompt triggered');
   }, [addLog]);
 
-  const value = useMemo<AppContextValue>(() => ({
-    state,
-    clearLogs,
-    loginUser,
-    logoutUser,
-    setConsentRequired,
-    setConsentGiven,
-    promptPush,
-    setPushEnabled,
-    sendSimpleNotification,
-    sendImageNotification,
-    sendCustomNotification,
-    setIamPaused,
-    sendIamTrigger,
-    addAlias,
-    addAliases,
-    addEmail,
-    removeEmail,
-    addSms,
-    removeSms,
-    addTag,
-    addTags,
-    removeSelectedTags,
-    sendOutcome,
-    sendUniqueOutcome,
-    sendOutcomeWithValue,
-    addTrigger,
-    addTriggers,
-    removeSelectedTriggers,
-    clearTriggers,
-    trackEvent,
-    setLocationShared,
-    requestLocationPermission,
-  }), [
-    state,
-    clearLogs,
-    loginUser,
-    logoutUser,
-    setConsentRequired,
-    setConsentGiven,
-    promptPush,
-    setPushEnabled,
-    sendSimpleNotification,
-    sendImageNotification,
-    sendCustomNotification,
-    setIamPaused,
-    sendIamTrigger,
-    addAlias,
-    addAliases,
-    addEmail,
-    removeEmail,
-    addSms,
-    removeSms,
-    addTag,
-    addTags,
-    removeSelectedTags,
-    sendOutcome,
-    sendUniqueOutcome,
-    sendOutcomeWithValue,
-    addTrigger,
-    addTriggers,
-    removeSelectedTriggers,
-    clearTriggers,
-    trackEvent,
-    setLocationShared,
-    requestLocationPermission,
-  ]);
+  const value = useMemo<AppContextValue>(
+    () => ({
+      state,
+      clearLogs,
+      loginUser,
+      logoutUser,
+      setConsentRequired,
+      setConsentGiven,
+      promptPush,
+      setPushEnabled,
+      sendSimpleNotification,
+      sendImageNotification,
+      sendCustomNotification,
+      setIamPaused,
+      sendIamTrigger,
+      addAlias,
+      addAliases,
+      addEmail,
+      removeEmail,
+      addSms,
+      removeSms,
+      addTag,
+      addTags,
+      removeSelectedTags,
+      sendOutcome,
+      sendUniqueOutcome,
+      sendOutcomeWithValue,
+      addTrigger,
+      addTriggers,
+      removeSelectedTriggers,
+      clearTriggers,
+      trackEvent,
+      setLocationShared,
+      requestLocationPermission,
+    }),
+    [
+      state,
+      clearLogs,
+      loginUser,
+      logoutUser,
+      setConsentRequired,
+      setConsentGiven,
+      promptPush,
+      setPushEnabled,
+      sendSimpleNotification,
+      sendImageNotification,
+      sendCustomNotification,
+      setIamPaused,
+      sendIamTrigger,
+      addAlias,
+      addAliases,
+      addEmail,
+      removeEmail,
+      addSms,
+      removeSms,
+      addTag,
+      addTags,
+      removeSelectedTags,
+      sendOutcome,
+      sendUniqueOutcome,
+      sendOutcomeWithValue,
+      addTrigger,
+      addTriggers,
+      removeSelectedTriggers,
+      clearTriggers,
+      trackEvent,
+      setLocationShared,
+      requestLocationPermission,
+    ],
+  );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }

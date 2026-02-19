@@ -61,7 +61,10 @@ export default class LogManager {
       second: '2-digit',
       hour12: false,
     });
-    this.entries = [{ timestamp, level, message }, ...this.entries].slice(0, 100);
+    this.entries = [{ timestamp, level, message }, ...this.entries].slice(
+      0,
+      100,
+    );
     this.emit();
   }
 

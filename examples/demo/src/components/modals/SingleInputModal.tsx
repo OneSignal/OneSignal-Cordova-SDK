@@ -38,9 +38,15 @@ const SingleInputModal: FC<SingleInputModalProps> = ({
         }}
       >
         <h3>{title}</h3>
-        <input value={value} onChange={(event) => setValue(event.target.value)} placeholder={placeholder} />
+        <input
+          value={value}
+          onChange={(event) => setValue(event.target.value)}
+          placeholder={placeholder}
+        />
         <div className="modal-actions">
-          <button type="button" onClick={onClose}>Cancel</button>
+          <button type="button" onClick={onClose}>
+            Cancel
+          </button>
           <button type="submit">{confirmLabel}</button>
         </div>
       </form>

@@ -17,7 +17,11 @@ const SmsSection: FC<SmsSectionProps> = ({
   onRemoveSms,
 }) => (
   <SectionCard title="SMS" onInfoTap={onInfoTap}>
-    <SingleList items={smsNumbers} emptyText="No SMS added" onRemove={onRemoveSms} />
+    <SingleList
+      items={smsNumbers}
+      emptyText="No SMS added"
+      onRemove={onRemoveSms}
+    />
     <ActionButton type="button" onClick={onAddSms}>
       ADD SMS
     </ActionButton>

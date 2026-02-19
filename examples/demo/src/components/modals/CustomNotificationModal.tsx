@@ -8,7 +8,11 @@ interface CustomNotificationModalProps {
   onSubmit: (title: string, body: string) => void;
 }
 
-const CustomNotificationModal: FC<CustomNotificationModalProps> = ({ open, onClose, onSubmit }) => {
+const CustomNotificationModal: FC<CustomNotificationModalProps> = ({
+  open,
+  onClose,
+  onSubmit,
+}) => {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
 
@@ -31,10 +35,20 @@ const CustomNotificationModal: FC<CustomNotificationModalProps> = ({ open, onClo
         }}
       >
         <h3>Custom Notification</h3>
-        <input value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Title" />
-        <textarea value={body} onChange={(event) => setBody(event.target.value)} placeholder="Body" />
+        <input
+          value={title}
+          onChange={(event) => setTitle(event.target.value)}
+          placeholder="Title"
+        />
+        <textarea
+          value={body}
+          onChange={(event) => setBody(event.target.value)}
+          placeholder="Body"
+        />
         <div className="modal-actions">
-          <button type="button" onClick={onClose}>Cancel</button>
+          <button type="button" onClick={onClose}>
+            Cancel
+          </button>
           <button type="submit">Send</button>
         </div>
       </form>

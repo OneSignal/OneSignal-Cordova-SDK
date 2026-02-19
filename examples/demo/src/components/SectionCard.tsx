@@ -12,7 +12,12 @@ const SectionCard: FC<SectionCardProps> = ({ title, onInfoTap, children }) => (
     <div className="section-head">
       <h2>{title}</h2>
       {onInfoTap ? (
-        <button className="icon-btn" type="button" onClick={onInfoTap} aria-label={`${title} info`}>
+        <button
+          className="icon-btn"
+          type="button"
+          onClick={onInfoTap}
+          aria-label={`${title} info`}
+        >
           <MdInfoOutline />
         </button>
       ) : null}

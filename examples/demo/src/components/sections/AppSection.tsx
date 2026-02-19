@@ -25,7 +25,9 @@ const AppSection: FC<AppSectionProps> = ({
       </div>
     </div>
     <div className="card tip-card">
-      <div>Add your own App ID, then rebuild to fully test all functionality.</div>
+      <div>
+        Add your own App ID, then rebuild to fully test all functionality.
+      </div>
       <div className="tip-link">Get your keys at onesignal.com</div>
     </div>
     <div className="card">
@@ -45,11 +47,15 @@ const AppSection: FC<AppSectionProps> = ({
           <div className="toggle-card">
             <div>
               <div className="label">Privacy Consent</div>
-              <div className="sub">Grant privacy consent for data processing</div>
+              <div className="sub">
+                Grant privacy consent for data processing
+              </div>
             </div>
             <IonToggle
               checked={privacyConsentGiven}
-              onIonChange={(event) => onTogglePrivacyConsent(event.detail.checked)}
+              onIonChange={(event) =>
+                onTogglePrivacyConsent(event.detail.checked)
+              }
             />
           </div>
         </>

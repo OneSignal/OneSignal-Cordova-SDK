@@ -7,7 +7,9 @@ import OneSignalApiService from '../services/OneSignalApiService';
 export default class OneSignalRepository {
   private readonly apiService: OneSignalApiService;
 
-  constructor(apiService: OneSignalApiService = OneSignalApiService.getInstance()) {
+  constructor(
+    apiService: OneSignalApiService = OneSignalApiService.getInstance(),
+  ) {
     this.apiService = apiService;
   }
 
