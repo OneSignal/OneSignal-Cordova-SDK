@@ -11,6 +11,7 @@ import OutcomeModal from '../components/modals/OutcomeModal';
 import PairInputModal from '../components/modals/PairInputModal';
 import SingleInputModal from '../components/modals/SingleInputModal';
 import TrackEventModal from '../components/modals/TrackEventModal';
+import TooltipModal from '../components/modals/TooltipModal';
 import AliasesSection from '../components/sections/AliasesSection';
 import AppSection from '../components/sections/AppSection';
 import EmailsSection from '../components/sections/EmailsSection';
@@ -25,6 +26,8 @@ import TagsSection from '../components/sections/TagsSection';
 import TrackEventSection from '../components/sections/TrackEventSection';
 import TriggersSection from '../components/sections/TriggersSection';
 import { useAppContext } from '../context/AppContext';
+import TooltipHelper from '../services/TooltipHelper';
+import type { TooltipData } from '../services/TooltipHelper';
 import { Theme } from '../theme/tokens';
 import './Home.css';
 
@@ -81,6 +84,8 @@ const Home: React.FC = () => {
   const [dialog, setDialog] = useState<DialogState>({ type: 'none' });
   const [toastMessage, setToastMessage] = useState('');
   const [toastOpen, setToastOpen] = useState(false);
+  const [tooltipVisible, setTooltipVisible] = useState(false);
+  const [activeTooltip, setActiveTooltip] = useState<TooltipData | null>(null);
 
   const statusLabel = useMemo(
     () => (state.externalUserId ? 'Logged In' : 'Anonymous'),
@@ -118,6 +123,18 @@ const Home: React.FC = () => {
   useEffect(() => {
     void promptPush();
   }, [promptPush]);
+
+  useEffect(() => {
+    void TooltipHelper.getInstance().init();
+  }, []);
+
+  const showTooltipModal = (key: string): void => {
+    const tooltip = TooltipHelper.getInstance().getTooltip(key);
+    if (tooltip) {
+      setActiveTooltip(tooltip);
+      setTooltipVisible(true);
+    }
+  };
 
   return (
     <IonPage>
@@ -196,13 +213,11 @@ const Home: React.FC = () => {
               onPromptPush={() =>
                 runAction('Push permission requested', promptPush)
               }
-              onInfoTap={() => showToast('Push section tooltip')}
+              onInfoTap={() => showTooltipModal('push')}
             />
 
             <SendPushSection
-              onInfoTap={() =>
-                showToast('SIMPLE: basic payload; WITH IMAGE: big_picture + ios_attachments; CUSTOM: open title/body modal')
-              }
+              onInfoTap={() => showTooltipModal('sendPushNotification')}
               onSendSimple={() =>
                 runAction('Simple notification sent', sendSimpleNotification)
               }
@@ -214,7 +229,7 @@ const Home: React.FC = () => {
 
             <InAppSection
               inAppMessagesPaused={state.inAppMessagesPaused}
-              onInfoTap={() => showToast('In-app messaging info')}
+              onInfoTap={() => showTooltipModal('inAppMessaging')}
               onTogglePaused={(checked) =>
                 runAction(
                   checked ? 'In-app messages paused' : 'In-app messages resumed',
@@ -224,7 +239,7 @@ const Home: React.FC = () => {
             />
 
             <SendIamSection
-              onInfoTap={() => showToast('Send IAM info')}
+              onInfoTap={() => showTooltipModal('sendInAppMessage')}
               onSendTopBanner={() =>
                 runAction('Sent IAM: top_banner', () =>
                   sendIamTrigger('top_banner'),
@@ -249,14 +264,14 @@ const Home: React.FC = () => {
 
             <AliasesSection
               aliasItems={aliasItems}
-              onInfoTap={() => showToast('Aliases info')}
+              onInfoTap={() => showTooltipModal('aliases')}
               onAddAlias={() => setDialog({ type: 'addAlias' })}
               onAddMultipleAliases={() => setDialog({ type: 'addMultipleAliases' })}
             />
 
             <EmailsSection
               emails={state.emailsList}
-              onInfoTap={() => showToast('Emails info')}
+              onInfoTap={() => showTooltipModal('emails')}
               onAddEmail={() => setDialog({ type: 'addEmail' })}
               onRemoveEmail={(email) =>
                 runAction(`Email removed: ${email}`, () => removeEmail(email))
@@ -265,7 +280,7 @@ const Home: React.FC = () => {
 
             <SmsSection
               smsNumbers={state.smsNumbersList}
-              onInfoTap={() => showToast('SMS info')}
+              onInfoTap={() => showTooltipModal('sms')}
               onAddSms={() => setDialog({ type: 'addSms' })}
               onRemoveSms={(sms) =>
                 runAction(`SMS removed: ${sms}`, () => removeSms(sms))
@@ -274,7 +289,7 @@ const Home: React.FC = () => {
 
             <TagsSection
               tagItems={tagItems}
-              onInfoTap={() => showToast('Tags info')}
+              onInfoTap={() => showTooltipModal('tags')}
               onRemoveTag={(key) =>
                 runAction(`Tag removed: ${key}`, () => removeSelectedTags([key]))
               }
@@ -284,13 +299,13 @@ const Home: React.FC = () => {
             />
 
             <OutcomesSection
-              onInfoTap={() => showToast('Outcome events info')}
+              onInfoTap={() => showTooltipModal('outcomes')}
               onSendOutcome={() => setDialog({ type: 'sendOutcome' })}
             />
 
             <TriggersSection
               triggerItems={triggerItems}
-              onInfoTap={() => showToast('Triggers info')}
+              onInfoTap={() => showTooltipModal('triggers')}
               onAddTrigger={() =>
                 runAction('Trigger added', () =>
                   addTrigger('trigger_manual', 'manual'),
@@ -310,13 +325,13 @@ const Home: React.FC = () => {
             />
 
             <TrackEventSection
-              onInfoTap={() => showToast('Track event info')}
+              onInfoTap={() => showTooltipModal('trackEvent')}
               onTrackEvent={() => setDialog({ type: 'trackEvent' })}
             />
 
             <LocationSection
               locationShared={state.locationShared}
-              onInfoTap={() => showToast('Location info')}
+              onInfoTap={() => showTooltipModal('location')}
               onToggleLocationShared={(checked) =>
                 runAction(
                   checked
@@ -529,6 +544,11 @@ const Home: React.FC = () => {
           message={toastMessage}
           duration={1600}
           onDidDismiss={() => setToastOpen(false)}
+        />
+        <TooltipModal
+          open={tooltipVisible}
+          tooltip={activeTooltip}
+          onClose={() => setTooltipVisible(false)}
         />
         <LoadingOverlay visible={state.isLoading} />
       </IonContent>

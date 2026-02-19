@@ -707,6 +707,7 @@ For each section, pass `onInfoTap` to `SectionCard`:
 - `SectionCard` shows optional info icon and invokes `onInfoTap`
 - In `Home.tsx`, wire `onInfoTap` to open a reusable `TooltipModal`
 - `TooltipModal` renders `title`, `description`, and `options` (if present)
+- `TooltipModal` close button text should be `OK`
 
 Example wiring:
 

@@ -370,6 +370,18 @@
   font-weight: 700;
 }
 
+.tooltip-options {
+  margin-top: 10px;
+}
+
+.tooltip-option + .tooltip-option {
+  margin-top: 8px;
+}
+
+.tooltip-option p {
+  margin: 4px 0 0;
+}
+
 .error {
   color: #d33f45;
   margin: 0;
