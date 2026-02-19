@@ -16,18 +16,6 @@ ios: {
 },
 ```
 
-From `examples/demo`, make sure native iOS files are generated and up to date:
-
-```sh
-bun run ios:sync
-```
-
-Then open the native project in Xcode:
-
-```sh
-open ios/App/App.xcworkspace
-```
-
 ---
 
 ## 1. iOS dependency setup
@@ -226,7 +214,7 @@ Note: on-disk folder is `OneSignalWidget`, target name is `OneSignalWidgetExtens
 
 ### OneSignalWidgetLiveActivity.swift
 
-`OneSignalWidgetAttributes` must conform to `OneSignalLiveActivityAttributes` and include `onesignal: OneSignalLiveActivityAttributeData`.  
+`OneSignalWidgetAttributes` must conform to `OneSignalLiveActivityAttributes` and include `onesignal: OneSignalLiveActivityAttributeData`.
 `ContentState` must conform to `OneSignalLiveActivityContentState` and include `onesignal: OneSignalLiveActivityContentStateData?`.
 
 ```swift

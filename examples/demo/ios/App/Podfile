@@ -23,6 +23,16 @@ target 'App' do
   # Add your Pods here
 end
 
+target 'OneSignalNotificationServiceExtension' do
+  use_frameworks!
+  pod 'OneSignalXCFramework', '>= 5.0.0', '< 6.0'
+end
+
+target 'OneSignalWidgetExtension' do
+  use_frameworks!
+  pod 'OneSignalXCFramework', '>= 5.0.0', '< 6.0'
+end
+
 post_install do |installer|
   assertDeploymentTarget(installer)
 end
