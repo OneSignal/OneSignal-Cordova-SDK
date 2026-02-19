@@ -1,22 +1,51 @@
-# iOS Setup: Push Notifications + Live Activities
+# iOS Setup: Push Notifications + Live Activities (Ionic + Capacitor)
 
-Configure the demo Flutter iOS project (`com.onesignal.example`) for OneSignal push notifications and live activities. All paths below are relative to the `ios/` directory.
+Configure the Ionic Capacitor demo app for OneSignal push notifications and live activities.
+
+All paths below are relative to `examples/demo/ios/App/`.
 
 ---
 
-## 1. Podfile
+## 0. Prerequisites
 
-Open `ios/Podfile` and make the following changes.
+In `examples/demo/capacitor.config.ts`, make sure iOS notification handling is configured like this:
 
-**Uncomment the platform line** (or add it if missing):
-
-```ruby
-platform :ios, '13.0'
+```ts
+ios: {
+  handleApplicationNotifications: false,
+},
 ```
 
-**Add two new targets** after the `Runner` target block and before `post_install`:
+From `examples/demo`, make sure native iOS files are generated and up to date:
+
+```sh
+bun run ios:sync
+```
+
+Then open the native project in Xcode:
+
+```sh
+open ios/App/App.xcworkspace
+```
+
+---
+
+## 1. iOS dependency setup
+
+Choose one path:
+
+### 1A. CocoaPods (`Podfile`)
+
+Open `Podfile` in `ios/App/Podfile`.
+
+The Capacitor app target is `App` (not `Runner`). Keep the existing target and add two new extension targets after it:
 
 ```ruby
+target 'App' do
+  capacitor_pods
+  # Add your Pods here
+end
+
 target 'OneSignalNotificationServiceExtension' do
   use_frameworks!
   pod 'OneSignalXCFramework', '>= 5.0.0', '< 6.0'
@@ -28,13 +57,17 @@ target 'OneSignalWidgetExtension' do
 end
 ```
 
+### 1B. Swift Package Manager (SPM)
+
+TODO
+
 ---
 
-## 2. Runner: entitlements + Info.plist
+## 2. App target entitlements + Info.plist
 
-### Runner.entitlements
+### App.entitlements
 
-Create `Runner/Runner.entitlements`:
+Create `App/App.entitlements`:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -51,11 +84,9 @@ Create `Runner/Runner.entitlements`:
 </plist>
 ```
 
-This enables push notifications (`aps-environment`) and an App Group shared with the extensions.
+### App/Info.plist
 
-### Info.plist
-
-In `Runner/Info.plist`, add the `UIBackgroundModes` array inside the top-level `<dict>`:
+In `App/Info.plist`, add this inside the top-level `<dict>`:
 
 ```xml
 <key>UIBackgroundModes</key>
@@ -68,7 +99,7 @@ In `Runner/Info.plist`, add the `UIBackgroundModes` array inside the top-level `
 
 ## 3. Notification Service Extension
 
-Allows OneSignal to process notifications before display (rich media, badges, etc). Create the `OneSignalNotificationServiceExtension/` folder with three files.
+Create `OneSignalNotificationServiceExtension/` with the 3 files below.
 
 ### NotificationService.swift
 
@@ -101,8 +132,6 @@ class NotificationService: UNNotificationServiceExtension {
 ```
 
 ### Info.plist
-
-All standard `CFBundle*` keys are required for the simulator to install the extension.
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -138,7 +167,7 @@ All standard `CFBundle*` keys are required for the simulator to install the exte
 
 ### OneSignalNotificationServiceExtension.entitlements
 
-The App Group must match the one in `Runner.entitlements`.
+The app group must match `App/App.entitlements`.
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -157,13 +186,11 @@ The App Group must match the one in `Runner.entitlements`.
 
 ## 4. Widget Extension (Live Activities)
 
-Create the `OneSignalWidget/` folder with the following files.
+Create `OneSignalWidget/` with the following files.
 
-Note: the on-disk folder is `OneSignalWidget` but the Xcode target name is `OneSignalWidgetExtension` (matching the Podfile target).
+Note: on-disk folder is `OneSignalWidget`, target name is `OneSignalWidgetExtension` (matching Podfile).
 
 ### Info.plist
-
-Same standard `CFBundle*` keys as the NSE, plus `NSSupportsLiveActivities`.
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -199,7 +226,8 @@ Same standard `CFBundle*` keys as the NSE, plus `NSSupportsLiveActivities`.
 
 ### OneSignalWidgetLiveActivity.swift
 
-`OneSignalWidgetAttributes` must conform to `OneSignalLiveActivityAttributes` (with `var onesignal: OneSignalLiveActivityAttributeData`), and `ContentState` must conform to `OneSignalLiveActivityContentState` (with `var onesignal: OneSignalLiveActivityContentStateData?`).
+`OneSignalWidgetAttributes` must conform to `OneSignalLiveActivityAttributes` and include `onesignal: OneSignalLiveActivityAttributeData`.  
+`ContentState` must conform to `OneSignalLiveActivityContentState` and include `onesignal: OneSignalLiveActivityContentStateData?`.
 
 ```swift
 import ActivityKit
@@ -266,39 +294,47 @@ struct OneSignalWidgetBundle: WidgetBundle {
 
 ---
 
-## 5. project.pbxproj
+## 5. Xcode project updates (`project.pbxproj`)
 
-The `project.pbxproj` needs native target entries for both extensions. These are complex (UUIDs, build phases, configuration lists) and are best done by opening the `.xcodeproj` in Xcode. The key requirements:
+Use Xcode to create both extension targets so UUIDs/build phases are generated correctly.
 
-**Runner target changes:**
-- Add `CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements` to all Runner build configurations (Debug/Release/Profile)
-- Add an `Embed Foundation Extensions` copy-files phase (`dstSubfolderSpec = 13`) embedding both `.appex` products. This phase must appear **before** the `Thin Binary` script phase to avoid a build cycle.
-- Add target dependencies from Runner to both extension targets
+### App target changes
 
-**OneSignalNotificationServiceExtension target** (`com.apple.product-type.app-extension`):
-- Sources, Frameworks, Resources build phases
-- `PRODUCT_BUNDLE_IDENTIFIER = com.onesignal.example.OneSignalNotificationServiceExtension` (must be prefixed with parent app's bundle ID)
+- Set `PRODUCT_BUNDLE_IDENTIFIER = com.onesignal.example` for the `App` target.
+- Add `CODE_SIGN_ENTITLEMENTS = App/App.entitlements` to all `App` build configurations.
+- Add an `Embed App Extensions` copy files phase (`dstSubfolderSpec = 13`) and embed both `.appex` products.
+- Ensure this copy phase is before script phases to avoid build cycles.
+- Add target dependencies from `App` to both extension targets.
+
+### OneSignalNotificationServiceExtension target
+
+- Product type: `com.apple.product-type.app-extension`
+- Build phases: Sources, Frameworks, Resources
+- `PRODUCT_BUNDLE_IDENTIFIER = com.onesignal.example.OneSignalNotificationServiceExtension`
 - `CODE_SIGN_ENTITLEMENTS = OneSignalNotificationServiceExtension/OneSignalNotificationServiceExtension.entitlements`
 - `INFOPLIST_FILE = OneSignalNotificationServiceExtension/Info.plist`
-- `SKIP_INSTALL = YES`, `SWIFT_VERSION = 5.0`, `IPHONEOS_DEPLOYMENT_TARGET = 13.0`
+- `SKIP_INSTALL = YES`, `SWIFT_VERSION = 5.0`, `IPHONEOS_DEPLOYMENT_TARGET = 14.0`
 
-**OneSignalWidgetExtension target** (`com.apple.product-type.app-extension`):
-- Sources, Frameworks (linking WidgetKit.framework and SwiftUI.framework), Resources build phases
+### OneSignalWidgetExtension target
+
+- Product type: `com.apple.product-type.app-extension`
+- Build phases: Sources, Frameworks, Resources
+- Link `WidgetKit.framework` and `SwiftUI.framework`
 - `PRODUCT_BUNDLE_IDENTIFIER = com.onesignal.example.OneSignalWidgetExtension`
-- `INFOPLIST_FILE = OneSignalWidget/Info.plist` (note: folder is `OneSignalWidget`, not `OneSignalWidgetExtension`)
-- `SKIP_INSTALL = YES`, `SWIFT_VERSION = 5.0`, `IPHONEOS_DEPLOYMENT_TARGET = 16.2` (Live Activities require iOS 16.2+)
+- `INFOPLIST_FILE = OneSignalWidget/Info.plist`
+- `SKIP_INSTALL = YES`, `SWIFT_VERSION = 5.0`, `IPHONEOS_DEPLOYMENT_TARGET = 16.2` (required for Live Activities)
 
 ---
 
-## 6. Install dependencies
+## 6. Install pods and sync
 
-Run `flutter pub get` first (the Podfile reads `Generated.xcconfig` which this creates), then `pod install`:
+From `examples/demo`, run:
 
 ```sh
-flutter pub get
-cd ios && pod install
+bun run ios:sync
+cd ios/App && pod install
 ```
 
-This generates the Pods workspace, xcconfig files, and CocoaPods build phases (`[CP] Check Pods Manifest.lock`, `[CP] Embed Pods Frameworks`). Open the `.xcworkspace` file (not `.xcodeproj`) going forward.
+Then open `ios/App/App.xcworkspace` (not `.xcodeproj`) in Xcode.
 
-Note: avoid setting `CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER` in extension build configurations since CocoaPods provides it via xcconfig.
+If native config changes are not reflected, rerun `bun run ios:sync` and reinstall pods.
