@@ -81,6 +81,10 @@ In `App/Info.plist`, add this inside the top-level `<dict>`:
 <array>
     <string>remote-notification</string>
 </array>
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>Used for location-targeted push notifications.</string>
+<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+<string>Used for location-targeted push notifications.</string>
 ```
 
 ---
