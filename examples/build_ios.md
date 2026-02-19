@@ -254,9 +254,9 @@ The `project.pbxproj` already includes both extension targets with all required 
 
 After syncing, open `ios/App/App.xcworkspace` in Xcode and verify:
 
-- **App** target: bundle ID `com.onesignal.example`, entitlements `App/App.entitlements`, depends on both extensions
-- **OneSignalNotificationServiceExtension**: bundle ID `com.onesignal.example.OneSignalNotificationServiceExtensionCordova`, deployment target iOS 14.0
-- **OneSignalWidgetExtension**: bundle ID `com.onesignal.example.OneSignalWidgetExtension`, deployment target iOS 16.2, `SUPPORTS_LIVE_ACTIVITIES = YES`
+- **App** target: bundle ID `com.onesignal.example`, team `99SW8E36CT`, entitlements `App/App.entitlements`, depends on both extensions
+- **OneSignalNotificationServiceExtension**: bundle ID `com.onesignal.example.OneSignalNotificationServiceExtensionCordova`, team `99SW8E36CT`, deployment target iOS 14.0
+- **OneSignalWidgetExtension**: bundle ID `com.onesignal.example.OneSignalWidgetExtension`, team `99SW8E36CT`, deployment target iOS 16.2, `SUPPORTS_LIVE_ACTIVITIES = YES`
 
 To add App Groups capability (shows up in Signing & Capabilities), select each target in Xcode and use **+ Capability > App Groups**, then add `group.com.onesignal.example.onesignal`. Do this for:
 - `App`
