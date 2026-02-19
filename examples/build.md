@@ -108,6 +108,8 @@ Requirements:
 - No Expo-specific setup in this project
 - Web entry file: `examples/demo/index.html` (built output goes to `examples/demo/dist/index.html`)
 - Do not use `examples/demo/www/index.html` in this Capacitor flow
+- Do not add `cordova-android` or `cordova-ios` as demo app dependencies
+- Do not add a `cordova.platforms` block in `examples/demo/package.json` for this Capacitor flow
 
 A setup.sh script in examples/ handles building, packing, and installing automatically.
 Add/verify the following scripts in package.json:
@@ -154,22 +156,33 @@ npx cap sync
 
 ---
 
-## Phase 2: OneSignal Initialization
+## Phase 2: OneSignal Initialization (Ionic + Capacitor)
 
-### Prompt 2.1 - Initialize on `deviceready`
+### Prompt 2.1 - Initialize on native app startup
 
-Initialize OneSignal only after Cordova is ready. In Ionic React, this is usually done once from app startup code.
+Initialize OneSignal only on native platforms and only after the native bridge is ready. In this Ionic React + Capacitor app, run initialization once from startup code.
 
 ```ts
+import { Capacitor } from '@capacitor/core';
 import OneSignal, { LogLevel } from 'onesignal-cordova-plugin';
 
 const ONE_SIGNAL_APP_ID = '77e32082-ea27-42e3-a898-c72e141824ef';
 
 function initOneSignal() {
-  document.addEventListener('deviceready', () => {
+  const start = () => {
     OneSignal.Debug.setLogLevel(LogLevel.Verbose);
     OneSignal.initialize(ONE_SIGNAL_APP_ID);
-  });
+  };
+
+  if (!Capacitor.isNativePlatform()) return;
+
+  // Cordova-bridge plugins in Capacitor are safe after deviceready when available.
+  if ('cordova' in window) {
+    document.addEventListener('deviceready', start, { once: true });
+    return;
+  }
+
+  start();
 }
 ```
 
@@ -218,7 +231,7 @@ Remove listeners in component cleanup where you attach them.
 
 ## Phase 3: App Architecture
 
-Use the same high-level architecture as the React Native demo but adapted to Ionic React + Cordova runtime:
+Use the same high-level architecture as the React Native demo but adapted to Ionic React + Capacitor runtime:
 
 - `src/models/*` for API/domain types
 - `src/services/*` for REST clients, storage, and utility services
@@ -239,7 +252,7 @@ Target behavior:
 
 ## Phase 4: Repository API Surface
 
-Create a `OneSignalRepository` class that wraps Cordova OneSignal APIs:
+Create a `OneSignalRepository` class that wraps OneSignal APIs used by the Ionic + Capacitor app:
 
 - User: `loginUser`, `logoutUser`
 - Aliases: `addAlias`, `addAliases`
@@ -372,7 +385,7 @@ Add a compact log panel for local debugging and Appium:
 Update native app metadata and IDs:
 
 - `capacitor.config.ts` app id: `com.onesignal.example`
-- No legacy Cordova metadata file setup required
+- Keep native projects generated through Capacitor (`android/` and `ios/`)
 
 Ensure plugin and platforms are present:
 
@@ -380,6 +393,7 @@ Ensure plugin and platforms are present:
 cd examples/demo
 npx cap ls
 npm ls onesignal-cordova-plugin --depth=0
+npx cap doctor
 ```
 
 Expected plugin list includes:
@@ -402,13 +416,26 @@ If native state becomes stale:
 
 ```bash
 cd examples/demo
-npx cordova platform rm android ios
-npx cordova platform add android ios
+bun run setup
+bun install
+npx cap sync
+```
+
+If native projects need to be regenerated from scratch:
+
+```bash
+cd examples/demo
+rm -rf android ios
+npx cap add android
+npx cap add ios
+bun run setup
+bun install
+npx cap sync
 ```
 
 ---
 
-## Reference API Snippets (Cordova)
+## Reference API Snippets (Ionic + Capacitor Native)
 
 ```ts
 // Push permission
@@ -450,7 +477,7 @@ OneSignal.Location.requestPermission();
 All checks should pass before considering the demo complete:
 
 - App starts with no runtime import or plugin errors
-- `OneSignal.initialize` runs only after `deviceready`
+- `OneSignal.initialize` runs only on native and only after bridge-ready startup
 - Login/logout, aliases, tags, emails, sms flows work
 - Push permission and opt-in state react correctly
 - IAM lifecycle and click listeners fire
