@@ -1,6 +1,6 @@
 .logview-panel {
   position: sticky;
-  top: 0;
+  top: var(--demo-header-height, 84px);
   z-index: 20;
   background: #1a1b1e;
   color: #c9d0db;

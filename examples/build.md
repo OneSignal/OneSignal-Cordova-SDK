@@ -110,7 +110,8 @@ Requirements:
 - Build with clean architecture: repository pattern + React Context + reducer state
 - TypeScript strict mode enabled
 - OneSignal brand colors with consistent token-based styling
-- Top header shows OneSignal logo wordmark plus separate `Sample App` text
+- Top header (app bar) is fixed/sticky, uses standard 56dp toolbar height (+ safe-area top inset), and shows OneSignal logo wordmark plus separate `Sample App` text
+- Logs panel is fixed/sticky directly below the app bar
 - Support both Android and iOS native targets
 - Dialogs should open with EMPTY input fields for Appium entry
 - Prefer separate component files per section to keep files focused
@@ -932,6 +933,10 @@ Implementation notes:
 - `index.html` should include `viewport-fit=cover` in the viewport meta tag.
 - Default `ion-header` + `ion-content` flow usually handles insets automatically.
 - If `IonContent` uses `fullscreen`, add explicit safe-area padding in page CSS.
+- For this demo, keep fixed/sticky bars coordinated with a shared header height variable:
+  - `.demo-app { --demo-header-height: calc(56px + var(--ion-safe-area-top)); }`
+  - `.brand-header { position: sticky; top: 0; z-index: 30; min-height: var(--demo-header-height); }`
+  - `.logview-panel { position: sticky; top: var(--demo-header-height); z-index: 20; }`
 - Example used in this demo:
   - `src/pages/Home.css`:
     - `.brand-header { padding-top: var(--ion-safe-area-top); }`
@@ -966,7 +971,7 @@ examples/demo/
     │   ├── ToggleRow.tsx                     # Label/description + Ionic toggle
     │   ├── ActionButton.tsx                  # Primary and outline action button
     │   ├── ListWidgets.tsx                   # PairList, SingleList, EmptyState
-    │   ├── LogView.tsx                       # Sticky logs panel (Appium-ready)
+    │   ├── LogView.tsx                       # Sticky logs panel below fixed app bar
     │   ├── modals/
     │   │   ├── SingleInputModal.tsx
     │   │   ├── PairInputModal.tsx
