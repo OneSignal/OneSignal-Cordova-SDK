@@ -1,0 +1,54 @@
+.logview-panel {
+  position: sticky;
+  top: var(--demo-header-height, 84px);
+  z-index: 20;
+  background: #1a1b1e;
+  color: #c9d0db;
+}
+
+.logview-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+}
+
+.logview-header strong {
+  color: #fff;
+}
+
+.logview-body {
+  max-height: 100px;
+  overflow-y: auto;
+  overflow-x: auto;
+  padding: 0 14px 10px;
+}
+
+.logview-row {
+  display: flex;
+  gap: 8px;
+  white-space: nowrap;
+  font-size: 12px;
+  line-height: 1.4;
+  padding: 2px 0;
+}
+
+.log-time {
+  color: #9aa6b7;
+}
+
+.log-level {
+  color: #8db8ff;
+  font-weight: 700;
+}
+
+.log-text {
+  color: #d8e0eb;
+}
+
+.logview-empty {
+  color: #9aa6b7;
+  font-size: 12px;
+  padding: 6px 0;
+}

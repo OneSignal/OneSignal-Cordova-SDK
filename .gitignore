@@ -16,3 +16,4 @@ coverage/
 
 # Android
 **/capacitor.build.gradle
+*.orig
