@@ -605,6 +605,7 @@ Location Section:
 Secondary Screen behavior (opened from `Next Activity` button):
 
 - Header title: `Secondary Activity`
+- Header includes a back icon button (e.g. `IonBackButton` or a chevron/arrow icon) that pops the screen
 - Screen body: centered text `Secondary Activity`
 - Keep this screen intentionally simple (no extra logic).
 

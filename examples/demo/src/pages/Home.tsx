@@ -1,4 +1,5 @@
 import { IonContent, IonPage, IonToast } from '@ionic/react';
+import { useHistory } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
 import oneSignalLogo from '../assets/onesignal_logo.svg';
 import ActionButton from '../components/ActionButton';
@@ -82,6 +83,7 @@ const Home: React.FC = () => {
     sendCustomNotification,
   } = useAppContext();
 
+  const history = useHistory();
   const [dialog, setDialog] = useState<DialogState>({ type: 'none' });
   const [toastMessage, setToastMessage] = useState('');
   const [toastOpen, setToastOpen] = useState(false);
@@ -324,11 +326,7 @@ const Home: React.FC = () => {
             <section className="section">
               <ActionButton
                 type="button"
-                onClick={() =>
-                  runAction('Next activity tapped', () =>
-                    trackEvent('next_activity_tapped'),
-                  )
-                }
+                onClick={() => history.push('/secondary')}
               >
                 NEXT ACTIVITY
               </ActionButton>
