@@ -102,6 +102,7 @@ Requirements:
 
 - Project path: `examples/demo`
 - App type: Ionic React (blank)
+- App name: `OneSignal Demo`
 - Keep source focused and lightweight
 - Android package id: `com.onesignal.example`
 - iOS bundle id: `com.onesignal.example`
@@ -110,6 +111,26 @@ Requirements:
 - Do not use `examples/demo/www/index.html` in this Capacitor flow
 - Do not add `cordova-android` or `cordova-ios` as demo app dependencies
 - Do not add a `cordova.platforms` block in `examples/demo/package.json` for this Capacitor flow
+- Use strict TypeScript and keep clean architecture (`repository + context/reducer`)
+- Use OneSignal brand colors and shared theme tokens/styles
+- Header should show OneSignal logo wordmark + separate `Sample App` label (centered)
+- Dialogs should open with empty input fields by default (Appium enters values)
+- Prefer separate component files per section to keep files focused/readable
+
+Asset requirements:
+
+- Download wordmark SVG:
+  `https://raw.githubusercontent.com/OneSignal/sdk-shared/refs/heads/main/assets/onesignal_logo.svg`
+- Save to demo assets and import the SVG component directly for header usage
+- Do not inline long SVG path strings in component files
+- Download padded app icon PNG:
+  `https://raw.githubusercontent.com/OneSignal/sdk-shared/refs/heads/main/assets/onesignal_logo_icon_padded.png`
+- Save it as the Capacitor source icon (for example `resources/icon.png`, 1024x1024)
+- Generate platform icons using Capacitor assets:
+  `bun add -d @capacitor/assets`
+  `npx @capacitor/assets generate`
+- Sync generated assets to native projects:
+  `npx cap sync`
 
 A setup.sh script in examples/ handles building, packing, and installing automatically.
 Add/verify the following scripts in package.json:
@@ -416,12 +437,14 @@ Create reusable components in `src/components/` for Ionic + React:
 - `ToggleRow.tsx`: label, optional description, and toggle control
 - `ActionButton.tsx`: primary and outline variants, full width
 - `ListWidgets.tsx`: pair item, single item, empty state, and list wrappers
-- `LoadingOverlay.tsx`: full-screen blocking overlay driven by context loading state
+- `LogView.tsx`: sticky/collapsible log panel with Appium-friendly `data-testid` labels
+- `modals/*`: modal components shared by multiple sections
 
 Guidelines:
 
 - Keep section spacing and card spacing consistent with the screenshot rules (12px section gap, 8px inner gap)
 - Use shared props and styles to avoid repeated per-section JSX/CSS
+- Keep optional one-off UI state local to components (for example, modal open state and temporary input values)
 
 ### Prompt 8.3 - Reusable Multi-Pair Modal
 
@@ -545,6 +568,17 @@ npx cap doctor
 Expected plugin list includes:
 
 - `onesignal-cordova-plugin`
+
+iOS plugin and notification checklist:
+
+- Add to iOS `Info.plist`:
+  `<key>UIBackgroundModes</key>` with `<string>remote-notification</string>`
+- If `npx cap sync ios` warns about `Package.swift` under
+  `ios/capacitor-cordova-ios-plugins/sources/OnesignalCordovaPlugin`,
+  re-run:
+  `bun run setup`
+  `bun install`
+  `npx cap sync`
 
 ---
 
