@@ -904,6 +904,40 @@ Implementation guidance:
 - Log each toast message through `LogManager.getInstance().i(...)` for traceability.
 - Replace currently visible toast text when a new action fires rapidly.
 
+### Prompt 8.8 - Safe Area Insets (Fullscreen Content)
+
+When using `IonContent fullscreen`, apply safe-area padding for custom headers/footers so content does not render under system UI.
+
+Use Ionic CSS vars (preferred):
+
+```css
+.my-header {
+  padding-top: var(--ion-safe-area-top);
+}
+
+.my-footer {
+  padding-bottom: var(--ion-safe-area-bottom);
+}
+```
+
+Raw CSS env vars are also valid:
+
+```css
+padding-top: env(safe-area-inset-top);
+padding-bottom: env(safe-area-inset-bottom);
+```
+
+Implementation notes:
+
+- `index.html` should include `viewport-fit=cover` in the viewport meta tag.
+- Default `ion-header` + `ion-content` flow usually handles insets automatically.
+- If `IonContent` uses `fullscreen`, add explicit safe-area padding in page CSS.
+- Example used in this demo:
+  - `src/pages/Home.css`:
+    - `.brand-header { padding-top: var(--ion-safe-area-top); }`
+    - `.content { padding-bottom: calc(12px + var(--ion-safe-area-bottom)); }`
+- Android insets may be `0` unless the app draws edge-to-edge and/or a display cutout is present.
+
 ---
 
 ## Key Files Structure
@@ -952,6 +986,7 @@ Implementation guidance:
 - strict TypeScript typing
 - non-blocking startup and tooltip loading
 - Appium-ready selectors for automation
+- safe-area aware layout when using `IonContent fullscreen`
 
 ---
 

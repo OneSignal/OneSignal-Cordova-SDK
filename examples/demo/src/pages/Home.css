@@ -8,6 +8,7 @@
   background: #eb4d52;
   color: #fff;
   min-height: 84px;
+  padding-top: var(--ion-safe-area-top);
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -93,6 +94,7 @@
 
 .content {
   padding: 12px;
+  padding-bottom: calc(12px + var(--ion-safe-area-bottom));
 }
 
 .section {
