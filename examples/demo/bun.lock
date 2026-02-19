@@ -5,13 +5,13 @@
     "": {
       "name": "demo",
       "dependencies": {
-        "@capacitor/android": "8.1.0",
-        "@capacitor/app": "8.0.1",
-        "@capacitor/core": "8.1.0",
-        "@capacitor/haptics": "8.0.0",
-        "@capacitor/ios": "8.1.0",
-        "@capacitor/keyboard": "8.0.0",
-        "@capacitor/status-bar": "8.0.1",
+        "@capacitor/android": "^7.5.0",
+        "@capacitor/app": "^7.1.2",
+        "@capacitor/core": "^7.5.0",
+        "@capacitor/haptics": "^7.0.3",
+        "@capacitor/ios": "^7.5.0",
+        "@capacitor/keyboard": "^7.0.4",
+        "@capacitor/status-bar": "^7.0.5",
         "@ionic/react": "^8.5.0",
         "@ionic/react-router": "^8.5.0",
         "@types/react-router": "^5.1.20",
@@ -24,7 +24,7 @@
       },
       "devDependencies": {
         "@capacitor/assets": "^3.0.5",
-        "@capacitor/cli": "8.1.0",
+        "@capacitor/cli": "7.5.0",
         "@types/react": "19.0.10",
         "@types/react-dom": "19.0.4",
         "@vitejs/plugin-legacy": "^5.0.0",
@@ -221,23 +221,23 @@
 
     "@babel/types": ["@babel/types@7.29.0", "", { "dependencies": { "@babel/helper-string-parser": "^7.27.1", "@babel/helper-validator-identifier": "^7.28.5" } }, "sha512-LwdZHpScM4Qz8Xw2iKSzS+cfglZzJGvofQICy7W7v4caru4EaAmyUuO6BGrbyQ2mYV11W0U8j5mBhd14dd3B0A=="],
 
-    "@capacitor/android": ["@capacitor/android@8.1.0", "", { "peerDependencies": { "@capacitor/core": "^8.1.0" } }, "sha512-z0acTPxj5DCy/U2FU7w+GA93oC+wdyKnsOcRg5rutDmSYa8Do1tzYqApKgf+hnuTNPbtrCTHp0Zy1cLiK/4MEw=="],
+    "@capacitor/android": ["@capacitor/android@7.5.0", "", { "peerDependencies": { "@capacitor/core": "^7.5.0" } }, "sha512-VjESuJYzQQH4vxvrOQV0yXuDv3Gx1bfb6YpAkoGfUHe0kiw0LY5nh5Kn7I5bI9hlht9SJ8YmSsCgFeMNyzKoWQ=="],
 
-    "@capacitor/app": ["@capacitor/app@8.0.1", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-yeG3yyA0ETKqvgqexwHMBlmVOF13A1hRXzv/km0Ptv5TrNIZvZJK4MTI3uiqvnbHrzoJGP5DwWAjEXEfi90v3Q=="],
+    "@capacitor/app": ["@capacitor/app@7.1.2", "", { "peerDependencies": { "@capacitor/core": ">=7.0.0" } }, "sha512-d4I/oF/PRu4megL7/IGKYfe5j7yzSON1FRFgq6kH+m5kH6g7V+wyjHRLauCzGNjdRx4S+nWOumINds0qcRBtKg=="],
 
     "@capacitor/assets": ["@capacitor/assets@3.0.5", "", { "dependencies": { "@capacitor/cli": "^5.3.0", "@ionic/utils-array": "2.1.6", "@ionic/utils-fs": "3.1.7", "@trapezedev/project": "^7.0.10", "commander": "8.3.0", "debug": "4.3.4", "fs-extra": "10.1.0", "node-fetch": "2.7.0", "node-html-parser": "5.4.2", "sharp": "0.32.6", "tslib": "2.6.2", "yargs": "17.7.2" }, "bin": { "capacitor-assets": "bin/capacitor-assets" } }, "sha512-ohz/OUq61Y1Fc6aVSt0uDrUdeOA7oTH4pkWDbv/8I3UrPjH7oPkzYhShuDRUjekNp9RBi198VSFdt0CetpEOzw=="],
 
-    "@capacitor/cli": ["@capacitor/cli@8.1.0", "", { "dependencies": { "@ionic/cli-framework-output": "^2.2.8", "@ionic/utils-subprocess": "^3.0.1", "@ionic/utils-terminal": "^2.3.5", "commander": "^12.1.0", "debug": "^4.4.0", "env-paths": "^2.2.0", "fs-extra": "^11.2.0", "kleur": "^4.1.5", "native-run": "^2.0.3", "open": "^8.4.0", "plist": "^3.1.0", "prompts": "^2.4.2", "rimraf": "^6.0.1", "semver": "^7.6.3", "tar": "^7.5.3", "tslib": "^2.8.1", "xml2js": "^0.6.2" }, "bin": { "cap": "bin/capacitor", "capacitor": "bin/capacitor" } }, "sha512-JAzA/ckPgTCjZz6YumBLV2dNCFEVXAuR1oOKLD7AJ4LAI5pF5RtRZrf5FoaxvJVb0S4CouZT5cD+7NwsNJX/nw=="],
+    "@capacitor/cli": ["@capacitor/cli@7.5.0", "", { "dependencies": { "@ionic/cli-framework-output": "^2.2.8", "@ionic/utils-subprocess": "^3.0.1", "@ionic/utils-terminal": "^2.3.5", "commander": "^12.1.0", "debug": "^4.4.0", "env-paths": "^2.2.0", "fs-extra": "^11.2.0", "kleur": "^4.1.5", "native-run": "^2.0.3", "open": "^8.4.0", "plist": "^3.1.0", "prompts": "^2.4.2", "rimraf": "^6.0.1", "semver": "^7.6.3", "tar": "^7.5.3", "tslib": "^2.8.1", "xml2js": "^0.6.2" }, "bin": { "cap": "bin/capacitor", "capacitor": "bin/capacitor" } }, "sha512-mlohsvLZjWrO5eAVTn1+dABNQwQawcphVp6NQVJZ3I4x2BAoNmJj53QflX7PYGUipL9gF9EM9Yiku3m1McxFZg=="],
 
-    "@capacitor/core": ["@capacitor/core@8.1.0", "", { "dependencies": { "tslib": "^2.1.0" } }, "sha512-UfMBMWc1v7J+14AhH03QmeNwV3HZx3qnOWhpwnHfzALEwAwlV/itQOQqcasMQYhOHWL0tiymc5ByaLTn7KKQxw=="],
+    "@capacitor/core": ["@capacitor/core@7.5.0", "", { "dependencies": { "tslib": "^2.1.0" } }, "sha512-4Y4trISe2Bp3lwsoGFoQIvgX4hiZO8S1Slmbz6oFaMxAuEc4noipQGCQx974PF4glwVVe/8+H3P9iEmCXtrUgA=="],
 
-    "@capacitor/haptics": ["@capacitor/haptics@8.0.0", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-DY1IUOjke1T4ITl7mFHQIKCaJJyHYAYRYHG9bVApU7PDOZiMVGMp48Yjzdqjya+wv/AHS5mDabSTUmhJ5uDvBA=="],
+    "@capacitor/haptics": ["@capacitor/haptics@7.0.3", "", { "peerDependencies": { "@capacitor/core": ">=7.0.0" } }, "sha512-6O5W4jtYKPGrulqt3pEeXKH1vWT5deSUoiiN2sVj7F6UgrEOxCmm06XS07Eeum0lDXEmksKARwtA+iQwHPswtA=="],
 
-    "@capacitor/ios": ["@capacitor/ios@8.1.0", "", { "peerDependencies": { "@capacitor/core": "^8.1.0" } }, "sha512-wPaQ8ayL0UY+SxydZbrmfzPs8TryZVEB6hrL/XBnXxQtb6rpEmIy/3GIltPwM+/T4m/IuaSDZOToWK65ruC00g=="],
+    "@capacitor/ios": ["@capacitor/ios@7.5.0", "", { "peerDependencies": { "@capacitor/core": "^7.5.0" } }, "sha512-HlEWLjmPMSyjD8pM2FSTYF7a7aoYDdrlUoA3Ybm8OnmOaby3R7L8jpzJr96igh/i2SpsHvDI7v3sO2FhSNKCKA=="],
 
-    "@capacitor/keyboard": ["@capacitor/keyboard@8.0.0", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-ycPW6iQyFwzDK95jihesj5EGiyyGSfbBqNek11iNp9tBOB7zDeYkUA2S/vPpOETt3dhP6pWr7a9gNVGuEfj11g=="],
+    "@capacitor/keyboard": ["@capacitor/keyboard@7.0.4", "", { "peerDependencies": { "@capacitor/core": ">=7.0.0" } }, "sha512-kKHsuDOC0q9iC1XANhQBK35S+hFKx4EfY9I+SEMPR6RuUAIuXQXYaA3+D0LkdRdHIf3OrlTDznPvXQ5Dg2WrCA=="],
 
-    "@capacitor/status-bar": ["@capacitor/status-bar@8.0.1", "", { "peerDependencies": { "@capacitor/core": ">=8.0.0" } }, "sha512-OR59dlbwvmrV5dKsC9lvwv48QaGbqcbSTBpk+9/WXWxXYSdXXdzJZU9p8oyNPAkuJhCdnSa3XmU43fZRPBJJ5w=="],
+    "@capacitor/status-bar": ["@capacitor/status-bar@7.0.5", "", { "peerDependencies": { "@capacitor/core": ">=7.0.0" } }, "sha512-d0DI/Usy4RrNiV5xfnypXNRLmWYMixC2yAUAwe6sCQQ0HF7oskDf4RpCxcZqbxnpc4H4A0qqiOSltfJLFAYshg=="],
 
     "@cspotcode/source-map-support": ["@cspotcode/source-map-support@0.8.1", "", { "dependencies": { "@jridgewell/trace-mapping": "0.3.9" } }, "sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw=="],
 
