@@ -145,7 +145,15 @@
 .kv-card .kv-row span:last-child {
   text-align: right;
   font-weight: 600;
-  word-break: break-word;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.kv-card .kv-row .id-value {
+  font-size: 0.92rem;
 }
 
 .divider {
