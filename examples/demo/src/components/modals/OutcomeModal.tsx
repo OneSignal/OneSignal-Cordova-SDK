@@ -26,6 +26,7 @@ const OutcomeModal: FC<OutcomeModalProps> = ({ open, onClose, onSubmit }) => {
   return (
     <ModalShell open={open}>
       <form
+        className="outcome-modal"
         onSubmit={(event) => {
           event.preventDefault();
           const trimmed = name.trim();
@@ -39,17 +40,48 @@ const OutcomeModal: FC<OutcomeModalProps> = ({ open, onClose, onSubmit }) => {
           onSubmit(trimmed, mode, null);
         }}
       >
-        <h3>Send Outcome</h3>
-        <div className="radio-list">
-          <label><input type="radio" checked={mode === 'normal'} onChange={() => setMode('normal')} /> Normal Outcome</label>
-          <label><input type="radio" checked={mode === 'unique'} onChange={() => setMode('unique')} /> Unique Outcome</label>
-          <label><input type="radio" checked={mode === 'value'} onChange={() => setMode('value')} /> Outcome with Value</label>
+        <h3 className="outcome-title">Send Outcome</h3>
+        <div className="radio-list outcome-radio-list">
+          <label>
+            <input
+              type="radio"
+              checked={mode === 'normal'}
+              onChange={() => setMode('normal')}
+            />
+            Normal Outcome
+          </label>
+          <label>
+            <input
+              type="radio"
+              checked={mode === 'unique'}
+              onChange={() => setMode('unique')}
+            />
+            Unique Outcome
+          </label>
+          <label>
+            <input
+              type="radio"
+              checked={mode === 'value'}
+              onChange={() => setMode('value')}
+            />
+            Outcome with Value
+          </label>
         </div>
-        <input value={name} onChange={(event) => setName(event.target.value)} placeholder="Outcome Name" />
+        <input
+          className="outcome-input"
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+          placeholder="Outcome Name"
+        />
         {mode === 'value' ? (
-          <input value={value} onChange={(event) => setValue(event.target.value)} placeholder="Outcome Value" />
+          <input
+            className="outcome-input"
+            value={value}
+            onChange={(event) => setValue(event.target.value)}
+            placeholder="Outcome Value"
+          />
         ) : null}
-        <div className="modal-actions">
+        <div className="modal-actions outcome-actions">
           <button type="button" onClick={onClose}>Cancel</button>
           <button type="submit">Send</button>
         </div>

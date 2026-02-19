@@ -382,6 +382,46 @@
   margin: 4px 0 0;
 }
 
+.outcome-modal {
+  padding: 2px;
+}
+
+.outcome-title {
+  margin-bottom: 16px;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.outcome-radio-list label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  min-height: 24px;
+  font-size: 16px;
+}
+
+.outcome-radio-list input[type='radio'] {
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  flex-shrink: 0;
+  accent-color: #ff3b4d;
+}
+
+.outcome-input {
+  margin-top: 8px;
+  margin-bottom: 0;
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-size: 18px;
+}
+
+.outcome-actions {
+  margin-top: 18px;
+  gap: 28px;
+}
+
 .error {
   color: #d33f45;
   margin: 0;
