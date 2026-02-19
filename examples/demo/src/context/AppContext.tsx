@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useReducer } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { Capacitor } from '@capacitor/core';
 import OneSignal from 'onesignal-cordova-plugin';
@@ -226,6 +226,8 @@ interface Props {
 
 export function AppContextProvider({ children }: Props) {
   const [state, dispatch] = useReducer(appReducer, initialState);
+  const mountedRef = useRef(true);
+  const requestSequenceRef = useRef(0);
 
   const addLog = useCallback((message: string) => {
     dispatch({ type: 'ADD_LOG', payload: message });
@@ -247,19 +249,30 @@ export function AppContextProvider({ children }: Props) {
   }, []);
 
   const fetchUserDataFromApi = useCallback(async () => {
+    const requestId = requestSequenceRef.current + 1;
+    requestSequenceRef.current = requestId;
+
     const onesignalId = await repository.getOnesignalId();
     if (!onesignalId) {
-      dispatch({ type: 'SET_LOADING', payload: false });
+      if (mountedRef.current && requestSequenceRef.current === requestId) {
+        dispatch({ type: 'SET_LOADING', payload: false });
+      }
       return;
     }
 
     const userData = await repository.fetchUser(onesignalId);
     if (!userData) {
-      dispatch({ type: 'SET_LOADING', payload: false });
+      if (mountedRef.current && requestSequenceRef.current === requestId) {
+        dispatch({ type: 'SET_LOADING', payload: false });
+      }
       return;
     }
 
     const externalId = await repository.getExternalId();
+    if (!mountedRef.current || requestSequenceRef.current !== requestId) {
+      return;
+    }
+
     dispatch({
       type: 'SET_USER_DATA',
       payload: {
@@ -272,7 +285,16 @@ export function AppContextProvider({ children }: Props) {
     });
 
     await new Promise((resolve) => setTimeout(resolve, 100));
-    dispatch({ type: 'SET_LOADING', payload: false });
+    if (mountedRef.current && requestSequenceRef.current === requestId) {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
+  }, []);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -313,6 +335,9 @@ export function AppContextProvider({ children }: Props) {
       });
 
       const onesignalId = await repository.getOnesignalId();
+      if (!mountedRef.current) {
+        return;
+      }
       if (onesignalId) {
         dispatch({ type: 'SET_LOADING', payload: true });
         await fetchUserDataFromApi();
@@ -321,6 +346,9 @@ export function AppContextProvider({ children }: Props) {
 
     init().catch(() => {
       addLog('Initialization failed');
+      if (mountedRef.current) {
+        dispatch({ type: 'SET_LOADING', payload: false });
+      }
     });
   }, [addLog, fetchUserDataFromApi, refreshPushState]);
 
@@ -330,17 +358,29 @@ export function AppContextProvider({ children }: Props) {
     }
 
     const onPermissionChange = (granted: boolean) => {
+      if (!mountedRef.current) {
+        return;
+      }
       dispatch({ type: 'SET_HAS_NOTIFICATION_PERMISSION', payload: granted });
       addLog(`Permission changed: ${granted}`);
     };
 
     const onPushSubscriptionChange = async () => {
+      if (!mountedRef.current) {
+        return;
+      }
       await refreshPushState();
       addLog('Push subscription changed');
     };
 
     const onUserChange = async () => {
+      if (!mountedRef.current) {
+        return;
+      }
       const externalId = await repository.getExternalId();
+      if (!mountedRef.current) {
+        return;
+      }
       dispatch({ type: 'SET_EXTERNAL_USER_ID', payload: externalId ?? undefined });
       addLog('User changed');
       dispatch({ type: 'SET_LOADING', payload: true });

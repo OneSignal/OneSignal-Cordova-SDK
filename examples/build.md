@@ -634,11 +634,17 @@ Note:
 
 ### Prompt 3.2 - UserData Model
 
-- `aliases: Record<string, string>`
-- `tags: Record<string, string>`
-- `emails: string[]`
-- `smsNumbers: string[]`
-- `externalId: string | null`
+```typescript
+interface UserData {
+  aliases: Record<string, string>;  // From identity object (filter out external_id, onesignal_id)
+  tags: Record<string, string>;     // From properties.tags object
+  emails: string[];                  // From subscriptions where type=="Email" -> token
+  smsNumbers: string[];              // From subscriptions where type=="SMS" -> token
+  externalId?: string;               // From identity.external_id
+}
+
+function userDataFromJson(json: Record<string, unknown>): UserData { ... }
+```
 
 ---
 
