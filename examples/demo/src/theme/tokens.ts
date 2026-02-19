@@ -3,7 +3,7 @@ export const Theme = {
     oneSignalRed: '#E54B4D',
     oneSignalGreen: '#34A853',
     oneSignalGreenLight: '#E6F4EA',
-    lightBackground: '#EEF0F3',
+    lightBackground: '#F8F9FA',
     cardBackground: '#FFFFFF',
     dividerColor: '#E8EAED',
     warningBackground: '#FFF8E1',

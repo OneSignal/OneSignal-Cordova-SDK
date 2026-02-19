@@ -6,6 +6,7 @@ import SectionCard from '../SectionCard';
 interface PushSectionProps {
   pushSubscriptionId: string | null | undefined;
   isPushEnabled: boolean;
+  hasNotificationPermission: boolean;
   onTogglePush: (checked: boolean) => void;
   onPromptPush: () => void;
   onInfoTap: () => void;
@@ -14,6 +15,7 @@ interface PushSectionProps {
 const PushSection: FC<PushSectionProps> = ({
   pushSubscriptionId,
   isPushEnabled,
+  hasNotificationPermission,
   onTogglePush,
   onPromptPush,
   onInfoTap,
@@ -26,17 +28,20 @@ const PushSection: FC<PushSectionProps> = ({
       </div>
       <div className="divider" />
       <div className="kv-row kv-row-toggle">
-        <span>Enabled</span>
+        <span>Push Enabled</span>
         <IonToggle
           checked={isPushEnabled}
           onIonChange={(event) => onTogglePush(event.detail.checked)}
           aria-label="Push enabled"
+          disabled={!hasNotificationPermission}
         />
       </div>
     </div>
-    <ActionButton variant="outline" type="button" onClick={onPromptPush}>
-      PROMPT PUSH
-    </ActionButton>
+    {!hasNotificationPermission ? (
+      <ActionButton variant="outline" type="button" onClick={onPromptPush}>
+        PROMPT PUSH
+      </ActionButton>
+    ) : null}
   </SectionCard>
 );
 

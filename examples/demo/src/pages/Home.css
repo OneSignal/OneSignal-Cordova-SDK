@@ -1,6 +1,6 @@
 .demo-app {
   --demo-header-height: calc(56px + var(--ion-safe-area-top));
-  background: #eef0f3;
+  background: #f8f9fa;
   min-height: 100%;
   color: #1f2733;
 }
@@ -312,7 +312,7 @@
 
 .modal-card h3 {
   margin: 0 0 14px;
-  font-size: 30px;
+  font-size: 22px;
   font-weight: 700;
 }
 

@@ -1,5 +1,5 @@
 import { IonContent, IonPage, IonToast } from '@ionic/react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import oneSignalLogo from '../assets/onesignal_logo.svg';
 import ActionButton from '../components/ActionButton';
 import LogView from '../components/LogView';
@@ -109,6 +109,10 @@ const Home: React.FC = () => {
     setDialog({ type: 'none' });
   };
 
+  useEffect(() => {
+    void promptPush();
+  }, [promptPush]);
+
   return (
     <IonPage>
       <IonContent fullscreen>
@@ -177,6 +181,7 @@ const Home: React.FC = () => {
             <PushSection
               pushSubscriptionId={state.pushSubscriptionId ?? null}
               isPushEnabled={state.isPushEnabled}
+              hasNotificationPermission={state.hasNotificationPermission}
               onTogglePush={(checked) =>
                 runAction(`Push ${checked ? 'enabled' : 'disabled'}`, () =>
                   setPushEnabled(checked),
