@@ -1,6 +1,7 @@
 import { IonContent, IonPage } from '@ionic/react';
 import { useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
+import { useAppContext } from '../context/AppContext';
 import './Home.css';
 
 type AliasItem = {
@@ -12,6 +13,10 @@ type TagItem = {
   key: string;
   value: string;
 };
+
+function isObjectRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
 
 type OutcomeMode = 'normal' | 'unique' | 'value';
 
@@ -29,31 +34,38 @@ type DialogState =
   | { type: 'trackEvent' }
   | { type: 'customNotification' };
 
-const ONE_SIGNAL_APP_ID = '77e32082-ea27-42e3-a898-c72e141824ef';
-
 const Home: React.FC = () => {
-  const [logs, setLogs] = useState<string[]>([
-    '[main] ApplicationService.onActivityStopped(3, APP_OPEN)',
-    'Parsed user data: aliases=0, tags=2, emails=0, sms=0',
-    'User data fetched successfully, parsing response...',
-    '[main] NotificationsManager.requestPermission()',
-  ]);
+  const {
+    state,
+    clearLogs,
+    loginUser,
+    setConsentRequired,
+    setPushEnabled,
+    promptPush,
+    setIamPaused,
+    sendIamTrigger,
+    addAlias,
+    addAliases,
+    addEmail,
+    addSms,
+    addTag,
+    addTags,
+    addTrigger,
+    addTriggers,
+    clearTriggers,
+    removeSelectedTags,
+    sendOutcome,
+    sendUniqueOutcome,
+    sendOutcomeWithValue,
+    trackEvent,
+    setLocationShared,
+    requestLocationPermission,
+    sendSimpleNotification,
+    sendImageNotification,
+    sendCustomNotification,
+  } = useAppContext();
+
   const [logsCollapsed, setLogsCollapsed] = useState(false);
-
-  const [consentRequired, setConsentRequired] = useState(false);
-  const [pushEnabled, setPushEnabled] = useState(true);
-  const [iamPaused, setIamPaused] = useState(false);
-  const [locationShared, setLocationShared] = useState(false);
-
-  const [externalUserId, setExternalUserId] = useState<string | null>(null);
-  const [aliases, setAliases] = useState<AliasItem[]>([]);
-  const [emails, setEmails] = useState<string[]>([]);
-  const [smsNumbers, setSmsNumbers] = useState<string[]>([]);
-  const [tags, setTags] = useState<TagItem[]>([
-    { key: 'newestOutcome', value: 'true' },
-    { key: 'somanem', value: 'somevalue' },
-  ]);
-  const [triggers, setTriggers] = useState<string[]>([]);
 
   const [dialog, setDialog] = useState<DialogState>({ type: 'none' });
 
@@ -75,13 +87,19 @@ const Home: React.FC = () => {
   const [customTitle, setCustomTitle] = useState('');
   const [customBody, setCustomBody] = useState('');
 
-  const statusLabel = useMemo(() => (externalUserId ? 'Logged In' : 'Anonymous'), [externalUserId]);
-
-  const pushId = '1b15279f-44c5-4b3c-8cd9-b27ccee1136e';
-
-  const addLog = (message: string) => {
-    setLogs((prev) => [message, ...prev].slice(0, 100));
-  };
+  const statusLabel = useMemo(() => (state.externalUserId ? 'Logged In' : 'Anonymous'), [state.externalUserId]);
+  const aliases: AliasItem[] = useMemo(
+    () => state.aliasesList.map(([label, id]) => ({ label, id })),
+    [state.aliasesList],
+  );
+  const tags: TagItem[] = useMemo(
+    () => state.tagsList.map(([key, value]) => ({ key, value })),
+    [state.tagsList],
+  );
+  const triggerValues = useMemo(
+    () => state.triggersList.map(([key, value]) => `${key}: ${value}`),
+    [state.triggersList],
+  );
 
   const resetDialogFields = () => {
     setSingleLabel('');
@@ -107,8 +125,7 @@ const Home: React.FC = () => {
   const onAddAlias = (e: FormEvent) => {
     e.preventDefault();
     if (!singleLabel.trim() || !singleId.trim()) return;
-    setAliases((prev) => [...prev, { label: singleLabel.trim(), id: singleId.trim() }]);
-    addLog(`Alias added: ${singleLabel.trim()}`);
+    void addAlias(singleLabel.trim(), singleId.trim());
     closeDialog();
   };
 
@@ -116,8 +133,8 @@ const Home: React.FC = () => {
     e.preventDefault();
     const valid = multiRows.filter((r) => r.label.trim() && r.id.trim());
     if (!valid.length) return;
-    setAliases((prev) => [...prev, ...valid.map((r) => ({ label: r.label.trim(), id: r.id.trim() }))]);
-    addLog(`Added ${valid.length} aliases`);
+    const record = Object.fromEntries(valid.map((row) => [row.label.trim(), row.id.trim()]));
+    void addAliases(record);
     closeDialog();
   };
 
@@ -125,8 +142,7 @@ const Home: React.FC = () => {
     e.preventDefault();
     const value = singleValue.trim();
     if (!value) return;
-    setEmails((prev) => [...prev, value]);
-    addLog(`Email added: ${value}`);
+    void addEmail(value);
     closeDialog();
   };
 
@@ -134,16 +150,14 @@ const Home: React.FC = () => {
     e.preventDefault();
     const value = singleValue.trim();
     if (!value) return;
-    setSmsNumbers((prev) => [...prev, value]);
-    addLog(`SMS added: ${value}`);
+    void addSms(value);
     closeDialog();
   };
 
   const onAddTag = (e: FormEvent) => {
     e.preventDefault();
     if (!singleLabel.trim() || !singleValue.trim()) return;
-    setTags((prev) => [...prev, { key: singleLabel.trim(), value: singleValue.trim() }]);
-    addLog(`Tag added: ${singleLabel.trim()}`);
+    void addTag(singleLabel.trim(), singleValue.trim());
     closeDialog();
   };
 
@@ -151,44 +165,58 @@ const Home: React.FC = () => {
     e.preventDefault();
     const valid = multiRows.filter((r) => r.label.trim() && r.id.trim());
     if (!valid.length) return;
-    setTags((prev) => [...prev, ...valid.map((r) => ({ key: r.label.trim(), value: r.id.trim() }))]);
-    addLog(`Added ${valid.length} tags`);
+    const record = Object.fromEntries(valid.map((row) => [row.label.trim(), row.id.trim()]));
+    void addTags(record);
     closeDialog();
   };
 
   const onRemoveSelectedTags = () => {
     if (!selectedTagKeys.length) return;
-    setTags((prev) => prev.filter((tag) => !selectedTagKeys.includes(tag.key)));
-    addLog(`Removed ${selectedTagKeys.length} tags`);
+    void removeSelectedTags(selectedTagKeys);
     closeDialog();
   };
 
   const onSendOutcome = (e: FormEvent) => {
     e.preventDefault();
     if (!outcomeName.trim()) return;
-    addLog(`Outcome sent (${outcomeMode}): ${outcomeName.trim()}`);
+    if (outcomeMode === 'unique') {
+      void sendUniqueOutcome(outcomeName.trim());
+    } else if (outcomeMode === 'value') {
+      const numericValue = Number(outcomeValue);
+      if (Number.isNaN(numericValue)) return;
+      void sendOutcomeWithValue(outcomeName.trim(), numericValue);
+    } else {
+      void sendOutcome(outcomeName.trim());
+    }
     closeDialog();
   };
 
   const onTrackEvent = (e: FormEvent) => {
     e.preventDefault();
     if (!eventName.trim()) return;
+    let props: Record<string, unknown> | undefined;
     if (eventProperties.trim()) {
       try {
-        JSON.parse(eventProperties);
+        const parsed = JSON.parse(eventProperties);
+        if (isObjectRecord(parsed)) {
+          props = parsed;
+        } else {
+          setJsonError('Properties must be a JSON object');
+          return;
+        }
       } catch {
         setJsonError('Properties must be valid JSON');
         return;
       }
     }
-    addLog(`Track event: ${eventName.trim()}`);
+    void trackEvent(eventName.trim(), props);
     closeDialog();
   };
 
   const onSendCustomNotification = (e: FormEvent) => {
     e.preventDefault();
     if (!customTitle.trim() || !customBody.trim()) return;
-    addLog(`Custom notification queued: ${customTitle.trim()}`);
+    void sendCustomNotification(customTitle.trim(), customBody.trim());
     closeDialog();
   };
 
@@ -203,8 +231,8 @@ const Home: React.FC = () => {
           <section className="logs-panel">
             <div className="logs-header">
               <strong>LOGS</strong>
-              <span>({logs.length})</span>
-              <button className="icon-btn" onClick={() => setLogs([])} type="button" aria-label="Clear logs">
+              <span>({state.logs.length})</span>
+              <button className="icon-btn" onClick={clearLogs} type="button" aria-label="Clear logs">
                 🗑
               </button>
               <button
@@ -218,7 +246,7 @@ const Home: React.FC = () => {
             </div>
             {!logsCollapsed && (
               <div className="logs-body">
-                {logs.map((line, idx) => (
+                {state.logs.map((line, idx) => (
                   <div key={`${line}-${idx}`} className="log-row">
                     <span className="log-time">16:39:40</span>
                     <span className="log-level">D</span>
@@ -233,7 +261,7 @@ const Home: React.FC = () => {
             <section className="section">
               <h2>APP</h2>
               <div className="card kv-card">
-                <div className="kv-row"><span>App ID</span><span>{ONE_SIGNAL_APP_ID}</span></div>
+                <div className="kv-row"><span>App ID</span><span>{state.appId}</span></div>
               </div>
               <div className="card tip-card">
                 <div>Add your own App ID, then rebuild to fully test all functionality.</div>
@@ -244,7 +272,7 @@ const Home: React.FC = () => {
                   <div className="label">Consent Required</div>
                   <div className="sub">Require consent before SDK processes data</div>
                 </div>
-                <input type="checkbox" checked={consentRequired} onChange={(e) => setConsentRequired(e.target.checked)} />
+                <input type="checkbox" checked={state.consentRequired} onChange={(e) => void setConsentRequired(e.target.checked)} />
               </div>
             </section>
 
@@ -253,7 +281,7 @@ const Home: React.FC = () => {
               <div className="card kv-card">
                 <div className="kv-row"><span>Status</span><span>{statusLabel}</span></div>
                 <div className="divider" />
-                <div className="kv-row"><span>External ID</span><span>{externalUserId ?? '—'}</span></div>
+                <div className="kv-row"><span>External ID</span><span>{state.externalUserId ?? '—'}</span></div>
               </div>
               <button className="action-btn" onClick={() => setDialog({ type: 'login' })} type="button">LOGIN USER</button>
             </section>
@@ -261,19 +289,20 @@ const Home: React.FC = () => {
             <section className="section">
               <div className="section-head"><h2>PUSH</h2><button className="icon-btn" type="button">ⓘ</button></div>
               <div className="card kv-card">
-                <div className="kv-row"><span>Push ID</span><span>{pushId}</span></div>
+                <div className="kv-row"><span>Push ID</span><span>{state.pushSubscriptionId ?? '—'}</span></div>
                 <div className="divider" />
                 <div className="kv-row">
                   <span>Enabled</span>
-                  <input type="checkbox" checked={pushEnabled} onChange={(e) => setPushEnabled(e.target.checked)} />
+                  <input type="checkbox" checked={state.isPushEnabled} onChange={(e) => void setPushEnabled(e.target.checked)} />
                 </div>
               </div>
+              <button className="action-btn outline" type="button" onClick={() => void promptPush()}>PROMPT PUSH</button>
             </section>
 
             <section className="section">
               <div className="section-head"><h2>SEND PUSH NOTIFICATION</h2><button className="icon-btn" type="button">ⓘ</button></div>
-              <button className="action-btn" type="button" onClick={() => addLog('Simple notification queued')}>SIMPLE</button>
-              <button className="action-btn" type="button" onClick={() => addLog('Image notification queued')}>WITH IMAGE</button>
+              <button className="action-btn" type="button" onClick={() => void sendSimpleNotification()}>SIMPLE</button>
+              <button className="action-btn" type="button" onClick={() => void sendImageNotification()}>WITH IMAGE</button>
               <button className="action-btn" type="button" onClick={() => setDialog({ type: 'customNotification' })}>CUSTOM</button>
             </section>
 
@@ -284,16 +313,16 @@ const Home: React.FC = () => {
                   <div className="label">Pause In-App Messages</div>
                   <div className="sub">Toggle in-app message display</div>
                 </div>
-                <input type="checkbox" checked={iamPaused} onChange={(e) => setIamPaused(e.target.checked)} />
+                <input type="checkbox" checked={state.inAppMessagesPaused} onChange={(e) => void setIamPaused(e.target.checked)} />
               </div>
             </section>
 
             <section className="section">
               <div className="section-head"><h2>SEND IN-APP MESSAGE</h2><button className="icon-btn" type="button">ⓘ</button></div>
-              <button className="action-btn" type="button" onClick={() => setTriggers((p) => [...p, 'top_banner'])}>TOP BANNER</button>
-              <button className="action-btn" type="button" onClick={() => setTriggers((p) => [...p, 'bottom_banner'])}>BOTTOM BANNER</button>
-              <button className="action-btn" type="button" onClick={() => setTriggers((p) => [...p, 'center_modal'])}>CENTER MODAL</button>
-              <button className="action-btn" type="button" onClick={() => setTriggers((p) => [...p, 'full_screen'])}>FULL SCREEN</button>
+              <button className="action-btn" type="button" onClick={() => void sendIamTrigger('top_banner')}>TOP BANNER</button>
+              <button className="action-btn" type="button" onClick={() => void sendIamTrigger('bottom_banner')}>BOTTOM BANNER</button>
+              <button className="action-btn" type="button" onClick={() => void sendIamTrigger('center_modal')}>CENTER MODAL</button>
+              <button className="action-btn" type="button" onClick={() => void sendIamTrigger('full_screen')}>FULL SCREEN</button>
             </section>
 
             <section className="section">
@@ -305,13 +334,13 @@ const Home: React.FC = () => {
 
             <section className="section">
               <div className="section-head"><h2>EMAILS</h2><button className="icon-btn" type="button">ⓘ</button></div>
-              <div className="card list-card">{emails.length ? emails.map((email) => <div key={email} className="list-item"><span>{email}</span></div>) : <p className="empty">No emails added</p>}</div>
+              <div className="card list-card">{state.emailsList.length ? state.emailsList.map((email) => <div key={email} className="list-item"><span>{email}</span></div>) : <p className="empty">No emails added</p>}</div>
               <button className="action-btn" type="button" onClick={() => setDialog({ type: 'addEmail' })}>ADD EMAIL</button>
             </section>
 
             <section className="section">
               <div className="section-head"><h2>SMS</h2><button className="icon-btn" type="button">ⓘ</button></div>
-              <div className="card list-card">{smsNumbers.length ? smsNumbers.map((sms) => <div key={sms} className="list-item"><span>{sms}</span></div>) : <p className="empty">No SMS added</p>}</div>
+              <div className="card list-card">{state.smsNumbersList.length ? state.smsNumbersList.map((sms) => <div key={sms} className="list-item"><span>{sms}</span></div>) : <p className="empty">No SMS added</p>}</div>
               <button className="action-btn" type="button" onClick={() => setDialog({ type: 'addSms' })}>ADD SMS</button>
             </section>
 
@@ -321,7 +350,7 @@ const Home: React.FC = () => {
                 {tags.length ? tags.map((tag) => (
                   <div key={tag.key} className="list-item two-line">
                     <div><strong>{tag.key}</strong><span>{tag.value}</span></div>
-                    <button type="button" className="delete-btn" onClick={() => setTags((prev) => prev.filter((t) => t.key !== tag.key))}>✕</button>
+                    <button type="button" className="delete-btn" onClick={() => void removeSelectedTags([tag.key])}>✕</button>
                   </div>
                 )) : <p className="empty">No tags added</p>}
               </div>
@@ -337,9 +366,10 @@ const Home: React.FC = () => {
 
             <section className="section">
               <div className="section-head"><h2>TRIGGERS</h2><button className="icon-btn" type="button">ⓘ</button></div>
-              <div className="card list-card">{triggers.length ? triggers.map((trigger, idx) => <div key={`${trigger}-${idx}`} className="list-item"><span>{trigger}</span></div>) : <p className="empty">No triggers added</p>}</div>
-              <button className="action-btn" type="button" onClick={() => setTriggers((prev) => [...prev, `trigger_${prev.length + 1}`])}>ADD</button>
-              <button className="action-btn" type="button" onClick={() => setTriggers((prev) => [...prev, `trigger_${prev.length + 1}`, `trigger_${prev.length + 2}`])}>ADD MULTIPLE</button>
+              <div className="card list-card">{triggerValues.length ? triggerValues.map((trigger, idx) => <div key={`${trigger}-${idx}`} className="list-item"><span>{trigger}</span></div>) : <p className="empty">No triggers added</p>}</div>
+              <button className="action-btn" type="button" onClick={() => void addTrigger('trigger_manual', 'manual')}>ADD</button>
+              <button className="action-btn" type="button" onClick={() => void addTriggers({ trigger_a: 'one', trigger_b: 'two' })}>ADD MULTIPLE</button>
+              <button className="action-btn outline" type="button" onClick={() => void clearTriggers()}>CLEAR</button>
             </section>
 
             <section className="section">
@@ -354,13 +384,13 @@ const Home: React.FC = () => {
                   <div className="label">Location Shared</div>
                   <div className="sub">Share device location with OneSignal</div>
                 </div>
-                <input type="checkbox" checked={locationShared} onChange={(e) => setLocationShared(e.target.checked)} />
+                <input type="checkbox" checked={state.locationShared} onChange={(e) => void setLocationShared(e.target.checked)} />
               </div>
-              <button className="action-btn" type="button" onClick={() => addLog('Location permission prompt triggered')}>PROMPT LOCATION</button>
+              <button className="action-btn" type="button" onClick={() => void requestLocationPermission()}>PROMPT LOCATION</button>
             </section>
 
             <section className="section">
-              <button className="action-btn" type="button" onClick={() => addLog('Next Activity tapped')}>NEXT ACTIVITY</button>
+              <button className="action-btn" type="button" onClick={() => void trackEvent('next_activity_tapped')}>NEXT ACTIVITY</button>
             </section>
           </main>
         </div>
@@ -369,7 +399,7 @@ const Home: React.FC = () => {
           <div className="modal-backdrop" role="dialog" aria-modal="true">
             <div className="modal-card">
               {dialog.type === 'login' && (
-                <form onSubmit={(e) => { e.preventDefault(); setExternalUserId(singleValue.trim() || null); addLog(`Login user: ${singleValue.trim() || 'anonymous'}`); closeDialog(); }}>
+                <form onSubmit={(e) => { e.preventDefault(); if (!singleValue.trim()) return; void loginUser(singleValue.trim()); closeDialog(); }}>
                   <h3>Login User</h3>
                   <input value={singleValue} onChange={(e) => setSingleValue(e.target.value)} placeholder="External User Id" />
                   <div className="modal-actions"><button type="button" onClick={closeDialog}>Cancel</button><button type="submit">Add</button></div>

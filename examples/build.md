@@ -248,6 +248,24 @@ Target behavior:
 - No `any` and no broad type assertions
 - Keep dependencies minimal
 
+### Prompt 3.1 - Implementation order (required)
+
+Do not implement the full demo directly in `src/pages/Home.tsx`.
+
+Build in this order:
+
+1. `src/repositories/OneSignalRepository.ts`
+2. `src/services/PreferencesService.ts`
+3. `src/context/AppContext.tsx` (state, reducer, actions, startup effects)
+4. `src/pages/Home.tsx` as presentational + dialog UI that calls context actions
+
+Rules:
+
+- `Home.tsx` should not call `OneSignal.*` directly
+- `Home.tsx` should not own core app state for push, consent, aliases, tags, triggers, or identity
+- Keep modal open/close and temporary form fields local to UI when practical
+- Put SDK logic in repository methods and context actions
+
 ---
 
 ## Phase 4: Repository API Surface
@@ -276,6 +294,12 @@ Map these methods directly to:
 - `OneSignal.InAppMessages.*`
 - `OneSignal.Location.*`
 - `OneSignal.Session.*`
+
+Repository behavior requirements:
+
+- No UI logic and no component state
+- Return typed values for async reads (`getPushSubscriptionId`, `isPushOptedIn`, IDs)
+- Guard native-only calls to avoid web runtime crashes
 
 ---
 
@@ -343,6 +367,12 @@ Persist with local storage service:
 - Location shared
 - IAM paused state
 
+Implementation notes:
+
+- Add a small `PreferencesService` in `src/services/PreferencesService.ts`
+- `AppContext` owns hydration from storage, initialization, observers, and dispatching updates
+- `Home.tsx` reads context state and invokes context actions only
+
 In-memory only:
 
 - Trigger list used for IAM testing
@@ -361,7 +391,24 @@ Startup sequence:
 
 ## Phase 8: Tooltips and Logging
 
-### Prompt 8.1 - Remote tooltip content
+### Prompt 8.1 - State Management with Context + Reducer
+
+Use React Context for dependency injection and `useReducer` for app state management.
+
+App root (`src/App.tsx`):
+
+- Wrap the routed app with `AppContextProvider`
+- Initialize OneSignal from context startup effects before user actions are available
+- Start tooltip fetch in the background (non-blocking) so UI is still usable if the request fails
+
+`AppContextProvider` (`src/context/AppContext.tsx`):
+
+- Holds shared runtime state in a reducer
+- Exposes state + action functions through `useAppContext`
+- Uses `OneSignalRepository` and `PreferencesService` internally
+- Owns observer lifecycle and startup hydration effects
+
+### Prompt 8.2 - Remote tooltip content
 
 Do not bundle local tooltip JSON.
 
@@ -369,7 +416,7 @@ Use:
 
 `https://raw.githubusercontent.com/OneSignal/sdk-shared/main/demo/tooltip_content.json`
 
-### Prompt 8.2 - Log view
+### Prompt 8.3 - Log view
 
 Add a compact log panel for local debugging and Appium:
 
