@@ -369,7 +369,7 @@ export function AppContextProvider({ children }: Props) {
     preferences.setExternalUserId(externalUserId);
     dispatch({ type: 'SET_EXTERNAL_USER_ID', payload: externalUserId });
     dispatch({ type: 'CLEAR_USER_DATA' });
-    addLog(`Login user: ${externalUserId}`);
+    addLog(`Logged in as: ${externalUserId}`);
   }, [addLog]);
 
   const logoutUser = useCallback(async () => {
@@ -380,7 +380,7 @@ export function AppContextProvider({ children }: Props) {
     dispatch({ type: 'CLEAR_USER_DATA' });
     dispatch({ type: 'CLEAR_TRIGGERS' });
     dispatch({ type: 'SET_LOADING', payload: false });
-    addLog('User logged out');
+    addLog('Logged out');
   }, [addLog]);
 
   const setConsentRequired = useCallback(async (required: boolean) => {
@@ -415,17 +415,17 @@ export function AppContextProvider({ children }: Props) {
 
   const sendSimpleNotification = useCallback(async () => {
     const sent = await repository.sendNotification(NotificationType.Simple);
-    addLog(sent ? 'Simple notification sent' : 'Simple notification failed');
+    addLog(sent ? 'Notification sent: Simple' : 'Failed to send notification');
   }, [addLog]);
 
   const sendImageNotification = useCallback(async () => {
     const sent = await repository.sendNotification(NotificationType.WithImage);
-    addLog(sent ? 'Image notification sent' : 'Image notification failed');
+    addLog(sent ? 'Notification sent: WithImage' : 'Failed to send notification');
   }, [addLog]);
 
   const sendCustomNotification = useCallback(async (title: string, body: string) => {
     const sent = await repository.sendCustomNotification(title, body);
-    addLog(sent ? `Notification sent: ${title}` : 'Notification failed');
+    addLog(sent ? `Notification sent: ${title}` : 'Failed to send notification');
   }, [addLog]);
 
   const setIamPaused = useCallback(async (paused: boolean) => {
@@ -438,14 +438,14 @@ export function AppContextProvider({ children }: Props) {
   const addTrigger = useCallback(async (key: string, value: string) => {
     repository.addTrigger(key, value);
     dispatch({ type: 'ADD_TRIGGER', payload: [key, value] });
-    addLog(`Trigger added: ${key}=${value}`);
+    addLog(`Trigger added: ${key}`);
   }, [addLog]);
 
   const addTriggers = useCallback(async (pairs: Record<string, string>) => {
     repository.addTriggers(pairs);
     const entries = toPairs(pairs);
     dispatch({ type: 'ADD_TRIGGERS', payload: entries });
-    addLog(`Added ${entries.length} triggers`);
+    addLog(`${entries.length} trigger(s) added`);
   }, [addLog]);
 
   const clearTriggers = useCallback(async () => {
@@ -457,7 +457,7 @@ export function AppContextProvider({ children }: Props) {
   const removeSelectedTriggers = useCallback(async (keys: string[]) => {
     repository.removeTriggers(keys);
     dispatch({ type: 'REMOVE_SELECTED_TRIGGERS', payload: keys });
-    addLog(`Removed ${keys.length} trigger(s)`);
+    addLog(`${keys.length} trigger(s) removed`);
   }, [addLog]);
 
   const sendIamTrigger = useCallback(async (iamType: string) => {
@@ -474,7 +474,7 @@ export function AppContextProvider({ children }: Props) {
     repository.addAliases(pairs);
     const entries = toPairs(pairs);
     dispatch({ type: 'ADD_ALIASES', payload: entries });
-    addLog(`Added ${entries.length} aliases`);
+    addLog(`${entries.length} alias(es) added`);
   }, [addLog]);
 
   const addEmail = useCallback(async (email: string) => {
@@ -511,13 +511,13 @@ export function AppContextProvider({ children }: Props) {
     repository.addTags(pairs);
     const entries = toPairs(pairs);
     dispatch({ type: 'ADD_TAGS', payload: entries });
-    addLog(`Added ${entries.length} tags`);
+    addLog(`${entries.length} tag(s) added`);
   }, [addLog]);
 
   const removeSelectedTags = useCallback(async (keys: string[]) => {
     repository.removeTags(keys);
     dispatch({ type: 'REMOVE_SELECTED_TAGS', payload: keys });
-    addLog(`Removed ${keys.length} tags`);
+    addLog(`${keys.length} tag(s) removed`);
   }, [addLog]);
 
   const sendOutcome = useCallback(async (name: string) => {
@@ -532,12 +532,12 @@ export function AppContextProvider({ children }: Props) {
 
   const sendOutcomeWithValue = useCallback(async (name: string, value: number) => {
     repository.sendOutcomeWithValue(name, value);
-    addLog(`Outcome sent with value: ${name}=${value}`);
+    addLog(`Outcome sent: ${name} = ${value}`);
   }, [addLog]);
 
   const trackEvent = useCallback(async (name: string, properties?: Record<string, unknown>) => {
     repository.trackEvent(name, properties);
-    addLog(`Track event: ${name}`);
+    addLog(`Event tracked: ${name}`);
   }, [addLog]);
 
   const setLocationShared = useCallback(async (shared: boolean) => {

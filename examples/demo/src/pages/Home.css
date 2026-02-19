@@ -370,6 +370,10 @@
   font-weight: 700;
 }
 
+.modal-actions button:last-child {
+  color: #ea4d53;
+}
+
 .tooltip-options {
   margin-top: 10px;
 }
