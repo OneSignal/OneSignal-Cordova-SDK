@@ -191,10 +191,51 @@
   margin-bottom: 8px;
 }
 
+.action-btn-content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.action-btn-icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+.action-btn.iam-btn {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 18px;
+}
+
+.action-btn.iam-btn .action-btn-content {
+  justify-content: flex-start;
+}
+
 .action-btn.outline {
   background: transparent;
   border: 1px solid #e5979a;
   color: #db4e54;
+}
+
+.toggle-card ion-toggle {
+  --track-background: #cfd4dc;
+  --track-background-checked: #ea4d53;
+  --handle-background: #fff;
+  --handle-background-checked: #fff;
+}
+
+.push-card .kv-row-toggle {
+  align-items: center;
+}
+
+.push-card ion-toggle {
+  --track-background: #d7dce4;
+  --track-background-checked: #ff3b4d;
+  --handle-background: #fff;
+  --handle-background-checked: #fff;
 }
 
 .list-card {

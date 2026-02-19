@@ -1,5 +1,11 @@
-import { IonContent, IonPage, IonToast } from '@ionic/react';
+import { IonContent, IonPage, IonToast, IonToggle } from '@ionic/react';
 import { useMemo, useState } from 'react';
+import {
+  MdCropSquare,
+  MdFullscreen,
+  MdOutlineVerticalAlignBottom,
+  MdOutlineVerticalAlignTop,
+} from 'react-icons/md';
 import oneSignalLogo from '../assets/onesignal_logo.svg';
 import ActionButton from '../components/ActionButton';
 import { PairList, SingleList } from '../components/ListWidgets';
@@ -165,34 +171,41 @@ const Home: React.FC = () => {
               >
                 LOGIN USER
               </ActionButton>
-              <ActionButton
-                variant="outline"
-                type="button"
-                onClick={() => runAction('Logged out', logoutUser)}
-              >
-                LOGOUT USER
-              </ActionButton>
+              {state.externalUserId ? (
+                <ActionButton
+                  variant="outline"
+                  type="button"
+                  onClick={() => runAction('Logged out', logoutUser)}
+                >
+                  LOGOUT USER
+                </ActionButton>
+              ) : null}
             </section>
 
             <SectionCard
               title="PUSH"
               onInfoTap={() => showToast('Push section tooltip')}
             >
-              <div className="card kv-card">
+              <div className="card kv-card push-card">
                 <div className="kv-row">
                   <span>Push ID</span>
                   <span>{state.pushSubscriptionId ?? '—'}</span>
                 </div>
+                <div className="divider" />
+                <div className="kv-row kv-row-toggle">
+                  <span>Enabled</span>
+                  <IonToggle
+                    checked={state.isPushEnabled}
+                    onIonChange={(event) =>
+                      runAction(
+                        `Push ${event.detail.checked ? 'enabled' : 'disabled'}`,
+                        () => setPushEnabled(event.detail.checked),
+                      )
+                    }
+                    aria-label="Push enabled"
+                  />
+                </div>
               </div>
-              <ToggleRow
-                label="Enabled"
-                checked={state.isPushEnabled}
-                onToggle={(checked) =>
-                  runAction(`Push ${checked ? 'enabled' : 'disabled'}`, () =>
-                    setPushEnabled(checked),
-                  )
-                }
-              />
               <ActionButton
                 variant="outline"
                 type="button"
@@ -256,6 +269,7 @@ const Home: React.FC = () => {
               onInfoTap={() => showToast('Send IAM info')}
             >
               <ActionButton
+                className="iam-btn"
                 type="button"
                 onClick={() =>
                   runAction('Sent IAM: top_banner', () =>
@@ -263,9 +277,15 @@ const Home: React.FC = () => {
                   )
                 }
               >
-                TOP BANNER
+                <span className="action-btn-content">
+                  <span className="action-btn-icon" aria-hidden>
+                    <MdOutlineVerticalAlignTop />
+                  </span>
+                  <span>TOP BANNER</span>
+                </span>
               </ActionButton>
               <ActionButton
+                className="iam-btn"
                 type="button"
                 onClick={() =>
                   runAction('Sent IAM: bottom_banner', () =>
@@ -273,9 +293,15 @@ const Home: React.FC = () => {
                   )
                 }
               >
-                BOTTOM BANNER
+                <span className="action-btn-content">
+                  <span className="action-btn-icon" aria-hidden>
+                    <MdOutlineVerticalAlignBottom />
+                  </span>
+                  <span>BOTTOM BANNER</span>
+                </span>
               </ActionButton>
               <ActionButton
+                className="iam-btn"
                 type="button"
                 onClick={() =>
                   runAction('Sent IAM: center_modal', () =>
@@ -283,9 +309,15 @@ const Home: React.FC = () => {
                   )
                 }
               >
-                CENTER MODAL
+                <span className="action-btn-content">
+                  <span className="action-btn-icon" aria-hidden>
+                    <MdCropSquare />
+                  </span>
+                  <span>CENTER MODAL</span>
+                </span>
               </ActionButton>
               <ActionButton
+                className="iam-btn"
                 type="button"
                 onClick={() =>
                   runAction('Sent IAM: full_screen', () =>
@@ -293,7 +325,12 @@ const Home: React.FC = () => {
                   )
                 }
               >
-                FULL SCREEN
+                <span className="action-btn-content">
+                  <span className="action-btn-icon" aria-hidden>
+                    <MdFullscreen />
+                  </span>
+                  <span>FULL SCREEN</span>
+                </span>
               </ActionButton>
             </SectionCard>
 
@@ -301,7 +338,7 @@ const Home: React.FC = () => {
               title="ALIASES"
               onInfoTap={() => showToast('Aliases info')}
             >
-              <PairList items={aliasItems} />
+              <PairList items={aliasItems} emptyText="No aliases added" />
               <ActionButton
                 type="button"
                 onClick={() => setDialog({ type: 'addAlias' })}
@@ -348,6 +385,7 @@ const Home: React.FC = () => {
             <SectionCard title="TAGS" onInfoTap={() => showToast('Tags info')}>
               <PairList
                 items={tagItems}
+                emptyText="No tags added"
                 onRemove={(key) =>
                   runAction(`Tag removed: ${key}`, () =>
                     removeSelectedTags([key]),
@@ -391,7 +429,7 @@ const Home: React.FC = () => {
               title="TRIGGERS"
               onInfoTap={() => showToast('Triggers info')}
             >
-              <PairList items={triggerItems} />
+              <PairList items={triggerItems} emptyText="No triggers added" />
               <ActionButton
                 type="button"
                 onClick={() =>

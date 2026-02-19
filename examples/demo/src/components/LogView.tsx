@@ -1,9 +1,12 @@
-import { IonIcon } from '@ionic/react';
-import { chevronDownOutline, chevronUpOutline, trashOutline } from 'ionicons/icons';
-import { useEffect, useMemo, useRef, useState } from 'react';
 import type { FC } from 'react';
-import LogManager from '../services/LogManager';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  MdDelete,
+  MdKeyboardArrowDown,
+  MdKeyboardArrowUp,
+} from 'react-icons/md';
 import type { LogEntry } from '../services/LogManager';
+import LogManager from '../services/LogManager';
 import './LogView.css';
 
 const manager = LogManager.getInstance();
@@ -37,7 +40,7 @@ const LogView: FC = () => {
           aria-label="Clear logs"
           data-testid="log_view_clear_button"
         >
-          <IonIcon icon={trashOutline} />
+          <MdDelete />
         </button>
         <button
           className="icon-btn"
@@ -45,21 +48,46 @@ const LogView: FC = () => {
           type="button"
           aria-label={collapsed ? 'Expand logs' : 'Collapse logs'}
         >
-          <IonIcon icon={collapsed ? chevronDownOutline : chevronUpOutline} />
+          {collapsed ? <MdKeyboardArrowDown /> : <MdKeyboardArrowUp />}
         </button>
       </div>
       {!collapsed ? (
-        <div className="logview-body" ref={scrollRef} data-testid="log_view_list">
+        <div
+          className="logview-body"
+          ref={scrollRef}
+          data-testid="log_view_list"
+        >
           {entries.length ? (
             entries.map((entry, index) => (
-              <div key={`${entry.timestamp}-${index}`} className="logview-row" data-testid={`log_entry_${index}`}>
-                <span className="log-time" data-testid={`log_entry_${index}_timestamp`}>{entry.timestamp}</span>
-                <span className="log-level" data-testid={`log_entry_${index}_level`}>{entry.level}</span>
-                <span className="log-text" data-testid={`log_entry_${index}_message`}>{entry.message}</span>
+              <div
+                key={`${entry.timestamp}-${index}`}
+                className="logview-row"
+                data-testid={`log_entry_${index}`}
+              >
+                <span
+                  className="log-time"
+                  data-testid={`log_entry_${index}_timestamp`}
+                >
+                  {entry.timestamp}
+                </span>
+                <span
+                  className="log-level"
+                  data-testid={`log_entry_${index}_level`}
+                >
+                  {entry.level}
+                </span>
+                <span
+                  className="log-text"
+                  data-testid={`log_entry_${index}_message`}
+                >
+                  {entry.message}
+                </span>
               </div>
             ))
           ) : (
-            <div className="logview-empty" data-testid="log_view_empty">No logs yet</div>
+            <div className="logview-empty" data-testid="log_view_empty">
+              No logs yet
+            </div>
           )}
         </div>
       ) : null}

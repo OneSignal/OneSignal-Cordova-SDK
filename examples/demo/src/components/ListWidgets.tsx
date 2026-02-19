@@ -1,6 +1,5 @@
 import type { FC } from 'react';
-import { IonIcon } from '@ionic/react';
-import { closeOutline } from 'ionicons/icons';
+import { MdClose } from 'react-icons/md';
 
 export type PairItem = {
   key: string;
@@ -14,6 +13,7 @@ interface EmptyStateProps {
 interface PairListProps {
   items: PairItem[];
   onRemove?: (key: string) => void;
+  emptyText?: string;
 }
 
 interface SingleListProps {
@@ -23,7 +23,7 @@ interface SingleListProps {
 
 export const EmptyState: FC<EmptyStateProps> = ({ text }) => <p className="empty">{text}</p>;
 
-export const PairList: FC<PairListProps> = ({ items, onRemove }) => (
+export const PairList: FC<PairListProps> = ({ items, onRemove, emptyText = 'No items' }) => (
   <div className="card list-card">
     {items.length ? (
       items.map((item) => (
@@ -34,13 +34,13 @@ export const PairList: FC<PairListProps> = ({ items, onRemove }) => (
           </div>
           {onRemove ? (
             <button type="button" className="delete-btn" onClick={() => onRemove(item.key)}>
-              <IonIcon icon={closeOutline} />
+              <MdClose />
             </button>
           ) : null}
         </div>
       ))
     ) : (
-      <EmptyState text="No items" />
+      <EmptyState text={emptyText} />
     )}
   </div>
 );

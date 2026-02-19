@@ -166,7 +166,7 @@ Required runtime dependencies:
 - Ionic/UI packages:
   - `@ionic/react`
   - `@ionic/react-router`
-  - `ionicons` (use `IonIcon` from `@ionic/react` with icons from `ionicons/icons`)
+  - `react-icons` (use Material icons from `react-icons/md`, for example in `src/components/LogView.tsx`)
 - React/router packages used by the demo:
   - `react`
   - `react-dom`
@@ -344,7 +344,7 @@ App Section layout:
 
 Push Section:
 
-- Section title includes info icon (use `IonIcon` (`@ionic/react`) + `ionicons/icons`).
+- Section title includes info icon (use `MdInfoOutline` from `react-icons/md`).
 - Show Push Subscription ID (read-only).
 - `Push Enabled` toggle controls opt-in/opt-out.
   - Toggle is disabled when notification permission is not granted.
@@ -357,7 +357,7 @@ Push Section:
 
 Send Push Notification Section:
 
-- Section title includes info icon (use `IonIcon` (`@ionic/react`) + `ionicons/icons`).
+- Section title includes info icon (use `MdInfoOutline` from `react-icons/md`).
 - Three actions:
   1. `SIMPLE` (simple title/body payload)
   2. `WITH IMAGE` (includes image payload for Android + iOS)
@@ -371,7 +371,7 @@ Send Push Notification Section:
 
 In-App Messaging Section:
 
-- Section title includes info icon (use `IonIcon` (`@ionic/react`) + `ionicons/icons`).
+- Section title includes info icon (use `MdInfoOutline` from `react-icons/md`).
 - `Pause In-App Messages` toggle:
   - Label: `Pause In-App Messages`
   - Description: `Toggle in-app message display`
@@ -380,7 +380,7 @@ In-App Messaging Section:
 
 Send In-App Message Section:
 
-- Section title includes info icon (use `IonIcon` (`@ionic/react`) + `ionicons/icons`).
+- Section title includes info icon (use `MdInfoOutline` from `react-icons/md`).
 - Four full-width buttons (stacked, not grid):
   1. `TOP BANNER` -> `iam_type = top_banner`
   2. `BOTTOM BANNER` -> `iam_type = bottom_banner`
@@ -388,7 +388,7 @@ Send In-App Message Section:
   4. `FULL SCREEN` -> `iam_type = full_screen`
 - Button behavior:
   - Full width, uppercase labels
-  - Left-aligned icon + text content using `IonIcon` with icons from `ionicons/icons`
+  - Left-aligned icon + text content using icons from `react-icons/md`
   - Uses app primary color styling
 - On tap:
   - Add/update trigger in SDK
@@ -400,7 +400,7 @@ Send In-App Message Section:
 
 Aliases Section:
 
-- Section title includes info icon (use `IonIcon` (`@ionic/react`) + `ionicons/icons`).
+- Section title includes info icon (use `MdInfoOutline` from `react-icons/md`).
 - Read-only key/value list.
 - Hide special alias keys from display:
   - `external_id`
@@ -413,7 +413,7 @@ Aliases Section:
 
 Emails Section:
 
-- Section title includes info icon (use `IonIcon` (`@ionic/react`) + `ionicons/icons`).
+- Section title includes info icon (use `MdInfoOutline` from `react-icons/md`).
 - List email values with remove action per row.
 - Empty state text: `No Emails Added`.
 - `ADD EMAIL` opens modal with empty field.
@@ -425,7 +425,7 @@ Emails Section:
 
 SMS Section:
 
-- Section title includes info icon (use `IonIcon` (`@ionic/react`) + `ionicons/icons`).
+- Section title includes info icon (use `MdInfoOutline` from `react-icons/md`).
 - List phone numbers with remove action per row.
 - Empty state text: `No SMS Added`.
 - `ADD SMS` opens modal with empty field.
@@ -435,7 +435,7 @@ SMS Section:
 
 Tags Section:
 
-- Section title includes info icon (use `IonIcon` (`@ionic/react`) + `ionicons/icons`).
+- Section title includes info icon (use `MdInfoOutline` from `react-icons/md`).
 - Show key/value entries in stacked layout (key over value).
 - Per-row remove action available.
 - Empty state text: `No Tags Added`.
@@ -449,7 +449,7 @@ Tags Section:
 
 Outcome Events Section:
 
-- Section title includes info icon (use `IonIcon` (`@ionic/react`) + `ionicons/icons`).
+- Section title includes info icon (use `MdInfoOutline` from `react-icons/md`).
 - `SEND OUTCOME` opens modal with 3 choices:
   1. Normal Outcome (name input)
   2. Unique Outcome (name input)
@@ -459,7 +459,7 @@ Outcome Events Section:
 
 Triggers Section:
 
-- Section title includes info icon (use `IonIcon` (`@ionic/react`) + `ionicons/icons`).
+- Section title includes info icon (use `MdInfoOutline` from `react-icons/md`).
 - Show key/value entries in stacked layout with row remove action.
 - Empty state text: `No Triggers Added`.
 - `ADD` and `ADD MULTIPLE` use the same modal patterns as Tags.
@@ -478,7 +478,7 @@ Important behavior:
 
 Track Event Section:
 
-- Section title includes info icon (use `IonIcon` (`@ionic/react`) + `ionicons/icons`).
+- Section title includes info icon (use `MdInfoOutline` from `react-icons/md`).
 - `TRACK EVENT` opens modal with:
   - Required Event Name input
   - Optional JSON properties input with placeholder example
@@ -491,7 +491,7 @@ Track Event Section:
 
 Location Section:
 
-- Section title includes info icon (use `IonIcon` (`@ionic/react`) + `ionicons/icons`).
+- Section title includes info icon (use `MdInfoOutline` from `react-icons/md`).
 - `Location Shared` toggle with descriptive subtitle.
 - `PROMPT LOCATION` button requests location permission.
 
@@ -780,7 +780,7 @@ Create reusable components in `src/components/`:
 `LogView.tsx`:
 
 - Sticky top debug panel with fixed height.
-- Clear button uses icon button style with `IonIcon` + `ionicons/icons`.
+- Clear button uses icon button style with icons from `react-icons/md`.
 - Auto-scroll to newest entries.
 
 `components/modals/*`:
@@ -942,20 +942,63 @@ Implementation notes:
 
 ## Key Files Structure
 
-- `src/context/AppContext.tsx`
-- `src/repositories/OneSignalRepository.ts`
-- `src/services/PreferencesService.ts`
-- `src/services/OneSignalApiService.ts`
-- `src/services/TooltipHelper.ts`
-- `src/services/LogManager.ts`
-- `src/components/LogView.tsx`
-- `src/components/SectionCard.tsx`
-- `src/components/ToggleRow.tsx`
-- `src/components/ActionButton.tsx`
-- `src/components/ListWidgets.tsx`
-- `src/components/modals/*`
-- `src/theme/tokens.ts`
-- `src/pages/Home.tsx`
+```text
+examples/demo/
+├── index.html                                # Viewport + app mount root
+├── package.json                              # Ionic/Capacitor + demo scripts
+├── capacitor.config.ts                       # Capacitor app config (android/ios)
+├── android/                                  # Native Android shell project
+├── ios/                                      # Native iOS shell project
+└── src/
+    ├── App.tsx                               # App root, router, provider wiring
+    ├── main.tsx                              # React entrypoint
+    ├── context/
+    │   └── AppContext.tsx                    # Context + reducer state/actions
+    ├── repositories/
+    │   └── OneSignalRepository.ts            # SDK-facing repository wrapper
+    ├── services/
+    │   ├── OneSignalApiService.ts            # REST API client for sample flows
+    │   ├── PreferencesService.ts             # localStorage persistence helper
+    │   ├── TooltipHelper.ts                  # Remote tooltip loading
+    │   └── LogManager.ts                     # Singleton logger + subscribers
+    ├── components/
+    │   ├── SectionCard.tsx                   # Section title + optional info action
+    │   ├── ToggleRow.tsx                     # Label/description + Ionic toggle
+    │   ├── ActionButton.tsx                  # Primary and outline action button
+    │   ├── ListWidgets.tsx                   # PairList, SingleList, EmptyState
+    │   ├── LogView.tsx                       # Sticky logs panel (Appium-ready)
+    │   ├── modals/
+    │   │   ├── SingleInputModal.tsx
+    │   │   ├── PairInputModal.tsx
+    │   │   ├── MultiPairInputModal.tsx
+    │   │   ├── MultiSelectRemoveModal.tsx
+    │   │   ├── OutcomeModal.tsx
+    │   │   ├── TrackEventModal.tsx
+    │   │   ├── CustomNotificationModal.tsx
+    │   │   └── TooltipModal.tsx
+    │   └── sections/                         # Optional section extraction from Home
+    │       ├── AppSection.tsx
+    │       ├── PushSection.tsx
+    │       ├── SendPushSection.tsx
+    │       ├── InAppSection.tsx
+    │       ├── SendIamSection.tsx
+    │       ├── AliasesSection.tsx
+    │       ├── EmailsSection.tsx
+    │       ├── SmsSection.tsx
+    │       ├── TagsSection.tsx
+    │       ├── OutcomesSection.tsx
+    │       ├── TriggersSection.tsx
+    │       ├── TrackEventSection.tsx
+    │       └── LocationSection.tsx
+    ├── pages/
+    │   ├── Home.tsx                          # Main demo screen composition
+    │   └── Home.css                          # Home page visual styles
+    ├── theme/
+    │   ├── tokens.ts                         # Theme tokens shared by components
+    │   └── variables.css                     # Ionic CSS variable overrides
+    └── assets/
+        └── onesignal_logo.svg               # Brand asset used in header
+```
 
 ---
 
