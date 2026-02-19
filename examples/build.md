@@ -211,15 +211,88 @@ If iOS sync reports `Package.swift`/SPM issues, regenerate native projects and r
 
 ### Prompt 1.4 - OneSignal Repository
 
-Create `src/repositories/OneSignalRepository.ts` and keep SDK calls in this layer:
+Create a `OneSignalRepository` class that centralizes all OneSignal SDK calls.
+This is a plain TypeScript class (not a Context) used inside `AppContextProvider`.
 
-- user login/logout
-- aliases, emails, sms
-- tags and triggers
-- outcomes and events
-- push/permission
-- consent/location/IAM pause
-- onesignal/external ids
+User operations:
+
+- `loginUser(externalUserId: string): Promise<void>`
+- `logoutUser(): Promise<void>`
+
+Alias operations:
+
+- `addAlias(label: string, id: string): void`
+- `addAliases(aliases: Record<string, string>): void`
+
+Email operations:
+
+- `addEmail(email: string): void`
+- `removeEmail(email: string): void`
+
+SMS operations:
+
+- `addSms(smsNumber: string): void`
+- `removeSms(smsNumber: string): void`
+
+Tag operations:
+
+- `addTag(key: string, value: string): void`
+- `addTags(tags: Record<string, string>): void`
+- `removeTags(keys: string[]): void`
+
+Trigger operations (via `OneSignal.InAppMessages`):
+
+- `addTrigger(key: string, value: string): void`
+- `addTriggers(triggers: Record<string, string>): void`
+- `removeTriggers(keys: string[]): void`
+- `clearTriggers(): void`
+
+Outcome operations (via `OneSignal.Session`):
+
+- `sendOutcome(name: string): void`
+- `sendUniqueOutcome(name: string): void`
+- `sendOutcomeWithValue(name: string, value: number): void`
+
+Track Event:
+
+- `trackEvent(name: string, properties?: Record<string, unknown>): void`
+
+Push subscription:
+
+- `getPushSubscriptionId(): string | undefined`
+- `isPushOptedIn(): boolean | undefined`
+- `optInPush(): void`
+- `optOutPush(): void`
+
+Notifications:
+
+- `hasPermission(): boolean`
+- `requestPermission(fallbackToSettings: boolean): Promise<boolean>`
+
+In-App Messages:
+
+- `setPaused(paused: boolean): void`
+
+Location:
+
+- `setLocationShared(shared: boolean): void`
+- `requestLocationPermission(): void`
+
+Privacy consent:
+
+- `setConsentRequired(required: boolean): void`
+- `setConsentGiven(granted: boolean): void`
+
+User IDs:
+
+- `getExternalId(): string | undefined`
+- `getOnesignalId(): string | undefined`
+
+Notification sending (via REST API, delegated to `OneSignalApiService`):
+
+- `sendNotification(type: NotificationType): Promise<boolean>`
+- `sendCustomNotification(title: string, body: string): Promise<boolean>`
+- `fetchUser(onesignalId: string): Promise<UserData | null>`
 
 ### Prompt 1.5 - OneSignalApiService (REST API Client)
 
@@ -360,12 +433,12 @@ Send Push Notification Section:
 
 - Section title includes info icon (use `MdInfoOutline` from `react-icons/md`).
 - Three actions:
-  1. `SIMPLE` (simple title/body payload)
-  2. `WITH IMAGE` (includes image payload for Android + iOS)
+  1. `SIMPLE` -> title: `Simple Notification`, body: `This is a simple push notification`
+  2. `WITH IMAGE` -> title: `Image Notification`, body: `This notification includes an image`
   3. `CUSTOM` (opens modal for custom title/body)
 - Image payload should use:
-  - `big_picture` for Android
-  - `ios_attachments` for iOS
+  - `big_picture` for Android: `https://media.onesignal.com/automated_push_templates/ratings_template.png`
+  - `ios_attachments` for iOS: `{"image":"https://media.onesignal.com/automated_push_templates/ratings_template.png"}`
 - Tooltip should describe each action type.
 
 ### Prompt 2.4 - In-App Messaging Section

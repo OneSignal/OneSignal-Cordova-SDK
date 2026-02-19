@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer } from 'react';
 import type { ReactNode } from 'react';
 import OneSignal from 'onesignal-cordova-plugin';
+import { NotificationType } from '../models/NotificationType';
 import OneSignalRepository from '../repositories/OneSignalRepository';
 import PreferencesService from '../services/PreferencesService';
 import LogManager from '../services/LogManager';
@@ -344,15 +345,18 @@ export function AppContextProvider({ children }: Props) {
   }, [addLog]);
 
   const sendSimpleNotification = useCallback(async () => {
-    addLog('Simple notification queued');
+    const sent = await repository.sendNotification(NotificationType.Simple);
+    addLog(sent ? 'Simple notification sent' : 'Simple notification failed');
   }, [addLog]);
 
   const sendImageNotification = useCallback(async () => {
-    addLog('Image notification queued');
+    const sent = await repository.sendNotification(NotificationType.WithImage);
+    addLog(sent ? 'Image notification sent' : 'Image notification failed');
   }, [addLog]);
 
   const sendCustomNotification = useCallback(async (title: string, body: string) => {
-    addLog(`Custom notification queued: ${title} (${body.length} chars)`);
+    const sent = await repository.sendCustomNotification(title, body);
+    addLog(sent ? `Notification sent: ${title}` : 'Notification failed');
   }, [addLog]);
 
   const setIamPaused = useCallback(async (paused: boolean) => {

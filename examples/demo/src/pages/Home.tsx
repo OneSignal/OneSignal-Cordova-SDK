@@ -194,7 +194,9 @@ const Home: React.FC = () => {
             />
 
             <SendPushSection
-              onInfoTap={() => showToast('Push notification info')}
+              onInfoTap={() =>
+                showToast('SIMPLE: basic payload; WITH IMAGE: big_picture + ios_attachments; CUSTOM: open title/body modal')
+              }
               onSendSimple={() =>
                 runAction('Simple notification sent', sendSimpleNotification)
               }

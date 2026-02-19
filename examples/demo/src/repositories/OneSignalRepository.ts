@@ -1,12 +1,22 @@
 import { Capacitor } from '@capacitor/core';
 import OneSignal from 'onesignal-cordova-plugin';
+import { NotificationType } from '../models/NotificationType';
+import type { UserData } from '../models/UserData';
+import OneSignalApiService from '../services/OneSignalApiService';
 
 export default class OneSignalRepository {
+  private readonly apiService: OneSignalApiService;
+
+  constructor(apiService: OneSignalApiService = OneSignalApiService.getInstance()) {
+    this.apiService = apiService;
+  }
+
   private isNative(): boolean {
     return Capacitor.isNativePlatform();
   }
 
   initialize(appId: string): void {
+    this.apiService.setAppId(appId);
     if (!this.isNative()) return;
     OneSignal.initialize(appId);
   }
@@ -169,5 +179,25 @@ export default class OneSignalRepository {
   getOnesignalId(): Promise<string | null> {
     if (!this.isNative()) return Promise.resolve(null);
     return OneSignal.User.getOnesignalId();
+  }
+
+  async sendNotification(type: NotificationType): Promise<boolean> {
+    const subscriptionId = await this.getPushSubscriptionId();
+    if (!subscriptionId) {
+      return false;
+    }
+    return this.apiService.sendNotification(type, subscriptionId);
+  }
+
+  async sendCustomNotification(title: string, body: string): Promise<boolean> {
+    const subscriptionId = await this.getPushSubscriptionId();
+    if (!subscriptionId) {
+      return false;
+    }
+    return this.apiService.sendCustomNotification(title, body, subscriptionId);
+  }
+
+  fetchUser(onesignalId: string): Promise<UserData | null> {
+    return this.apiService.fetchUser(onesignalId);
   }
 }
