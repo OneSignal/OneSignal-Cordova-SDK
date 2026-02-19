@@ -248,35 +248,19 @@ struct OneSignalWidgetBundle: WidgetBundle {
 
 ---
 
-## 5. Xcode project updates (`project.pbxproj`)
+## 5. Xcode project (`project.pbxproj`)
 
-Use Xcode to create both extension targets so UUIDs/build phases are generated correctly.
+The `project.pbxproj` already includes both extension targets with all required build settings, dependencies, and the Embed App Extensions phase. No manual Xcode changes needed for the project file.
 
-### App target changes
+After syncing, open `ios/App/App.xcworkspace` in Xcode and verify:
 
-- Set `PRODUCT_BUNDLE_IDENTIFIER = com.onesignal.example` for the `App` target.
-- Add `CODE_SIGN_ENTITLEMENTS = App/App.entitlements` to all `App` build configurations.
-- Add an `Embed App Extensions` copy files phase (`dstSubfolderSpec = 13`) and embed both `.appex` products.
-- Ensure this copy phase is before script phases to avoid build cycles.
-- Add target dependencies from `App` to both extension targets.
+- **App** target: bundle ID `com.onesignal.example`, entitlements `App/App.entitlements`, depends on both extensions
+- **OneSignalNotificationServiceExtension**: bundle ID `com.onesignal.example.OneSignalNotificationServiceExtensionCordova`, deployment target iOS 14.0
+- **OneSignalWidgetExtension**: bundle ID `com.onesignal.example.OneSignalWidgetExtension`, deployment target iOS 16.2, `SUPPORTS_LIVE_ACTIVITIES = YES`
 
-### OneSignalNotificationServiceExtension target
-
-- Product type: `com.apple.product-type.app-extension`
-- Build phases: Sources, Frameworks, Resources
-- `PRODUCT_BUNDLE_IDENTIFIER = com.onesignal.example.OneSignalNotificationServiceExtension`
-- `CODE_SIGN_ENTITLEMENTS = OneSignalNotificationServiceExtension/OneSignalNotificationServiceExtension.entitlements`
-- `INFOPLIST_FILE = OneSignalNotificationServiceExtension/Info.plist`
-- `SKIP_INSTALL = YES`, `SWIFT_VERSION = 5.0`, `IPHONEOS_DEPLOYMENT_TARGET = 14.0`
-
-### OneSignalWidgetExtension target
-
-- Product type: `com.apple.product-type.app-extension`
-- Build phases: Sources, Frameworks, Resources
-- Link `WidgetKit.framework` and `SwiftUI.framework`
-- `PRODUCT_BUNDLE_IDENTIFIER = com.onesignal.example.OneSignalWidgetExtension`
-- `INFOPLIST_FILE = OneSignalWidget/Info.plist`
-- `SKIP_INSTALL = YES`, `SWIFT_VERSION = 5.0`, `IPHONEOS_DEPLOYMENT_TARGET = 16.2` (required for Live Activities)
+To add App Groups capability (shows up in Signing & Capabilities), select each target in Xcode and use **+ Capability > App Groups**, then add `group.com.onesignal.example.onesignal`. Do this for:
+- `App`
+- `OneSignalNotificationServiceExtension`
 
 ---
 
