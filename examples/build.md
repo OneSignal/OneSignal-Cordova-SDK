@@ -127,11 +127,12 @@ Asset requirements:
 
 - Download padded icon PNG:
   `https://raw.githubusercontent.com/OneSignal/sdk-shared/refs/heads/main/assets/onesignal_logo_icon_padded.png`
-- Save as Capacitor icon source (for example `resources/icon.png`, 1024x1024)
-- Generate platform icons using Capacitor tooling (not RN script):
+- Save as Capacitor icon source at `resources/icon.png` (must be 1024x1024 PNG)
+- Generate platform icons for both iOS and Android using Capacitor tooling:
   `bun add -d @capacitor/assets`
-  `npx @capacitor/assets generate`
-  `npx cap sync`
+  `bunx @capacitor/assets generate --iconBackgroundColor "#ffffff" --iconBackgroundColorDark "#000000"`
+  `bun run ios:sync`
+- This writes icons into `ios/App/App/Assets.xcassets/AppIcon.appiconset/` (iOS) and `android/app/src/main/res/` (Android)
 
 Local plugin setup requirement:
 
