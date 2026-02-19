@@ -209,6 +209,13 @@ bun run ios
 
 If iOS sync reports `Package.swift`/SPM issues, regenerate native projects and rerun setup/sync.
 
+Android app label requirement:
+
+- Ensure launcher/app display name is exactly `OneSignal Demo`.
+- In `android/app/src/main/res/values/strings.xml`, set:
+  - `app_name` = `OneSignal Demo`
+  - `title_activity_main` = `OneSignal Demo`
+
 ### Prompt 1.4 - OneSignal Repository
 
 Create a `OneSignalRepository` class that centralizes all OneSignal SDK calls.
