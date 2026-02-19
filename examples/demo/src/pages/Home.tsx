@@ -47,6 +47,7 @@ const Home: React.FC = () => {
     state,
     loginUser,
     setConsentRequired,
+    setConsentGiven,
     setPushEnabled,
     promptPush,
     setIamPaused,
@@ -130,9 +131,15 @@ const Home: React.FC = () => {
             <AppSection
               appId={state.appId}
               consentRequired={state.consentRequired}
+              privacyConsentGiven={state.privacyConsentGiven}
               onToggleConsent={(checked) =>
                 runAction(`Consent required: ${checked}`, () =>
                   setConsentRequired(checked),
+                )
+              }
+              onTogglePrivacyConsent={(checked) =>
+                runAction(`Privacy consent: ${checked}`, () =>
+                  setConsentGiven(checked),
                 )
               }
             />
@@ -147,14 +154,14 @@ const Home: React.FC = () => {
                 <div className="divider" />
                 <div className="kv-row">
                   <span>External ID</span>
-                  <span>{state.externalUserId ?? '—'}</span>
+                  <span>{state.externalUserId ?? '-'}</span>
                 </div>
               </div>
               <ActionButton
                 onClick={() => setDialog({ type: 'login' })}
                 type="button"
               >
-                LOGIN USER
+                {state.externalUserId ? 'SWITCH USER' : 'LOGIN USER'}
               </ActionButton>
               {state.externalUserId ? (
                 <ActionButton

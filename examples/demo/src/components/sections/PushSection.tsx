@@ -22,7 +22,7 @@ const PushSection: FC<PushSectionProps> = ({
     <div className="card kv-card push-card">
       <div className="kv-row">
         <span>Push ID</span>
-        <span>{pushSubscriptionId ?? '—'}</span>
+        <span className="id-value">{pushSubscriptionId ?? '—'}</span>
       </div>
       <div className="divider" />
       <div className="kv-row kv-row-toggle">
