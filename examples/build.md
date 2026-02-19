@@ -1,6 +1,90 @@
-# OneSignal Ionic + Cordova Sample App Build Guide
+# OneSignal Ionic + Capacitor Sample App Build Guide
 
-This document defines how to build and maintain the demo at `examples/demo` as an Ionic + Cordova project using this repository's local `onesignal-cordova-plugin`.
+This document defines how to build and maintain the demo at `examples/demo` as an Ionic + Capacitor project using this repository's local `onesignal-cordova-plugin`.
+
+---
+
+## Phase 0: Reference Screenshots (REQUIRED)
+
+### Prompt 0.1 - Capture Reference UI
+
+```bash
+Before building anything, an Android emulator MUST be running with the
+reference OneSignal demo app installed. These screenshots are the source
+of truth for the UI you are building. Do NOT proceed to Phase 1 without them.
+
+Check for connected emulators:
+  adb devices
+
+If no device is listed, stop and ask the user to start one.
+
+Identify which emulator has com.onesignal.sdktest installed by checking each listed device, e.g.:
+  adb -s emulator-5554 shell pm list packages 2>/dev/null | grep -i onesignal
+  adb -s emulator-5556 shell pm list packages 2>/dev/null | grep -i onesignal
+
+Use that emulator's serial (e.g. emulator-5556) for all subsequent adb commands via the -s flag.
+
+Launch the reference app:
+  adb -s <emulator-serial> shell am start -n com.onesignal.sdktest/.ui.main.MainActivity
+
+Dismiss any in-app messages that appear on launch. Tap the X or
+click-through button on each IAM until the main UI is fully visible
+with no overlays.
+
+Create an output directory:
+  mkdir -p /tmp/onesignal_reference
+
+Capture screenshots by scrolling through the full UI:
+1. Take a screenshot from the top of the screen:
+     adb shell screencap -p /sdcard/ref_01.png && adb pull /sdcard/ref_01.png /tmp/onesignal_reference/ref_01.png
+2. Scroll down by roughly one viewport height:
+     adb shell input swipe 500 1500 500 500
+3. Take the next screenshot (ref_02.png, ref_03.png, etc.)
+4. Repeat until you've reached the bottom of the scrollable content
+
+You MUST read each captured screenshot image so you can see the actual UI.
+These images define the visual target for every section you build later.
+Pay close attention to:
+  - Section header style and casing
+  - Card vs non-card content grouping
+  - Button placement (inside vs outside cards)
+  - List item layout (stacked vs inline key-value)
+  - Icon choices (delete, close, info, etc.)
+  - Typography, spacing, and colors
+  - Spacing: 12px gap between sections, 8px gap between cards/buttons within a section
+
+You can also interact with the reference app to observe specific flows:
+
+Dump the UI hierarchy to find elements by resource-id, text, or content-desc:
+  adb shell uiautomator dump /sdcard/ui.xml && adb pull /sdcard/ui.xml /tmp/onesignal_reference/ui.xml
+
+Parse the XML to find an element's bounds, then tap it:
+  adb shell input tap <centerX> <centerY>
+
+Type into a focused text field:
+  adb shell input text "test"
+
+Example flow to observe "Add Tag" behavior:
+  1. Dump UI -> find the ADD button bounds -> tap it
+  2. Dump UI -> find the Key and Value fields -> tap and type into them
+  3. Tap the confirm button -> screenshot the result
+  4. Compare the tag list state before and after
+
+Also capture screenshots of key dialogs to match their layout:
+  - Add Alias (single pair input)
+  - Add Multiple Aliases/Tags (dynamic rows with add/remove)
+  - Remove Selected Tags (checkbox multi-select)
+  - Login User
+  - Send Outcome (radio options)
+  - Track Event (with JSON properties field)
+  - Custom Notification (title + body)
+These dialog screenshots are important for matching field layout,
+button placement, spacing, and validation behavior.
+
+Refer back to these screenshots throughout all remaining phases whenever
+you need to decide on layout, spacing, section order, dialog flows, or
+overall look and feel.
+```
 
 ---
 
@@ -12,10 +96,6 @@ This document defines how to build and maintain the demo at `examples/demo` as a
 # from repo root
 cd examples
 npx @ionic/cli start demo blank --type=react --no-interactive
-
-# inside the app
-cd demo
-npx @ionic/cli integrations enable cordova --quiet
 ```
 
 Requirements:
@@ -26,13 +106,23 @@ Requirements:
 - Android package id: `com.onesignal.example`
 - iOS bundle id: `com.onesignal.example`
 - No Expo-specific setup in this project
+- Web entry file: `examples/demo/index.html` (built output goes to `examples/demo/dist/index.html`)
+- Do not use `examples/demo/www/index.html` in this Capacitor flow
+
+A setup.sh script in examples/ handles building, packing, and installing automatically.
+Add/verify the following scripts in package.json:
+```
+  "setup": "../setup.sh",
+  "preandroid": "bun run setup",
+  "preios": "bun run setup",
+```
 
 ### Prompt 1.2 - Add platforms
 
 ```bash
 cd examples/demo
-npx cordova platform add android
-npx cordova platform add ios
+npx ionic capacitor add android
+npx ionic capacitor add ios
 ```
 
 ### Prompt 1.3 - Keep local plugin workflow
@@ -45,32 +135,26 @@ Update `examples/demo/package.json` scripts to include:
 {
   "scripts": {
     "setup": "../setup.sh",
-    "build:web": "vite build",
-    "prepare:cordova": "bun run build:web && npx cordova prepare",
-    "android": "bun run setup && bun run prepare:cordova && npx cordova run android",
-    "ios": "bun run setup && bun run prepare:cordova && npx cordova run ios"
+    "preandroid": "bun run setup",
+    "preios": "bun run setup",
+    "android": "npx ionic capacitor run android",
+    "ios": "npx ionic capacitor run ios"
   }
 }
 ```
 
-Install the plugin from the packed tarball:
+Install or refresh the plugin from the packed tarball:
 
 ```bash
 cd examples/demo
 bun run setup
-npx cordova plugin add ../../onesignal-cordova-plugin.tgz
-```
-
-If already installed, refresh it:
-
-```bash
-npx cordova plugin rm onesignal-cordova-plugin
-npx cordova plugin add ../../onesignal-cordova-plugin.tgz
+bun install
+npx cap sync
 ```
 
 ---
 
-## Phase 2: OneSignal Initialization (Cordova)
+## Phase 2: OneSignal Initialization
 
 ### Prompt 2.1 - Initialize on `deviceready`
 
@@ -283,19 +367,19 @@ Add a compact log panel for local debugging and Appium:
 
 ---
 
-## Phase 9: Cordova Configuration Checklist
+## Phase 9: Native Configuration Checklist
 
-Update Cordova app metadata and IDs:
+Update native app metadata and IDs:
 
-- `config.xml` widget id: `com.onesignal.example`
-- Android package and iOS bundle generated from the same id
+- `capacitor.config.ts` app id: `com.onesignal.example`
+- No legacy Cordova metadata file setup required
 
 Ensure plugin and platforms are present:
 
 ```bash
 cd examples/demo
-npx cordova plugin ls
-npx cordova platform ls
+npx cap ls
+npm ls onesignal-cordova-plugin --depth=0
 ```
 
 Expected plugin list includes:
