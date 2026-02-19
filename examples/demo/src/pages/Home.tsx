@@ -10,8 +10,8 @@ import MultiSelectRemoveModal from '../components/modals/MultiSelectRemoveModal'
 import OutcomeModal from '../components/modals/OutcomeModal';
 import PairInputModal from '../components/modals/PairInputModal';
 import SingleInputModal from '../components/modals/SingleInputModal';
-import TrackEventModal from '../components/modals/TrackEventModal';
 import TooltipModal from '../components/modals/TooltipModal';
+import TrackEventModal from '../components/modals/TrackEventModal';
 import AliasesSection from '../components/sections/AliasesSection';
 import AppSection from '../components/sections/AppSection';
 import EmailsSection from '../components/sections/EmailsSection';
@@ -26,8 +26,8 @@ import TagsSection from '../components/sections/TagsSection';
 import TrackEventSection from '../components/sections/TrackEventSection';
 import TriggersSection from '../components/sections/TriggersSection';
 import { useAppContext } from '../context/AppContext';
-import TooltipHelper from '../services/TooltipHelper';
 import type { TooltipData } from '../services/TooltipHelper';
+import TooltipHelper from '../services/TooltipHelper';
 import { Theme } from '../theme/tokens';
 import './Home.css';
 
@@ -36,6 +36,8 @@ type DialogState =
   | { type: 'login' }
   | { type: 'addAlias' }
   | { type: 'addMultipleAliases' }
+  | { type: 'addTrigger' }
+  | { type: 'addMultipleTriggers' }
   | { type: 'addEmail' }
   | { type: 'addSms' }
   | { type: 'addTag' }
@@ -94,7 +96,9 @@ const Home: React.FC = () => {
   const aliasItems = useMemo(
     () =>
       state.aliasesList
-        .filter(([label]) => label !== 'external_id' && label !== 'onesignal_id')
+        .filter(
+          ([label]) => label !== 'external_id' && label !== 'onesignal_id',
+        )
         .map(([label, id]) => ({ key: label, value: id })),
     [state.aliasesList],
   );
@@ -232,7 +236,9 @@ const Home: React.FC = () => {
               onInfoTap={() => showTooltipModal('inAppMessaging')}
               onTogglePaused={(checked) =>
                 runAction(
-                  checked ? 'In-app messages paused' : 'In-app messages resumed',
+                  checked
+                    ? 'In-app messages paused'
+                    : 'In-app messages resumed',
                   () => setIamPaused(checked),
                 )
               }
@@ -266,7 +272,9 @@ const Home: React.FC = () => {
               aliasItems={aliasItems}
               onInfoTap={() => showTooltipModal('aliases')}
               onAddAlias={() => setDialog({ type: 'addAlias' })}
-              onAddMultipleAliases={() => setDialog({ type: 'addMultipleAliases' })}
+              onAddMultipleAliases={() =>
+                setDialog({ type: 'addMultipleAliases' })
+              }
             />
 
             <EmailsSection
@@ -291,11 +299,15 @@ const Home: React.FC = () => {
               tagItems={tagItems}
               onInfoTap={() => showTooltipModal('tags')}
               onRemoveTag={(key) =>
-                runAction(`Tag removed: ${key}`, () => removeSelectedTags([key]))
+                runAction(`Tag removed: ${key}`, () =>
+                  removeSelectedTags([key]),
+                )
               }
               onAddTag={() => setDialog({ type: 'addTag' })}
               onAddMultipleTags={() => setDialog({ type: 'addMultipleTags' })}
-              onRemoveSelectedTags={() => setDialog({ type: 'removeSelectedTags' })}
+              onRemoveSelectedTags={() =>
+                setDialog({ type: 'removeSelectedTags' })
+              }
             />
 
             <OutcomesSection
@@ -306,15 +318,14 @@ const Home: React.FC = () => {
             <TriggersSection
               triggerItems={triggerItems}
               onInfoTap={() => showTooltipModal('triggers')}
-              onAddTrigger={() =>
-                runAction('Trigger added', () =>
-                  addTrigger('trigger_manual', 'manual'),
+              onRemoveTrigger={(key) =>
+                runAction(`Trigger removed: ${key}`, () =>
+                  removeSelectedTriggers([key]),
                 )
               }
+              onAddTrigger={() => setDialog({ type: 'addTrigger' })}
               onAddMultipleTriggers={() =>
-                runAction('Multiple triggers added', () =>
-                  addTriggers({ trigger_a: 'one', trigger_b: 'two' }),
-                )
+                setDialog({ type: 'addMultipleTriggers' })
               }
               onRemoveSelectedTriggers={() =>
                 setDialog({ type: 'removeSelectedTriggers' })
@@ -435,6 +446,21 @@ const Home: React.FC = () => {
           }
         />
 
+        <PairInputModal
+          open={dialog.type === 'addTrigger'}
+          title="Add Trigger"
+          firstPlaceholder="Key"
+          secondPlaceholder="Value"
+          confirmLabel="Add"
+          onClose={closeDialog}
+          onSubmit={(key, value) =>
+            runAction(`Trigger added: ${key}`, async () => {
+              await addTrigger(key, value);
+              closeDialog();
+            })
+          }
+        />
+
         <MultiPairInputModal
           open={dialog.type === 'addMultipleAliases'}
           title="Add Multiple Aliases"
@@ -449,6 +475,20 @@ const Home: React.FC = () => {
                 closeDialog();
               },
             )
+          }
+        />
+
+        <MultiPairInputModal
+          open={dialog.type === 'addMultipleTriggers'}
+          title="Add Multiple Triggers"
+          firstPlaceholder="Key"
+          secondPlaceholder="Value"
+          onClose={closeDialog}
+          onSubmit={(pairs) =>
+            runAction(`${Object.keys(pairs).length} trigger(s) added`, async () => {
+              await addTriggers(pairs);
+              closeDialog();
+            })
           }
         />
 

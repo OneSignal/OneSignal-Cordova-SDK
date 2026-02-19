@@ -7,6 +7,7 @@ import SectionCard from '../SectionCard';
 interface TriggersSectionProps {
   triggerItems: PairItem[];
   onInfoTap: () => void;
+  onRemoveTrigger: (key: string) => void;
   onAddTrigger: () => void;
   onAddMultipleTriggers: () => void;
   onRemoveSelectedTriggers: () => void;
@@ -16,25 +17,30 @@ interface TriggersSectionProps {
 const TriggersSection: FC<TriggersSectionProps> = ({
   triggerItems,
   onInfoTap,
+  onRemoveTrigger,
   onAddTrigger,
   onAddMultipleTriggers,
   onRemoveSelectedTriggers,
   onClearTriggers,
 }) => (
   <SectionCard title="TRIGGERS" onInfoTap={onInfoTap}>
-    <PairList items={triggerItems} emptyText="No triggers added" />
+    <PairList items={triggerItems} emptyText="No Triggers Added" onRemove={onRemoveTrigger} />
     <ActionButton type="button" onClick={onAddTrigger}>
       ADD
     </ActionButton>
     <ActionButton type="button" onClick={onAddMultipleTriggers}>
       ADD MULTIPLE
     </ActionButton>
-    <ActionButton variant="outline" type="button" onClick={onRemoveSelectedTriggers}>
-      REMOVE SELECTED
-    </ActionButton>
-    <ActionButton variant="outline" type="button" onClick={onClearTriggers}>
-      CLEAR
-    </ActionButton>
+    {triggerItems.length ? (
+      <ActionButton variant="outline" type="button" onClick={onRemoveSelectedTriggers}>
+        REMOVE SELECTED
+      </ActionButton>
+    ) : null}
+    {triggerItems.length ? (
+      <ActionButton variant="outline" type="button" onClick={onClearTriggers}>
+        CLEAR ALL
+      </ActionButton>
+    ) : null}
   </SectionCard>
 );
 

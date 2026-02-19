@@ -535,20 +535,23 @@ Outcome Events Section:
 
 Triggers Section:
 
-- Section title includes info icon (use `MdInfoOutline` from `react-icons/md`).
-- Show key/value entries in stacked layout with row remove action.
+- Section title: `Triggers` with info icon (use `MdInfoOutline` from `react-icons/md`).
+- List displays key/value pairs.
+- Each row uses stacked layout (key above value) and includes an inline `X` remove action on the right.
 - Empty state text: `No Triggers Added`.
-- `ADD` and `ADD MULTIPLE` use the same modal patterns as Tags.
-- Action buttons (only when triggers exist):
-  - `REMOVE SELECTED` (checkbox multi-select modal)
-  - `CLEAR ALL`
+- `ADD` button opens `PairInputModal` with empty Key and Value fields.
+- `ADD MULTIPLE` button opens `MultiPairInputModal` with dynamic rows.
+- Extra action buttons are shown only when triggers exist:
+  - `REMOVE SELECTED` opens `MultiSelectRemoveModal` with checkboxes.
+  - `CLEAR ALL` removes all triggers at once.
 
 Important behavior:
 
-- Triggers are stored in memory only for current app session.
-- `triggersList` is session state and should not be persisted.
-- Sending IAM actions should upsert `iam_type` in the same trigger list.
-- Triggers reset when app restarts.
+- Triggers are stored in memory only during the current app session.
+- `triggersList` is in-memory session state and must not be persisted.
+- Sending IAM actions updates the same list by upserting `iam_type`.
+- Triggers are cleared when the app restarts.
+- This transient behavior is intentional for IAM trigger testing.
 
 ### Prompt 2.12 - Track Event Section
 
