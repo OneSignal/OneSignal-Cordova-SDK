@@ -1,14 +1,7 @@
-import { IonContent, IonPage, IonToast, IonToggle } from '@ionic/react';
+import { IonContent, IonPage, IonToast } from '@ionic/react';
 import { useMemo, useState } from 'react';
-import {
-  MdCropSquare,
-  MdFullscreen,
-  MdOutlineVerticalAlignBottom,
-  MdOutlineVerticalAlignTop,
-} from 'react-icons/md';
 import oneSignalLogo from '../assets/onesignal_logo.svg';
 import ActionButton from '../components/ActionButton';
-import { PairList, SingleList } from '../components/ListWidgets';
 import LogView from '../components/LogView';
 import CustomNotificationModal from '../components/modals/CustomNotificationModal';
 import MultiPairInputModal from '../components/modals/MultiPairInputModal';
@@ -17,8 +10,19 @@ import OutcomeModal from '../components/modals/OutcomeModal';
 import PairInputModal from '../components/modals/PairInputModal';
 import SingleInputModal from '../components/modals/SingleInputModal';
 import TrackEventModal from '../components/modals/TrackEventModal';
-import SectionCard from '../components/SectionCard';
-import ToggleRow from '../components/ToggleRow';
+import AliasesSection from '../components/sections/AliasesSection';
+import AppSection from '../components/sections/AppSection';
+import EmailsSection from '../components/sections/EmailsSection';
+import InAppSection from '../components/sections/InAppSection';
+import LocationSection from '../components/sections/LocationSection';
+import OutcomesSection from '../components/sections/OutcomesSection';
+import PushSection from '../components/sections/PushSection';
+import SendIamSection from '../components/sections/SendIamSection';
+import SendPushSection from '../components/sections/SendPushSection';
+import SmsSection from '../components/sections/SmsSection';
+import TagsSection from '../components/sections/TagsSection';
+import TrackEventSection from '../components/sections/TrackEventSection';
+import TriggersSection from '../components/sections/TriggersSection';
 import { useAppContext } from '../context/AppContext';
 import { Theme } from '../theme/tokens';
 import './Home.css';
@@ -97,9 +101,7 @@ const Home: React.FC = () => {
   };
 
   const runAction = (message: string, action: () => Promise<void>) => {
-    action()
-      .then(() => showToast(message))
-      .catch(() => showToast('Action failed'));
+    action().then(() => showToast(message));
   };
 
   const closeDialog = () => {
@@ -125,32 +127,15 @@ const Home: React.FC = () => {
           <LogView />
 
           <main className="content">
-            <section className="section">
-              <h2>APP</h2>
-              <div className="card kv-card">
-                <div className="kv-row">
-                  <span>App ID</span>
-                  <span>{state.appId}</span>
-                </div>
-              </div>
-              <div className="card tip-card">
-                <div>
-                  Add your own App ID, then rebuild to fully test all
-                  functionality.
-                </div>
-                <div className="tip-link">Get your keys at onesignal.com</div>
-              </div>
-              <ToggleRow
-                label="Consent Required"
-                description="Require consent before SDK processes data"
-                checked={state.consentRequired}
-                onToggle={(checked) =>
-                  runAction(`Consent required: ${checked}`, () =>
-                    setConsentRequired(checked),
-                  )
-                }
-              />
-            </section>
+            <AppSection
+              appId={state.appId}
+              consentRequired={state.consentRequired}
+              onToggleConsent={(checked) =>
+                runAction(`Consent required: ${checked}`, () =>
+                  setConsentRequired(checked),
+                )
+              }
+            />
 
             <section className="section">
               <h2>USER</h2>
@@ -182,331 +167,145 @@ const Home: React.FC = () => {
               ) : null}
             </section>
 
-            <SectionCard
-              title="PUSH"
+            <PushSection
+              pushSubscriptionId={state.pushSubscriptionId ?? null}
+              isPushEnabled={state.isPushEnabled}
+              onTogglePush={(checked) =>
+                runAction(`Push ${checked ? 'enabled' : 'disabled'}`, () =>
+                  setPushEnabled(checked),
+                )
+              }
+              onPromptPush={() =>
+                runAction('Push permission requested', promptPush)
+              }
               onInfoTap={() => showToast('Push section tooltip')}
-            >
-              <div className="card kv-card push-card">
-                <div className="kv-row">
-                  <span>Push ID</span>
-                  <span>{state.pushSubscriptionId ?? '—'}</span>
-                </div>
-                <div className="divider" />
-                <div className="kv-row kv-row-toggle">
-                  <span>Enabled</span>
-                  <IonToggle
-                    checked={state.isPushEnabled}
-                    onIonChange={(event) =>
-                      runAction(
-                        `Push ${event.detail.checked ? 'enabled' : 'disabled'}`,
-                        () => setPushEnabled(event.detail.checked),
-                      )
-                    }
-                    aria-label="Push enabled"
-                  />
-                </div>
-              </div>
-              <ActionButton
-                variant="outline"
-                type="button"
-                onClick={() =>
-                  runAction('Push permission requested', promptPush)
-                }
-              >
-                PROMPT PUSH
-              </ActionButton>
-            </SectionCard>
+            />
 
-            <SectionCard
-              title="SEND PUSH NOTIFICATION"
+            <SendPushSection
               onInfoTap={() => showToast('Push notification info')}
-            >
-              <ActionButton
-                type="button"
-                onClick={() =>
-                  runAction('Simple notification sent', sendSimpleNotification)
-                }
-              >
-                SIMPLE
-              </ActionButton>
-              <ActionButton
-                type="button"
-                onClick={() =>
-                  runAction('Image notification sent', sendImageNotification)
-                }
-              >
-                WITH IMAGE
-              </ActionButton>
-              <ActionButton
-                type="button"
-                onClick={() => setDialog({ type: 'customNotification' })}
-              >
-                CUSTOM
-              </ActionButton>
-            </SectionCard>
+              onSendSimple={() =>
+                runAction('Simple notification sent', sendSimpleNotification)
+              }
+              onSendImage={() =>
+                runAction('Image notification sent', sendImageNotification)
+              }
+              onSendCustom={() => setDialog({ type: 'customNotification' })}
+            />
 
-            <SectionCard
-              title="IN-APP MESSAGING"
+            <InAppSection
+              inAppMessagesPaused={state.inAppMessagesPaused}
               onInfoTap={() => showToast('In-app messaging info')}
-            >
-              <ToggleRow
-                label="Pause In-App Messages"
-                description="Toggle in-app message display"
-                checked={state.inAppMessagesPaused}
-                onToggle={(checked) =>
-                  runAction(
-                    checked
-                      ? 'In-app messages paused'
-                      : 'In-app messages resumed',
-                    () => setIamPaused(checked),
-                  )
-                }
-              />
-            </SectionCard>
+              onTogglePaused={(checked) =>
+                runAction(
+                  checked ? 'In-app messages paused' : 'In-app messages resumed',
+                  () => setIamPaused(checked),
+                )
+              }
+            />
 
-            <SectionCard
-              title="SEND IN-APP MESSAGE"
+            <SendIamSection
               onInfoTap={() => showToast('Send IAM info')}
-            >
-              <ActionButton
-                className="iam-btn"
-                type="button"
-                onClick={() =>
-                  runAction('Sent IAM: top_banner', () =>
-                    sendIamTrigger('top_banner'),
-                  )
-                }
-              >
-                <span className="action-btn-content">
-                  <span className="action-btn-icon" aria-hidden>
-                    <MdOutlineVerticalAlignTop />
-                  </span>
-                  <span>TOP BANNER</span>
-                </span>
-              </ActionButton>
-              <ActionButton
-                className="iam-btn"
-                type="button"
-                onClick={() =>
-                  runAction('Sent IAM: bottom_banner', () =>
-                    sendIamTrigger('bottom_banner'),
-                  )
-                }
-              >
-                <span className="action-btn-content">
-                  <span className="action-btn-icon" aria-hidden>
-                    <MdOutlineVerticalAlignBottom />
-                  </span>
-                  <span>BOTTOM BANNER</span>
-                </span>
-              </ActionButton>
-              <ActionButton
-                className="iam-btn"
-                type="button"
-                onClick={() =>
-                  runAction('Sent IAM: center_modal', () =>
-                    sendIamTrigger('center_modal'),
-                  )
-                }
-              >
-                <span className="action-btn-content">
-                  <span className="action-btn-icon" aria-hidden>
-                    <MdCropSquare />
-                  </span>
-                  <span>CENTER MODAL</span>
-                </span>
-              </ActionButton>
-              <ActionButton
-                className="iam-btn"
-                type="button"
-                onClick={() =>
-                  runAction('Sent IAM: full_screen', () =>
-                    sendIamTrigger('full_screen'),
-                  )
-                }
-              >
-                <span className="action-btn-content">
-                  <span className="action-btn-icon" aria-hidden>
-                    <MdFullscreen />
-                  </span>
-                  <span>FULL SCREEN</span>
-                </span>
-              </ActionButton>
-            </SectionCard>
+              onSendTopBanner={() =>
+                runAction('Sent IAM: top_banner', () =>
+                  sendIamTrigger('top_banner'),
+                )
+              }
+              onSendBottomBanner={() =>
+                runAction('Sent IAM: bottom_banner', () =>
+                  sendIamTrigger('bottom_banner'),
+                )
+              }
+              onSendCenterModal={() =>
+                runAction('Sent IAM: center_modal', () =>
+                  sendIamTrigger('center_modal'),
+                )
+              }
+              onSendFullScreen={() =>
+                runAction('Sent IAM: full_screen', () =>
+                  sendIamTrigger('full_screen'),
+                )
+              }
+            />
 
-            <SectionCard
-              title="ALIASES"
+            <AliasesSection
+              aliasItems={aliasItems}
               onInfoTap={() => showToast('Aliases info')}
-            >
-              <PairList items={aliasItems} emptyText="No aliases added" />
-              <ActionButton
-                type="button"
-                onClick={() => setDialog({ type: 'addAlias' })}
-              >
-                ADD
-              </ActionButton>
-              <ActionButton
-                type="button"
-                onClick={() => setDialog({ type: 'addMultipleAliases' })}
-              >
-                ADD MULTIPLE
-              </ActionButton>
-            </SectionCard>
+              onAddAlias={() => setDialog({ type: 'addAlias' })}
+              onAddMultipleAliases={() => setDialog({ type: 'addMultipleAliases' })}
+            />
 
-            <SectionCard
-              title="EMAILS"
+            <EmailsSection
+              emails={state.emailsList}
               onInfoTap={() => showToast('Emails info')}
-            >
-              <SingleList
-                items={state.emailsList}
-                emptyText="No emails added"
-              />
-              <ActionButton
-                type="button"
-                onClick={() => setDialog({ type: 'addEmail' })}
-              >
-                ADD EMAIL
-              </ActionButton>
-            </SectionCard>
+              onAddEmail={() => setDialog({ type: 'addEmail' })}
+            />
 
-            <SectionCard title="SMS" onInfoTap={() => showToast('SMS info')}>
-              <SingleList
-                items={state.smsNumbersList}
-                emptyText="No SMS added"
-              />
-              <ActionButton
-                type="button"
-                onClick={() => setDialog({ type: 'addSms' })}
-              >
-                ADD SMS
-              </ActionButton>
-            </SectionCard>
+            <SmsSection
+              smsNumbers={state.smsNumbersList}
+              onInfoTap={() => showToast('SMS info')}
+              onAddSms={() => setDialog({ type: 'addSms' })}
+            />
 
-            <SectionCard title="TAGS" onInfoTap={() => showToast('Tags info')}>
-              <PairList
-                items={tagItems}
-                emptyText="No tags added"
-                onRemove={(key) =>
-                  runAction(`Tag removed: ${key}`, () =>
-                    removeSelectedTags([key]),
-                  )
-                }
-              />
-              <ActionButton
-                type="button"
-                onClick={() => setDialog({ type: 'addTag' })}
-              >
-                ADD
-              </ActionButton>
-              <ActionButton
-                type="button"
-                onClick={() => setDialog({ type: 'addMultipleTags' })}
-              >
-                ADD MULTIPLE
-              </ActionButton>
-              <ActionButton
-                variant="outline"
-                type="button"
-                onClick={() => setDialog({ type: 'removeSelectedTags' })}
-              >
-                REMOVE SELECTED
-              </ActionButton>
-            </SectionCard>
+            <TagsSection
+              tagItems={tagItems}
+              onInfoTap={() => showToast('Tags info')}
+              onRemoveTag={(key) =>
+                runAction(`Tag removed: ${key}`, () => removeSelectedTags([key]))
+              }
+              onAddTag={() => setDialog({ type: 'addTag' })}
+              onAddMultipleTags={() => setDialog({ type: 'addMultipleTags' })}
+              onRemoveSelectedTags={() => setDialog({ type: 'removeSelectedTags' })}
+            />
 
-            <SectionCard
-              title="OUTCOME EVENTS"
+            <OutcomesSection
               onInfoTap={() => showToast('Outcome events info')}
-            >
-              <ActionButton
-                type="button"
-                onClick={() => setDialog({ type: 'sendOutcome' })}
-              >
-                SEND OUTCOME
-              </ActionButton>
-            </SectionCard>
+              onSendOutcome={() => setDialog({ type: 'sendOutcome' })}
+            />
 
-            <SectionCard
-              title="TRIGGERS"
+            <TriggersSection
+              triggerItems={triggerItems}
               onInfoTap={() => showToast('Triggers info')}
-            >
-              <PairList items={triggerItems} emptyText="No triggers added" />
-              <ActionButton
-                type="button"
-                onClick={() =>
-                  runAction('Trigger added', () =>
-                    addTrigger('trigger_manual', 'manual'),
-                  )
-                }
-              >
-                ADD
-              </ActionButton>
-              <ActionButton
-                type="button"
-                onClick={() =>
-                  runAction('Multiple triggers added', () =>
-                    addTriggers({ trigger_a: 'one', trigger_b: 'two' }),
-                  )
-                }
-              >
-                ADD MULTIPLE
-              </ActionButton>
-              <ActionButton
-                variant="outline"
-                type="button"
-                onClick={() => setDialog({ type: 'removeSelectedTriggers' })}
-              >
-                REMOVE SELECTED
-              </ActionButton>
-              <ActionButton
-                variant="outline"
-                type="button"
-                onClick={() => runAction('All triggers cleared', clearTriggers)}
-              >
-                CLEAR
-              </ActionButton>
-            </SectionCard>
+              onAddTrigger={() =>
+                runAction('Trigger added', () =>
+                  addTrigger('trigger_manual', 'manual'),
+                )
+              }
+              onAddMultipleTriggers={() =>
+                runAction('Multiple triggers added', () =>
+                  addTriggers({ trigger_a: 'one', trigger_b: 'two' }),
+                )
+              }
+              onRemoveSelectedTriggers={() =>
+                setDialog({ type: 'removeSelectedTriggers' })
+              }
+              onClearTriggers={() =>
+                runAction('All triggers cleared', clearTriggers)
+              }
+            />
 
-            <SectionCard
-              title="TRACK EVENT"
+            <TrackEventSection
               onInfoTap={() => showToast('Track event info')}
-            >
-              <ActionButton
-                type="button"
-                onClick={() => setDialog({ type: 'trackEvent' })}
-              >
-                TRACK EVENT
-              </ActionButton>
-            </SectionCard>
+              onTrackEvent={() => setDialog({ type: 'trackEvent' })}
+            />
 
-            <SectionCard
-              title="LOCATION"
+            <LocationSection
+              locationShared={state.locationShared}
               onInfoTap={() => showToast('Location info')}
-            >
-              <ToggleRow
-                label="Location Shared"
-                description="Share device location with OneSignal"
-                checked={state.locationShared}
-                onToggle={(checked) =>
-                  runAction(
-                    checked
-                      ? 'Location sharing enabled'
-                      : 'Location sharing disabled',
-                    () => setLocationShared(checked),
-                  )
-                }
-              />
-              <ActionButton
-                type="button"
-                onClick={() =>
-                  runAction(
-                    'Location permission prompt shown',
-                    requestLocationPermission,
-                  )
-                }
-              >
-                PROMPT LOCATION
-              </ActionButton>
-            </SectionCard>
+              onToggleLocationShared={(checked) =>
+                runAction(
+                  checked
+                    ? 'Location sharing enabled'
+                    : 'Location sharing disabled',
+                  () => setLocationShared(checked),
+                )
+              }
+              onPromptLocation={() =>
+                runAction(
+                  'Location permission prompt shown',
+                  requestLocationPermission,
+                )
+              }
+            />
 
             <section className="section">
               <ActionButton
