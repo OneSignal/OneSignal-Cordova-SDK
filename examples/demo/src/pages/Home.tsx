@@ -118,17 +118,14 @@ const Home: React.FC = () => {
                 <div>Add your own App ID, then rebuild to fully test all functionality.</div>
                 <div className="tip-link">Get your keys at onesignal.com</div>
               </div>
-              <div className="card toggle-card">
-                <div>
-                  <div className="label">Consent Required</div>
-                  <div className="sub">Require consent before SDK processes data</div>
-                </div>
-                <input
-                  type="checkbox"
-                  checked={state.consentRequired}
-                  onChange={(e) => runAction(`Consent required: ${e.target.checked}`, () => setConsentRequired(e.target.checked))}
-                />
-              </div>
+              <ToggleRow
+                label="Consent Required"
+                description="Require consent before SDK processes data"
+                checked={state.consentRequired}
+                onToggle={(checked) =>
+                  runAction(`Consent required: ${checked}`, () => setConsentRequired(checked))
+                }
+              />
             </section>
 
             <section className="section">
@@ -151,16 +148,14 @@ const Home: React.FC = () => {
             <SectionCard title="PUSH" onInfoTap={() => showToast('Push section tooltip')}>
               <div className="card kv-card">
                 <div className="kv-row"><span>Push ID</span><span>{state.pushSubscriptionId ?? '—'}</span></div>
-                <div className="divider" />
-                <div className="kv-row">
-                  <span>Enabled</span>
-                  <input
-                    type="checkbox"
-                    checked={state.isPushEnabled}
-                    onChange={(e) => runAction(`Push ${e.target.checked ? 'enabled' : 'disabled'}`, () => setPushEnabled(e.target.checked))}
-                  />
-                </div>
               </div>
+              <ToggleRow
+                label="Enabled"
+                checked={state.isPushEnabled}
+                onToggle={(checked) =>
+                  runAction(`Push ${checked ? 'enabled' : 'disabled'}`, () => setPushEnabled(checked))
+                }
+              />
               <ActionButton variant="outline" type="button" onClick={() => runAction('Push permission requested', promptPush)}>
                 PROMPT PUSH
               </ActionButton>
@@ -177,9 +172,9 @@ const Home: React.FC = () => {
                 label="Pause In-App Messages"
                 description="Toggle in-app message display"
                 checked={state.inAppMessagesPaused}
-                onChange={(e) => runAction(
-                  e.target.checked ? 'In-app messages paused' : 'In-app messages resumed',
-                  () => setIamPaused(e.target.checked),
+                onToggle={(checked) => runAction(
+                  checked ? 'In-app messages paused' : 'In-app messages resumed',
+                  () => setIamPaused(checked),
                 )}
               />
             </SectionCard>
@@ -238,10 +233,10 @@ const Home: React.FC = () => {
                 label="Location Shared"
                 description="Share device location with OneSignal"
                 checked={state.locationShared}
-                onChange={(e) =>
+                onToggle={(checked) =>
                   runAction(
-                    e.target.checked ? 'Location sharing enabled' : 'Location sharing disabled',
-                    () => setLocationShared(e.target.checked),
+                    checked ? 'Location sharing enabled' : 'Location sharing disabled',
+                    () => setLocationShared(checked),
                   )}
               />
               <ActionButton type="button" onClick={() => runAction('Location permission prompt shown', requestLocationPermission)}>

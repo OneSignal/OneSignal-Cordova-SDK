@@ -374,6 +374,10 @@ Functional expectations:
 - Tags and triggers support add multiple and remove selected
 - Track Event validates JSON before submit
 - Lists show empty state text when no values exist
+- Use toggle switches (not checkboxes) for:
+  - Consent Required
+  - Push Enabled
+  - Location Shared
 
 ---
 
@@ -502,7 +506,78 @@ Use:
 
 `https://raw.githubusercontent.com/OneSignal/sdk-shared/main/demo/tooltip_content.json`
 
-### Prompt 8.7 - Log View (Appium-Ready)
+Tooltip content is maintained in `sdk-shared` and should be loaded at runtime.
+
+### Prompt 8.7 - Tooltip helper service
+
+Create a tooltip helper service (for example `src/services/TooltipHelper.ts`) that caches remote tooltip data:
+
+```ts
+interface TooltipOption {
+  name: string;
+  description: string;
+}
+
+interface TooltipData {
+  title: string;
+  description: string;
+  options?: TooltipOption[];
+}
+
+class TooltipHelper {
+  private static instance: TooltipHelper;
+  private initialized = false;
+  private tooltips: Record<string, TooltipData> = {};
+
+  private static readonly TOOLTIP_URL =
+    'https://raw.githubusercontent.com/OneSignal/sdk-shared/main/demo/tooltip_content.json';
+
+  static getInstance(): TooltipHelper {
+    if (!TooltipHelper.instance) {
+      TooltipHelper.instance = new TooltipHelper();
+    }
+    return TooltipHelper.instance;
+  }
+
+  async init(): Promise<void> {
+    if (this.initialized) return;
+    try {
+      const response = await fetch(TooltipHelper.TOOLTIP_URL);
+      if (response.ok) {
+        const parsed = (await response.json()) as Record<string, TooltipData>;
+        this.tooltips = parsed;
+      }
+    } catch {
+      // Non-blocking by design.
+    }
+    this.initialized = true;
+  }
+
+  getTooltip(key: string): TooltipData | undefined {
+    return this.tooltips[key];
+  }
+}
+```
+
+Behavior requirements:
+
+- Call `init()` once during startup in a non-blocking way
+- If fetch fails, app should continue normally and tooltips remain optional
+- Keep parsed tooltip map in memory for fast access
+
+### Prompt 8.8 - Tooltip UI integration
+
+Wire tooltips to section info buttons:
+
+- `SectionCard` keeps optional `onInfoTap`
+- Each section passes a tooltip key (for example `app`, `push`, `aliases`, `tags`, `triggers`)
+- On info tap, lookup tooltip via `TooltipHelper.getInstance().getTooltip(key)`
+- Show tooltip in a reusable `TooltipModal` (for example `src/components/modals/TooltipModal.tsx`)
+- `TooltipModal` renders title, description, and optional options list
+
+If no tooltip exists for a key, do nothing (no crash, no blocking).
+
+### Prompt 8.9 - Log View (Appium-Ready)
 
 Add a collapsible log view at the top of the screen for debugging and Appium.
 
@@ -534,7 +609,7 @@ Appium labels (use `data-testid` in web/Ionic):
 | `log_entry_{N}_level`    | Level badge/text               |
 | `log_entry_{N}_message`  | Log message text               |
 
-### Prompt 8.8 - User Feedback
+### Prompt 8.10 - User Feedback
 
 Show user feedback for important actions using Ionic-friendly UI (for example `IonToast` + inline validation text).
 
@@ -579,6 +654,13 @@ iOS plugin and notification checklist:
   `bun run setup`
   `bun install`
   `npx cap sync`
+
+Android live-reload note:
+
+- Running `ionic cap run android -l --external` may update
+  `android/app/src/main/AndroidManifest.xml` (for cleartext dev-server traffic)
+- Tooling may also generate `AndroidManifest.xml.orig` backup files
+- Ignore backup files in git (for example `*.orig` in `.gitignore`)
 
 ---
 

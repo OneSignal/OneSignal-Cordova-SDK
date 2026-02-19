@@ -1,3 +1,5 @@
+import { IonIcon } from '@ionic/react';
+import { chevronDownOutline, chevronUpOutline, trashOutline } from 'ionicons/icons';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { FC } from 'react';
 import LogManager from '../services/LogManager';
@@ -35,7 +37,7 @@ const LogView: FC = () => {
           aria-label="Clear logs"
           data-testid="log_view_clear_button"
         >
-          🗑
+          <IonIcon icon={trashOutline} />
         </button>
         <button
           className="icon-btn"
@@ -43,7 +45,7 @@ const LogView: FC = () => {
           type="button"
           aria-label={collapsed ? 'Expand logs' : 'Collapse logs'}
         >
-          {collapsed ? '⌄' : '⌃'}
+          <IonIcon icon={collapsed ? chevronDownOutline : chevronUpOutline} />
         </button>
       </div>
       {!collapsed ? (

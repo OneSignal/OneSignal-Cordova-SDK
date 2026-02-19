@@ -1,19 +1,20 @@
-import type { ChangeEventHandler, FC } from 'react';
+import { IonToggle } from '@ionic/react';
+import type { FC } from 'react';
 
 interface ToggleRowProps {
   label: string;
   description?: string;
   checked: boolean;
-  onChange: ChangeEventHandler<HTMLInputElement>;
+  onToggle: (checked: boolean) => void;
 }
 
-const ToggleRow: FC<ToggleRowProps> = ({ label, description, checked, onChange }) => (
+const ToggleRow: FC<ToggleRowProps> = ({ label, description, checked, onToggle }) => (
   <div className="card toggle-card">
     <div>
       <div className="label">{label}</div>
       {description ? <div className="sub">{description}</div> : null}
     </div>
-    <input type="checkbox" checked={checked} onChange={onChange} />
+    <IonToggle checked={checked} onIonChange={(event) => onToggle(event.detail.checked)} />
   </div>
 );
 
