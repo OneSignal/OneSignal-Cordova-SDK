@@ -2,6 +2,7 @@ import { IonContent, IonPage, IonToast } from '@ionic/react';
 import { useEffect, useMemo, useState } from 'react';
 import oneSignalLogo from '../assets/onesignal_logo.svg';
 import ActionButton from '../components/ActionButton';
+import LoadingOverlay from '../components/LoadingOverlay';
 import LogView from '../components/LogView';
 import CustomNotificationModal from '../components/modals/CustomNotificationModal';
 import MultiPairInputModal from '../components/modals/MultiPairInputModal';
@@ -56,7 +57,9 @@ const Home: React.FC = () => {
     addAlias,
     addAliases,
     addEmail,
+    removeEmail,
     addSms,
+    removeSms,
     addTag,
     addTags,
     addTrigger,
@@ -252,12 +255,18 @@ const Home: React.FC = () => {
               emails={state.emailsList}
               onInfoTap={() => showToast('Emails info')}
               onAddEmail={() => setDialog({ type: 'addEmail' })}
+              onRemoveEmail={(email) =>
+                runAction(`Email removed: ${email}`, () => removeEmail(email))
+              }
             />
 
             <SmsSection
               smsNumbers={state.smsNumbersList}
               onInfoTap={() => showToast('SMS info')}
               onAddSms={() => setDialog({ type: 'addSms' })}
+              onRemoveSms={(sms) =>
+                runAction(`SMS removed: ${sms}`, () => removeSms(sms))
+              }
             />
 
             <TagsSection
@@ -518,6 +527,7 @@ const Home: React.FC = () => {
           duration={1600}
           onDidDismiss={() => setToastOpen(false)}
         />
+        <LoadingOverlay visible={state.isLoading} />
       </IonContent>
     </IonPage>
   );

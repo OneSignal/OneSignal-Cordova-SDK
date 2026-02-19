@@ -1,6 +1,6 @@
 import { Capacitor } from '@capacitor/core';
 import OneSignal from 'onesignal-cordova-plugin';
-import { NotificationType } from '../models/NotificationType';
+import type { NotificationType } from '../models/NotificationType';
 import type { UserData } from '../models/UserData';
 import OneSignalApiService from '../services/OneSignalApiService';
 

@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer } from 'react';
 import type { ReactNode } from 'react';
+import { Capacitor } from '@capacitor/core';
 import OneSignal from 'onesignal-cordova-plugin';
 import { NotificationType } from '../models/NotificationType';
 import OneSignalRepository from '../repositories/OneSignalRepository';
@@ -23,6 +24,7 @@ export interface AppState {
   smsNumbersList: string[];
   tagsList: Pair[];
   triggersList: Pair[];
+  isLoading: boolean;
   logs: string[];
 }
 
@@ -39,21 +41,25 @@ const initialState: AppState = {
   aliasesList: [],
   emailsList: [],
   smsNumbersList: [],
-  tagsList: [
-    ['newestOutcome', 'true'],
-    ['somanem', 'somevalue'],
-  ],
+  tagsList: [],
   triggersList: [],
-  logs: [
-    '[main] ApplicationService.onActivityStopped(3, APP_OPEN)',
-    'Parsed user data: aliases=0, tags=2, emails=0, sms=0',
-    'User data fetched successfully, parsing response...',
-    '[main] NotificationsManager.requestPermission()',
-  ],
+  isLoading: false,
+  logs: [],
 };
 
 type AppAction =
+  | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_INITIAL_STATE'; payload: Partial<AppState> }
+  | {
+      type: 'SET_USER_DATA';
+      payload: {
+        aliasesList: Pair[];
+        tagsList: Pair[];
+        emailsList: string[];
+        smsNumbersList: string[];
+        externalUserId: string | undefined;
+      };
+    }
   | { type: 'SET_EXTERNAL_USER_ID'; payload: string | undefined }
   | { type: 'SET_PUSH_SUBSCRIPTION'; payload: { id: string | undefined; optedIn: boolean } }
   | { type: 'SET_HAS_NOTIFICATION_PERMISSION'; payload: boolean }
@@ -66,7 +72,9 @@ type AppAction =
   | { type: 'ADD_ALIASES'; payload: Pair[] }
   | { type: 'CLEAR_USER_DATA' }
   | { type: 'ADD_EMAIL'; payload: string }
+  | { type: 'REMOVE_EMAIL'; payload: string }
   | { type: 'ADD_SMS'; payload: string }
+  | { type: 'REMOVE_SMS'; payload: string }
   | { type: 'ADD_TAG'; payload: Pair }
   | { type: 'ADD_TAGS'; payload: Pair[] }
   | { type: 'REMOVE_SELECTED_TAGS'; payload: string[] }
@@ -87,8 +95,12 @@ function upsertPairs(existing: Pair[], incoming: Pair[]): Pair[] {
 
 function appReducer(state: AppState, action: AppAction): AppState {
   switch (action.type) {
+    case 'SET_LOADING':
+      return { ...state, isLoading: action.payload };
     case 'SET_INITIAL_STATE':
       return { ...state, ...action.payload };
+    case 'SET_USER_DATA':
+      return { ...state, ...action.payload, isLoading: false };
     case 'SET_EXTERNAL_USER_ID':
       return { ...state, externalUserId: action.payload };
     case 'SET_PUSH_SUBSCRIPTION':
@@ -124,8 +136,18 @@ function appReducer(state: AppState, action: AppAction): AppState {
       };
     case 'ADD_EMAIL':
       return { ...state, emailsList: [...state.emailsList, action.payload] };
+    case 'REMOVE_EMAIL':
+      return {
+        ...state,
+        emailsList: state.emailsList.filter((email) => email !== action.payload),
+      };
     case 'ADD_SMS':
       return { ...state, smsNumbersList: [...state.smsNumbersList, action.payload] };
+    case 'REMOVE_SMS':
+      return {
+        ...state,
+        smsNumbersList: state.smsNumbersList.filter((sms) => sms !== action.payload),
+      };
     case 'ADD_TAG':
       return { ...state, tagsList: upsertPairs(state.tagsList, [action.payload]) };
     case 'ADD_TAGS':
@@ -170,7 +192,9 @@ type AppContextValue = {
   addAlias: (label: string, id: string) => Promise<void>;
   addAliases: (pairs: Record<string, string>) => Promise<void>;
   addEmail: (email: string) => Promise<void>;
+  removeEmail: (email: string) => Promise<void>;
   addSms: (sms: string) => Promise<void>;
+  removeSms: (sms: string) => Promise<void>;
   addTag: (key: string, value: string) => Promise<void>;
   addTags: (pairs: Record<string, string>) => Promise<void>;
   removeSelectedTags: (keys: string[]) => Promise<void>;
@@ -222,6 +246,35 @@ export function AppContextProvider({ children }: Props) {
     });
   }, []);
 
+  const fetchUserDataFromApi = useCallback(async () => {
+    const onesignalId = await repository.getOnesignalId();
+    if (!onesignalId) {
+      dispatch({ type: 'SET_LOADING', payload: false });
+      return;
+    }
+
+    const userData = await repository.fetchUser(onesignalId);
+    if (!userData) {
+      dispatch({ type: 'SET_LOADING', payload: false });
+      return;
+    }
+
+    const externalId = await repository.getExternalId();
+    dispatch({
+      type: 'SET_USER_DATA',
+      payload: {
+        aliasesList: Object.entries(userData.aliases),
+        tagsList: Object.entries(userData.tags),
+        emailsList: userData.emails,
+        smsNumbersList: userData.smsNumbers,
+        externalUserId: externalId ?? userData.externalId,
+      },
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    dispatch({ type: 'SET_LOADING', payload: false });
+  }, []);
+
   useEffect(() => {
     const init = async () => {
       const appId = preferences.getAppId();
@@ -258,14 +311,24 @@ export function AppContextProvider({ children }: Props) {
         type: 'SET_HAS_NOTIFICATION_PERMISSION',
         payload: repository.hasPermission(),
       });
+
+      const onesignalId = await repository.getOnesignalId();
+      if (onesignalId) {
+        dispatch({ type: 'SET_LOADING', payload: true });
+        await fetchUserDataFromApi();
+      }
     };
 
     init().catch(() => {
       addLog('Initialization failed');
     });
-  }, [addLog, refreshPushState]);
+  }, [addLog, fetchUserDataFromApi, refreshPushState]);
 
   useEffect(() => {
+    if (!Capacitor.isNativePlatform()) {
+      return;
+    }
+
     const onPermissionChange = (granted: boolean) => {
       dispatch({ type: 'SET_HAS_NOTIFICATION_PERMISSION', payload: granted });
       addLog(`Permission changed: ${granted}`);
@@ -280,6 +343,8 @@ export function AppContextProvider({ children }: Props) {
       const externalId = await repository.getExternalId();
       dispatch({ type: 'SET_EXTERNAL_USER_ID', payload: externalId ?? undefined });
       addLog('User changed');
+      dispatch({ type: 'SET_LOADING', payload: true });
+      await fetchUserDataFromApi();
     };
 
     OneSignal.Notifications.addEventListener('permissionChange', onPermissionChange);
@@ -291,7 +356,7 @@ export function AppContextProvider({ children }: Props) {
       OneSignal.User.pushSubscription.removeEventListener('change', onPushSubscriptionChange);
       OneSignal.User.removeEventListener('change', onUserChange);
     };
-  }, [addLog, refreshPushState]);
+  }, [addLog, fetchUserDataFromApi, refreshPushState]);
 
   const clearLogs = useCallback(() => {
     dispatch({ type: 'CLEAR_LOGS' });
@@ -299,6 +364,7 @@ export function AppContextProvider({ children }: Props) {
   }, []);
 
   const loginUser = useCallback(async (externalUserId: string) => {
+    dispatch({ type: 'SET_LOADING', payload: true });
     repository.loginUser(externalUserId);
     preferences.setExternalUserId(externalUserId);
     dispatch({ type: 'SET_EXTERNAL_USER_ID', payload: externalUserId });
@@ -307,10 +373,13 @@ export function AppContextProvider({ children }: Props) {
   }, [addLog]);
 
   const logoutUser = useCallback(async () => {
+    dispatch({ type: 'SET_LOADING', payload: true });
     repository.logoutUser();
     preferences.setExternalUserId(null);
     dispatch({ type: 'SET_EXTERNAL_USER_ID', payload: undefined });
     dispatch({ type: 'CLEAR_USER_DATA' });
+    dispatch({ type: 'CLEAR_TRIGGERS' });
+    dispatch({ type: 'SET_LOADING', payload: false });
     addLog('User logged out');
   }, [addLog]);
 
@@ -414,10 +483,22 @@ export function AppContextProvider({ children }: Props) {
     addLog(`Email added: ${email}`);
   }, [addLog]);
 
+  const removeEmail = useCallback(async (email: string) => {
+    repository.removeEmail(email);
+    dispatch({ type: 'REMOVE_EMAIL', payload: email });
+    addLog(`Email removed: ${email}`);
+  }, [addLog]);
+
   const addSms = useCallback(async (sms: string) => {
     repository.addSms(sms);
     dispatch({ type: 'ADD_SMS', payload: sms });
     addLog(`SMS added: ${sms}`);
+  }, [addLog]);
+
+  const removeSms = useCallback(async (sms: string) => {
+    repository.removeSms(sms);
+    dispatch({ type: 'REMOVE_SMS', payload: sms });
+    addLog(`SMS removed: ${sms}`);
   }, [addLog]);
 
   const addTag = useCallback(async (key: string, value: string) => {
@@ -488,7 +569,9 @@ export function AppContextProvider({ children }: Props) {
     addAlias,
     addAliases,
     addEmail,
+    removeEmail,
     addSms,
+    removeSms,
     addTag,
     addTags,
     removeSelectedTags,
@@ -519,7 +602,9 @@ export function AppContextProvider({ children }: Props) {
     addAlias,
     addAliases,
     addEmail,
+    removeEmail,
     addSms,
+    removeSms,
     addTag,
     addTags,
     removeSelectedTags,
