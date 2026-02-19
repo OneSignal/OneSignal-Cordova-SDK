@@ -50,41 +50,48 @@ const MultiPairInputModal: FC<MultiPairInputModalProps> = ({
       >
         <h3>{title}</h3>
         {rows.map((row, index) => (
-          <div className="inline-fields row-with-remove" key={`row-${index}`}>
-            <input
-              value={row.key}
-              onChange={(event) =>
-                setRows((prev) =>
-                  prev.map((entry, entryIndex) =>
-                    entryIndex === index ? { ...entry, key: event.target.value } : entry,
-                  ),
-                )
-              }
-              placeholder={firstPlaceholder}
-            />
-            <input
-              value={row.value}
-              onChange={(event) =>
-                setRows((prev) =>
-                  prev.map((entry, entryIndex) =>
-                    entryIndex === index ? { ...entry, value: event.target.value } : entry,
-                  ),
-                )
-              }
-              placeholder={secondPlaceholder}
-            />
-            {rows.length > 1 ? (
-              <button
-                type="button"
-                className="delete-btn"
-                onClick={() => setRows((prev) => prev.filter((_, entryIndex) => entryIndex !== index))}
-              >
-                <MdClose />
-              </button>
-            ) : null}
+          <div key={`row-${index}`}>
+            <div className="inline-fields row-with-remove">
+              <input
+                value={row.key}
+                onChange={(event) =>
+                  setRows((prev) =>
+                    prev.map((entry, entryIndex) =>
+                      entryIndex === index ? { ...entry, key: event.target.value } : entry,
+                    ),
+                  )
+                }
+                placeholder={firstPlaceholder}
+              />
+              <input
+                value={row.value}
+                onChange={(event) =>
+                  setRows((prev) =>
+                    prev.map((entry, entryIndex) =>
+                      entryIndex === index ? { ...entry, value: event.target.value } : entry,
+                    ),
+                  )
+                }
+                placeholder={secondPlaceholder}
+              />
+              {rows.length > 1 ? (
+                <button
+                  type="button"
+                  className="delete-btn"
+                  onClick={() => setRows((prev) => prev.filter((_, entryIndex) => entryIndex !== index))}
+                >
+                  <MdClose />
+                </button>
+              ) : null}
+            </div>
+            {index < rows.length - 1 ? <div className="multi-row-divider" /> : null}
           </div>
         ))}
-        <button type="button" className="text-btn" onClick={() => setRows((prev) => [...prev, { key: '', value: '' }])}>
+        <button
+          type="button"
+          className="text-btn text-btn-center"
+          onClick={() => setRows((prev) => [...prev, { key: '', value: '' }])}
+        >
           + Add Row
         </button>
         <div className="modal-actions">

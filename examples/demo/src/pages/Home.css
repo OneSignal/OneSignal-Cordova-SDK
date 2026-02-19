@@ -289,6 +289,10 @@
   align-items: center;
   justify-content: center;
   line-height: 1;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  font-size: 24px;
 }
 
 .modal-backdrop {
@@ -347,6 +351,17 @@
   margin: 4px 0 12px;
 }
 
+.text-btn-center {
+  display: block;
+  margin: 4px auto 12px;
+}
+
+.multi-row-divider {
+  height: 1px;
+  background: #e4e7eb;
+  margin: 0 0 10px;
+}
+
 .checkbox-list label,
 .radio-list label {
   display: flex;
@@ -355,11 +370,24 @@
   margin-bottom: 10px;
 }
 
+.multi-select-remove-modal .checkbox-list label {
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.multi-select-remove-modal .checkbox-list input[type='checkbox'] {
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  accent-color: #ea4d53;
+  flex-shrink: 0;
+}
+
 .modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  margin-top: 12px;
+  margin-top: 24px;
 }
 
 .modal-actions button {

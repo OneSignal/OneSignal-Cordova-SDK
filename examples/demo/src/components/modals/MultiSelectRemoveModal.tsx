@@ -21,7 +21,7 @@ const MultiSelectRemoveModal: FC<MultiSelectRemoveModalProps> = ({ open, title, 
 
   return (
     <ModalShell open={open}>
-      <div>
+      <div className="multi-select-remove-modal">
         <h3>{title}</h3>
         <div className="checkbox-list">
           {items.map(([key]) => (
