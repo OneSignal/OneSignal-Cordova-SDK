@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import OneSignal from 'onesignal-cordova-plugin';
 import OneSignalRepository from '../repositories/OneSignalRepository';
 import PreferencesService from '../services/PreferencesService';
+import LogManager from '../services/LogManager';
 
 type Pair = [string, string];
 
@@ -70,6 +71,7 @@ type AppAction =
   | { type: 'REMOVE_SELECTED_TAGS'; payload: string[] }
   | { type: 'ADD_TRIGGER'; payload: Pair }
   | { type: 'ADD_TRIGGERS'; payload: Pair[] }
+  | { type: 'REMOVE_SELECTED_TRIGGERS'; payload: string[] }
   | { type: 'CLEAR_TRIGGERS' }
   | { type: 'ADD_LOG'; payload: string }
   | { type: 'CLEAR_LOGS' };
@@ -135,6 +137,10 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return { ...state, triggersList: upsertPairs(state.triggersList, [action.payload]) };
     case 'ADD_TRIGGERS':
       return { ...state, triggersList: upsertPairs(state.triggersList, action.payload) };
+    case 'REMOVE_SELECTED_TRIGGERS': {
+      const keys = new Set(action.payload);
+      return { ...state, triggersList: state.triggersList.filter(([key]) => !keys.has(key)) };
+    }
     case 'CLEAR_TRIGGERS':
       return { ...state, triggersList: [] };
     case 'ADD_LOG':
@@ -172,6 +178,7 @@ type AppContextValue = {
   sendOutcomeWithValue: (name: string, value: number) => Promise<void>;
   addTrigger: (key: string, value: string) => Promise<void>;
   addTriggers: (pairs: Record<string, string>) => Promise<void>;
+  removeSelectedTriggers: (keys: string[]) => Promise<void>;
   clearTriggers: () => Promise<void>;
   trackEvent: (name: string, properties?: Record<string, unknown>) => Promise<void>;
   setLocationShared: (shared: boolean) => Promise<void>;
@@ -182,6 +189,7 @@ const AppContext = createContext<AppContextValue | null>(null);
 
 const repository = new OneSignalRepository();
 const preferences = new PreferencesService();
+const logManager = LogManager.getInstance();
 
 function toPairs(pairs: Record<string, string>): Pair[] {
   return Object.entries(pairs).map(([key, value]) => [key, value]);
@@ -196,6 +204,7 @@ export function AppContextProvider({ children }: Props) {
 
   const addLog = useCallback((message: string) => {
     dispatch({ type: 'ADD_LOG', payload: message });
+    logManager.i('AppContext', message);
   }, []);
 
   const refreshPushState = useCallback(async () => {
@@ -285,6 +294,7 @@ export function AppContextProvider({ children }: Props) {
 
   const clearLogs = useCallback(() => {
     dispatch({ type: 'CLEAR_LOGS' });
+    logManager.clear();
   }, []);
 
   const loginUser = useCallback(async (externalUserId: string) => {
@@ -369,6 +379,12 @@ export function AppContextProvider({ children }: Props) {
     repository.clearTriggers();
     dispatch({ type: 'CLEAR_TRIGGERS' });
     addLog('All triggers cleared');
+  }, [addLog]);
+
+  const removeSelectedTriggers = useCallback(async (keys: string[]) => {
+    repository.removeTriggers(keys);
+    dispatch({ type: 'REMOVE_SELECTED_TRIGGERS', payload: keys });
+    addLog(`Removed ${keys.length} trigger(s)`);
   }, [addLog]);
 
   const sendIamTrigger = useCallback(async (iamType: string) => {
@@ -477,6 +493,7 @@ export function AppContextProvider({ children }: Props) {
     sendOutcomeWithValue,
     addTrigger,
     addTriggers,
+    removeSelectedTriggers,
     clearTriggers,
     trackEvent,
     setLocationShared,
@@ -507,6 +524,7 @@ export function AppContextProvider({ children }: Props) {
     sendOutcomeWithValue,
     addTrigger,
     addTriggers,
+    removeSelectedTriggers,
     clearTriggers,
     trackEvent,
     setLocationShared,

@@ -408,7 +408,70 @@ App root (`src/App.tsx`):
 - Uses `OneSignalRepository` and `PreferencesService` internally
 - Owns observer lifecycle and startup hydration effects
 
-### Prompt 8.2 - Remote tooltip content
+### Prompt 8.2 - Reusable Components
+
+Create reusable components in `src/components/` for Ionic + React:
+
+- `SectionCard.tsx`: section title, optional info button, children slot
+- `ToggleRow.tsx`: label, optional description, and toggle control
+- `ActionButton.tsx`: primary and outline variants, full width
+- `ListWidgets.tsx`: pair item, single item, empty state, and list wrappers
+- `LoadingOverlay.tsx`: full-screen blocking overlay driven by context loading state
+
+Guidelines:
+
+- Keep section spacing and card spacing consistent with the screenshot rules (12px section gap, 8px inner gap)
+- Use shared props and styles to avoid repeated per-section JSX/CSS
+
+### Prompt 8.3 - Reusable Multi-Pair Modal
+
+Aliases, Tags, and Triggers should share a reusable multi-pair modal.
+
+Behavior:
+
+- Opens full-width (content constrained with page padding)
+- Starts with one empty key/value row
+- "Add Row" adds another row
+- Row remove control hidden when only one row remains
+- "Add All" disabled until all fields are filled
+- Submits a `Record<string, string>` payload for bulk actions
+
+Used by:
+
+- Aliases -> `addAliases`
+- Tags -> `addTags`
+- Triggers -> `addTriggers`
+
+### Prompt 8.4 - Reusable Remove Multi Modal
+
+Tags and Triggers should share a reusable remove-selected modal.
+
+Behavior:
+
+- Accepts current items as `[string, string][]`
+- Displays checkbox rows using key label
+- Allows zero or more selections
+- Confirm button label includes count (`Remove (N)`) and is disabled when `N = 0`
+- Returns selected keys as `string[]`
+
+Used by:
+
+- Tags -> `removeSelectedTags`
+- Triggers -> `removeSelectedTriggers` (or equivalent clear/remove action)
+
+### Prompt 8.5 - Theme and Tokens
+
+Create shared theme tokens (for example in `src/theme/tokens.ts` or `src/theme.ts`):
+
+- Primary red (`#E54B4D` or app-approved equivalent)
+- Background, card, divider, warning colors
+- Typography sizes/weights for headers, labels, and row values
+- Spacing constants (`sectionGap = 12`, `cardGap = 8`)
+- Card radius and button radius tokens
+
+Apply these tokens consistently across all sections and dialogs.
+
+### Prompt 8.6 - Remote tooltip content
 
 Do not bundle local tooltip JSON.
 
@@ -416,14 +479,50 @@ Use:
 
 `https://raw.githubusercontent.com/OneSignal/sdk-shared/main/demo/tooltip_content.json`
 
-### Prompt 8.3 - Log view
+### Prompt 8.7 - Log View (Appium-Ready)
 
-Add a compact log panel for local debugging and Appium:
+Add a collapsible log view at the top of the screen for debugging and Appium.
 
-- Fixed height
-- Clear action
-- Auto-scroll to newest
-- Stable test ids on rows and controls
+Suggested files:
+
+- `src/services/LogManager.ts` - singleton logger with subscribers
+- `src/components/LogView.tsx` - sticky log component
+
+Log view requirements:
+
+- Sticky near top while content scrolls below
+- Fixed height (`~100px`)
+- Clear control (icon button)
+- Auto-scroll to newest entry
+- Uses shared logger stream + console forwarding (`debug/info/warn/error`)
+
+Appium labels (use `data-testid` in web/Ionic):
+
+| data-testid              | Description                    |
+|--------------------------|--------------------------------|
+| `log_view_container`     | Main log container             |
+| `log_view_header`        | Expand/collapse row            |
+| `log_view_count`         | Log count text                 |
+| `log_view_clear_button`  | Clear logs button              |
+| `log_view_list`          | Scrollable log list            |
+| `log_view_empty`         | Empty-state row                |
+| `log_entry_{N}`          | Log row container              |
+| `log_entry_{N}_timestamp`| Timestamp text                 |
+| `log_entry_{N}_level`    | Level badge/text               |
+| `log_entry_{N}_message`  | Log message text               |
+
+### Prompt 8.8 - User Feedback
+
+Show user feedback for important actions using Ionic-friendly UI (for example `IonToast` + inline validation text).
+
+Expected feedback coverage:
+
+- Login/logout
+- Alias/tag/trigger/email/SMS add/remove
+- Notification action success/failure
+- IAM trigger actions
+- Outcome and track event actions
+- Push and location toggle/permission actions
 
 ---
 
