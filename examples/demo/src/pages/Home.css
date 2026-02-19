@@ -1,0 +1,305 @@
+.demo-app {
+  background: #eef0f3;
+  min-height: 100%;
+  color: #1f2733;
+}
+
+.brand-header {
+  background: #eb4d52;
+  color: #fff;
+  height: 84px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.brand-title {
+  font-size: 20px;
+}
+
+.logs-panel {
+  background: #11151d;
+  color: #c9d0db;
+}
+
+.logs-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+}
+
+.logs-header strong {
+  color: #fff;
+}
+
+.icon-btn {
+  margin-left: auto;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.icon-btn + .icon-btn {
+  margin-left: 8px;
+}
+
+.logs-body {
+  max-height: 120px;
+  overflow: auto;
+  padding: 0 14px 10px;
+}
+
+.log-row {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 1.4;
+  padding: 2px 0;
+}
+
+.log-time {
+  color: #9aa6b7;
+}
+
+.log-level {
+  color: #8db8ff;
+  font-weight: 700;
+}
+
+.log-text {
+  color: #d8e0eb;
+}
+
+.content {
+  padding: 12px;
+}
+
+.section {
+  margin-bottom: 12px;
+}
+
+.section h2 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  letter-spacing: 0.7px;
+  color: #5f6670;
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.section-head h2 {
+  margin: 0;
+}
+
+.section-head .icon-btn {
+  margin-left: auto;
+  color: #737c89;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #dce0e5;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 8px;
+}
+
+.kv-card .kv-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.kv-card .kv-row span:last-child {
+  text-align: right;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.divider {
+  height: 1px;
+  margin: 12px 0;
+  background: #e4e7eb;
+}
+
+.tip-card {
+  background: #fff6df;
+  border-color: #f0d9a5;
+  color: #8f6c1f;
+}
+
+.tip-link {
+  color: #ea4d53;
+  font-weight: 700;
+  margin-top: 6px;
+}
+
+.toggle-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.label {
+  font-weight: 600;
+}
+
+.sub {
+  font-size: 13px;
+  color: #6f7782;
+  margin-top: 2px;
+}
+
+.action-btn {
+  width: 100%;
+  border: 0;
+  background: #ea4d53;
+  color: #fff;
+  border-radius: 12px;
+  height: 44px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  margin-bottom: 8px;
+}
+
+.action-btn.outline {
+  background: transparent;
+  border: 1px solid #e5979a;
+  color: #db4e54;
+}
+
+.list-card {
+  padding: 0;
+}
+
+.list-item {
+  padding: 12px 14px;
+  border-bottom: 1px solid #e4e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.list-item:last-child {
+  border-bottom: 0;
+}
+
+.list-item.two-line > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.list-item span {
+  color: #6d7580;
+}
+
+.empty {
+  text-align: center;
+  color: #9aa1aa;
+  margin: 20px 0;
+}
+
+.delete-btn {
+  border: 0;
+  background: transparent;
+  color: #ea4d53;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 10;
+}
+
+.modal-card {
+  width: min(640px, 100%);
+  background: #fff;
+  border-radius: 16px;
+  padding: 18px;
+}
+
+.modal-card h3 {
+  margin: 0 0 14px;
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.modal-card input,
+.modal-card textarea {
+  width: 100%;
+  border: 1px solid #ccd2da;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 17px;
+  margin-bottom: 10px;
+}
+
+.modal-card textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.inline-fields {
+  display: flex;
+  gap: 10px;
+}
+
+.row-with-remove {
+  align-items: center;
+}
+
+.text-btn {
+  background: transparent;
+  border: 0;
+  color: #ea4d53;
+  font-weight: 700;
+  margin: 4px 0 12px;
+}
+
+.checkbox-list label,
+.radio-list label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.modal-actions button {
+  border: 0;
+  background: transparent;
+  color: #5b636f;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.error {
+  color: #d33f45;
+  margin: 0;
+}

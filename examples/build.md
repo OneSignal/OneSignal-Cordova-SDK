@@ -139,8 +139,8 @@ Update `examples/demo/package.json` scripts to include:
     "setup": "../setup.sh",
     "preandroid": "bun run setup",
     "preios": "bun run setup",
-    "android": "npx ionic capacitor run android",
-    "ios": "npx ionic capacitor run ios"
+    "android": "ionic cap run android -l --external",
+    "ios": "ionic cap run ios -l --external"
   }
 }
 ```
@@ -411,6 +411,8 @@ cd examples/demo
 bun run android
 bun run ios
 ```
+
+These scripts run with live reload (`-l`) and external host binding (`--external`).
 
 If native state becomes stale:
 
