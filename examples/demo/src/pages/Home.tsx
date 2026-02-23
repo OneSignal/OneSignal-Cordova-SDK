@@ -144,7 +144,7 @@ const Home: React.FC = () => {
           <header className="brand-header">
             <div className="brand-title">
               <img className="brand-logo" src={oneSignalLogo} alt="OneSignal" />
-              <span className="brand-subtitle">Sample App</span>
+              <span className="brand-subtitle">Cordova</span>
             </div>
           </header>
           <LogView />

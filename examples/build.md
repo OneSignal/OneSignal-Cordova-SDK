@@ -110,7 +110,7 @@ Requirements:
 - Build with clean architecture: repository pattern + React Context + reducer state
 - TypeScript strict mode enabled
 - OneSignal brand colors with consistent token-based styling
-- Top header (app bar) is fixed/sticky, uses standard 56dp toolbar height (+ safe-area top inset), and shows OneSignal logo wordmark plus separate `Sample App` text
+- Top header (app bar) is fixed/sticky, uses standard 56dp toolbar height (+ safe-area top inset), and shows OneSignal logo wordmark plus separate `Cordova` text
 - Logs panel is fixed/sticky directly below the app bar
 - Support both Android and iOS native targets
 - Dialogs should open with EMPTY input fields for Appium entry
