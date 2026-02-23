@@ -413,15 +413,15 @@ App Section layout:
 
 3. Consent card with up to two toggles:
    a. `Consent Required` toggle (always visible):
-      - Label: `Consent Required`
-      - Description: `Require consent before SDK processes data`
-      - Calls `setConsentRequired(value)`
-   b. `Privacy Consent` toggle (only visible when Consent Required is ON):
-      - Label: `Privacy Consent`
-      - Description: `Consent given for data collection`
-      - Calls `setConsentGiven(value)`
-      - Separated from the above toggle by a horizontal divider
-      - NOT a blocking overlay — user can interact with app regardless of state
+   - Label: `Consent Required`
+   - Description: `Require consent before SDK processes data`
+   - Calls `setConsentRequired(value)`
+     b. `Privacy Consent` toggle (only visible when Consent Required is ON):
+   - Label: `Privacy Consent`
+   - Description: `Consent given for data collection`
+   - Calls `setConsentGiven(value)`
+   - Separated from the above toggle by a horizontal divider
+   - NOT a blocking overlay — user can interact with app regardless of state
 
 4. User status card (always visible, ABOVE the login/logout buttons):
    - Card with two rows separated by a divider
@@ -891,12 +891,6 @@ Create reusable components in `src/components/`:
 - Centered `IonSpinner`.
 - Controlled by `isLoading` from app context.
 
-`LogView.tsx`:
-
-- Sticky top debug panel with fixed height.
-- Clear button uses icon button style with icons from `react-icons/md`.
-- Auto-scroll to newest entries.
-
 `components/modals/*`:
 
 - Shared shells and focused modal components:
@@ -941,20 +935,18 @@ Behavior:
 
 ### Prompt 8.5 - Theme
 
-```
 Define shared design tokens as CSS custom properties on `:root` in `Home.css`.
 Do not use a `tokens.ts` file.
 
 All colors, spacing, typography, button styles, card styles, and component
 specs are defined in the shared style reference:
-  https://raw.githubusercontent.com/OneSignal/sdk-shared/refs/heads/main/demo/styles.md
+https://raw.githubusercontent.com/OneSignal/sdk-shared/refs/heads/main/demo/styles.md
 
 Map the style reference values to CSS custom properties (e.g. --color-primary,
 --space-card-gap, --radius-card, --font-size-body, etc.) and use them
 throughout `Home.css`.
 
 Avoid inline `style` attributes in TSX — use CSS classes instead.
-```
 
 ### Prompt 8.6 - Log View (Appium-Ready)
 
@@ -965,13 +957,19 @@ Files:
 - `src/services/LogManager.ts` (singleton logger + subscribers)
 - `src/components/LogView.tsx` (UI viewer)
 
-Behavior:
+LogManager Features:
 
-- Sticky top panel, fixed ~100px height.
-- Expand/collapse support (default expanded).
-- Clear logs icon button (not text-only).
-- Auto-scroll to newest entries.
-- Console forwarding for `debug/info/warn/error`.
+- Singleton with subscriber callbacks for reactive UI updates
+- API: LogManager.getInstance().d(tag, message), .i(), .w(), .e()
+- Console forwarding for debug/info/warn/error
+- Notifies listeners with new entry only (null on clear)
+
+LogView Features:
+
+- Refer to the Logs View section of the shared style reference for layout, colors, and typography
+- Header sits above the list; 100px height applies to the list area only
+- Newest entries at the top
+- Clear icon only visible when entries exist
 
 Appium ids:
 

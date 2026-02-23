@@ -30,26 +30,33 @@ const LogView: FC = () => {
 
   return (
     <section className="logview-panel" data-testid="log_view_container">
-      <div className="logview-header" data-testid="log_view_header">
+      <div
+        className="logview-header"
+        data-testid="log_view_header"
+        onClick={() => setCollapsed((value) => !value)}
+      >
         <strong>LOGS</strong>
-        <span className="logview-count" data-testid="log_view_count">{countText}</span>
+        <span className="logview-count" data-testid="log_view_count">
+          {countText}
+        </span>
         <button
           className="icon-btn"
-          onClick={() => manager.clear()}
+          onClick={(e) => {
+            e.stopPropagation();
+            manager.clear();
+          }}
           type="button"
           aria-label="Clear logs"
           data-testid="log_view_clear_button"
         >
           <MdDelete />
         </button>
-        <button
-          className="icon-btn logview-collapse-btn"
-          onClick={() => setCollapsed((value) => !value)}
-          type="button"
+        <span
+          className="icon-btn"
           aria-label={collapsed ? 'Expand logs' : 'Collapse logs'}
         >
           {collapsed ? <MdKeyboardArrowDown /> : <MdKeyboardArrowUp />}
-        </button>
+        </span>
       </div>
       {!collapsed ? (
         <div
