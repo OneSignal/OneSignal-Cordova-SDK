@@ -26,6 +26,7 @@ const OutcomeModal: FC<OutcomeModalProps> = ({ open, onClose, onSubmit }) => {
   return (
     <ModalShell open={open}>
       <form
+        autoCapitalize="off"
         className="outcome-modal"
         onSubmit={(event) => {
           event.preventDefault();

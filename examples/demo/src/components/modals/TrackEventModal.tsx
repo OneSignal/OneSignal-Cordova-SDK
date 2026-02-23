@@ -32,6 +32,7 @@ const TrackEventModal: FC<TrackEventModalProps> = ({
   return (
     <ModalShell open={open}>
       <form
+        autoCapitalize="off"
         onSubmit={(event) => {
           event.preventDefault();
           const trimmedName = name.trim();

@@ -32,7 +32,7 @@ const LogView: FC = () => {
     <section className="logview-panel" data-testid="log_view_container">
       <div className="logview-header" data-testid="log_view_header">
         <strong>LOGS</strong>
-        <span data-testid="log_view_count">{countText}</span>
+        <span className="logview-count" data-testid="log_view_count">{countText}</span>
         <button
           className="icon-btn"
           onClick={() => manager.clear()}
@@ -43,7 +43,7 @@ const LogView: FC = () => {
           <MdDelete />
         </button>
         <button
-          className="icon-btn"
+          className="icon-btn logview-collapse-btn"
           onClick={() => setCollapsed((value) => !value)}
           type="button"
           aria-label={collapsed ? 'Expand logs' : 'Collapse logs'}
@@ -71,7 +71,7 @@ const LogView: FC = () => {
                   {entry.timestamp}
                 </span>
                 <span
-                  className="log-level"
+                  className={`log-level log-level-${entry.level.toLowerCase()}`}
                   data-testid={`log_entry_${index}_level`}
                 >
                   {entry.level}

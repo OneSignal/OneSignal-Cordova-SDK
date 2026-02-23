@@ -26,6 +26,7 @@ const CustomNotificationModal: FC<CustomNotificationModalProps> = ({
   return (
     <ModalShell open={open}>
       <form
+        autoCapitalize="off"
         onSubmit={(event) => {
           event.preventDefault();
           const trimmedTitle = title.trim();

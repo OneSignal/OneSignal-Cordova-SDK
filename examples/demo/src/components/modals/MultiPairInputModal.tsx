@@ -42,6 +42,7 @@ const MultiPairInputModal: FC<MultiPairInputModalProps> = ({
   return (
     <ModalShell open={open}>
       <form
+        autoCapitalize="off"
         onSubmit={(event) => {
           event.preventDefault();
           if (!isValid) return;

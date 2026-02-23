@@ -30,6 +30,7 @@ const SingleInputModal: FC<SingleInputModalProps> = ({
   return (
     <ModalShell open={open}>
       <form
+        autoCapitalize="off"
         onSubmit={(event) => {
           event.preventDefault();
           const trimmed = value.trim();

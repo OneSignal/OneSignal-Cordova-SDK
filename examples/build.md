@@ -52,7 +52,7 @@ Pay close attention to:
 - List item layout (stacked vs inline key-value)
 - Icon choices (delete, close, info, etc.)
 - Typography, spacing, and colors
-- Spacing: 12px gap between sections, 8px gap between cards/buttons within a section
+- Spacing between sections, cards, and buttons (see shared style reference)
 
 You can also interact with the reference app to observe specific flows:
 
@@ -431,7 +431,7 @@ App Section layout:
      - Status shows `Anonymous`
      - External ID shows `–` (dash)
    - When logged in:
-     - Status shows `Logged In` with green styling (`#2E7D32`)
+     - Status shows `Logged In` with success color styling
      - External ID shows the actual external user ID
 
 5. `LOGIN USER` button:
@@ -941,41 +941,20 @@ Behavior:
 
 ### Prompt 8.5 - Theme
 
-Define shared design tokens as CSS custom properties on `:root` in `Home.css`. Do not use a `tokens.ts` file.
+```
+Define shared design tokens as CSS custom properties on `:root` in `Home.css`.
+Do not use a `tokens.ts` file.
 
-Colors:
+All colors, spacing, typography, button styles, card styles, and component
+specs are defined in the shared style reference:
+  https://raw.githubusercontent.com/OneSignal/sdk-shared/refs/heads/main/demo/styles.md
 
-- `--color-primary: #E54B4D`
-- `--color-success: #34A853`
-- `--color-success-subtle: #E6F4EA`
-- `--color-background: #F8F9FA`
-- `--color-card: #FFFFFF`
-- `--color-divider: #E8EAED`
-- `--color-warning-bg: #FFF8E1`
-- `--color-text-primary: #1F2733`
-- `--color-text-secondary: #6F7782`
+Map the style reference values to CSS custom properties (e.g. --color-primary,
+--space-card-gap, --radius-card, --font-size-body, etc.) and use them
+throughout `Home.css`.
 
-Spacing:
-
-- `--space-card-gap: 8px`
-- `--space-section-gap: 12px`
-- `--space-page-padding: 12px`
-
-Typography:
-
-- `--font-size-section-header: 12px`
-- `--font-size-body-large: 16px`
-- `--font-size-body: 14px`
-- `--font-size-caption: 13px`
-- `--font-size-mono: 12px`
-
-Radii:
-
-- `--radius-card: 12px`
-- `--radius-button: 8px`
-- `--radius-modal: 16px`
-
-Use these variables throughout `Home.css`. Avoid inline `style` attributes in TSX — use CSS classes instead.
+Avoid inline `style` attributes in TSX — use CSS classes instead.
+```
 
 ### Prompt 8.6 - Log View (Appium-Ready)
 
@@ -1128,7 +1107,6 @@ examples/demo/
     │   ├── Home.tsx                          # Main demo screen composition
     │   └── Home.css                          # Home page visual styles
     ├── theme/
-    │   ├── tokens.ts                         # Theme tokens shared by components
     │   └── variables.css                     # Ionic CSS variable overrides
     └── assets/
         └── onesignal_logo.svg               # Brand asset used in header

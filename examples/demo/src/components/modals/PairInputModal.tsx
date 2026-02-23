@@ -34,6 +34,7 @@ const PairInputModal: FC<PairInputModalProps> = ({
   return (
     <ModalShell open={open}>
       <form
+        autoCapitalize="off"
         onSubmit={(event) => {
           event.preventDefault();
           const firstValue = first.trim();
