@@ -1,5 +1,7 @@
-import type { FC } from 'react';
+import { type FC, useState } from 'react';
 import { MdClose } from 'react-icons/md';
+
+const COLLAPSE_THRESHOLD = 5;
 
 export type PairItem = {
   key: string;
@@ -36,7 +38,7 @@ export const PairList: FC<PairListProps> = ({
       items.map((item) => (
         <div key={item.key} className="list-item two-line">
           <div>
-            <strong>{item.key}</strong>
+            <span className="list-key">{item.key}</span>
             <span>{item.value}</span>
           </div>
           {onRemove ? (
@@ -60,25 +62,43 @@ export const SingleList: FC<SingleListProps> = ({
   items,
   emptyText,
   onRemove,
-}) => (
-  <div className="card list-card">
-    {items.length ? (
-      items.map((item) => (
-        <div key={item} className="list-item">
-          <span>{item}</span>
-          {onRemove ? (
+}) => {
+  const [expanded, setExpanded] = useState(false);
+  const showAll = expanded || items.length <= COLLAPSE_THRESHOLD;
+  const displayItems = showAll ? items : items.slice(0, COLLAPSE_THRESHOLD);
+  const hiddenCount = items.length - COLLAPSE_THRESHOLD;
+
+  return (
+    <div className="card list-card">
+      {items.length ? (
+        <>
+          {displayItems.map((item) => (
+            <div key={item} className="list-item">
+              <span>{item}</span>
+              {onRemove ? (
+                <button
+                  type="button"
+                  className="delete-btn"
+                  onClick={() => onRemove(item)}
+                >
+                  <MdClose />
+                </button>
+              ) : null}
+            </div>
+          ))}
+          {!showAll && hiddenCount > 0 && (
             <button
               type="button"
-              className="delete-btn"
-              onClick={() => onRemove(item)}
+              className="more-link"
+              onClick={() => setExpanded(true)}
             >
-              <MdClose />
+              {hiddenCount} more
             </button>
-          ) : null}
-        </div>
-      ))
-    ) : (
-      <EmptyState text={emptyText} />
-    )}
-  </div>
-);
+          )}
+        </>
+      ) : (
+        <EmptyState text={emptyText} />
+      )}
+    </div>
+  );
+};

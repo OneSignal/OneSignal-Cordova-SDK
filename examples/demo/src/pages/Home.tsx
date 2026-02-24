@@ -15,6 +15,7 @@ import TooltipModal from '../components/modals/TooltipModal';
 import TrackEventModal from '../components/modals/TrackEventModal';
 import AliasesSection from '../components/sections/AliasesSection';
 import AppSection from '../components/sections/AppSection';
+import UserSection from '../components/sections/UserSection';
 import EmailsSection from '../components/sections/EmailsSection';
 import InAppSection from '../components/sections/InAppSection';
 import LocationSection from '../components/sections/LocationSection';
@@ -154,7 +155,6 @@ const Home: React.FC = () => {
               appId={state.appId}
               consentRequired={state.consentRequired}
               privacyConsentGiven={state.privacyConsentGiven}
-              externalUserId={state.externalUserId}
               onToggleConsent={(checked) =>
                 runAction(`Consent required: ${checked}`, () =>
                   setConsentRequired(checked),
@@ -165,6 +165,10 @@ const Home: React.FC = () => {
                   setConsentGiven(checked),
                 )
               }
+            />
+
+            <UserSection
+              externalUserId={state.externalUserId}
               onLogin={() => setDialog({ type: 'login' })}
               onLogout={() => runAction('Logged out', logoutUser)}
             />
@@ -338,7 +342,7 @@ const Home: React.FC = () => {
           open={dialog.type === 'login'}
           title="Login User"
           placeholder="External User Id"
-          confirmLabel="Add"
+          confirmLabel="Login"
           onClose={closeDialog}
           onSubmit={(value) =>
             runAction(`Logged in as ${value}`, async () => {

@@ -1,30 +1,21 @@
 import { IonToggle } from '@ionic/react';
 import type { FC } from 'react';
-import ActionButton from '../ActionButton';
 
 interface AppSectionProps {
   appId: string;
   consentRequired: boolean;
   privacyConsentGiven: boolean;
-  externalUserId: string | undefined;
   onToggleConsent: (checked: boolean) => void;
   onTogglePrivacyConsent: (checked: boolean) => void;
-  onLogin: () => void;
-  onLogout: () => void;
 }
 
 const AppSection: FC<AppSectionProps> = ({
   appId,
   consentRequired,
   privacyConsentGiven,
-  externalUserId,
   onToggleConsent,
   onTogglePrivacyConsent,
-  onLogin,
-  onLogout,
 }) => {
-  const isLoggedIn = Boolean(externalUserId);
-
   return (
     <section className="section">
       <h2>APP</h2>
@@ -69,27 +60,6 @@ const AppSection: FC<AppSectionProps> = ({
           </>
         ) : null}
       </div>
-      <div className="card kv-card">
-        <div className="kv-row">
-          <span>Status</span>
-          <span className={isLoggedIn ? 'text-success' : undefined}>
-            {isLoggedIn ? 'Logged In' : 'Anonymous'}
-          </span>
-        </div>
-        <div className="divider" />
-        <div className="kv-row">
-          <span>External ID</span>
-          <span className="id-value">{externalUserId ?? '–'}</span>
-        </div>
-      </div>
-      <ActionButton type="button" onClick={onLogin}>
-        {isLoggedIn ? 'SWITCH USER' : 'LOGIN USER'}
-      </ActionButton>
-      {isLoggedIn ? (
-        <ActionButton variant="outline" type="button" onClick={onLogout}>
-          LOGOUT USER
-        </ActionButton>
-      ) : null}
     </section>
   );
 };

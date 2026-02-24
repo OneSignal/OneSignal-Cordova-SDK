@@ -122,7 +122,7 @@ Asset requirements:
   `https://raw.githubusercontent.com/OneSignal/sdk-shared/refs/heads/main/assets/onesignal_logo.svg`
 - Save to demo assets (for example `src/assets/onesignal_logo.svg`) and render it in the header component used by this demo (`src/pages/Home.tsx`) via import:
   `import OneSignalLogo from '../assets/onesignal_logo.svg';`
-- Use the logo as the `OneSignal` wordmark and show separate `Sample App` text
+- Use the logo as the `OneSignal` wordmark and show separate `Cordova` text
 - Do not inline long SVG paths in `Home.tsx`/header JSX
 
 - Download padded icon PNG:
@@ -442,7 +442,7 @@ User Section layout (separate section card titled "User", placed after App Secti
 2. `LOGIN USER` button:
    - Shows `LOGIN USER` when no user is logged in
    - Shows `SWITCH USER` when a user is logged in
-   - Opens modal with empty `External User Id` field
+   - Opens "Login User" modal with empty `External User Id` field
 
 3. `LOGOUT USER` button (only visible when a user is logged in)
 
@@ -507,8 +507,8 @@ Send In-App Message Section:
 Aliases Section:
 
 - Section title includes info icon (use `MdInfoOutline` from `react-icons/md`).
-- List showing key-value pairs (read-only, no delete icons).
-- Each item shows: Label | ID.
+- Stacked key-value list (read-only, no delete icons).
+- Each item shows Label on top, ID below (see styles.md "Stacked" list layout).
 - Hide special alias keys from display:
   - `external_id`
   - `onesignal_id`
