@@ -247,13 +247,15 @@ describe('Notifications', () => {
         [],
       );
 
-      mockExec.mockClear();
+      // Capture the callback before adding second listener
+      const foregroundCallback = mockExec.mock.calls[0][0];
+
       const mockListener2 = vi.fn();
       notifications.addEventListener('foregroundWillDisplay', mockListener2);
 
       // can call display event listeners
       const notificationData = mockNotification();
-      mockExec.mock.calls[0][0](notificationData);
+      foregroundCallback(notificationData);
 
       const displayEvent = new NotificationWillDisplayEvent(notificationData);
       expect(mockListener).toHaveBeenCalledWith(displayEvent);
@@ -295,6 +297,56 @@ describe('Notifications', () => {
       notifications.addEventListener('unknown', mockListener);
 
       expect(window.cordova.exec).not.toHaveBeenCalled();
+    });
+
+    test('should only register native handler once for multiple click listeners', () => {
+      const handler1 = vi.fn();
+      const handler2 = vi.fn();
+      const handler3 = vi.fn();
+
+      // Add first listener - should register native handler
+      notifications.addEventListener('click', handler1);
+      expect(window.cordova.exec).toHaveBeenCalledTimes(1);
+
+      // Add second listener - should NOT register native handler again
+      notifications.addEventListener('click', handler2);
+      expect(window.cordova.exec).toHaveBeenCalledTimes(1);
+
+      // Add third listener - should still be only one registration
+      notifications.addEventListener('click', handler3);
+      expect(window.cordova.exec).toHaveBeenCalledTimes(1);
+
+      // Trigger the event
+      const clickData = mockNotificationClickEvent();
+      mockExec.mock.calls[0][0](clickData);
+
+      // All handlers should execute exactly once
+      expect(handler1).toHaveBeenCalledTimes(1);
+      expect(handler1).toHaveBeenCalledWith(clickData);
+      expect(handler2).toHaveBeenCalledTimes(1);
+      expect(handler2).toHaveBeenCalledWith(clickData);
+      expect(handler3).toHaveBeenCalledTimes(1);
+      expect(handler3).toHaveBeenCalledWith(clickData);
+    });
+
+    test('should only register native handler once for multiple foregroundWillDisplay listeners', () => {
+      const handler1 = vi.fn();
+      const handler2 = vi.fn();
+
+      notifications.addEventListener('foregroundWillDisplay', handler1);
+      notifications.addEventListener('foregroundWillDisplay', handler2);
+
+      expect(window.cordova.exec).toHaveBeenCalledTimes(1);
+    });
+
+    test('should only register native handler once for multiple permissionChange listeners', () => {
+      const handler1 = vi.fn();
+      const handler2 = vi.fn();
+
+      notifications.addEventListener('permissionChange', handler1);
+      notifications.addEventListener('permissionChange', handler2);
+
+      expect(window.cordova.exec).toHaveBeenCalledTimes(1);
     });
   });
 

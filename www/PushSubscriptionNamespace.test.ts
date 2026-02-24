@@ -243,6 +243,35 @@ describe('PushSubscription', () => {
       expect(mockListener).toHaveBeenCalledWith(SUB_CHANGED_STATE);
       expect(mockListener2).toHaveBeenCalledWith(SUB_CHANGED_STATE);
     });
+
+    test('should only register native handler once for multiple listeners', () => {
+      const handler1 = vi.fn();
+      const handler2 = vi.fn();
+      const handler3 = vi.fn();
+
+      // Add first listener - should register native handler
+      pushSubscription.addEventListener('change', handler1);
+      expect(window.cordova.exec).toHaveBeenCalledTimes(1);
+
+      // Add second listener - should NOT register native handler again
+      pushSubscription.addEventListener('change', handler2);
+      expect(window.cordova.exec).toHaveBeenCalledTimes(1);
+
+      // Add third listener - should still be only one registration
+      pushSubscription.addEventListener('change', handler3);
+      expect(window.cordova.exec).toHaveBeenCalledTimes(1);
+
+      // Trigger the event
+      mockExec.mock.calls[0][0](SUB_CHANGED_STATE);
+
+      // All handlers should execute exactly once
+      expect(handler1).toHaveBeenCalledTimes(1);
+      expect(handler1).toHaveBeenCalledWith(SUB_CHANGED_STATE);
+      expect(handler2).toHaveBeenCalledTimes(1);
+      expect(handler2).toHaveBeenCalledWith(SUB_CHANGED_STATE);
+      expect(handler3).toHaveBeenCalledTimes(1);
+      expect(handler3).toHaveBeenCalledWith(SUB_CHANGED_STATE);
+    });
   });
 
   describe('removeEventListener', () => {

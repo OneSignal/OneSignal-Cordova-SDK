@@ -90,6 +90,79 @@ describe('InAppMessages', () => {
 
       expect(window.cordova.exec).not.toHaveBeenCalled();
     });
+
+    test('should only register native handler once for multiple listeners of same event type', () => {
+      const handler1 = vi.fn();
+      const handler2 = vi.fn();
+      const handler3 = vi.fn();
+
+      // Add first listener - should register native handler
+      inAppMessages.addEventListener('click', handler1);
+      expect(window.cordova.exec).toHaveBeenCalledTimes(1);
+
+      // Add second listener - should NOT register native handler again
+      inAppMessages.addEventListener('click', handler2);
+      expect(window.cordova.exec).toHaveBeenCalledTimes(1);
+
+      // Add third listener - should still be only one registration
+      inAppMessages.addEventListener('click', handler3);
+      expect(window.cordova.exec).toHaveBeenCalledTimes(1);
+
+      // Trigger the event with click data
+      const clickData = {
+        message: { messageId: 'test' },
+        result: { closingMessage: true, actionId: 'test' },
+      };
+      mockExec.mock.calls[0][0](clickData);
+
+      // All handlers should execute exactly once
+      expect(handler1).toHaveBeenCalledTimes(1);
+      expect(handler1).toHaveBeenCalledWith(clickData);
+      expect(handler2).toHaveBeenCalledTimes(1);
+      expect(handler2).toHaveBeenCalledWith(clickData);
+      expect(handler3).toHaveBeenCalledTimes(1);
+      expect(handler3).toHaveBeenCalledWith(clickData);
+    });
+
+    test('should only register native handler once for willDisplay event', () => {
+      const handler1 = vi.fn();
+      const handler2 = vi.fn();
+
+      inAppMessages.addEventListener('willDisplay', handler1);
+      inAppMessages.addEventListener('willDisplay', handler2);
+
+      expect(window.cordova.exec).toHaveBeenCalledTimes(1);
+    });
+
+    test('should only register native handler once for didDisplay event', () => {
+      const handler1 = vi.fn();
+      const handler2 = vi.fn();
+
+      inAppMessages.addEventListener('didDisplay', handler1);
+      inAppMessages.addEventListener('didDisplay', handler2);
+
+      expect(window.cordova.exec).toHaveBeenCalledTimes(1);
+    });
+
+    test('should only register native handler once for willDismiss event', () => {
+      const handler1 = vi.fn();
+      const handler2 = vi.fn();
+
+      inAppMessages.addEventListener('willDismiss', handler1);
+      inAppMessages.addEventListener('willDismiss', handler2);
+
+      expect(window.cordova.exec).toHaveBeenCalledTimes(1);
+    });
+
+    test('should only register native handler once for didDismiss event', () => {
+      const handler1 = vi.fn();
+      const handler2 = vi.fn();
+
+      inAppMessages.addEventListener('didDismiss', handler1);
+      inAppMessages.addEventListener('didDismiss', handler2);
+
+      expect(window.cordova.exec).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('removeEventListener', () => {
