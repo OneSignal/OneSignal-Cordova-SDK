@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   MdDelete,
   MdKeyboardArrowDown,
@@ -14,19 +14,16 @@ const manager = LogManager.getInstance();
 const LogView: FC = () => {
   const [entries, setEntries] = useState<LogEntry[]>([]);
   const [collapsed, setCollapsed] = useState(false);
-  const scrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    return manager.subscribe(setEntries);
+    return manager.subscribe((entry) => {
+      if (entry) {
+        setEntries((prev) => [entry, ...prev]);
+      } else {
+        setEntries([]);
+      }
+    });
   }, []);
-
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = 0;
-    }
-  }, [entries]);
-
-  const countText = useMemo(() => `(${entries.length})`, [entries.length]);
 
   return (
     <section className="logview-panel" data-testid="log_view_container">
@@ -37,20 +34,22 @@ const LogView: FC = () => {
       >
         <strong>LOGS</strong>
         <span className="logview-count" data-testid="log_view_count">
-          {countText}
+          ({entries.length})
         </span>
-        <button
-          className="icon-btn"
-          onClick={(e) => {
-            e.stopPropagation();
-            manager.clear();
-          }}
-          type="button"
-          aria-label="Clear logs"
-          data-testid="log_view_clear_button"
-        >
-          <MdDelete />
-        </button>
+        {entries.length > 0 && (
+          <button
+            className="icon-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              manager.clear();
+            }}
+            type="button"
+            aria-label="Clear logs"
+            data-testid="log_view_clear_button"
+          >
+            <MdDelete />
+          </button>
+        )}
         <span
           className="icon-btn"
           aria-label={collapsed ? 'Expand logs' : 'Collapse logs'}
@@ -59,11 +58,7 @@ const LogView: FC = () => {
         </span>
       </div>
       {!collapsed ? (
-        <div
-          className="logview-body"
-          ref={scrollRef}
-          data-testid="log_view_list"
-        >
+        <div className="logview-body" data-testid="log_view_list">
           {entries.length ? (
             entries.map((entry, index) => (
               <div
@@ -87,7 +82,7 @@ const LogView: FC = () => {
                   className="log-text"
                   data-testid={`log_entry_${index}_message`}
                 >
-                  {entry.message}
+                  {entry.tag}: {entry.message}
                 </span>
               </div>
             ))

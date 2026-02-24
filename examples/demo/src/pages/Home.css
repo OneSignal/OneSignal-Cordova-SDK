@@ -10,6 +10,12 @@
   --os-divider: #e8eaed;
   --os-warning-background: #fff8e1;
   --os-overlay-scrim: rgba(0, 0, 0, 0.26);
+  --os-log-background: #1a1b1e;
+  --os-log-debug: #82aaff;
+  --os-log-info: #c3e88d;
+  --os-log-warn: #ffcb6b;
+  --os-log-error: #ff5370;
+  --os-log-timestamp: #676e7b;
 
   /* Spacing */
   --space-card-gap: 8px;

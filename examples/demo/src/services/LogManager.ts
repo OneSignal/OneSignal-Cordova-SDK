@@ -3,10 +3,11 @@ export type LogLevel = 'D' | 'I' | 'W' | 'E';
 export interface LogEntry {
   timestamp: string;
   level: LogLevel;
+  tag: string;
   message: string;
 }
 
-type LogListener = (entries: LogEntry[]) => void;
+type LogListener = (entry: LogEntry | null) => void;
 
 export default class LogManager {
   private static instance: LogManager | null = null;
@@ -21,9 +22,12 @@ export default class LogManager {
     return LogManager.instance;
   }
 
+  getEntries(): LogEntry[] {
+    return this.entries;
+  }
+
   subscribe(listener: LogListener): () => void {
     this.listeners.add(listener);
-    listener(this.entries);
     return () => {
       this.listeners.delete(listener);
     };
@@ -31,44 +35,41 @@ export default class LogManager {
 
   clear(): void {
     this.entries = [];
-    this.emit();
+    this.emit(null);
   }
 
   d(tag: string, message: string): void {
-    this.append('D', `[${tag}] ${message}`);
+    this.append('D', tag, message);
     console.log(`[D][${tag}] ${message}`);
   }
 
   i(tag: string, message: string): void {
-    this.append('I', `[${tag}] ${message}`);
+    this.append('I', tag, message);
     console.log(`[I][${tag}] ${message}`);
   }
 
   w(tag: string, message: string): void {
-    this.append('W', `[${tag}] ${message}`);
+    this.append('W', tag, message);
     console.warn(`[W][${tag}] ${message}`);
   }
 
   e(tag: string, message: string): void {
-    this.append('E', `[${tag}] ${message}`);
+    this.append('E', tag, message);
     console.error(`[E][${tag}] ${message}`);
   }
 
-  private append(level: LogLevel, message: string): void {
-    const timestamp = new Date().toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false,
-    });
-    this.entries = [{ timestamp, level, message }, ...this.entries].slice(
-      0,
-      100,
-    );
-    this.emit();
+  private append(level: LogLevel, tag: string, message: string): void {
+    const now = new Date();
+    const timestamp = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+    const entry: LogEntry = { timestamp, level, tag, message };
+    this.entries.unshift(entry);
+    if (this.entries.length > 100) {
+      this.entries.length = 100;
+    }
+    this.emit(entry);
   }
 
-  private emit(): void {
-    this.listeners.forEach((listener) => listener(this.entries));
+  private emit(entry: LogEntry | null): void {
+    this.listeners.forEach((listener) => listener(entry));
   }
 }

@@ -385,22 +385,23 @@ Ionic + Capacitor notes:
 
 ### Section Order (top to bottom)
 
-1. **App Section** (App ID input, guidance text, consent required toggle, logged-in state, login/logout actions)
-2. **Push Section** (Push subscription ID, push enabled toggle, permission state, auto-prompt on startup)
-3. **Send Push Notification Section** (Simple, With Image, and Custom notification actions)
-4. **In-App Messaging Section** (IAM paused toggle and lifecycle log visibility)
-5. **Send In-App Message Section** (Top Banner, Bottom Banner, Center Modal, Full Screen trigger actions)
-6. **Aliases Section** (Add, Add Multiple, Remove, read-only key/value list)
-7. **Emails Section** (Add/Remove with list display, collapsible behavior for longer lists)
-8. **SMS Section** (Add/Remove with list display, collapsible behavior for longer lists)
-9. **Tags Section** (Add, Add Multiple, Remove Selected)
-10. **Outcome Events Section** (Send Outcome flow with outcome type selection)
-11. **Triggers Section** (Add, Add Multiple, Remove Selected, Clear All - IN MEMORY ONLY)
-12. **Track Event Section** (Track event with JSON validation for properties)
-13. **Location Section** (Location Shared toggle and Prompt Location action)
-14. **Next Page/Activity Button**
+1. **App Section** (App ID input, guidance text, consent required toggle)
+2. **User Section** (Logged-in state, login/logout actions)
+3. **Push Section** (Push subscription ID, push enabled toggle, permission state, auto-prompt on startup)
+4. **Send Push Notification Section** (Simple, With Image, and Custom notification actions)
+5. **In-App Messaging Section** (IAM paused toggle and lifecycle log visibility)
+6. **Send In-App Message Section** (Top Banner, Bottom Banner, Center Modal, Full Screen trigger actions)
+7. **Aliases Section** (Add, Add Multiple, Remove, read-only key/value list)
+8. **Emails Section** (Add/Remove with list display, collapsible behavior for longer lists)
+9. **SMS Section** (Add/Remove with list display, collapsible behavior for longer lists)
+10. **Tags Section** (Add, Add Multiple, Remove Selected)
+11. **Outcome Events Section** (Send Outcome flow with outcome type selection)
+12. **Triggers Section** (Add, Add Multiple, Remove Selected, Clear All - IN MEMORY ONLY)
+13. **Track Event Section** (Track event with JSON validation for properties)
+14. **Location Section** (Location Shared toggle and Prompt Location action)
+15. **Next Page/Activity Button**
 
-### Prompt 2.1 - App Section
+### Prompt 2.1a - App Section
 
 App Section layout:
 
@@ -423,7 +424,11 @@ App Section layout:
    - Separated from the above toggle by a horizontal divider
    - NOT a blocking overlay — user can interact with app regardless of state
 
-4. User status card (always visible, ABOVE the login/logout buttons):
+### Prompt 2.1b - User Section
+
+User Section layout (separate section card titled "User", placed after App Section):
+
+1. User status card (always visible, ABOVE the login/logout buttons):
    - Card with two rows separated by a divider
    - Row 1: `Status` label on the left, value on the right
    - Row 2: `External ID` label on the left, value on the right
@@ -434,12 +439,12 @@ App Section layout:
      - Status shows `Logged In` with success color styling
      - External ID shows the actual external user ID
 
-5. `LOGIN USER` button:
+2. `LOGIN USER` button:
    - Shows `LOGIN USER` when no user is logged in
    - Shows `SWITCH USER` when a user is logged in
    - Opens modal with empty `External User Id` field
 
-6. `LOGOUT USER` button (only visible when a user is logged in)
+3. `LOGOUT USER` button (only visible when a user is logged in)
 
 ### Prompt 2.2 - Push Section
 
