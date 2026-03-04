@@ -103,7 +103,7 @@ jobs:
 
       - name: Setup Capacitor
         run: |
-          cd example/IonicCapOneSignal
+          cd examples/demo
           bun run build
 
       - name: Update Android SDK version
@@ -125,7 +125,7 @@ jobs:
           sed -i '' 's|<framework src="com\.onesignal:OneSignal:[^"]*" />|<framework src="com.onesignal:OneSignal:'"$VERSION"'" />|' plugin.xml
           echo "✓ Updated plugin.xml with Android SDK ${VERSION}"
 
-          cd example/IonicCapOneSignal
+          cd examples/demo
           bunx cap sync android
 
           # Only commit if there are changes
@@ -153,7 +153,7 @@ jobs:
           echo "✓ Updated plugin.xml with iOS SDK ${VERSION}"
 
           # Need to regenerate the Podfile.lock
-          cd example/IonicCapOneSignal/ios/App
+          cd examples/demo/ios/App
           rm -f Podfile.lock
           cd ../..
           bunx cap sync ios
