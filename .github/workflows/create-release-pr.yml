@@ -79,14 +79,6 @@ jobs:
       - name: Setup Git User
         uses: OneSignal/sdk-shared/.github/actions/setup-git-user@main
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      - name: Install
-        run: bun install --frozen-lockfile
-
       - name: Get current native SDK versions from target branch
         id: current_versions
         run: |
@@ -100,11 +92,6 @@ jobs:
           echo "cordova_from=$CURRENT_VERSION" >> $GITHUB_OUTPUT
           echo "android_from=$ANDROID_VERSION" >> $GITHUB_OUTPUT
           echo "ios_from=$IOS_VERSION" >> $GITHUB_OUTPUT
-
-      - name: Setup Capacitor
-        run: |
-          cd examples/demo
-          bun run build
 
       - name: Update Android SDK version
         if: inputs.android_version != ''
@@ -124,9 +111,6 @@ jobs:
           # mac os sed syntax
           sed -i '' 's|<framework src="com\.onesignal:OneSignal:[^"]*" />|<framework src="com.onesignal:OneSignal:'"$VERSION"'" />|' plugin.xml
           echo "✓ Updated plugin.xml with Android SDK ${VERSION}"
-
-          cd examples/demo
-          bunx cap sync android
 
           # Only commit if there are changes
           git add -A
@@ -151,12 +135,6 @@ jobs:
           # mac os sed syntax
           sed -i '' "s|<pod name=\"OneSignalXCFramework\" spec=\"[^\"]*\" />|<pod name=\"OneSignalXCFramework\" spec=\"${VERSION}\" />|" plugin.xml
           echo "✓ Updated plugin.xml with iOS SDK ${VERSION}"
-
-          # Need to regenerate the Podfile.lock
-          cd examples/demo/ios/App
-          rm -f Podfile.lock
-          cd ../..
-          bunx cap sync ios
 
           # Only commit if there are changes
           git add -A
