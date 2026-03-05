@@ -18,7 +18,11 @@ interface SendIamSectionProps {
 
 const iamButtons: { label: string; icon: ReactNode; key: string }[] = [
   { label: 'TOP BANNER', icon: <MdOutlineVerticalAlignTop />, key: 'top' },
-  { label: 'BOTTOM BANNER', icon: <MdOutlineVerticalAlignBottom />, key: 'bottom' },
+  {
+    label: 'BOTTOM BANNER',
+    icon: <MdOutlineVerticalAlignBottom />,
+    key: 'bottom',
+  },
   { label: 'CENTER MODAL', icon: <MdCropSquare />, key: 'center' },
   { label: 'FULL SCREEN', icon: <MdFullscreen />, key: 'full' },
 ];
@@ -30,14 +34,26 @@ const SendIamSection: FC<SendIamSectionProps> = ({
   onSendCenterModal,
   onSendFullScreen,
 }) => {
-  const handlers = [onSendTopBanner, onSendBottomBanner, onSendCenterModal, onSendFullScreen];
+  const handlers = [
+    onSendTopBanner,
+    onSendBottomBanner,
+    onSendCenterModal,
+    onSendFullScreen,
+  ];
 
   return (
     <SectionCard title="SEND IN-APP MESSAGE" onInfoTap={onInfoTap}>
       {iamButtons.map((btn, i) => (
-        <ActionButton key={btn.key} className="iam-btn" type="button" onClick={handlers[i]}>
+        <ActionButton
+          key={btn.key}
+          className="iam-btn"
+          type="button"
+          onClick={handlers[i]}
+        >
           <span className="action-btn-content">
-            <span className="action-btn-icon" aria-hidden>{btn.icon}</span>
+            <span className="action-btn-icon" aria-hidden>
+              {btn.icon}
+            </span>
             <span>{btn.label}</span>
           </span>
         </ActionButton>
