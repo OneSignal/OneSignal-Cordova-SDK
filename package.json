@@ -1,7 +1,6 @@
 {
-  "version": "5.3.1",
+  "version": "5.3.2",
   "name": "onesignal-cordova-plugin",
-  "author": "Josh Kasten, Brad Hesse, Rodrigo Gomez-Palacio",
   "files": [
     "dist",
     "plugin.xml",
@@ -29,6 +28,7 @@
   },
   "devDependencies": {
     "@capacitor/cli": "^7.4.4",
+    "@types/bun": "latest",
     "@types/cordova": "^11.0.3",
     "@vitest/coverage-v8": "^4.0.2",
     "concurrently": "^9.2.1",
@@ -38,8 +38,7 @@
     "typescript": "^5.9.3",
     "vite": "^7.1.12",
     "vite-plugin-dts": "^4.5.4",
-    "vitest": "^4.0.2",
-    "@types/bun": "latest"
+    "vitest": "^4.0.2"
   },
   "bugs": {
     "url": "https://github.com/OneSignal/OneSignal-Cordova-SDK/issues"
@@ -89,14 +88,11 @@
     "messaging",
     "ecosystem:cordova",
     "cordova-android",
-    "cordova-ios",
-    "cordova-amazon-fireos"
+    "cordova-ios"
   ],
   "license": "MIT",
   "platforms": [
     "android",
-    "ios",
-    "amazon-fireos"
-  ],
-  "private": true
+    "ios"
+  ]
 }

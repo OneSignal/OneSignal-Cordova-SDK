@@ -13,7 +13,9 @@ mv onesignal-cordova-plugin-*.tgz onesignal-cordova-plugin.tgz
 
 # Use fresh install of the package
 cd "$ORIGINAL_DIR"
-bun pm cache rm
-bun i
+bun remove onesignal-cordova-plugin
+bun add file:../../onesignal-cordova-plugin.tgz
+
+cd ios/App && pod update OneSignalXCFramework --no-repo-update && cd ../..
 
 bun cap sync
