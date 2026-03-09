@@ -16,6 +16,7 @@
         "@ionic/react-router": "^8.5.0",
         "@types/react-router": "^5.1.20",
         "@types/react-router-dom": "^5.3.3",
+        "onesignal-cordova-plugin": "file:../../onesignal-cordova-plugin.tgz",
         "react": "19.0.0",
         "react-dom": "19.0.0",
         "react-icons": "^5.5.0",
@@ -29,7 +30,6 @@
         "@types/react-dom": "19.0.4",
         "@vitejs/plugin-legacy": "^7.2.1",
         "@vitejs/plugin-react": "^4.0.1",
-        "onesignal-cordova-plugin": "file:../../onesignal-cordova-plugin.tgz",
         "terser": "^5.4.0",
         "typescript": "~5.9.0",
         "vite": "^7.3.1",
@@ -883,7 +883,7 @@
 
     "once": ["once@1.4.0", "", { "dependencies": { "wrappy": "1" } }, "sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w=="],
 
-    "onesignal-cordova-plugin": ["onesignal-cordova-plugin@../../onesignal-cordova-plugin.tgz", {}, "sha512-3ZVnxN929mxxQOQfFalnVxDF8lu1/rQdLkY4GqroQjgNwVjqIshao4x060nIh8yTIjNkIzL3LWC7lESrffP5vw=="],
+    "onesignal-cordova-plugin": ["onesignal-cordova-plugin@../../onesignal-cordova-plugin.tgz", {}, "sha512-kLbhmrcWj5Kliv3CmmZmuJ1fe6pRkcuF6ZiIHUuPtVRn+vIztrDxUG/agoxin+8+Lk3a6iJwlbjCJIiQcu4lLg=="],
 
     "open": ["open@8.4.2", "", { "dependencies": { "define-lazy-prop": "^2.0.0", "is-docker": "^2.1.1", "is-wsl": "^2.2.0" } }, "sha512-7x81NCL719oNbsq/3mh+hVrAWmFuEYUqrq/Iw3kUzH8ReypT9QQ0BLoJS7/G9k6N81XjW4qHWtjWwe/9eLy1EQ=="],
 
