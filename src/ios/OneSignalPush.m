@@ -166,11 +166,10 @@ static Class delegateClass = nil;
     return;
   delegateClass = [delegate class];
 
-  injectSelectorCordova(self.class,
-                        @selector(oneSignalApplication:
-                            didFinishLaunchingWithOptions:),
-                        delegateClass,
-                        @selector(application:didFinishLaunchingWithOptions:));
+  injectSelectorCordova(
+      self.class,
+      @selector(oneSignalApplication:didFinishLaunchingWithOptions:),
+      delegateClass, @selector(application:didFinishLaunchingWithOptions:));
   [self setOneSignalCordovaDelegate:delegate];
 }
 
@@ -178,8 +177,8 @@ static Class delegateClass = nil;
     didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   initOneSignalObject(launchOptions);
 
-  if ([self respondsToSelector:@selector(oneSignalApplication:
-                                   didFinishLaunchingWithOptions:)])
+  if ([self respondsToSelector:
+                @selector(oneSignalApplication:didFinishLaunchingWithOptions:)])
     return [self oneSignalApplication:application
         didFinishLaunchingWithOptions:launchOptions];
   return YES;
