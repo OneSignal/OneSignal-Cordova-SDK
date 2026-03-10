@@ -82,6 +82,7 @@ const Home: React.FC = () => {
     sendSimpleNotification,
     sendImageNotification,
     sendCustomNotification,
+    clearAllNotifications,
   } = useAppContext();
 
   const history = useHistory();
@@ -197,6 +198,9 @@ const Home: React.FC = () => {
                 runAction('Image notification sent', sendImageNotification)
               }
               onSendCustom={() => setDialog({ type: 'customNotification' })}
+              onClearAll={() =>
+                runAction('All notifications cleared', clearAllNotifications)
+              }
             />
 
             <InAppSection

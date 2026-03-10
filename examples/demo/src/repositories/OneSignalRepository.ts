@@ -73,6 +73,11 @@ export default class OneSignalRepository {
     return OneSignal.Notifications.requestPermission(fallbackToSettings);
   }
 
+  clearAllNotifications(): void {
+    if (!this.isNative()) return;
+    OneSignal.Notifications.clearAll();
+  }
+
   setPaused(paused: boolean): void {
     if (!this.isNative()) return;
     OneSignal.InAppMessages.setPaused(paused);

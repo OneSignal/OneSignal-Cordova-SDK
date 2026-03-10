@@ -226,6 +226,7 @@ type AppContextValue = {
   sendSimpleNotification: () => Promise<void>;
   sendImageNotification: () => Promise<void>;
   sendCustomNotification: (title: string, body: string) => Promise<void>;
+  clearAllNotifications: () => Promise<void>;
   setIamPaused: (paused: boolean) => Promise<void>;
   sendIamTrigger: (iamType: string) => Promise<void>;
   addAlias: (label: string, id: string) => Promise<void>;
@@ -544,6 +545,11 @@ export function AppContextProvider({ children }: Props) {
     [addLog],
   );
 
+  const clearAllNotifications = useCallback(async () => {
+    repository.clearAllNotifications();
+    addLog('All notifications cleared');
+  }, [addLog]);
+
   const setIamPaused = useCallback(
     async (paused: boolean) => {
       repository.setPaused(paused);
@@ -738,6 +744,7 @@ export function AppContextProvider({ children }: Props) {
       sendSimpleNotification,
       sendImageNotification,
       sendCustomNotification,
+      clearAllNotifications,
       setIamPaused,
       sendIamTrigger,
       addAlias,
@@ -772,6 +779,7 @@ export function AppContextProvider({ children }: Props) {
       sendSimpleNotification,
       sendImageNotification,
       sendCustomNotification,
+      clearAllNotifications,
       setIamPaused,
       sendIamTrigger,
       addAlias,
