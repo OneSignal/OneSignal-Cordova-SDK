@@ -7,6 +7,7 @@ interface SendPushSectionProps {
   onSendSimple: () => void;
   onSendImage: () => void;
   onSendCustom: () => void;
+  onClearAll: () => void;
 }
 
 const SendPushSection: FC<SendPushSectionProps> = ({
@@ -14,6 +15,7 @@ const SendPushSection: FC<SendPushSectionProps> = ({
   onSendSimple,
   onSendImage,
   onSendCustom,
+  onClearAll,
 }) => (
   <SectionCard title="SEND PUSH NOTIFICATION" onInfoTap={onInfoTap}>
     <ActionButton type="button" onClick={onSendSimple}>
@@ -24,6 +26,9 @@ const SendPushSection: FC<SendPushSectionProps> = ({
     </ActionButton>
     <ActionButton type="button" onClick={onSendCustom}>
       CUSTOM
+    </ActionButton>
+    <ActionButton variant="outline" type="button" onClick={onClearAll}>
+      CLEAR ALL
     </ActionButton>
   </SectionCard>
 );
