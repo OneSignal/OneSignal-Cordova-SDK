@@ -370,7 +370,7 @@ public class OneSignalPush extends CordovaPlugin
 
         initDone = true;
         OneSignalWrapper.setSdkType("cordova");
-        OneSignalWrapper.setSdkVersion("050305");
+        OneSignalWrapper.setSdkVersion("050306");
         try {
             String appId = data.getString(0);
             OneSignal.initWithContext(this.cordova.getActivity(), appId);
