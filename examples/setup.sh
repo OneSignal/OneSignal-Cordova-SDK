@@ -16,6 +16,11 @@ cd "$ORIGINAL_DIR"
 bun remove onesignal-cordova-plugin
 bun add file:../../onesignal-cordova-plugin.tgz
 
-cd ios/App && pod update OneSignalXCFramework --no-repo-update && cd ../..
+pod_update() {
+  cd ios/App && pod update OneSignalXCFramework --no-repo-update && cd ../..
+}
 
-bun cap sync
+# cap sync may fail if pods are outdated; retry after updating pods
+pod_update
+bun cap sync || { pod_update && bun cap sync; }
+
