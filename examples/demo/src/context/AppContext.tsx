@@ -776,7 +776,7 @@ export function AppContextProvider({ children }: Props) {
   const endLiveActivity = useCallback(
     async (activityId: string): Promise<boolean> => {
       const success = await repository.updateLiveActivity(activityId, 'end', {
-        message: 'Ended Live Activity',
+        data: { status: 'delivered', message: 'Ended Live Activity' },
       });
       addLog(
         success

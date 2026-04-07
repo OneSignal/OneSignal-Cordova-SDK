@@ -81,10 +81,12 @@ const LiveActivitySection: FC<LiveActivitySectionProps> = ({
   const handleEnd = async () => {
     setUpdating(true);
     try {
-      await onEnd(activityId);
+      const success = await onEnd(activityId);
+      if (success) {
+        setStatusIndex(0);
+      }
     } finally {
       setUpdating(false);
-      setStatusIndex(0);
     }
   };
 
