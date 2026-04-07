@@ -228,10 +228,23 @@
   justify-content: flex-start;
 }
 
+.action-btn:disabled {
+  background: var(--os-grey-500);
+  color: #fff;
+  opacity: 0.6;
+}
+
 .action-btn.outline {
   background: transparent;
   border: 1px solid var(--os-primary);
   color: var(--os-primary);
+}
+
+.action-btn.outline:disabled {
+  border-color: var(--os-grey-500);
+  color: var(--os-grey-500);
+  background: transparent;
+  opacity: 0.6;
 }
 
 .toggle-card ion-toggle {
@@ -330,7 +343,7 @@
   align-items: center;
   justify-content: center;
   padding: 24px 16px;
-  z-index: 10;
+  z-index: 50;
 }
 
 .modal-card {
@@ -498,6 +511,36 @@
 
 .text-success {
   color: var(--os-success);
+}
+
+.inline-input-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.inline-input-label {
+  font-size: var(--font-size-body);
+  color: var(--os-grey-600);
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+.inline-input-field {
+  flex: 1;
+  text-align: right;
+  font-size: var(--font-size-body);
+  color: #212121;
+  padding: 4px 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  min-width: 0;
+}
+
+.inline-input-field::placeholder {
+  color: var(--os-grey-500);
 }
 
 .loading-overlay {

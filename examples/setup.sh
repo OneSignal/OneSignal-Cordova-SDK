@@ -16,6 +16,8 @@ cd "$ORIGINAL_DIR"
 bun remove onesignal-cordova-plugin
 bun add file:../../onesignal-cordova-plugin.tgz
 
+bun run build
+
 pod_update() {
   cd ios/App && pod update OneSignalXCFramework --no-repo-update && cd ../..
 }

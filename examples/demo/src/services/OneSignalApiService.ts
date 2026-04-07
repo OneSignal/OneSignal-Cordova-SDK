@@ -1,6 +1,10 @@
+import { CapacitorHttp } from '@capacitor/core';
 import { NotificationType } from '../models/NotificationType';
 import { userDataFromJson } from '../models/UserData';
 import type { UserData } from '../models/UserData';
+import LogManager from './LogManager';
+
+const TAG = 'OneSignalApiService';
 
 export const IMAGE_NOTIFICATION_URL =
   'https://media.onesignal.com/automated_push_templates/ratings_template.png';
@@ -11,6 +15,8 @@ export const IMAGE_NOTIFICATION_PAYLOAD = {
     image: IMAGE_NOTIFICATION_URL,
   },
 } as const;
+
+const API_KEY = (import.meta.env.VITE_ONESIGNAL_API_KEY ?? '').trim();
 
 class OneSignalApiService {
   private static instance: OneSignalApiService;
@@ -30,6 +36,10 @@ class OneSignalApiService {
 
   getAppId(): string {
     return this.appId;
+  }
+
+  hasApiKey(): boolean {
+    return API_KEY.length > 0;
   }
 
   async sendNotification(
@@ -101,6 +111,55 @@ class OneSignalApiService {
 
       return response.ok;
     } catch {
+      return false;
+    }
+  }
+
+  async updateLiveActivity(
+    activityId: string,
+    event: 'update' | 'end',
+    eventUpdates: Record<string, unknown> = {},
+  ): Promise<boolean> {
+    if (!this.appId || !this.hasApiKey()) {
+      return false;
+    }
+
+    try {
+      const url = `https://api.onesignal.com/apps/${this.appId}/live_activities/${encodeURIComponent(activityId)}/notifications`;
+      const data: Record<string, unknown> = {
+        event,
+        event_updates: eventUpdates,
+        name: event === 'end' ? 'End Live Activity' : 'Live Activity Update',
+        priority: 10,
+      };
+
+      if (event === 'end') {
+        data.dismissal_date = Math.floor(Date.now() / 1000);
+      }
+
+      const response = await CapacitorHttp.post({
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Key ${API_KEY}`,
+        },
+        data,
+      });
+
+      if (response.status < 200 || response.status >= 300) {
+        LogManager.getInstance().e(
+          TAG,
+          `${event} live activity failed: ${JSON.stringify(response.data)}`,
+        );
+        return false;
+      }
+
+      return true;
+    } catch (err) {
+      LogManager.getInstance().e(
+        TAG,
+        `${event} live activity error: ${String(err)}`,
+      );
       return false;
     }
   }
