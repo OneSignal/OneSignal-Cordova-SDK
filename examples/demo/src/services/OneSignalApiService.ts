@@ -1,3 +1,4 @@
+import { CapacitorHttp } from '@capacitor/core';
 import { NotificationType } from '../models/NotificationType';
 import { userDataFromJson } from '../models/UserData';
 import type { UserData } from '../models/UserData';
@@ -15,15 +16,12 @@ export const IMAGE_NOTIFICATION_PAYLOAD = {
   },
 } as const;
 
+const API_KEY = (import.meta.env.VITE_ONESIGNAL_API_KEY ?? '').trim();
+
 class OneSignalApiService {
   private static instance: OneSignalApiService;
 
   private appId = '';
-  private apiKey: string;
-
-  constructor() {
-    this.apiKey = (import.meta.env.VITE_ONESIGNAL_API_KEY ?? '').trim();
-  }
 
   static getInstance(): OneSignalApiService {
     if (!OneSignalApiService.instance) {
@@ -41,7 +39,7 @@ class OneSignalApiService {
   }
 
   hasApiKey(): boolean {
-    return this.apiKey.length > 0;
+    return API_KEY.length > 0;
   }
 
   async sendNotification(
@@ -128,7 +126,7 @@ class OneSignalApiService {
 
     try {
       const url = `https://api.onesignal.com/apps/${this.appId}/live_activities/${activityId}/notifications`;
-      const payload: Record<string, unknown> = {
+      const data: Record<string, unknown> = {
         event,
         event_updates: eventUpdates,
         name: event === 'end' ? 'End Live Activity' : 'Live Activity Update',
@@ -136,21 +134,20 @@ class OneSignalApiService {
       };
 
       if (event === 'end') {
-        payload.dismissal_date = Math.floor(Date.now() / 1000);
+        data.dismissal_date = Math.floor(Date.now() / 1000);
       }
 
-      const response = await fetch(url, {
-        method: 'POST',
+      const response = await CapacitorHttp.post({
+        url,
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Key ${this.apiKey}`,
+          Authorization: `Key ${API_KEY}`,
         },
-        body: JSON.stringify(payload),
+        data,
       });
 
-      if (!response.ok) {
-        const text = await response.text();
-        LogManager.getInstance().e(TAG, `${event} live activity failed: ${text}`);
+      if (response.status < 200 || response.status >= 300) {
+        LogManager.getInstance().e(TAG, `${event} live activity failed: ${JSON.stringify(response.data)}`);
         return false;
       }
 
