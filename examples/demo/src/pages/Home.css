@@ -228,10 +228,23 @@
   justify-content: flex-start;
 }
 
+.action-btn:disabled {
+  background: var(--os-grey-500);
+  color: #fff;
+  opacity: 0.6;
+}
+
 .action-btn.outline {
   background: transparent;
   border: 1px solid var(--os-primary);
   color: var(--os-primary);
+}
+
+.action-btn.outline:disabled {
+  border-color: var(--os-grey-500);
+  color: var(--os-grey-500);
+  background: transparent;
+  opacity: 0.6;
 }
 
 .toggle-card ion-toggle {
