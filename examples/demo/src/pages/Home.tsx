@@ -1,6 +1,7 @@
 import { IonContent, IonPage, IonToast } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
+import { Capacitor } from '@capacitor/core';
 import oneSignalLogo from '../assets/onesignal_logo.svg';
 import ActionButton from '../components/ActionButton';
 import LoadingOverlay from '../components/LoadingOverlay';
@@ -18,6 +19,7 @@ import AppSection from '../components/sections/AppSection';
 import UserSection from '../components/sections/UserSection';
 import EmailsSection from '../components/sections/EmailsSection';
 import InAppSection from '../components/sections/InAppSection';
+import LiveActivitySection from '../components/sections/LiveActivitySection';
 import LocationSection from '../components/sections/LocationSection';
 import OutcomesSection from '../components/sections/OutcomesSection';
 import PushSection from '../components/sections/PushSection';
@@ -83,6 +85,10 @@ const Home: React.FC = () => {
     sendImageNotification,
     sendCustomNotification,
     clearAllNotifications,
+    hasApiKey,
+    startDefaultLiveActivity,
+    updateLiveActivity,
+    endLiveActivity,
   } = useAppContext();
 
   const history = useHistory();
@@ -330,6 +336,16 @@ const Home: React.FC = () => {
                 )
               }
             />
+
+            {Capacitor.getPlatform() === 'ios' && (
+              <LiveActivitySection
+                hasApiKey={hasApiKey}
+                onInfoTap={() => showTooltipModal('liveActivities')}
+                onStart={startDefaultLiveActivity}
+                onUpdate={updateLiveActivity}
+                onEnd={endLiveActivity}
+              />
+            )}
 
             <section className="section">
               <ActionButton

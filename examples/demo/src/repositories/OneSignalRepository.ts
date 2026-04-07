@@ -207,4 +207,33 @@ export default class OneSignalRepository {
   fetchUser(onesignalId: string): Promise<UserData | null> {
     return this.apiService.fetchUser(onesignalId);
   }
+
+  setupDefaultLiveActivity(): void {
+    if (!this.isNative()) return;
+    OneSignal.LiveActivities.setupDefault({
+      enablePushToStart: true,
+      enablePushToUpdate: true,
+    });
+  }
+
+  startDefaultLiveActivity(
+    activityId: string,
+    attributes: object,
+    content: object,
+  ): void {
+    if (!this.isNative()) return;
+    OneSignal.LiveActivities.startDefault(activityId, attributes, content);
+  }
+
+  async updateLiveActivity(
+    activityId: string,
+    event: 'update' | 'end',
+    eventUpdates?: Record<string, unknown>,
+  ): Promise<boolean> {
+    return this.apiService.updateLiveActivity(activityId, event, eventUpdates);
+  }
+
+  hasApiKey(): boolean {
+    return this.apiService.hasApiKey();
+  }
 }

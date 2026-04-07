@@ -500,6 +500,36 @@
   color: var(--os-success);
 }
 
+.inline-input-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.inline-input-label {
+  font-size: var(--font-size-body);
+  color: var(--os-grey-600);
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+.inline-input-field {
+  flex: 1;
+  text-align: right;
+  font-size: var(--font-size-body);
+  color: #212121;
+  padding: 4px 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  min-width: 0;
+}
+
+.inline-input-field::placeholder {
+  color: var(--os-grey-500);
+}
+
 .loading-overlay {
   position: fixed;
   inset: 0;

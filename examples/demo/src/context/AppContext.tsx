@@ -251,6 +251,17 @@ type AppContextValue = {
   ) => Promise<void>;
   setLocationShared: (shared: boolean) => Promise<void>;
   requestLocationPermission: () => Promise<void>;
+  hasApiKey: boolean;
+  startDefaultLiveActivity: (
+    activityId: string,
+    attributes: object,
+    content: object,
+  ) => void;
+  updateLiveActivity: (
+    activityId: string,
+    eventUpdates: Record<string, unknown>,
+  ) => Promise<boolean>;
+  endLiveActivity: (activityId: string) => Promise<boolean>;
 };
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -364,6 +375,7 @@ export function AppContextProvider({ children }: Props) {
       repository.setConsentRequired(consentRequired);
       repository.setConsentGiven(consentGiven);
       repository.initialize(appId);
+      repository.setupDefaultLiveActivity();
       repository.setPaused(iamPaused);
       repository.setLocationShared(locationShared);
 
@@ -731,6 +743,51 @@ export function AppContextProvider({ children }: Props) {
     addLog('Location permission prompt triggered');
   }, [addLog]);
 
+  const hasApiKey = repository.hasApiKey();
+
+  const startDefaultLiveActivity = useCallback(
+    (activityId: string, attributes: object, content: object) => {
+      repository.startDefaultLiveActivity(activityId, attributes, content);
+      addLog(`Started Live Activity: ${activityId}`);
+    },
+    [addLog],
+  );
+
+  const updateLiveActivity = useCallback(
+    async (
+      activityId: string,
+      eventUpdates: Record<string, unknown>,
+    ): Promise<boolean> => {
+      const success = await repository.updateLiveActivity(
+        activityId,
+        'update',
+        eventUpdates,
+      );
+      addLog(
+        success
+          ? `Updated Live Activity: ${activityId}`
+          : 'Failed to update Live Activity',
+      );
+      return success;
+    },
+    [addLog],
+  );
+
+  const endLiveActivity = useCallback(
+    async (activityId: string): Promise<boolean> => {
+      const success = await repository.updateLiveActivity(activityId, 'end', {
+        message: 'Ended Live Activity',
+      });
+      addLog(
+        success
+          ? `Ended Live Activity: ${activityId}`
+          : 'Failed to end Live Activity',
+      );
+      return success;
+    },
+    [addLog],
+  );
+
   const value = useMemo<AppContextValue>(
     () => ({
       state,
@@ -766,6 +823,10 @@ export function AppContextProvider({ children }: Props) {
       trackEvent,
       setLocationShared,
       requestLocationPermission,
+      hasApiKey,
+      startDefaultLiveActivity,
+      updateLiveActivity,
+      endLiveActivity,
     }),
     [
       state,
@@ -801,6 +862,10 @@ export function AppContextProvider({ children }: Props) {
       trackEvent,
       setLocationShared,
       requestLocationPermission,
+      hasApiKey,
+      startDefaultLiveActivity,
+      updateLiveActivity,
+      endLiveActivity,
     ],
   );
 
