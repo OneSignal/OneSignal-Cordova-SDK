@@ -147,13 +147,19 @@ class OneSignalApiService {
       });
 
       if (response.status < 200 || response.status >= 300) {
-        LogManager.getInstance().e(TAG, `${event} live activity failed: ${JSON.stringify(response.data)}`);
+        LogManager.getInstance().e(
+          TAG,
+          `${event} live activity failed: ${JSON.stringify(response.data)}`,
+        );
         return false;
       }
 
       return true;
     } catch (err) {
-      LogManager.getInstance().e(TAG, `${event} live activity error: ${String(err)}`);
+      LogManager.getInstance().e(
+        TAG,
+        `${event} live activity error: ${String(err)}`,
+      );
       return false;
     }
   }

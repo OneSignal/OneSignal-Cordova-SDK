@@ -24,11 +24,7 @@ const ORDER_STATUSES = [
 interface LiveActivitySectionProps {
   hasApiKey: boolean;
   onInfoTap?: () => void;
-  onStart: (
-    activityId: string,
-    attributes: object,
-    content: object,
-  ) => void;
+  onStart: (activityId: string, attributes: object, content: object) => void;
   onUpdate: (
     activityId: string,
     eventUpdates: Record<string, unknown>,
