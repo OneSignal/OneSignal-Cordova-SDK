@@ -1,5 +1,16 @@
 import { IonToggle } from '@ionic/react';
 import type { FC } from 'react';
+import SectionCard from '../SectionCard';
+
+const MASK_CHAR = '•';
+const E2E_MODE = (import.meta.env.VITE_E2E_MODE ?? '').trim() === 'true';
+
+function maskValue(value: string): string {
+  if (E2E_MODE) {
+    return MASK_CHAR.repeat(value.length);
+  }
+  return value;
+}
 
 interface AppSectionProps {
   appId: string;
@@ -17,19 +28,27 @@ const AppSection: FC<AppSectionProps> = ({
   onTogglePrivacyConsent,
 }) => {
   return (
-    <section className="section">
-      <h2>APP</h2>
+    <SectionCard title="APP" sectionKey="app">
       <div className="card kv-card">
         <div className="kv-row">
           <span>App ID</span>
-          <span className="id-value">{appId}</span>
+          <span className="id-value" data-testid="app_id_value">
+            {maskValue(appId)}
+          </span>
         </div>
       </div>
       <div className="card tip-card">
         <div>
           Add your own App ID, then rebuild to fully test all functionality.
         </div>
-        <div className="tip-link">Get your keys at onesignal.com</div>
+        <a
+          className="tip-link"
+          href="https://onesignal.com"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Get your keys at onesignal.com
+        </a>
       </div>
       <div className="card">
         <div className="toggle-card">
@@ -40,6 +59,7 @@ const AppSection: FC<AppSectionProps> = ({
           <IonToggle
             checked={consentRequired}
             onIonChange={(event) => onToggleConsent(event.detail.checked)}
+            data-testid="consent_required_toggle"
           />
         </div>
         {consentRequired ? (
@@ -55,12 +75,13 @@ const AppSection: FC<AppSectionProps> = ({
                 onIonChange={(event) =>
                   onTogglePrivacyConsent(event.detail.checked)
                 }
+                data-testid="privacy_consent_toggle"
               />
             </div>
           </>
         ) : null}
       </div>
-    </section>
+    </SectionCard>
   );
 };
 

@@ -1,11 +1,8 @@
-const APP_ID_KEY = 'onesignal.demo.appId';
 const CONSENT_REQUIRED_KEY = 'onesignal.demo.consentRequired';
 const CONSENT_GIVEN_KEY = 'onesignal.demo.consentGiven';
 const EXTERNAL_ID_KEY = 'onesignal.demo.externalUserId';
 const LOCATION_SHARED_KEY = 'onesignal.demo.locationShared';
 const IAM_PAUSED_KEY = 'onesignal.demo.iamPaused';
-
-const DEFAULT_APP_ID = '77e32082-ea27-42e3-a898-c72e141824ef';
 
 function readBoolean(key: string, fallback: boolean): boolean {
   const value = localStorage.getItem(key);
@@ -13,13 +10,14 @@ function readBoolean(key: string, fallback: boolean): boolean {
   return value === 'true';
 }
 
-export default class PreferencesService {
-  getAppId(): string {
-    return localStorage.getItem(APP_ID_KEY) ?? DEFAULT_APP_ID;
-  }
+class PreferencesService {
+  private static instance: PreferencesService;
 
-  setAppId(value: string): void {
-    localStorage.setItem(APP_ID_KEY, value);
+  static getInstance(): PreferencesService {
+    if (!PreferencesService.instance) {
+      PreferencesService.instance = new PreferencesService();
+    }
+    return PreferencesService.instance;
   }
 
   getConsentRequired(): boolean {
@@ -66,3 +64,5 @@ export default class PreferencesService {
     localStorage.setItem(IAM_PAUSED_KEY, String(value));
   }
 }
+
+export default PreferencesService;

@@ -1,4 +1,4 @@
-package io.ionic.starter;
+package com.onesignal.example;
 
 import com.getcapacitor.BridgeActivity;
 

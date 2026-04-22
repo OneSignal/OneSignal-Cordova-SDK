@@ -6,6 +6,7 @@ interface ToggleRowProps {
   description?: string;
   checked: boolean;
   onToggle: (checked: boolean) => void;
+  testID?: string;
 }
 
 const ToggleRow: FC<ToggleRowProps> = ({
@@ -13,6 +14,7 @@ const ToggleRow: FC<ToggleRowProps> = ({
   description,
   checked,
   onToggle,
+  testID,
 }) => (
   <div className="card toggle-card">
     <div>
@@ -22,6 +24,7 @@ const ToggleRow: FC<ToggleRowProps> = ({
     <IonToggle
       checked={checked}
       onIonChange={(event) => onToggle(event.detail.checked)}
+      data-testid={testID}
     />
   </div>
 );

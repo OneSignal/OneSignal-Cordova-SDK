@@ -8,8 +8,8 @@ type Row = { key: string; value: string };
 interface MultiPairInputModalProps {
   open: boolean;
   title: string;
-  firstPlaceholder: string;
-  secondPlaceholder: string;
+  keyPlaceholder: string;
+  valuePlaceholder: string;
   onClose: () => void;
   onSubmit: (pairs: Record<string, string>) => void;
 }
@@ -17,8 +17,8 @@ interface MultiPairInputModalProps {
 const MultiPairInputModal: FC<MultiPairInputModalProps> = ({
   open,
   title,
-  firstPlaceholder,
-  secondPlaceholder,
+  keyPlaceholder,
+  valuePlaceholder,
   onClose,
   onSubmit,
 }) => {
@@ -68,7 +68,8 @@ const MultiPairInputModal: FC<MultiPairInputModalProps> = ({
                     ),
                   )
                 }
-                placeholder={firstPlaceholder}
+                placeholder={keyPlaceholder}
+                data-testid={`multipair_key_${index}`}
               />
               <input
                 value={row.value}
@@ -81,7 +82,8 @@ const MultiPairInputModal: FC<MultiPairInputModalProps> = ({
                     ),
                   )
                 }
-                placeholder={secondPlaceholder}
+                placeholder={valuePlaceholder}
+                data-testid={`multipair_value_${index}`}
               />
               {rows.length > 1 ? (
                 <button
@@ -106,6 +108,7 @@ const MultiPairInputModal: FC<MultiPairInputModalProps> = ({
           type="button"
           className="text-btn text-btn-center"
           onClick={() => setRows((prev) => [...prev, { key: '', value: '' }])}
+          data-testid="multipair_add_row_button"
         >
           + Add Row
         </button>
@@ -113,7 +116,11 @@ const MultiPairInputModal: FC<MultiPairInputModalProps> = ({
           <button type="button" onClick={onClose}>
             Cancel
           </button>
-          <button type="submit" disabled={!isValid}>
+          <button
+            type="submit"
+            disabled={!isValid}
+            data-testid="multipair_confirm_button"
+          >
             Add All
           </button>
         </div>

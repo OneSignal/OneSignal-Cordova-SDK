@@ -5,29 +5,33 @@ import ModalShell from './ModalShell';
 interface PairInputModalProps {
   open: boolean;
   title: string;
-  firstPlaceholder: string;
-  secondPlaceholder: string;
+  keyPlaceholder: string;
+  valuePlaceholder: string;
   confirmLabel: string;
   onClose: () => void;
-  onSubmit: (first: string, second: string) => void;
+  onSubmit: (key: string, value: string) => void;
+  keyTestID?: string;
+  valueTestID?: string;
 }
 
 const PairInputModal: FC<PairInputModalProps> = ({
   open,
   title,
-  firstPlaceholder,
-  secondPlaceholder,
+  keyPlaceholder,
+  valuePlaceholder,
   confirmLabel,
   onClose,
   onSubmit,
+  keyTestID,
+  valueTestID,
 }) => {
-  const [first, setFirst] = useState('');
-  const [second, setSecond] = useState('');
+  const [key, setKey] = useState('');
+  const [value, setValue] = useState('');
 
   useEffect(() => {
     if (open) {
-      setFirst('');
-      setSecond('');
+      setKey('');
+      setValue('');
     }
   }, [open]);
 
@@ -37,30 +41,34 @@ const PairInputModal: FC<PairInputModalProps> = ({
         autoCapitalize="off"
         onSubmit={(event) => {
           event.preventDefault();
-          const firstValue = first.trim();
-          const secondValue = second.trim();
-          if (!firstValue || !secondValue) return;
-          onSubmit(firstValue, secondValue);
+          const trimmedKey = key.trim();
+          const trimmedValue = value.trim();
+          if (!trimmedKey || !trimmedValue) return;
+          onSubmit(trimmedKey, trimmedValue);
         }}
       >
         <h3>{title}</h3>
         <div className="inline-fields">
           <input
-            value={first}
-            onChange={(event) => setFirst(event.target.value)}
-            placeholder={firstPlaceholder}
+            value={key}
+            onChange={(event) => setKey(event.target.value)}
+            placeholder={keyPlaceholder}
+            data-testid={keyTestID}
           />
           <input
-            value={second}
-            onChange={(event) => setSecond(event.target.value)}
-            placeholder={secondPlaceholder}
+            value={value}
+            onChange={(event) => setValue(event.target.value)}
+            placeholder={valuePlaceholder}
+            data-testid={valueTestID}
           />
         </div>
         <div className="modal-actions">
           <button type="button" onClick={onClose}>
             Cancel
           </button>
-          <button type="submit">{confirmLabel}</button>
+          <button type="submit" data-testid="singlepair_confirm_button">
+            {confirmLabel}
+          </button>
         </div>
       </form>
     </ModalShell>

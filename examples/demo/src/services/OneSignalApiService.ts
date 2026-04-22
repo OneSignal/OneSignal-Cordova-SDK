@@ -2,9 +2,6 @@ import { CapacitorHttp } from '@capacitor/core';
 import { NotificationType } from '../models/NotificationType';
 import { userDataFromJson } from '../models/UserData';
 import type { UserData } from '../models/UserData';
-import LogManager from './LogManager';
-
-const TAG = 'OneSignalApiService';
 
 export const IMAGE_NOTIFICATION_URL =
   'https://media.onesignal.com/automated_push_templates/ratings_template.png';
@@ -109,8 +106,15 @@ class OneSignalApiService {
         },
       );
 
-      return response.ok;
-    } catch {
+      if (!response.ok) {
+        const text = await response.text();
+        console.error(`Send notification failed: ${text}`);
+        return false;
+      }
+
+      return true;
+    } catch (err) {
+      console.error(`Send notification error: ${String(err)}`);
       return false;
     }
   }
@@ -147,8 +151,7 @@ class OneSignalApiService {
       });
 
       if (response.status < 200 || response.status >= 300) {
-        LogManager.getInstance().e(
-          TAG,
+        console.error(
           `${event} live activity failed: ${JSON.stringify(response.data)}`,
         );
         return false;
@@ -156,10 +159,7 @@ class OneSignalApiService {
 
       return true;
     } catch (err) {
-      LogManager.getInstance().e(
-        TAG,
-        `${event} live activity error: ${String(err)}`,
-      );
+      console.error(`${event} live activity error: ${String(err)}`);
       return false;
     }
   }
@@ -173,11 +173,13 @@ class OneSignalApiService {
       const url = `https://api.onesignal.com/apps/${this.appId}/users/by/onesignal_id/${onesignalId}`;
       const response = await fetch(url);
       if (!response.ok) {
+        console.warn(`fetchUser failed: ${response.status}`);
         return null;
       }
       const json = (await response.json()) as Record<string, unknown>;
       return userDataFromJson(json);
-    } catch {
+    } catch (err) {
+      console.error(`fetchUser error: ${String(err)}`);
       return null;
     }
   }
