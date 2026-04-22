@@ -1,5 +1,4 @@
-import { Capacitor } from '@capacitor/core';
-import OneSignal from 'onesignal-cordova-plugin';
+import OneSignal, { LogLevel } from 'onesignal-cordova-plugin';
 import {
   createContext,
   createElement,
@@ -22,15 +21,10 @@ function resolveAppId(): string {
   return envId || DEFAULT_APP_ID;
 }
 
-function isNative(): boolean {
-  return Capacitor.isNativePlatform();
-}
-
 const apiService = OneSignalApiService.getInstance();
 const preferences = PreferencesService.getInstance();
 
 async function postNotification(type: NotificationType): Promise<boolean> {
-  if (!isNative()) return false;
   const subscriptionId = await OneSignal.User.pushSubscription.getIdAsync();
   if (!subscriptionId) return false;
   return apiService.sendNotification(type, subscriptionId);
@@ -40,7 +34,6 @@ async function postCustomNotification(
   title: string,
   body: string,
 ): Promise<boolean> {
-  if (!isNative()) return false;
   const subscriptionId = await OneSignal.User.pushSubscription.getIdAsync();
   if (!subscriptionId) return false;
   return apiService.sendCustomNotification(title, body, subscriptionId);
@@ -148,7 +141,6 @@ function useOneSignalState(): UseOneSignalReturn {
   const requestSequenceRef = useRef(0);
 
   const fetchUserDataFromApi = useCallback(async () => {
-    if (!isNative()) return;
     const requestId = requestSequenceRef.current + 1;
     requestSequenceRef.current = requestId;
     setIsLoading(true);
@@ -180,7 +172,6 @@ function useOneSignalState(): UseOneSignalReturn {
     let cancelled = false;
 
     const refreshPushState = async () => {
-      if (!isNative()) return;
       const [id, optedIn] = await Promise.all([
         OneSignal.User.pushSubscription.getIdAsync(),
         OneSignal.User.pushSubscription.getOptedInAsync(),
@@ -203,7 +194,6 @@ function useOneSignalState(): UseOneSignalReturn {
 
     const handleUserChange = () => {
       if (cancelled) return;
-      console.log('User changed');
       fetchUserDataFromApi();
     };
 
@@ -223,11 +213,10 @@ function useOneSignalState(): UseOneSignalReturn {
       setLocationSharedState(nextLocationShared);
       setExternalUserId(storedExternalUserId);
 
-      if (!isNative()) {
-        if (!cancelled) setIsReady(true);
-        return;
-      }
-
+      // Verbose log level enables WKWebView.isInspectable on the IAM webview
+      // (see OSInAppMessageView.m), which lets Appium's XCUITest driver
+      // enumerate the IAM context for E2E tests on iOS 16.4+.
+      OneSignal.Debug.setLogLevel(LogLevel.Verbose);
       OneSignal.setConsentRequired(nextConsentRequired);
       OneSignal.setConsentGiven(nextPrivacyConsentGiven);
       OneSignal.initialize(nextAppId);
@@ -271,7 +260,6 @@ function useOneSignalState(): UseOneSignalReturn {
 
     return () => {
       cancelled = true;
-      if (!isNative()) return;
       OneSignal.Notifications.removeEventListener(
         'permissionChange',
         handlePermissionChange,
@@ -293,9 +281,7 @@ function useOneSignalState(): UseOneSignalReturn {
     setIsLoading(true);
 
     try {
-      if (isNative()) {
-        OneSignal.login(nextExternalUserId);
-      }
+      OneSignal.login(nextExternalUserId);
       preferences.setExternalUserId(nextExternalUserId);
       setExternalUserId(nextExternalUserId);
       console.log(`Logged in as: ${nextExternalUserId}`);
@@ -308,7 +294,7 @@ function useOneSignalState(): UseOneSignalReturn {
   };
 
   const logoutUser = async () => {
-    if (isNative()) OneSignal.logout();
+    OneSignal.logout();
     preferences.setExternalUserId(null);
     setExternalUserId(undefined);
     setAliasesList([]);
@@ -321,32 +307,23 @@ function useOneSignalState(): UseOneSignalReturn {
 
   const setConsentRequired = async (required: boolean) => {
     setConsentRequiredState(required);
-    if (isNative()) OneSignal.setConsentRequired(required);
+    OneSignal.setConsentRequired(required);
     preferences.setConsentRequired(required);
   };
 
   const setConsentGiven = async (granted: boolean) => {
     setPrivacyConsentGivenState(granted);
-    if (isNative()) OneSignal.setConsentGiven(granted);
+    OneSignal.setConsentGiven(granted);
     preferences.setConsentGiven(granted);
   };
 
-  const promptPush = async () => {
-    if (!isNative()) return;
-    const canRequest = await OneSignal.Notifications.canRequestPermission();
-    if (canRequest) {
-      const granted = await OneSignal.Notifications.requestPermission(true);
-      setHasNotificationPermission(granted);
-    }
-  };
+  const promptPush =  () =>  OneSignal.Notifications.requestPermission(true);
 
   const setPushEnabled = (enabled: boolean) => {
-    if (isNative()) {
-      if (enabled) {
-        OneSignal.User.pushSubscription.optIn();
-      } else {
-        OneSignal.User.pushSubscription.optOut();
-      }
+    if (enabled) {
+      OneSignal.User.pushSubscription.optIn();
+    } else {
+      OneSignal.User.pushSubscription.optOut();
     }
     setIsPushEnabled(enabled);
     console.log(enabled ? 'Push enabled' : 'Push disabled');
@@ -367,19 +344,19 @@ function useOneSignalState(): UseOneSignalReturn {
   };
 
   const clearAllNotifications = () => {
-    if (isNative()) OneSignal.Notifications.clearAll();
+    OneSignal.Notifications.clearAll();
     console.log('All notifications cleared');
   };
 
   const setIamPaused = async (paused: boolean) => {
     setInAppMessagesPaused(paused);
-    if (isNative()) OneSignal.InAppMessages.setPaused(paused);
+    OneSignal.InAppMessages.setPaused(paused);
     preferences.setIamPaused(paused);
     console.log(paused ? 'In-app messages paused' : 'In-app messages resumed');
   };
 
   const sendIamTrigger = (iamType: string) => {
-    if (isNative()) OneSignal.InAppMessages.addTrigger('iam_type', iamType);
+    OneSignal.InAppMessages.addTrigger('iam_type', iamType);
     setTriggersList((prev) => {
       const filtered = prev.filter(([key]) => key !== 'iam_type');
       return [...filtered, ['iam_type', iamType] as [string, string]];
@@ -388,20 +365,20 @@ function useOneSignalState(): UseOneSignalReturn {
   };
 
   const addAlias = (label: string, id: string) => {
-    if (isNative()) OneSignal.User.addAlias(label, id);
+    OneSignal.User.addAlias(label, id);
     setAliasesList((prev) => [...prev, [label, id]]);
     console.log(`Alias added: ${label}`);
   };
 
   const addAliases = (pairs: Record<string, string>) => {
-    if (isNative()) OneSignal.User.addAliases(pairs);
+    OneSignal.User.addAliases(pairs);
     const newEntries = toPairs(pairs);
     setAliasesList((prev) => [...prev, ...newEntries]);
     console.log(`${newEntries.length} alias(es) added`);
   };
 
   const addEmail = (email: string) => {
-    if (isNative()) OneSignal.User.addEmail(email);
+    OneSignal.User.addEmail(email);
     setEmailsList((prev) => [
       ...prev.filter((value) => value !== email),
       email,
@@ -410,13 +387,13 @@ function useOneSignalState(): UseOneSignalReturn {
   };
 
   const removeEmail = (email: string) => {
-    if (isNative()) OneSignal.User.removeEmail(email);
+    OneSignal.User.removeEmail(email);
     setEmailsList((prev) => prev.filter((value) => value !== email));
     console.log(`Email removed: ${email}`);
   };
 
   const addSms = (sms: string) => {
-    if (isNative()) OneSignal.User.addSms(sms);
+    OneSignal.User.addSms(sms);
     setSmsNumbersList((prev) => [
       ...prev.filter((value) => value !== sms),
       sms,
@@ -425,13 +402,13 @@ function useOneSignalState(): UseOneSignalReturn {
   };
 
   const removeSms = (sms: string) => {
-    if (isNative()) OneSignal.User.removeSms(sms);
+    OneSignal.User.removeSms(sms);
     setSmsNumbersList((prev) => prev.filter((value) => value !== sms));
     console.log(`SMS removed: ${sms}`);
   };
 
   const addTag = (key: string, value: string) => {
-    if (isNative()) OneSignal.User.addTag(key, value);
+    OneSignal.User.addTag(key, value);
     setTagsList((prev) => {
       const filtered = prev.filter(([k]) => k !== key);
       return [...filtered, [key, value]];
@@ -440,7 +417,7 @@ function useOneSignalState(): UseOneSignalReturn {
   };
 
   const addTags = (pairs: Record<string, string>) => {
-    if (isNative()) OneSignal.User.addTags(pairs);
+    OneSignal.User.addTags(pairs);
     const newEntries = toPairs(pairs);
     setTagsList((prev) => {
       const keys = new Set(newEntries.map(([k]) => k));
@@ -450,29 +427,29 @@ function useOneSignalState(): UseOneSignalReturn {
   };
 
   const removeSelectedTags = (keys: string[]) => {
-    if (isNative()) OneSignal.User.removeTags(keys);
+    OneSignal.User.removeTags(keys);
     const keySet = new Set(keys);
     setTagsList((prev) => prev.filter(([k]) => !keySet.has(k)));
     console.log(`${keys.length} tag(s) removed`);
   };
 
   const sendOutcome = (name: string) => {
-    if (isNative()) OneSignal.Session.addOutcome(name);
+    OneSignal.Session.addOutcome(name);
     console.log(`Outcome sent: ${name}`);
   };
 
   const sendUniqueOutcome = (name: string) => {
-    if (isNative()) OneSignal.Session.addUniqueOutcome(name);
+    OneSignal.Session.addUniqueOutcome(name);
     console.log(`Unique outcome sent: ${name}`);
   };
 
   const sendOutcomeWithValue = (name: string, value: number) => {
-    if (isNative()) OneSignal.Session.addOutcomeWithValue(name, value);
+    OneSignal.Session.addOutcomeWithValue(name, value);
     console.log(`Outcome sent: ${name} = ${value}`);
   };
 
   const addTrigger = (key: string, value: string) => {
-    if (isNative()) OneSignal.InAppMessages.addTrigger(key, value);
+    OneSignal.InAppMessages.addTrigger(key, value);
     setTriggersList((prev) => {
       const filtered = prev.filter(([k]) => k !== key);
       return [...filtered, [key, value]];
@@ -481,7 +458,7 @@ function useOneSignalState(): UseOneSignalReturn {
   };
 
   const addTriggers = (pairs: Record<string, string>) => {
-    if (isNative()) OneSignal.InAppMessages.addTriggers(pairs);
+    OneSignal.InAppMessages.addTriggers(pairs);
     const newEntries = toPairs(pairs);
     setTriggersList((prev) => {
       const keys = new Set(newEntries.map(([k]) => k));
@@ -491,26 +468,26 @@ function useOneSignalState(): UseOneSignalReturn {
   };
 
   const removeSelectedTriggers = (keys: string[]) => {
-    if (isNative()) OneSignal.InAppMessages.removeTriggers(keys);
+    OneSignal.InAppMessages.removeTriggers(keys);
     const keySet = new Set(keys);
     setTriggersList((prev) => prev.filter(([k]) => !keySet.has(k)));
     console.log(`${keys.length} trigger(s) removed`);
   };
 
   const clearTriggers = () => {
-    if (isNative()) OneSignal.InAppMessages.clearTriggers();
+    OneSignal.InAppMessages.clearTriggers();
     setTriggersList([]);
     console.log('All triggers cleared');
   };
 
   const trackEvent = (name: string, properties?: Record<string, unknown>) => {
-    if (isNative()) OneSignal.User.trackEvent(name, properties);
+    OneSignal.User.trackEvent(name, properties);
     console.log(`Event tracked: ${name}`);
   };
 
   const setLocationShared = async (shared: boolean) => {
     setLocationSharedState(shared);
-    if (isNative()) OneSignal.Location.setShared(shared);
+    OneSignal.Location.setShared(shared);
     preferences.setLocationShared(shared);
     console.log(
       shared ? 'Location sharing enabled' : 'Location sharing disabled',
@@ -518,7 +495,7 @@ function useOneSignalState(): UseOneSignalReturn {
   };
 
   const requestLocationPermission = () => {
-    if (isNative()) OneSignal.Location.requestPermission();
+    OneSignal.Location.requestPermission();
   };
 
   const startDefaultLiveActivity = (
@@ -526,9 +503,7 @@ function useOneSignalState(): UseOneSignalReturn {
     attributes: object,
     content: object,
   ) => {
-    if (isNative()) {
-      OneSignal.LiveActivities.startDefault(activityId, attributes, content);
-    }
+    OneSignal.LiveActivities.startDefault(activityId, attributes, content);
     console.log(`Started Live Activity: ${activityId}`);
   };
 
