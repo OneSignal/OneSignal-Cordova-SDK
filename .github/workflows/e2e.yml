@@ -46,15 +46,15 @@ jobs:
           onesignal-app-id: ${{ vars.APPIUM_ONESIGNAL_APP_ID }}
           onesignal-api-key: ${{ secrets.APPIUM_ONESIGNAL_API_KEY }}
 
-      - name: Build debug APK
+      - name: Build release APK
         working-directory: examples/demo/android
-        run: ./gradlew assembleDebug --quiet --console=plain --warning-mode=summary
+        run: ./gradlew assembleRelease --quiet --console=plain --warning-mode=summary
 
       - name: Upload APK
         uses: actions/upload-artifact@v7
         with:
           name: demo-apk
-          path: examples/demo/android/app/build/outputs/apk/debug/app-debug.apk
+          path: examples/demo/android/app/build/outputs/apk/release/app-release.apk
           retention-days: 1
           compression-level: 0
 
@@ -139,7 +139,7 @@ jobs:
     with:
       platform: android
       app-artifact: demo-apk
-      app-filename: app-debug.apk
+      app-filename: app-release.apk
       sdk-type: cordova
       build-name: cordova-android-${{ github.ref_name }}-${{ github.run_number }}
 
