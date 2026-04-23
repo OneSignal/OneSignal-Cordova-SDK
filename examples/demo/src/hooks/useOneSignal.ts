@@ -317,7 +317,7 @@ function useOneSignalState(): UseOneSignalReturn {
     preferences.setConsentGiven(granted);
   };
 
-  const promptPush =  () =>  OneSignal.Notifications.requestPermission(true);
+  const promptPush = () => OneSignal.Notifications.requestPermission(true);
 
   const setPushEnabled = (enabled: boolean) => {
     if (enabled) {
