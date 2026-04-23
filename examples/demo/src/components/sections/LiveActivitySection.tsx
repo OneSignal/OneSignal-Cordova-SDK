@@ -23,21 +23,21 @@ const ORDER_STATUSES = [
 
 interface LiveActivitySectionProps {
   hasApiKey: boolean;
-  onInfoTap?: () => void;
   onStart: (activityId: string, attributes: object, content: object) => void;
   onUpdate: (
     activityId: string,
     eventUpdates: Record<string, unknown>,
   ) => Promise<boolean>;
   onEnd: (activityId: string) => Promise<boolean>;
+  onInfoTap?: () => void;
 }
 
 const LiveActivitySection: FC<LiveActivitySectionProps> = ({
   hasApiKey,
-  onInfoTap,
   onStart,
   onUpdate,
   onEnd,
+  onInfoTap,
 }) => {
   const [activityId, setActivityId] = useState('order-1');
   const [orderNumber, setOrderNumber] = useState('ORD-1234');
@@ -94,7 +94,11 @@ const LiveActivitySection: FC<LiveActivitySectionProps> = ({
   const isEmpty = !activityId.trim();
 
   return (
-    <SectionCard title="LIVE ACTIVITIES" onInfoTap={onInfoTap}>
+    <SectionCard
+      title="LIVE ACTIVITIES"
+      onInfoTap={onInfoTap}
+      sectionKey="live_activities"
+    >
       <div className="card">
         <div className="inline-input-row">
           <label className="inline-input-label" htmlFor="la-activity-id">
@@ -109,6 +113,7 @@ const LiveActivitySection: FC<LiveActivitySectionProps> = ({
             placeholder="Activity ID"
             autoCapitalize="none"
             autoCorrect="off"
+            data-testid="live_activity_id_input"
           />
         </div>
         <div className="divider" />
@@ -125,11 +130,17 @@ const LiveActivitySection: FC<LiveActivitySectionProps> = ({
             placeholder="Order #"
             autoCapitalize="none"
             autoCorrect="off"
+            data-testid="live_activity_order_input"
           />
         </div>
       </div>
 
-      <ActionButton type="button" onClick={handleStart} disabled={isEmpty}>
+      <ActionButton
+        type="button"
+        onClick={handleStart}
+        disabled={isEmpty}
+        data-testid="start_live_activity_button"
+      >
         START LIVE ACTIVITY
       </ActionButton>
 
@@ -137,6 +148,7 @@ const LiveActivitySection: FC<LiveActivitySectionProps> = ({
         type="button"
         onClick={handleUpdate}
         disabled={isEmpty || updating || !hasApiKey}
+        data-testid="update_live_activity_button"
       >
         {`UPDATE → ${nextStatus.status.replace(/_/g, ' ').toUpperCase()}`}
       </ActionButton>
@@ -146,6 +158,7 @@ const LiveActivitySection: FC<LiveActivitySectionProps> = ({
         type="button"
         onClick={handleEnd}
         disabled={isEmpty || updating || !hasApiKey}
+        data-testid="end_live_activity_button"
       >
         END LIVE ACTIVITY
       </ActionButton>

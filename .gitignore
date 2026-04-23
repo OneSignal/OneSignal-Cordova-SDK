@@ -9,6 +9,7 @@ dist
 build/
 coverage/
 *.tgz
+.cordova-sdk-source.stamp
 
 .DS_Store
 # Coverage

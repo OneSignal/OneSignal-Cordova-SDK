@@ -9,6 +9,7 @@ interface SingleInputModalProps {
   confirmLabel: string;
   onClose: () => void;
   onSubmit: (value: string) => void;
+  inputTestId?: string;
 }
 
 const SingleInputModal: FC<SingleInputModalProps> = ({
@@ -18,6 +19,7 @@ const SingleInputModal: FC<SingleInputModalProps> = ({
   confirmLabel,
   onClose,
   onSubmit,
+  inputTestId,
 }) => {
   const [value, setValue] = useState('');
 
@@ -43,12 +45,15 @@ const SingleInputModal: FC<SingleInputModalProps> = ({
           value={value}
           onChange={(event) => setValue(event.target.value)}
           placeholder={placeholder}
+          data-testid={inputTestId}
         />
         <div className="modal-actions">
           <button type="button" onClick={onClose}>
             Cancel
           </button>
-          <button type="submit">{confirmLabel}</button>
+          <button type="submit" data-testid="singleinput_confirm_button">
+            {confirmLabel}
+          </button>
         </div>
       </form>
     </ModalShell>

@@ -301,6 +301,14 @@
   font-size: var(--font-size-body);
 }
 
+.list-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 0;
+  color: var(--os-grey-600);
+}
+
 .empty {
   text-align: center;
   font-size: var(--font-size-body);

@@ -94,5 +94,6 @@
   "platforms": [
     "android",
     "ios"
-  ]
+  ],
+  "packageManager": "bun@1.3.13"
 }

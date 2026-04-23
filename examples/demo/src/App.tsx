@@ -1,10 +1,18 @@
-import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
+import {
+  IonApp,
+  IonRouterOutlet,
+  IonToast,
+  setupIonicReact,
+} from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
+import { useEffect, useState } from 'react';
 import { Redirect, Route } from 'react-router-dom';
 import { StatusBar, Style } from '@capacitor/status-bar';
-import { AppContextProvider } from './context/AppContext';
-import Home from './pages/Home';
+import { OneSignalProvider } from './hooks/useOneSignal';
+import HomeScreen from './pages/HomeScreen';
 import Secondary from './pages/Secondary';
+import TooltipHelper from './services/TooltipHelper';
+import { subscribeSnackbar } from './utils/showSnackbar';
 
 StatusBar.setStyle({ style: Style.Dark }).catch(() => {});
 
@@ -40,24 +48,51 @@ import './theme/variables.css';
 
 setupIonicReact();
 
-const App: React.FC = () => (
-  <IonApp>
-    <AppContextProvider>
-      <IonReactRouter>
-        <IonRouterOutlet>
-          <Route exact path="/home">
-            <Home />
-          </Route>
-          <Route exact path="/secondary">
-            <Secondary />
-          </Route>
-          <Route exact path="/">
-            <Redirect to="/home" />
-          </Route>
-        </IonRouterOutlet>
-      </IonReactRouter>
-    </AppContextProvider>
-  </IonApp>
-);
+const App: React.FC = () => {
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastOpen, setToastOpen] = useState(false);
+
+  useEffect(() => {
+    void TooltipHelper.getInstance().init();
+    // Close-then-open on a fresh tick so consecutive snackbars (e.g. tests
+    // sending three outcomes in a row) reliably restart IonToast's timer and
+    // re-render the new message. Calling setToastOpen(true) while already true
+    // is a no-op for IonToast and the new `message` is often ignored mid-flight.
+    return subscribeSnackbar((message) => {
+      setToastOpen(false);
+      setTimeout(() => {
+        setToastMessage(message);
+        setToastOpen(true);
+      }, 0);
+    });
+  }, []);
+
+  return (
+    <IonApp>
+      <OneSignalProvider>
+        <IonReactRouter>
+          <IonRouterOutlet>
+            <Route exact path="/home">
+              <HomeScreen />
+            </Route>
+            <Route exact path="/secondary">
+              <Secondary />
+            </Route>
+            <Route exact path="/">
+              <Redirect to="/home" />
+            </Route>
+          </IonRouterOutlet>
+        </IonReactRouter>
+        <IonToast
+          isOpen={toastOpen}
+          message={toastMessage}
+          duration={1600}
+          onDidDismiss={() => setToastOpen(false)}
+          data-testid="snackbar_toast"
+        />
+      </OneSignalProvider>
+    </IonApp>
+  );
+};
 
 export default App;

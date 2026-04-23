@@ -58,6 +58,7 @@ const TrackEventModal: FC<TrackEventModalProps> = ({
           value={name}
           onChange={(event) => setName(event.target.value)}
           placeholder="Event Name"
+          data-testid="event_name_input"
         />
         <textarea
           value={properties}
@@ -66,13 +67,16 @@ const TrackEventModal: FC<TrackEventModalProps> = ({
             setError(null);
           }}
           placeholder="Properties (JSON, optional)"
+          data-testid="event_properties_input"
         />
         {error ? <p className="error">{error}</p> : null}
         <div className="modal-actions">
           <button type="button" onClick={onClose}>
             Cancel
           </button>
-          <button type="submit">Track</button>
+          <button type="submit" data-testid="event_track_button">
+            Track
+          </button>
         </div>
       </form>
     </ModalShell>

@@ -1,28 +1,111 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Run from inside any examples/<demo> directory.
 ORIGINAL_DIR=$(pwd)
+SDK_ROOT=$(cd "$ORIGINAL_DIR/../.." && pwd)
 
-# Build root package
-cd ../../
+info() { echo -e "\033[0;32m[setup]\033[0m $*"; }
+
+# ── Plugin tarball cache ─────────────────────────────────────────────────────
+# Skip the rebuild/repack/`bun add` cycle when the plugin sources haven't
+# changed and the demo already has it installed. Mirrors run-local.sh.
+SDK_STAMP="$SDK_ROOT/.cordova-sdk-source.stamp"
+INSTALLED_DIR="$ORIGINAL_DIR/node_modules/onesignal-cordova-plugin"
+
+SDK_SRC_HASH=$(find "$SDK_ROOT/src" "$SDK_ROOT/www" \
+                    "$SDK_ROOT/package.json" "$SDK_ROOT/plugin.xml" \
+                    "$SDK_ROOT/build-extras-onesignal.gradle" \
+               -type f 2>/dev/null \
+               | sort \
+               | xargs shasum 2>/dev/null \
+               | shasum \
+               | awk '{print $1}')
+
+if [[ -d "$INSTALLED_DIR" ]] && [[ -f "$SDK_STAMP" ]] && [[ "$(cat "$SDK_STAMP")" == "$SDK_SRC_HASH" ]]; then
+  info "Cordova SDK source unchanged, skipping rebuild + repack"
+else
+  info "Building Cordova plugin & packing tarball..."
+  (cd "$SDK_ROOT" && bun run build)
+  (cd "$SDK_ROOT" && rm -f onesignal-cordova-plugin*.tgz && bun pm pack && mv onesignal-cordova-plugin-*.tgz onesignal-cordova-plugin.tgz)
+
+  # Always go through bun remove + bun add so bun.lock's integrity hash for
+  # the tarball stays in sync with the freshly-built tarball on disk.
+  #
+  # `bun remove` first because bun verifies the existing integrity hash
+  # before replacing the entry; without removing, a stale hash from a prior
+  # build (or a spec mismatch with the relative path declared in
+  # package.json) causes `bun add` to fail with a dependency-loop error
+  # under bun 1.3+. The relative `file:../../...` path is intentional —
+  # an absolute path would leak the local layout into the lockfile and
+  # also trips the same loop check by differing from package.json's spec.
+  info "Registering tarball with bun (refreshes bun.lock integrity hash)..."
+  bun remove onesignal-cordova-plugin 2>/dev/null || true
+  bun add file:../../onesignal-cordova-plugin.tgz
+
+  echo "$SDK_SRC_HASH" > "$SDK_STAMP"
+fi
+
+# ── Web bundle ───────────────────────────────────────────────────────────────
+info "Building web bundle (vite)..."
 bun run build
 
-rm -f onesignal-cordova-plugin.tgz
-bun pm pack
-mv onesignal-cordova-plugin-*.tgz onesignal-cordova-plugin.tgz
-
-# Use fresh install of the package
-cd "$ORIGINAL_DIR"
-bun remove onesignal-cordova-plugin
-bun add file:../../onesignal-cordova-plugin.tgz
-
-bun run build
+# ── Capacitor sync cache ─────────────────────────────────────────────────────
+# `cap sync` runs `pod install` + an internal `xcodebuild clean`, so skipping
+# it when nothing relevant changed saves ~30-60s and keeps the Xcode build
+# dir warm for incremental rebuilds.
+#
+# We hash the web bundle *sources* (not `dist/`) because Vite's legacy plugin
+# emits content-hashed chunk filenames whose order can drift between identical
+# builds, which would invalidate the stamp on every run.
+SYNC_STAMP="$ORIGINAL_DIR/ios/App/build/.cap-sync.stamp"
+SYNC_HASH=$(find "$ORIGINAL_DIR/src" "$ORIGINAL_DIR/index.html" \
+                 "$ORIGINAL_DIR/capacitor.config.ts" "$ORIGINAL_DIR/vite.config.ts" \
+                 "$ORIGINAL_DIR/package.json" "$ORIGINAL_DIR/bun.lock" \
+                 "$ORIGINAL_DIR/ios/App" \
+            -type f \
+            ! -path "*/node_modules/*" \
+            ! -path "*/Pods/*" \
+            ! -path "*/build/*" \
+            ! -path "*/DerivedData/*" \
+            ! -path "*/xcuserdata/*" \
+            \( -name "Podfile" -o -name "build.gradle" \
+               -o -name "*.ts" -o -name "*.tsx" \
+               -o -name "*.json" -o -name "*.html" -o -name "*.js" \
+               -o -name "*.css" -o -name "*.svg" -o -name "*.xml" \
+               -o -name "*.lock" \) \
+            2>/dev/null \
+            | sort \
+            | xargs shasum 2>/dev/null \
+            | shasum \
+            | awk '{print $1}')
+SYNC_HASH="${SYNC_HASH}-${SDK_SRC_HASH}"
 
 pod_update() {
-  cd ios/App && pod update OneSignalXCFramework --no-repo-update && cd ../..
+  (cd "$ORIGINAL_DIR/ios/App" && pod update OneSignalXCFramework --no-repo-update)
 }
 
-# cap sync may fail if pods are outdated; retry after updating pods
-pod_update
-bun cap sync || { pod_update && bun cap sync; }
-
+if [[ -d "$ORIGINAL_DIR/ios/App/App/public" ]] && [[ -f "$SYNC_STAMP" ]] && [[ "$(cat "$SYNC_STAMP")" == "$SYNC_HASH" ]]; then
+  info "Capacitor sync inputs unchanged, skipping pod update + cap sync"
+elif ! command -v pod >/dev/null 2>&1; then
+  # CI Android builds run on Linux where CocoaPods is not installed. We
+  # still need the Android side of `cap sync` to generate
+  # android/app/capacitor.build.gradle; just skip the iOS half (which
+  # would shell out to pod and fail).
+  info "CocoaPods not found, syncing Android only..."
+  bun cap sync android
+  mkdir -p "$(dirname "$SYNC_STAMP")"
+  echo "$SYNC_HASH" > "$SYNC_STAMP"
+else
+  info "Syncing Capacitor + updating Pods..."
+  # On a fresh checkout `capacitor-cordova-ios-plugins/` doesn't exist yet
+  # (it's generated by `cap sync`), so the very first sync must run before
+  # any `pod` command — otherwise pod resolves the Podfile and bails on a
+  # missing local podspec. After the first successful sync, `pod_update`
+  # bumps OneSignalXCFramework to the latest matching version. If a
+  # subsequent sync fails on already-outdated pods, retry once.
+  bun cap sync || { pod_update && bun cap sync; }
+  pod_update
+  mkdir -p "$(dirname "$SYNC_STAMP")"
+  echo "$SYNC_HASH" > "$SYNC_STAMP"
+fi

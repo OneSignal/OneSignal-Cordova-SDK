@@ -4,21 +4,22 @@ import ToggleRow from '../ToggleRow';
 
 interface InAppSectionProps {
   inAppMessagesPaused: boolean;
-  onInfoTap: () => void;
   onTogglePaused: (checked: boolean) => void;
+  onInfoTap: () => void;
 }
 
 const InAppSection: FC<InAppSectionProps> = ({
   inAppMessagesPaused,
-  onInfoTap,
   onTogglePaused,
+  onInfoTap,
 }) => (
-  <SectionCard title="IN-APP MESSAGING" onInfoTap={onInfoTap}>
+  <SectionCard title="IN-APP MESSAGING" onInfoTap={onInfoTap} sectionKey="iam">
     <ToggleRow
       label="Pause In-App Messages"
       description="Toggle in-app message display"
       checked={inAppMessagesPaused}
       onToggle={onTogglePaused}
+      testID="pause_iam_toggle"
     />
   </SectionCard>
 );
