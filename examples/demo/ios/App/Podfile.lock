@@ -1,16 +1,16 @@
 PODS:
-  - Capacitor (7.6.0):
+  - Capacitor (8.3.1):
     - CapacitorCordova
-  - CapacitorApp (7.1.2):
+  - CapacitorApp (8.1.0):
     - Capacitor
-  - CapacitorCordova (7.6.0)
-  - CapacitorHaptics (7.0.4):
+  - CapacitorCordova (8.3.1)
+  - CapacitorHaptics (8.0.2):
     - Capacitor
-  - CapacitorKeyboard (7.0.5):
+  - CapacitorKeyboard (8.0.3):
     - Capacitor
-  - CapacitorStatusBar (7.0.5):
+  - CapacitorStatusBar (8.0.2):
     - Capacitor
-  - CordovaPluginsStatic (7.5.0):
+  - CordovaPluginsStatic (8.3.1):
     - CapacitorCordova
     - OneSignalXCFramework (= 5.5.0)
   - OneSignalXCFramework (5.5.0):
@@ -91,15 +91,15 @@ EXTERNAL SOURCES:
     :path: "../capacitor-cordova-ios-plugins"
 
 SPEC CHECKSUMS:
-  Capacitor: 6e644e9e3369368ac601c77a0fad57f34b78aaa6
-  CapacitorApp: f01a913211780e0718dae9750442c3e23f96e106
-  CapacitorCordova: f163aa2e84b79efc54d6a75b305bc7e05fb80c5d
-  CapacitorHaptics: bf3f58fc5dc7975a7ad5b7c725e5bb5bd435ae81
-  CapacitorKeyboard: 2fa1e17aec16aef8b01adbc20e8fc295db46104d
-  CapacitorStatusBar: 6de542f202c0dd3f9d0a73b240d4c9d3dddc49b4
-  CordovaPluginsStatic: cdfdd1bdab8a319bc3139abc6b718405980495ca
+  Capacitor: 46dbaa89c1d1cd121b9fc2dc839c1f39cc49e326
+  CapacitorApp: 449ffe26375e96f8aaaee625ac6e01e5c57c8650
+  CapacitorCordova: 9010447fe25e869705fcf525e5f490facde87608
+  CapacitorHaptics: 296f771ecd89c7a1bd92a7b6826a7d268e2e70f5
+  CapacitorKeyboard: 31c8285d92c9d1410071d52449f16d2c6673b6f4
+  CapacitorStatusBar: 01d5763b4ed720de5ce2edbc938de6a98f4c8f32
+  CordovaPluginsStatic: 9f04e2c906e996372d5a43ebfd8a1a0bc7fdd02d
   OneSignalXCFramework: 943852e7d70d719f73e9669d48620aeec1b93022
 
-PODFILE CHECKSUM: c7d0e14bd5e3dbed8dd48854f5142b34dada81b6
+PODFILE CHECKSUM: 892242555b0dc410fc880efd419fbc59f99aa3c7
 
 COCOAPODS: 1.16.2

@@ -93,7 +93,10 @@ elif ! command -v pod >/dev/null 2>&1; then
   # android/app/capacitor.build.gradle; just skip the iOS half (which
   # would shell out to pod and fail).
   info "CocoaPods not found, syncing Android only..."
-  bun cap sync android
+  # `--bun` forces bun to ignore cap's `#!/usr/bin/env node` shebang and run
+  # it under bun's runtime; without it we fall through to system node, which
+  # CI doesn't install (and Capacitor 8 demands node >=22).
+  bunx --bun cap sync android
   mkdir -p "$(dirname "$SYNC_STAMP")"
   echo "$SYNC_HASH" > "$SYNC_STAMP"
 else
@@ -104,7 +107,7 @@ else
   # missing local podspec. After the first successful sync, `pod_update`
   # bumps OneSignalXCFramework to the latest matching version. If a
   # subsequent sync fails on already-outdated pods, retry once.
-  bun cap sync || { pod_update && bun cap sync; }
+  bunx --bun cap sync || { pod_update && bunx --bun cap sync; }
   pod_update
   mkdir -p "$(dirname "$SYNC_STAMP")"
   echo "$SYNC_HASH" > "$SYNC_STAMP"
