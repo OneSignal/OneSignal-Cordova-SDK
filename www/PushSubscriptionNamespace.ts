@@ -21,6 +21,9 @@ export default class PushSubscription {
     event: PushSubscriptionChangedState,
   ) => void)[] = [];
 
+  // Track whether native handler has been registered to avoid duplicate registrations
+  private _changeHandlerRegistered = false;
+
   private _processFunctionList(
     array: ((event: PushSubscriptionChangedState) => void)[],
     param: PushSubscriptionChangedState,
@@ -174,18 +177,23 @@ export default class PushSubscription {
     this._subscriptionObserverList.push(
       listener as (event: PushSubscriptionChangedState) => void,
     );
-    const subscriptionCallBackProcessor = (
-      state: PushSubscriptionChangedState,
-    ) => {
-      this._processFunctionList(this._subscriptionObserverList, state);
-    };
-    window.cordova.exec(
-      subscriptionCallBackProcessor,
-      noop,
-      'OneSignalPush',
-      'addPushSubscriptionObserver',
-      [],
-    );
+
+    // Only register the native handler once
+    if (!this._changeHandlerRegistered) {
+      this._changeHandlerRegistered = true;
+      const subscriptionCallBackProcessor = (
+        state: PushSubscriptionChangedState,
+      ) => {
+        this._processFunctionList(this._subscriptionObserverList, state);
+      };
+      window.cordova.exec(
+        subscriptionCallBackProcessor,
+        noop,
+        'OneSignalPush',
+        'addPushSubscriptionObserver',
+        [],
+      );
+    }
   }
 
   /**
