@@ -1,4 +1,7 @@
-import OneSignal, { LogLevel } from 'onesignal-cordova-plugin';
+import OneSignal, {
+  LogLevel,
+  type NotificationWillDisplayEvent,
+} from 'onesignal-cordova-plugin';
 import {
   createContext,
   createElement,
@@ -183,6 +186,16 @@ function useOneSignalState(): UseOneSignalReturn {
       console.log(`Permission changed: ${granted}`);
     };
 
+    const handleForegroundWillDisplay = (e: NotificationWillDisplayEvent) => {
+      console.log(`Notification foregroundWillDisplay: ${e.getNotification().title ?? ''}`);
+
+     // If you want to test preventDefault, you can uncomment the following line:
+      // e.preventDefault(); // prevent the notification from displaying immediately
+      // setTimeout(() => {
+      //   e.getNotification().display(); // display the notification after 5 seconds (overrides the preventDefault)
+      // }, 5000);
+    };
+
     const handlePushSubscriptionChange = () => {
       if (cancelled) return;
       void refreshPushState();
@@ -233,6 +246,14 @@ function useOneSignalState(): UseOneSignalReturn {
         'permissionChange',
         handlePermissionChange,
       );
+      // Required so foreground pushes actually display: registering this
+      // listener wires up the native `addForegroundLifecycleListener` bridge.
+      // Without it the SDK never resolves `proceedWithWillDisplay` and the
+      // banner stays queued.
+      OneSignal.Notifications.addEventListener(
+        'foregroundWillDisplay',
+        handleForegroundWillDisplay,
+      );
       OneSignal.User.pushSubscription.addEventListener(
         'change',
         handlePushSubscriptionChange,
@@ -259,6 +280,10 @@ function useOneSignalState(): UseOneSignalReturn {
       OneSignal.Notifications.removeEventListener(
         'permissionChange',
         handlePermissionChange,
+      );
+      OneSignal.Notifications.removeEventListener(
+        'foregroundWillDisplay',
+        handleForegroundWillDisplay,
       );
       OneSignal.User.pushSubscription.removeEventListener(
         'change',
