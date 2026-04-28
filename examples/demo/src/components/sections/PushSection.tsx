@@ -2,16 +2,7 @@ import { IonToggle } from '@ionic/react';
 import type { FC } from 'react';
 import ActionButton from '../ActionButton';
 import SectionCard from '../SectionCard';
-
-const MASK_CHAR = '•';
-const E2E_MODE = (import.meta.env.VITE_E2E_MODE ?? '').trim() === 'true';
-
-function maskValue(value: string): string {
-  if (E2E_MODE) {
-    return MASK_CHAR.repeat(value.length);
-  }
-  return value;
-}
+import { maskValue } from '../../utils/maskValue';
 
 interface PushSectionProps {
   pushSubscriptionId: string | null | undefined;
