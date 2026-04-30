@@ -39,7 +39,7 @@ const HomeScreen: FC = () => {
     if (os.isReady) {
       void os.promptPush();
     }
-  }, [os]);
+  }, [os.isReady, os.promptPush]);
 
   const showTooltipModal = (key: string): void => {
     const tooltip = TooltipHelper.getInstance().getTooltip(key);

@@ -1,14 +1,5 @@
 import OneSignal, { LogLevel, type NotificationWillDisplayEvent } from 'onesignal-cordova-plugin';
-import {
-  createContext,
-  createElement,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-  type ReactNode,
-} from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { NotificationType } from '../models/NotificationType';
 import OneSignalApiService from '../services/OneSignalApiService';
@@ -101,7 +92,7 @@ export type UseOneSignalReturn = {
   endLiveActivity: (activityId: string) => Promise<boolean>;
 };
 
-function useOneSignalState(): UseOneSignalReturn {
+export function useOneSignal(): UseOneSignalReturn {
   const [appId] = useState(resolveAppId);
   const [consentRequired, setConsentRequiredState] = useState(false);
   const [privacyConsentGiven, setPrivacyConsentGivenState] = useState(false);
@@ -536,23 +527,4 @@ function useOneSignalState(): UseOneSignalReturn {
     updateLiveActivity,
     endLiveActivity,
   };
-}
-
-const OneSignalContext = createContext<UseOneSignalReturn | null>(null);
-
-interface ProviderProps {
-  children: ReactNode;
-}
-
-export function OneSignalProvider({ children }: ProviderProps) {
-  const value = useOneSignalState();
-  return createElement(OneSignalContext.Provider, { value }, children);
-}
-
-export function useOneSignal(): UseOneSignalReturn {
-  const ctx = useContext(OneSignalContext);
-  if (!ctx) {
-    throw new Error('useOneSignal must be used within <OneSignalProvider>');
-  }
-  return ctx;
 }

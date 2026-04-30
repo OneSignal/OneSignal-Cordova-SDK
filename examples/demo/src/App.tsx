@@ -4,7 +4,6 @@ import { IonReactRouter } from '@ionic/react-router';
 import { useEffect, useState } from 'react';
 import { Redirect, Route } from 'react-router-dom';
 
-import { OneSignalProvider } from './hooks/useOneSignal';
 import HomeScreen from './pages/HomeScreen';
 import Secondary from './pages/Secondary';
 import TooltipHelper from './services/TooltipHelper';
@@ -60,28 +59,26 @@ const App: React.FC = () => {
 
   return (
     <IonApp>
-      <OneSignalProvider>
-        <IonReactRouter>
-          <IonRouterOutlet>
-            <Route exact path="/home">
-              <HomeScreen />
-            </Route>
-            <Route exact path="/secondary">
-              <Secondary />
-            </Route>
-            <Route exact path="/">
-              <Redirect to="/home" />
-            </Route>
-          </IonRouterOutlet>
-        </IonReactRouter>
-        <IonToast
-          isOpen={toastOpen}
-          message={toastMessage}
-          duration={1600}
-          onDidDismiss={() => setToastOpen(false)}
-          data-testid="snackbar_toast"
-        />
-      </OneSignalProvider>
+      <IonReactRouter>
+        <IonRouterOutlet>
+          <Route exact path="/home">
+            <HomeScreen />
+          </Route>
+          <Route exact path="/secondary">
+            <Secondary />
+          </Route>
+          <Route exact path="/">
+            <Redirect to="/home" />
+          </Route>
+        </IonRouterOutlet>
+      </IonReactRouter>
+      <IonToast
+        isOpen={toastOpen}
+        message={toastMessage}
+        duration={1600}
+        onDidDismiss={() => setToastOpen(false)}
+        data-testid="snackbar_toast"
+      />
     </IonApp>
   );
 };
