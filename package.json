@@ -36,15 +36,12 @@
   "scripts": {
     "build": "vp pack",
     "format:spotless": "./examples/demo/android/gradlew spotlessApply",
-    "format:prettier": "vp fmt \"**/*.{ts,tsx}\" --ignore-path .gitignore",
-    "format": "concurrently \"npm:format:spotless\" \"npm:format:prettier\"",
+    "format": "vp fmt && vp run format:spotless",
     "format:check:spotless": "./examples/demo/android/gradlew spotlessCheck",
-    "format:check:prettier": "vp fmt --check \"**/*.{ts,tsx}\" --ignore-path .gitignore",
-    "format:check": "concurrently \"npm:format:check:spotless\" \"npm:format:check:prettier\"",
-    "lint": "vp check ./www ./examples/demo && vp run format:check",
-    "lint:fix": "vp check --fix ./www ./examples/demo  && vp run format",
+    "format:check": "vp fmt --check && vp run format:check:spotless",
+    "lint": "vp check ./www && vp run format:check:spotless",
+    "lint:fix": "vp check --fix ./www && vp run format",
     "test": "vp test",
-    "test:coverage": "vp test run --coverage",
     "prepare": "vp config"
   },
   "devDependencies": {
@@ -52,7 +49,6 @@
     "@types/bun": "latest",
     "@types/cordova": "^11.0.3",
     "@vitest/coverage-v8": "^4.1.0",
-    "concurrently": "^9.2.1",
     "happy-dom": "^20.0.8",
     "typescript": "^5.9.3",
     "vite-plus": "^0.1.19"

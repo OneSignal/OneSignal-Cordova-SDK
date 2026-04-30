@@ -1,7 +1,7 @@
 name: 📣 General feedback
 description: Tell us what's on your mind
-title: "[Feedback]: "
-labels: ["Feedback"]
+title: '[Feedback]: '
+labels: ['Feedback']
 body:
   - type: markdown
     attributes:
