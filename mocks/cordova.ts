@@ -1,4 +1,6 @@
-export const mockExec = vi.fn();
+import { vi, type Mock } from 'vite-plus/test';
+
+export const mockExec: Mock = vi.fn();
 
 export function mockCordova(): void {
   mockExec.mockReset();

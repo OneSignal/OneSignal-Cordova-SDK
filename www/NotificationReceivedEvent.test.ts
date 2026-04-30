@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, test } from 'vite-plus/test';
+
 import { mockCordova } from '../mocks/cordova';
 import { mockNotification } from '../mocks/data';
 import { NotificationWillDisplayEvent } from './NotificationReceivedEvent';

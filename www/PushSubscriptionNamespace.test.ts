@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, test, vi } from 'vite-plus/test';
+
 import { PREV_SUB_ID, PREV_SUB_TOKEN, SUB_ID, SUB_TOKEN } from '../mocks/constants';
 import { mockCordova, mockExec } from '../mocks/cordova';
 import PushSubscription, { type PushSubscriptionChangedState } from './PushSubscriptionNamespace';

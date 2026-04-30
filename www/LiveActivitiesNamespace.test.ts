@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, test, vi } from 'vite-plus/test';
+
 import { SUB_TOKEN } from '../mocks/constants';
 import { mockCordova } from '../mocks/cordova';
 import LiveActivities from './LiveActivitiesNamespace';

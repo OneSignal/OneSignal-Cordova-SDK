@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, test } from 'vite-plus/test';
+
 import { APP_ID } from '../mocks/constants';
 import { mockCordova, mockExec } from '../mocks/cordova';
 import { OneSignalPlugin } from './index';

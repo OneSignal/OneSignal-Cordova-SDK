@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, test, vi } from 'vite-plus/test';
+
 import { mockCordova, mockExec } from '../mocks/cordova';
 import * as helpers from './helpers';
 import InAppMessages from './InAppMessagesNamespace';

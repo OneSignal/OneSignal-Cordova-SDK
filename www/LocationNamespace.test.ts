@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, test } from 'vite-plus/test';
+
 import { mockCordova, mockExec } from '../mocks/cordova';
 import Location from './LocationNamespace';
 
