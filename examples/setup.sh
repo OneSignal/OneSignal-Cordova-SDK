@@ -46,7 +46,7 @@ vp run build
 # `cap sync` runs `pod install` + `xcodebuild clean` (~30-60s); skip when
 # inputs are unchanged. Hash sources (not `dist/`) since Vite's legacy plugin
 # emits content-hashed chunk names that drift between identical builds.
-SYNC_STAMP="$ORIGINAL_DIR/ios/App/build/.cap-sync.stamp"
+SYNC_STAMP="$ORIGINAL_DIR/.cap-sync.stamp"
 SYNC_HASH=$(find "$ORIGINAL_DIR/src" "$ORIGINAL_DIR/index.html" \
                  "$ORIGINAL_DIR/capacitor.config.ts" "$ORIGINAL_DIR/vite.config.ts" \
                  "$ORIGINAL_DIR/package.json" "$ORIGINAL_DIR/bun.lock" \
@@ -74,6 +74,5 @@ if [[ -d "$ORIGINAL_DIR/ios/App/App/public" ]] && [[ -f "$SYNC_STAMP" ]] && [[ "
 else
   info "Syncing Capacitor..."
   vpx cap sync
-  mkdir -p "$(dirname "$SYNC_STAMP")"
   echo "$SYNC_HASH" > "$SYNC_STAMP"
 fi
