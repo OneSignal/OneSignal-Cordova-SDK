@@ -71,6 +71,12 @@ SYNC_HASH="${SYNC_HASH}-${SDK_SRC_HASH}"
 
 if [[ -d "$ORIGINAL_DIR/ios/App/App/public" ]] && [[ -f "$SYNC_STAMP" ]] && [[ "$(cat "$SYNC_STAMP")" == "$SYNC_HASH" ]]; then
   info "Capacitor sync inputs unchanged, skipping cap sync"
+elif ! command -v pod >/dev/null 2>&1; then
+  # CI Android jobs run on Linux where CocoaPods isn't installed.
+  # Sync only Android so plain `cap sync` doesn't shell out to pod.
+  info "CocoaPods not found, syncing Android only..."
+  vpx cap sync android
+  echo "$SYNC_HASH" > "$SYNC_STAMP"
 else
   info "Syncing Capacitor..."
   vpx cap sync
