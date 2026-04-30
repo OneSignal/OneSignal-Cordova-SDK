@@ -31,15 +31,16 @@
     "src",
     "build-extras-onesignal.gradle"
   ],
-  "main": "dist/index.js",
+  "type": "module",
+  "main": "dist/index.cjs",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "vp pack",
     "format:spotless": "./examples/demo/android/gradlew spotlessApply",
-    "format": "vp fmt && vp run format:spotless",
+    "format": "vp fmt && npm run format:spotless",
     "format:check:spotless": "./examples/demo/android/gradlew spotlessCheck",
-    "format:check": "vp fmt --check && vp run format:check:spotless",
-    "lint": "vp check ./www && vp run format:check:spotless",
+    "format:check": "vp fmt --check && npm run format:check:spotless",
+    "lint": "vp check ./www && npm run format:check:spotless",
     "lint:fix": "vp check --fix ./www && vp run format",
     "test": "vp test",
     "prepare": "vp config"

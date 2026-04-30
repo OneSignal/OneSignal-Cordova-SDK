@@ -23,7 +23,7 @@ export default defineConfig({
     dts: true,
     format: 'cjs',
     minify: true,
-    outExtensions: () => ({ js: '.js', dts: '.d.ts' }),
+    outExtensions: () => ({ js: '.cjs', dts: '.d.ts' }),
     outputOptions: {
       exports: 'named',
     },
