@@ -44,8 +44,8 @@ vp run build
 
 # ── Capacitor sync cache ─────────────────────────────────────────────────────
 # `cap sync` runs `pod install` + `xcodebuild clean` (~30-60s); skip when
-# inputs are unchanged. Hash sources (not `dist/`) since Vite's legacy plugin
-# emits content-hashed chunk names that drift between identical builds.
+# inputs are unchanged. Hash sources (not `dist/`) since bundlers emit
+# content-hashed chunk names that can drift between identical builds.
 SYNC_STAMP="$ORIGINAL_DIR/.cap-sync.stamp"
 SYNC_HASH=$(find "$ORIGINAL_DIR/src" "$ORIGINAL_DIR/index.html" \
                  "$ORIGINAL_DIR/capacitor.config.ts" "$ORIGINAL_DIR/vite.config.ts" \
