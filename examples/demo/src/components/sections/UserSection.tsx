@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import { useState } from 'react';
+
 import { showSnackbar } from '../../utils/showSnackbar';
 import ActionButton from '../ActionButton';
 import SingleInputModal from '../modals/SingleInputModal';
@@ -11,11 +12,7 @@ interface UserSectionProps {
   onLogout: () => Promise<void>;
 }
 
-const UserSection: FC<UserSectionProps> = ({
-  externalUserId,
-  onLogin,
-  onLogout,
-}) => {
+const UserSection: FC<UserSectionProps> = ({ externalUserId, onLogin, onLogout }) => {
   const [loginOpen, setLoginOpen] = useState(false);
   const isLoggedIn = Boolean(externalUserId);
 
@@ -38,10 +35,7 @@ const UserSection: FC<UserSectionProps> = ({
       <div className="card kv-card">
         <div className="kv-row">
           <span>Status</span>
-          <span
-            className={isLoggedIn ? 'text-success' : undefined}
-            data-testid="user_status_value"
-          >
+          <span className={isLoggedIn ? 'text-success' : undefined} data-testid="user_status_value">
             {isLoggedIn ? 'Logged In' : 'Anonymous'}
           </span>
         </div>

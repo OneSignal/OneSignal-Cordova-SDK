@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+
 import type { TooltipData } from '../../services/TooltipHelper';
 import ModalShell from './ModalShell';
 

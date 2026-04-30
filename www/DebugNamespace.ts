@@ -27,8 +27,6 @@ export default class Debug {
    * @returns void
    */
   setAlertLevel(visualLogLevel: LogLevel): void {
-    window.cordova.exec(noop, noop, 'OneSignalPush', 'setAlertLevel', [
-      visualLogLevel,
-    ]);
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'setAlertLevel', [visualLogLevel]);
   }
 }

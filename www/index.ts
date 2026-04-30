@@ -65,9 +65,7 @@ export class OneSignalPlugin {
       this.Notifications._setPropertyAndObserver();
     };
 
-    window.cordova.exec(observerCallback, noop, 'OneSignalPush', 'init', [
-      this._appID,
-    ]);
+    window.cordova.exec(observerCallback, noop, 'OneSignalPush', 'init', [this._appID]);
   }
 
   /**
@@ -94,13 +92,7 @@ export class OneSignalPlugin {
    * @returns void
    */
   setConsentRequired(required: boolean): void {
-    window.cordova.exec(
-      noop,
-      noop,
-      'OneSignalPush',
-      'setPrivacyConsentRequired',
-      [required],
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'setPrivacyConsentRequired', [required]);
   }
 
   /**
@@ -109,9 +101,7 @@ export class OneSignalPlugin {
    * @returns void
    */
   setConsentGiven(granted: boolean): void {
-    window.cordova.exec(noop, noop, 'OneSignalPush', 'setPrivacyConsentGiven', [
-      granted,
-    ]);
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'setPrivacyConsentGiven', [granted]);
   }
 }
 
@@ -137,10 +127,7 @@ export type {
   PushSubscriptionState,
 } from './PushSubscriptionNamespace';
 
-export type {
-  NotificationClickEvent,
-  NotificationClickResult,
-} from './types/NotificationClicked';
+export type { NotificationClickEvent, NotificationClickResult } from './types/NotificationClicked';
 
 export type {
   InAppMessageActionUrlType,

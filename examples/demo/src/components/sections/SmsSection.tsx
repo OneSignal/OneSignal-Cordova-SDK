@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import { useState } from 'react';
+
 import ActionButton from '../ActionButton';
 import { SingleList } from '../ListWidgets';
 import SingleInputModal from '../modals/SingleInputModal';
@@ -31,11 +32,7 @@ const SmsSection: FC<SmsSectionProps> = ({
         onRemove={(sms) => onRemove(sms)}
         sectionKey="sms"
       />
-      <ActionButton
-        type="button"
-        onClick={() => setAddOpen(true)}
-        data-testid="add_sms_button"
-      >
+      <ActionButton type="button" onClick={() => setAddOpen(true)} data-testid="add_sms_button">
         ADD SMS
       </ActionButton>
       <SingleInputModal

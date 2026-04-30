@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { FC } from 'react';
+
 import ModalShell from './ModalShell';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -12,11 +13,7 @@ interface TrackEventModalProps {
   onSubmit: (name: string, properties?: Record<string, unknown>) => void;
 }
 
-const TrackEventModal: FC<TrackEventModalProps> = ({
-  open,
-  onClose,
-  onSubmit,
-}) => {
+const TrackEventModal: FC<TrackEventModalProps> = ({ open, onClose, onSubmit }) => {
   const [name, setName] = useState('');
   const [properties, setProperties] = useState('');
   const [error, setError] = useState<string | null>(null);

@@ -79,6 +79,12 @@ jobs:
       - name: Setup Git User
         uses: OneSignal/sdk-shared/.github/actions/setup-git-user@main
 
+      - name: Set up Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          cache: true
+          run-install: true
+
       - name: Get current native SDK versions from target branch
         id: current_versions
         run: |
@@ -166,6 +172,24 @@ jobs:
           git add -A
           git diff --staged --quiet && exit 0
           git commit -m "Release $NEW_VERSION" && git push
+
+      - name: Refresh demo Podfile.lock
+        run: |
+          # Runs after all version edits (package.json + plugin.xml) so the
+          # repacked plugin tarball and OneSignalXCFramework pin both reflect
+          # the new release. setup.sh runs `cap sync` which runs `pod install`,
+          # regenerating Podfile.lock entries for the path-based plugin and
+          # any changed native pins in a single resolve.
+          (
+            cd examples/demo
+            vp run setup
+          )
+          echo "✓ Refreshed examples/demo/ios/App/Podfile.lock"
+
+          # Only commit if there are changes
+          git add -A
+          git diff --staged --quiet && exit 0
+          git commit -m "Update demo Podfile.lock" && git push
 
   create-pr:
     needs: [prep, update_version]

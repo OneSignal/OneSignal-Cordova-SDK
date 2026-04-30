@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { FC } from 'react';
+
 import ModalShell from './ModalShell';
 
 export type OutcomeMode = 'normal' | 'unique' | 'value';

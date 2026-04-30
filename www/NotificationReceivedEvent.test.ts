@@ -57,9 +57,7 @@ describe('NotificationWillDisplayEvent', () => {
       const notification2 = notificationEvent.getNotification();
 
       expect(notification1).toBeInstanceOf(OSNotification);
-      expect(notification1.notificationId).toBe(
-        notificationData.notificationId,
-      );
+      expect(notification1.notificationId).toBe(notificationData.notificationId);
 
       expect(notification1).toBe(notification2);
     });

@@ -4,6 +4,7 @@
     "esbenp.prettier-vscode",
     "llvm-vs-code-extensions.vscode-clangd",
     "redhat.vscode-yaml",
-    "ryanluker.vscode-coverage-gutters"
+    "ryanluker.vscode-coverage-gutters",
+    "VoidZero.vite-plus-extension-pack"
   ]
 }

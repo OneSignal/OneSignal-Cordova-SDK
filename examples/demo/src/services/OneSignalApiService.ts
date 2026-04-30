@@ -1,4 +1,5 @@
 import { CapacitorHttp } from '@capacitor/core';
+
 import { NotificationType } from '../models/NotificationType';
 import { userDataFromJson } from '../models/UserData';
 import type { UserData } from '../models/UserData';
@@ -39,10 +40,7 @@ class OneSignalApiService {
     return API_KEY.length > 0;
   }
 
-  async sendNotification(
-    type: NotificationType,
-    subscriptionId: string,
-  ): Promise<boolean> {
+  async sendNotification(type: NotificationType, subscriptionId: string): Promise<boolean> {
     let headings: Record<string, string>;
     let contents: Record<string, string>;
     const extra: Record<string, unknown> = {};
@@ -67,12 +65,7 @@ class OneSignalApiService {
     body: string,
     subscriptionId: string,
   ): Promise<boolean> {
-    return this.postNotification(
-      { en: title },
-      { en: body },
-      subscriptionId,
-      {},
-    );
+    return this.postNotification({ en: title }, { en: body }, subscriptionId, {});
   }
 
   private async postNotification(
@@ -94,17 +87,14 @@ class OneSignalApiService {
         ...extra,
       };
 
-      const response = await fetch(
-        'https://onesignal.com/api/v1/notifications',
-        {
-          method: 'POST',
-          headers: {
-            Accept: 'application/vnd.onesignal.v1+json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(body),
+      const response = await fetch('https://onesignal.com/api/v1/notifications', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/vnd.onesignal.v1+json',
+          'Content-Type': 'application/json',
         },
-      );
+        body: JSON.stringify(body),
+      });
 
       if (!response.ok) {
         const text = await response.text();
@@ -151,9 +141,7 @@ class OneSignalApiService {
       });
 
       if (response.status < 200 || response.status >= 300) {
-        console.error(
-          `${event} live activity failed: ${JSON.stringify(response.data)}`,
-        );
+        console.error(`${event} live activity failed: ${JSON.stringify(response.data)}`);
         return false;
       }
 

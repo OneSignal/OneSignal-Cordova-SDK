@@ -1,8 +1,9 @@
 import type { FC } from 'react';
+
+import { showSnackbar } from '../../utils/showSnackbar';
 import ActionButton from '../ActionButton';
 import SectionCard from '../SectionCard';
 import ToggleRow from '../ToggleRow';
-import { showSnackbar } from '../../utils/showSnackbar';
 
 interface LocationSectionProps {
   locationShared: boolean;

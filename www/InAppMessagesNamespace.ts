@@ -10,26 +10,13 @@ import type {
 } from './types/InAppMessage';
 
 export default class InAppMessages {
-  private _inAppMessageClickListeners: ((
-    action: InAppMessageClickEvent,
-  ) => void)[] = [];
-  private _willDisplayInAppMessageListeners: ((
-    event: InAppMessageWillDisplayEvent,
-  ) => void)[] = [];
-  private _didDisplayInAppMessageListeners: ((
-    event: InAppMessageDidDisplayEvent,
-  ) => void)[] = [];
-  private _willDismissInAppMessageListeners: ((
-    event: InAppMessageWillDismissEvent,
-  ) => void)[] = [];
-  private _didDismissInAppMessageListeners: ((
-    event: InAppMessageDidDismissEvent,
-  ) => void)[] = [];
+  private _inAppMessageClickListeners: ((action: InAppMessageClickEvent) => void)[] = [];
+  private _willDisplayInAppMessageListeners: ((event: InAppMessageWillDisplayEvent) => void)[] = [];
+  private _didDisplayInAppMessageListeners: ((event: InAppMessageDidDisplayEvent) => void)[] = [];
+  private _willDismissInAppMessageListeners: ((event: InAppMessageWillDismissEvent) => void)[] = [];
+  private _didDismissInAppMessageListeners: ((event: InAppMessageDidDismissEvent) => void)[] = [];
 
-  private _processFunctionList<T>(
-    array: ((event: T) => void)[],
-    param: T,
-  ): void {
+  private _processFunctionList<T>(array: ((event: T) => void)[], param: T): void {
     for (let i = 0; i < array.length; i++) {
       array[i](param);
     }
@@ -46,9 +33,7 @@ export default class InAppMessages {
     listener: (event: InAppMessageEventTypeMap[K]) => void,
   ): void {
     if (event === 'click') {
-      this._inAppMessageClickListeners.push(
-        listener as (event: InAppMessageClickEvent) => void,
-      );
+      this._inAppMessageClickListeners.push(listener as (event: InAppMessageClickEvent) => void);
       const inAppMessageClickListener = (json: InAppMessageClickEvent) => {
         this._processFunctionList(this._inAppMessageClickListeners, json);
       };
@@ -63,13 +48,8 @@ export default class InAppMessages {
       this._willDisplayInAppMessageListeners.push(
         listener as (event: InAppMessageWillDisplayEvent) => void,
       );
-      const willDisplayCallBackProcessor = (
-        event: InAppMessageWillDisplayEvent,
-      ) => {
-        this._processFunctionList(
-          this._willDisplayInAppMessageListeners,
-          event,
-        );
+      const willDisplayCallBackProcessor = (event: InAppMessageWillDisplayEvent) => {
+        this._processFunctionList(this._willDisplayInAppMessageListeners, event);
       };
       window.cordova.exec(
         willDisplayCallBackProcessor,
@@ -82,9 +62,7 @@ export default class InAppMessages {
       this._didDisplayInAppMessageListeners.push(
         listener as (event: InAppMessageDidDisplayEvent) => void,
       );
-      const didDisplayCallBackProcessor = (
-        event: InAppMessageDidDisplayEvent,
-      ) => {
+      const didDisplayCallBackProcessor = (event: InAppMessageDidDisplayEvent) => {
         this._processFunctionList(this._didDisplayInAppMessageListeners, event);
       };
       window.cordova.exec(
@@ -98,13 +76,8 @@ export default class InAppMessages {
       this._willDismissInAppMessageListeners.push(
         listener as (event: InAppMessageWillDismissEvent) => void,
       );
-      const willDismissInAppMessageProcessor = (
-        event: InAppMessageWillDismissEvent,
-      ) => {
-        this._processFunctionList(
-          this._willDismissInAppMessageListeners,
-          event,
-        );
+      const willDismissInAppMessageProcessor = (event: InAppMessageWillDismissEvent) => {
+        this._processFunctionList(this._willDismissInAppMessageListeners, event);
       };
       window.cordova.exec(
         willDismissInAppMessageProcessor,
@@ -117,9 +90,7 @@ export default class InAppMessages {
       this._didDismissInAppMessageListeners.push(
         listener as (event: InAppMessageDidDismissEvent) => void,
       );
-      const didDismissInAppMessageCallBackProcessor = (
-        event: InAppMessageDidDismissEvent,
-      ) => {
+      const didDismissInAppMessageCallBackProcessor = (event: InAppMessageDidDismissEvent) => {
         this._processFunctionList(this._didDismissInAppMessageListeners, event);
       };
       window.cordova.exec(
@@ -199,9 +170,7 @@ export default class InAppMessages {
    */
   removeTriggers(keys: string[]): void {
     if (!Array.isArray(keys)) {
-      console.error(
-        'OneSignal: removeTriggers: argument must be of type Array',
-      );
+      console.error('OneSignal: removeTriggers: argument must be of type Array');
     }
 
     window.cordova.exec(noop, noop, 'OneSignalPush', 'removeTriggers', [keys]);

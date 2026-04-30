@@ -2,7 +2,7 @@
   "compilerOptions": {
     "outDir": "dist",
     "target": "es2020",
-    "moduleResolution": "node",
+    "moduleResolution": "Bundler",
     "noImplicitAny": true,
     "lib": ["es2020", "dom"],
     "skipLibCheck": true,

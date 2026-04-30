@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import { useEffect, useState } from 'react';
+
 import ModalShell from './ModalShell';
 
 interface CustomNotificationModalProps {
@@ -8,11 +9,7 @@ interface CustomNotificationModalProps {
   onSubmit: (title: string, body: string) => void;
 }
 
-const CustomNotificationModal: FC<CustomNotificationModalProps> = ({
-  open,
-  onClose,
-  onSubmit,
-}) => {
+const CustomNotificationModal: FC<CustomNotificationModalProps> = ({ open, onClose, onSubmit }) => {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
 
@@ -41,11 +38,7 @@ const CustomNotificationModal: FC<CustomNotificationModalProps> = ({
           onChange={(event) => setTitle(event.target.value)}
           placeholder="Title"
         />
-        <input
-          value={body}
-          onChange={(event) => setBody(event.target.value)}
-          placeholder="Body"
-        />
+        <input value={body} onChange={(event) => setBody(event.target.value)} placeholder="Body" />
         <div className="modal-actions">
           <button type="button" onClick={onClose}>
             Cancel

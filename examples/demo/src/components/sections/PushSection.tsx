@@ -1,8 +1,9 @@
 import { IonToggle } from '@ionic/react';
 import type { FC } from 'react';
+
+import { maskValue } from '../../utils/maskValue';
 import ActionButton from '../ActionButton';
 import SectionCard from '../SectionCard';
-import { maskValue } from '../../utils/maskValue';
 
 interface PushSectionProps {
   pushSubscriptionId: string | null | undefined;
@@ -42,11 +43,7 @@ const PushSection: FC<PushSectionProps> = ({
       </div>
     </div>
     {!hasNotificationPermission ? (
-      <ActionButton
-        type="button"
-        onClick={onPromptPush}
-        data-testid="prompt_push_button"
-      >
+      <ActionButton type="button" onClick={onPromptPush} data-testid="prompt_push_button">
         PROMPT PUSH
       </ActionButton>
     ) : null}

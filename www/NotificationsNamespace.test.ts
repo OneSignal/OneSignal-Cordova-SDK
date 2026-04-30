@@ -1,10 +1,8 @@
 import { mockCordova, mockExec } from '../mocks/cordova';
 import { mockNotification, mockNotificationClickEvent } from '../mocks/data';
-import { NotificationWillDisplayEvent } from './NotificationReceivedEvent';
-import Notifications, {
-  OSNotificationPermission,
-} from './NotificationsNamespace';
 import * as helpers from './helpers';
+import { NotificationWillDisplayEvent } from './NotificationReceivedEvent';
+import Notifications, { OSNotificationPermission } from './NotificationsNamespace';
 
 describe('Notifications', () => {
   let notifications: Notifications;
@@ -54,9 +52,7 @@ describe('Notifications', () => {
         reject(mockError);
       });
 
-      await expect(notifications.getPermissionAsync()).rejects.toThrow(
-        mockError.message,
-      );
+      await expect(notifications.getPermissionAsync()).rejects.toThrow(mockError.message);
     });
   });
 
@@ -96,9 +92,7 @@ describe('Notifications', () => {
       mockExec.mockImplementation((_resolve, reject) => {
         reject(mockError);
       });
-      await expect(notifications.permissionNative()).rejects.toThrow(
-        mockError.message,
-      );
+      await expect(notifications.permissionNative()).rejects.toThrow(mockError.message);
     });
   });
 
@@ -177,9 +171,7 @@ describe('Notifications', () => {
       mockExec.mockImplementation((resolve, reject) => {
         reject(mockError);
       });
-      await expect(notifications.canRequestPermission()).rejects.toThrow(
-        mockError.message,
-      );
+      await expect(notifications.canRequestPermission()).rejects.toThrow(mockError.message);
     });
   });
 
@@ -299,21 +291,20 @@ describe('Notifications', () => {
   });
 
   describe('removeEventListener', () => {
-    test.each([
-      ['click'],
-      ['foregroundWillDisplay'],
-      ['permissionChange'],
-    ] as const)('should remove %s event listener', (eventType) => {
-      const mockListener = vi.fn();
-      notifications.addEventListener(eventType, mockListener);
-      notifications.removeEventListener(eventType, mockListener);
+    test.each([['click'], ['foregroundWillDisplay'], ['permissionChange']] as const)(
+      'should remove %s event listener',
+      (eventType) => {
+        const mockListener = vi.fn();
+        notifications.addEventListener(eventType, mockListener);
+        notifications.removeEventListener(eventType, mockListener);
 
-      // No cordova.exec call for removeEventListener, just internal array manipulation
-      expect(window.cordova.exec).toHaveBeenCalledTimes(1); // Only the addEventListener call
+        // No cordova.exec call for removeEventListener, just internal array manipulation
+        expect(window.cordova.exec).toHaveBeenCalledTimes(1); // Only the addEventListener call
 
-      mockExec.mock.calls[0][0]('some-data');
-      expect(mockListener).not.toHaveBeenCalled();
-    });
+        mockExec.mock.calls[0][0]('some-data');
+        expect(mockListener).not.toHaveBeenCalled();
+      },
+    );
 
     test('should not remove listener for unknown event type', () => {
       vi.spyOn(helpers, 'removeListener').mockImplementation(() => {});
@@ -385,9 +376,7 @@ describe('Notifications', () => {
 
     test('should return true when permission is set via permission listener', () => {
       notifications._setPropertyAndObserver();
-      const callback = mockExec.mock.calls.find(
-        (call) => call[3] === 'addPermissionObserver',
-      )?.[0];
+      const callback = mockExec.mock.calls.find((call) => call[3] === 'addPermissionObserver')?.[0];
       callback?.(true);
 
       const result = notifications.hasPermission();

@@ -59,24 +59,16 @@ export const PairList: FC<PairListProps> = ({
         <div
           key={item.key}
           className="list-item two-line"
-          data-testid={
-            sectionKey ? `${sectionKey}_pair_${item.key}` : undefined
-          }
+          data-testid={sectionKey ? `${sectionKey}_pair_${item.key}` : undefined}
         >
           <div>
             <span
               className="list-key"
-              data-testid={
-                sectionKey ? `${sectionKey}_pair_key_${item.key}` : undefined
-              }
+              data-testid={sectionKey ? `${sectionKey}_pair_key_${item.key}` : undefined}
             >
               {item.key}
             </span>
-            <span
-              data-testid={
-                sectionKey ? `${sectionKey}_pair_value_${item.key}` : undefined
-              }
-            >
+            <span data-testid={sectionKey ? `${sectionKey}_pair_value_${item.key}` : undefined}>
               {item.value}
             </span>
           </div>
@@ -86,9 +78,7 @@ export const PairList: FC<PairListProps> = ({
               className="delete-btn"
               onClick={() => onRemove(item.key)}
               aria-label={`Remove ${item.key}`}
-              data-testid={
-                sectionKey ? `${sectionKey}_remove_${item.key}` : undefined
-              }
+              data-testid={sectionKey ? `${sectionKey}_remove_${item.key}` : undefined}
             >
               <MdClose />
             </button>
@@ -98,10 +88,7 @@ export const PairList: FC<PairListProps> = ({
     ) : loading ? (
       <LoadingState testID={sectionKey ? `${sectionKey}_loading` : undefined} />
     ) : (
-      <EmptyState
-        text={emptyText}
-        testID={sectionKey ? `${sectionKey}_empty` : undefined}
-      />
+      <EmptyState text={emptyText} testID={sectionKey ? `${sectionKey}_empty` : undefined} />
     )}
   </div>
 );
@@ -124,11 +111,7 @@ export const SingleList: FC<SingleListProps> = ({
         <>
           {displayItems.map((item) => (
             <div key={item} className="list-item">
-              <span
-                data-testid={
-                  sectionKey ? `${sectionKey}_value_${item}` : undefined
-                }
-              >
+              <span data-testid={sectionKey ? `${sectionKey}_value_${item}` : undefined}>
                 {item}
               </span>
               {onRemove ? (
@@ -137,9 +120,7 @@ export const SingleList: FC<SingleListProps> = ({
                   className="delete-btn"
                   onClick={() => onRemove(item)}
                   aria-label={`Remove ${item}`}
-                  data-testid={
-                    sectionKey ? `${sectionKey}_remove_${item}` : undefined
-                  }
+                  data-testid={sectionKey ? `${sectionKey}_remove_${item}` : undefined}
                 >
                   <MdClose />
                 </button>
@@ -147,24 +128,15 @@ export const SingleList: FC<SingleListProps> = ({
             </div>
           ))}
           {!showAll && hiddenCount > 0 && (
-            <button
-              type="button"
-              className="more-link"
-              onClick={() => setExpanded(true)}
-            >
+            <button type="button" className="more-link" onClick={() => setExpanded(true)}>
               {hiddenCount} more
             </button>
           )}
         </>
       ) : loading ? (
-        <LoadingState
-          testID={sectionKey ? `${sectionKey}_loading` : undefined}
-        />
+        <LoadingState testID={sectionKey ? `${sectionKey}_loading` : undefined} />
       ) : (
-        <EmptyState
-          text={emptyText}
-          testID={sectionKey ? `${sectionKey}_empty` : undefined}
-        />
+        <EmptyState text={emptyText} testID={sectionKey ? `${sectionKey}_empty` : undefined} />
       )}
     </div>
   );

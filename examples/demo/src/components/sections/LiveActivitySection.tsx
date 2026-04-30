@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { FC } from 'react';
+
 import ActionButton from '../ActionButton';
 import SectionCard from '../SectionCard';
 
@@ -24,10 +25,7 @@ const ORDER_STATUSES = [
 interface LiveActivitySectionProps {
   hasApiKey: boolean;
   onStart: (activityId: string, attributes: object, content: object) => void;
-  onUpdate: (
-    activityId: string,
-    eventUpdates: Record<string, unknown>,
-  ) => Promise<boolean>;
+  onUpdate: (activityId: string, eventUpdates: Record<string, unknown>) => Promise<boolean>;
   onEnd: (activityId: string) => Promise<boolean>;
   onInfoTap?: () => void;
 }
@@ -94,11 +92,7 @@ const LiveActivitySection: FC<LiveActivitySectionProps> = ({
   const isEmpty = !activityId.trim();
 
   return (
-    <SectionCard
-      title="LIVE ACTIVITIES"
-      onInfoTap={onInfoTap}
-      sectionKey="live_activities"
-    >
+    <SectionCard title="LIVE ACTIVITIES" onInfoTap={onInfoTap} sectionKey="live_activities">
       <div className="card">
         <div className="inline-input-row">
           <label className="inline-input-label" htmlFor="la-activity-id">

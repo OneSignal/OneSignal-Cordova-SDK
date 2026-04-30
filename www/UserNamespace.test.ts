@@ -478,30 +478,22 @@ describe('User', () => {
       const eventName = 'purchase';
       const circularObj: Record<string, unknown> = { name: 'test' };
       circularObj.self = circularObj;
-      const consoleSpy = vi
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       user.trackEvent(eventName, circularObj);
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        'Properties must be a JSON-serializable object',
-      );
+      expect(consoleSpy).toHaveBeenCalledWith('Properties must be a JSON-serializable object');
       expect(window.cordova.exec).not.toHaveBeenCalled();
       consoleSpy.mockRestore();
     });
 
     test('should not call cordova.exec when properties is an array', () => {
       const eventName = 'purchase';
-      const consoleSpy = vi
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       user.trackEvent(eventName, ['item1', 'item2'] as unknown as object);
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        'Properties must be a JSON-serializable object',
-      );
+      expect(consoleSpy).toHaveBeenCalledWith('Properties must be a JSON-serializable object');
       expect(window.cordova.exec).not.toHaveBeenCalled();
       consoleSpy.mockRestore();
     });

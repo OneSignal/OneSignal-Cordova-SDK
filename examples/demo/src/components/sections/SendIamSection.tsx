@@ -5,6 +5,7 @@ import {
   MdOutlineVerticalAlignBottom,
   MdOutlineVerticalAlignTop,
 } from 'react-icons/md';
+
 import ActionButton from '../ActionButton';
 import SectionCard from '../SectionCard';
 
@@ -51,11 +52,7 @@ const iamButtons: {
 ];
 
 const SendIamSection: FC<SendIamSectionProps> = ({ onSendIam, onInfoTap }) => (
-  <SectionCard
-    title="SEND IN-APP MESSAGE"
-    onInfoTap={onInfoTap}
-    sectionKey="send_iam"
-  >
+  <SectionCard title="SEND IN-APP MESSAGE" onInfoTap={onInfoTap} sectionKey="send_iam">
     {iamButtons.map((btn) => (
       <ActionButton
         key={btn.key}

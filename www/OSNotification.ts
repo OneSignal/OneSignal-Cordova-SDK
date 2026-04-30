@@ -183,10 +183,7 @@ export class OSNotification {
     /// (Android Only)
     /// Summary notifications grouped
     /// Notification payload will have the most recent notification received.
-    if (
-      receivedEvent.groupedNotifications &&
-      receivedEvent.groupedNotifications.length
-    ) {
+    if (receivedEvent.groupedNotifications && receivedEvent.groupedNotifications.length) {
       this.groupedNotifications = receivedEvent.groupedNotifications;
     }
 
@@ -278,8 +275,6 @@ export class OSNotification {
    * @returns void
    */
   display(): void {
-    window.cordova.exec(noop, noop, 'OneSignalPush', 'displayNotification', [
-      this.notificationId,
-    ]);
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'displayNotification', [this.notificationId]);
   }
 }

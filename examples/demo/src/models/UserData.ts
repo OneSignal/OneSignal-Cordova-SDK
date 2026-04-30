@@ -23,9 +23,7 @@ export function userDataFromJson(json: Record<string, unknown>): UserData {
     Object.entries(identity)
       .filter(
         ([key, value]) =>
-          key !== 'external_id' &&
-          key !== 'onesignal_id' &&
-          typeof value === 'string',
+          key !== 'external_id' && key !== 'onesignal_id' && typeof value === 'string',
       )
       .map(([key, value]) => [key, String(value)]),
   );
@@ -52,8 +50,7 @@ export function userDataFromJson(json: Record<string, unknown>): UserData {
     }
   });
 
-  const externalId =
-    typeof identity.external_id === 'string' ? identity.external_id : undefined;
+  const externalId = typeof identity.external_id === 'string' ? identity.external_id : undefined;
 
   return {
     aliases,

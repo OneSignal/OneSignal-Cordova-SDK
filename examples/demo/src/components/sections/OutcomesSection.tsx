@@ -1,9 +1,10 @@
 import type { FC } from 'react';
 import { useState } from 'react';
+
+import { showSnackbar } from '../../utils/showSnackbar';
 import ActionButton from '../ActionButton';
 import OutcomeModal from '../modals/OutcomeModal';
 import SectionCard from '../SectionCard';
-import { showSnackbar } from '../../utils/showSnackbar';
 
 interface OutcomesSectionProps {
   onSendNormal: (name: string) => void;
@@ -21,16 +22,8 @@ const OutcomesSection: FC<OutcomesSectionProps> = ({
   const [open, setOpen] = useState(false);
 
   return (
-    <SectionCard
-      title="OUTCOME EVENTS"
-      onInfoTap={onInfoTap}
-      sectionKey="outcomes"
-    >
-      <ActionButton
-        type="button"
-        onClick={() => setOpen(true)}
-        data-testid="send_outcome_button"
-      >
+    <SectionCard title="OUTCOME EVENTS" onInfoTap={onInfoTap} sectionKey="outcomes">
+      <ActionButton type="button" onClick={() => setOpen(true)} data-testid="send_outcome_button">
         SEND OUTCOME
       </ActionButton>
       <OutcomeModal

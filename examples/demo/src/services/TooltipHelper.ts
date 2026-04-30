@@ -48,8 +48,7 @@ class TooltipHelper {
 
         const item = value as Record<string, unknown>;
         const title = typeof item.title === 'string' ? item.title : '';
-        const description =
-          typeof item.description === 'string' ? item.description : '';
+        const description = typeof item.description === 'string' ? item.description : '';
         const options = Array.isArray(item.options)
           ? item.options
               .map((option) => {
@@ -57,14 +56,9 @@ class TooltipHelper {
                   return null;
                 }
                 const optionRecord = option as Record<string, unknown>;
-                const name =
-                  typeof optionRecord.name === 'string'
-                    ? optionRecord.name
-                    : '';
+                const name = typeof optionRecord.name === 'string' ? optionRecord.name : '';
                 const optionDescription =
-                  typeof optionRecord.description === 'string'
-                    ? optionRecord.description
-                    : '';
+                  typeof optionRecord.description === 'string' ? optionRecord.description : '';
 
                 if (!name || !optionDescription) {
                   return null;

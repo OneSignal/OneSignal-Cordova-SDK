@@ -8,16 +8,8 @@ interface SectionCardProps {
   children: ReactNode;
 }
 
-const SectionCard: FC<SectionCardProps> = ({
-  title,
-  onInfoTap,
-  sectionKey,
-  children,
-}) => (
-  <section
-    className="section"
-    data-testid={sectionKey ? `${sectionKey}_section` : undefined}
-  >
+const SectionCard: FC<SectionCardProps> = ({ title, onInfoTap, sectionKey, children }) => (
+  <section className="section" data-testid={sectionKey ? `${sectionKey}_section` : undefined}>
     <div className="section-head">
       <h2>{title}</h2>
       {onInfoTap ? (

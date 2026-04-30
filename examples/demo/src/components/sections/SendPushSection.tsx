@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import { useState } from 'react';
+
 import { NotificationType } from '../../models/NotificationType';
 import ActionButton from '../ActionButton';
 import CustomNotificationModal from '../modals/CustomNotificationModal';
@@ -7,10 +8,7 @@ import SectionCard from '../SectionCard';
 
 interface SendPushSectionProps {
   onSendNotification: (type: NotificationType) => void | Promise<void>;
-  onSendCustomNotification: (
-    title: string,
-    body: string,
-  ) => void | Promise<void>;
+  onSendCustomNotification: (title: string, body: string) => void | Promise<void>;
   onClearAll: () => void;
   onInfoTap: () => void;
 }
@@ -24,11 +22,7 @@ const SendPushSection: FC<SendPushSectionProps> = ({
   const [customOpen, setCustomOpen] = useState(false);
 
   return (
-    <SectionCard
-      title="SEND PUSH NOTIFICATION"
-      onInfoTap={onInfoTap}
-      sectionKey="send_push"
-    >
+    <SectionCard title="SEND PUSH NOTIFICATION" onInfoTap={onInfoTap} sectionKey="send_push">
       <ActionButton
         type="button"
         onClick={() => void onSendNotification(NotificationType.Simple)}
