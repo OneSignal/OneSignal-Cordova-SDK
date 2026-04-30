@@ -31,7 +31,7 @@ else
   # Remove before add so bun.lock's integrity hash refreshes against the new
   # tarball; otherwise `vp add` hits a dependency-loop error under bun 1.3+.
   # Keep the relative `file:../../...` path to match package.json's spec.
-  info "Registering tarball with vp (refreshes vp.lock integrity hash)..."
+  info "Registering tarball with vp (refreshes bun.lock integrity hash)..."
   vp remove onesignal-cordova-plugin 2>/dev/null || true
   vp add file:../../onesignal-cordova-plugin.tgz
 
