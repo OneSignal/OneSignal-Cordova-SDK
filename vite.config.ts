@@ -22,7 +22,11 @@ export default defineConfig({
     entry: 'www/index.ts',
     dts: true,
     format: 'cjs',
+    minify: true,
     outExtensions: () => ({ js: '.js', dts: '.d.ts' }),
+    outputOptions: {
+      exports: 'named',
+    },
   },
   test: {
     clearMocks: true,
