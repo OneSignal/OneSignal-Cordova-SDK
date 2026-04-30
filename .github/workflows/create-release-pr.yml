@@ -174,20 +174,16 @@ jobs:
           git commit -m "Release $NEW_VERSION" && git push
 
       - name: Refresh demo Podfile.lock
+        if: inputs.ios_version != ''
         run: |
-          # plugin.xml's OneSignalXCFramework pin just changed. cap sync's
-          # `pod install` refuses to silently mutate the committed
-          # Podfile.lock for transitive dev-pod constraints, so the first
-          # setup attempt fails after generating capacitor-cordova-ios-plugins/.
-          # We then bump the lock explicitly and re-run setup, which now
-          # finds the lock consistent with the new pin and succeeds. The
-          # second setup is cheap — SDK_STAMP was already written, so only
-          # cap sync re-runs.
+          # `pod install` (last step of cap sync) bails on the committed
+          # Podfile.lock when plugin.xml's OneSignalXCFramework pin moved.
+          # Everything before it succeeds, so `pod update` can then bump
+          # just that entry against the regenerated cordova-ios-plugins shim.
           (
             cd examples/demo
-            vp run setup || true
+            vp run setup || echo "::notice::expected pod install conflict; bumping OneSignalXCFramework"
             (cd ios/App && pod update OneSignalXCFramework --no-repo-update)
-            vp run setup
           )
           echo "✓ Refreshed examples/demo/ios/App/Podfile.lock"
 
