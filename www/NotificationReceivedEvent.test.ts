@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, test } from 'vite-plus/test';
+
 import { mockCordova } from '../mocks/cordova';
 import { mockNotification } from '../mocks/data';
 import { NotificationWillDisplayEvent } from './NotificationReceivedEvent';
@@ -57,9 +59,7 @@ describe('NotificationWillDisplayEvent', () => {
       const notification2 = notificationEvent.getNotification();
 
       expect(notification1).toBeInstanceOf(OSNotification);
-      expect(notification1.notificationId).toBe(
-        notificationData.notificationId,
-      );
+      expect(notification1.notificationId).toBe(notificationData.notificationId);
 
       expect(notification1).toBe(notification2);
     });

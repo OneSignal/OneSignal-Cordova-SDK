@@ -1,7 +1,8 @@
 import { IonToggle } from '@ionic/react';
 import type { FC } from 'react';
-import SectionCard from '../SectionCard';
+
 import { maskValue } from '../../utils/maskValue';
+import SectionCard from '../SectionCard';
 
 interface AppSectionProps {
   appId: string;
@@ -29,15 +30,8 @@ const AppSection: FC<AppSectionProps> = ({
         </div>
       </div>
       <div className="card tip-card">
-        <div>
-          Add your own App ID, then rebuild to fully test all functionality.
-        </div>
-        <a
-          className="tip-link"
-          href="https://onesignal.com"
-          target="_blank"
-          rel="noreferrer"
-        >
+        <div>Add your own App ID, then rebuild to fully test all functionality.</div>
+        <a className="tip-link" href="https://onesignal.com" target="_blank" rel="noreferrer">
           Get your keys at onesignal.com
         </a>
       </div>
@@ -63,9 +57,7 @@ const AppSection: FC<AppSectionProps> = ({
               </div>
               <IonToggle
                 checked={privacyConsentGiven}
-                onIonChange={(event) =>
-                  onTogglePrivacyConsent(event.detail.checked)
-                }
+                onIonChange={(event) => onTogglePrivacyConsent(event.detail.checked)}
                 data-testid="privacy_consent_toggle"
               />
             </div>

@@ -7,6 +7,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/react';
+
 import './Secondary.css';
 
 const Secondary: React.FC = () => (

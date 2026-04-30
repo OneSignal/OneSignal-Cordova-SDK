@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, test } from 'vite-plus/test';
+
 import { mockCordova } from '../mocks/cordova';
 import Debug, { LogLevel } from './DebugNamespace';
 
@@ -21,20 +23,17 @@ describe('Debug', () => {
     [LogLevel.Info, 4],
     [LogLevel.Debug, 5],
     [LogLevel.Verbose, 6],
-  ])(
-    'should call cordova.exec for setLogLevel with %s',
-    (logLevel, logLevelValue) => {
-      debug.setLogLevel(logLevel);
+  ])('should call cordova.exec for setLogLevel with %s', (logLevel, logLevelValue) => {
+    debug.setLogLevel(logLevel);
 
-      expect(window.cordova.exec).toHaveBeenCalledWith(
-        expect.any(Function),
-        expect.any(Function),
-        'OneSignalPush',
-        'setLogLevel',
-        [logLevelValue],
-      );
-    },
-  );
+    expect(window.cordova.exec).toHaveBeenCalledWith(
+      expect.any(Function),
+      expect.any(Function),
+      'OneSignalPush',
+      'setLogLevel',
+      [logLevelValue],
+    );
+  });
 
   test.each([
     [LogLevel.None, 0],
@@ -44,18 +43,15 @@ describe('Debug', () => {
     [LogLevel.Info, 4],
     [LogLevel.Debug, 5],
     [LogLevel.Verbose, 6],
-  ])(
-    'should call cordova.exec for setAlertLevel with %s',
-    (logLevel, logLevelValue) => {
-      debug.setAlertLevel(logLevel);
+  ])('should call cordova.exec for setAlertLevel with %s', (logLevel, logLevelValue) => {
+    debug.setAlertLevel(logLevel);
 
-      expect(window.cordova.exec).toHaveBeenCalledWith(
-        expect.any(Function),
-        expect.any(Function),
-        'OneSignalPush',
-        'setAlertLevel',
-        [logLevelValue],
-      );
-    },
-  );
+    expect(window.cordova.exec).toHaveBeenCalledWith(
+      expect.any(Function),
+      expect.any(Function),
+      'OneSignalPush',
+      'setAlertLevel',
+      [logLevelValue],
+    );
+  });
 });

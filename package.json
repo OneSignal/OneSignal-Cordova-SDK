@@ -1,58 +1,63 @@
 {
-  "version": "5.3.7",
   "name": "onesignal-cordova-plugin",
+  "version": "5.3.7",
+  "description": "OneSignal is a high volume Push Notification service for mobile apps. In addition to basic notification delivery, OneSignal also provides tools to localize, target, schedule, and automate notifications that you send.",
+  "keywords": [
+    "adm",
+    "apns",
+    "cordova-android",
+    "cordova-ios",
+    "ecosystem:cordova",
+    "gcm",
+    "messaging",
+    "notification",
+    "push",
+    "push notification",
+    "push notifications",
+    "retention"
+  ],
+  "homepage": "https://github.com/OneSignal/OneSignal-Cordova-SDK#readme",
+  "bugs": {
+    "url": "https://github.com/OneSignal/OneSignal-Cordova-SDK/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OneSignal/OneSignal-Cordova-SDK.git"
+  },
   "files": [
     "dist",
     "plugin.xml",
     "src",
     "build-extras-onesignal.gradle"
   ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/OneSignal/OneSignal-Cordova-SDK.git"
-  },
-  "main": "dist/index.js",
+  "type": "module",
+  "main": "dist/index.cjs",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc --noEmit && vite build",
+    "build": "vp pack",
     "format:spotless": "./examples/demo/android/gradlew spotlessApply",
-    "format:prettier": "prettier --write \"**/*.{ts,tsx}\" --ignore-path .gitignore",
-    "format": "concurrently \"npm:format:spotless\" \"npm:format:prettier\"",
+    "format": "vp fmt && npm run format:spotless",
     "format:check:spotless": "./examples/demo/android/gradlew spotlessCheck",
-    "format:check:prettier": "prettier --check \"**/*.{ts,tsx}\" --ignore-path .gitignore",
-    "format:check": "concurrently \"npm:format:check:spotless\" \"npm:format:check:prettier\"",
-    "lint": "oxlint ./www ./examples/demo && bun run format:check",
-    "lint:fix": "oxlint ./www ./examples/demo --fix && bun run format",
-    "test": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "format:check": "vp fmt --check && npm run format:check:spotless",
+    "lint": "vp check ./www && npm run format:check:spotless",
+    "lint:fix": "vp check --fix ./www && vp run format",
+    "test": "vp test",
+    "prepare": "vp config"
   },
   "devDependencies": {
     "@capacitor/cli": "^7.4.4",
     "@types/bun": "latest",
     "@types/cordova": "^11.0.3",
-    "@vitest/coverage-v8": "^4.0.2",
-    "concurrently": "^9.2.1",
+    "@vitest/coverage-v8": "^4.1.0",
     "happy-dom": "^20.0.8",
-    "oxlint": "^1.42.0",
-    "prettier": "^3.6.2",
     "typescript": "^5.9.3",
-    "vite": "^7.1.12",
-    "vite-plugin-dts": "^4.5.4",
-    "vitest": "^4.0.2"
+    "vite-plus": "^0.1.19"
   },
-  "bugs": {
-    "url": "https://github.com/OneSignal/OneSignal-Cordova-SDK/issues"
+  "overrides": {
+    "vite": "npm:@voidzero-dev/vite-plus-core@latest",
+    "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
   },
-  "cordova": {
-    "id": "onesignal-cordova-plugin",
-    "platforms": [
-      "android",
-      "ios",
-      "amazon-fireos"
-    ]
-  },
-  "cordova_name": "OneSignal Push Notifications",
-  "description": "OneSignal is a high volume Push Notification service for mobile apps. In addition to basic notification delivery, OneSignal also provides tools to localize, target, schedule, and automate notifications that you send.",
   "engines": [
     {
       "name": "cordova-android",
@@ -75,25 +80,18 @@
       "version": ">=4.3.0"
     }
   ],
-  "homepage": "https://github.com/OneSignal/OneSignal-Cordova-SDK#readme",
-  "keywords": [
-    "push",
-    "notification",
-    "push notification",
-    "push notifications",
-    "apns",
-    "gcm",
-    "adm",
-    "retention",
-    "messaging",
-    "ecosystem:cordova",
-    "cordova-android",
-    "cordova-ios"
-  ],
-  "license": "MIT",
+  "packageManager": "bun@1.3.13",
+  "cordova": {
+    "id": "onesignal-cordova-plugin",
+    "platforms": [
+      "android",
+      "ios",
+      "amazon-fireos"
+    ]
+  },
+  "cordova_name": "OneSignal Push Notifications",
   "platforms": [
     "android",
     "ios"
-  ],
-  "packageManager": "bun@1.3.13"
+  ]
 }

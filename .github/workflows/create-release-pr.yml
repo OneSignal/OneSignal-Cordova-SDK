@@ -79,6 +79,12 @@ jobs:
       - name: Setup Git User
         uses: OneSignal/sdk-shared/.github/actions/setup-git-user@main
 
+      - name: Set up Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          cache: true
+          run-install: true
+
       - name: Get current native SDK versions from target branch
         id: current_versions
         run: |
@@ -166,6 +172,25 @@ jobs:
           git add -A
           git diff --staged --quiet && exit 0
           git commit -m "Release $NEW_VERSION" && git push
+
+      - name: Refresh demo Podfile.lock
+        if: inputs.ios_version != ''
+        run: |
+          # `pod install` (last step of cap sync) bails on the committed
+          # Podfile.lock when plugin.xml's OneSignalXCFramework pin moved.
+          # Everything before it succeeds, so `pod update` can then bump
+          # just that entry against the regenerated cordova-ios-plugins shim.
+          (
+            cd examples/demo
+            vp run setup || echo "::notice::expected pod install conflict; bumping OneSignalXCFramework"
+            (cd ios/App && pod update OneSignalXCFramework --no-repo-update)
+          )
+          echo "✓ Refreshed examples/demo/ios/App/Podfile.lock"
+
+          # Only commit if there are changes
+          git add -A
+          git diff --staged --quiet && exit 0
+          git commit -m "Update demo Podfile.lock" && git push
 
   create-pr:
     needs: [prep, update_version]

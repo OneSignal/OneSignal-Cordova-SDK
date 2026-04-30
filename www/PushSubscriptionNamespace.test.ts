@@ -1,13 +1,8 @@
-import {
-  PREV_SUB_ID,
-  PREV_SUB_TOKEN,
-  SUB_ID,
-  SUB_TOKEN,
-} from '../mocks/constants';
+import { beforeEach, describe, expect, test, vi } from 'vite-plus/test';
+
+import { PREV_SUB_ID, PREV_SUB_TOKEN, SUB_ID, SUB_TOKEN } from '../mocks/constants';
 import { mockCordova, mockExec } from '../mocks/cordova';
-import PushSubscription, {
-  type PushSubscriptionChangedState,
-} from './PushSubscriptionNamespace';
+import PushSubscription, { type PushSubscriptionChangedState } from './PushSubscriptionNamespace';
 
 const SUB_CHANGED_STATE: PushSubscriptionChangedState = {
   current: { id: SUB_ID, token: SUB_TOKEN, optedIn: true },
@@ -128,9 +123,7 @@ describe('PushSubscription', () => {
         reject(mockError);
       });
 
-      await expect(pushSubscription.getIdAsync()).rejects.toThrow(
-        mockError.message,
-      );
+      await expect(pushSubscription.getIdAsync()).rejects.toThrow(mockError.message);
     });
   });
 
@@ -170,9 +163,7 @@ describe('PushSubscription', () => {
         reject(mockError);
       });
 
-      await expect(pushSubscription.getTokenAsync()).rejects.toThrow(
-        mockError.message,
-      );
+      await expect(pushSubscription.getTokenAsync()).rejects.toThrow(mockError.message);
     });
   });
 
@@ -210,9 +201,7 @@ describe('PushSubscription', () => {
         reject(mockError);
       });
 
-      await expect(pushSubscription.getOptedInAsync()).rejects.toThrow(
-        mockError.message,
-      );
+      await expect(pushSubscription.getOptedInAsync()).rejects.toThrow(mockError.message);
     });
   });
 

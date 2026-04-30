@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import { useMemo, useState } from 'react';
+
 import ActionButton from '../ActionButton';
 import { PairList } from '../ListWidgets';
 import MultiPairInputModal from '../modals/MultiPairInputModal';
@@ -28,10 +29,7 @@ const TagsSection: FC<TagsSectionProps> = ({
   const [addMultipleOpen, setAddMultipleOpen] = useState(false);
   const [removeOpen, setRemoveOpen] = useState(false);
 
-  const items = useMemo(
-    () => tags.map(([key, value]) => ({ key, value })),
-    [tags],
-  );
+  const items = useMemo(() => tags.map(([key, value]) => ({ key, value })), [tags]);
 
   return (
     <SectionCard title="TAGS" onInfoTap={onInfoTap} sectionKey="tags">
@@ -42,11 +40,7 @@ const TagsSection: FC<TagsSectionProps> = ({
         onRemove={(key) => onRemoveSelected([key])}
         sectionKey="tags"
       />
-      <ActionButton
-        type="button"
-        onClick={() => setAddOpen(true)}
-        data-testid="add_tag_button"
-      >
+      <ActionButton type="button" onClick={() => setAddOpen(true)} data-testid="add_tag_button">
         ADD TAG
       </ActionButton>
       <ActionButton

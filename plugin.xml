@@ -13,7 +13,7 @@
 
   <license>MIT</license>
 
-  <js-module src="dist/index.js" name="OneSignalPlugin">
+  <js-module src="dist/index.cjs" name="OneSignalPlugin">
     <clobbers target="OneSignal" />
   </js-module>
 

@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, test, vi } from 'vite-plus/test';
+
 import { mockCordova, mockExec } from '../mocks/cordova';
 import * as helpers from './helpers';
 import InAppMessages from './InAppMessagesNamespace';
@@ -42,46 +44,27 @@ describe('InAppMessages', () => {
 
     test.each([
       ['click', 'setInAppMessageClickHandler', messageData.click],
-      [
-        'willDisplay',
-        'setOnWillDisplayInAppMessageHandler',
-        messageData.willDisplay,
-      ],
-      [
-        'didDisplay',
-        'setOnDidDisplayInAppMessageHandler',
-        messageData.didDisplay,
-      ],
-      [
-        'willDismiss',
-        'setOnWillDismissInAppMessageHandler',
-        messageData.willDismiss,
-      ],
-      [
-        'didDismiss',
-        'setOnDidDismissInAppMessageHandler',
-        messageData.didDismiss,
-      ],
-    ] as const)(
-      'should call cordova.exec for %s event',
-      (eventType, methodName, data) => {
-        const mockListener = vi.fn();
-        inAppMessages.addEventListener(eventType, mockListener);
+      ['willDisplay', 'setOnWillDisplayInAppMessageHandler', messageData.willDisplay],
+      ['didDisplay', 'setOnDidDisplayInAppMessageHandler', messageData.didDisplay],
+      ['willDismiss', 'setOnWillDismissInAppMessageHandler', messageData.willDismiss],
+      ['didDismiss', 'setOnDidDismissInAppMessageHandler', messageData.didDismiss],
+    ] as const)('should call cordova.exec for %s event', (eventType, methodName, data) => {
+      const mockListener = vi.fn();
+      inAppMessages.addEventListener(eventType, mockListener);
 
-        expect(window.cordova.exec).toHaveBeenCalledWith(
-          expect.any(Function),
-          expect.any(Function),
-          'OneSignalPush',
-          methodName,
-          [],
-        );
+      expect(window.cordova.exec).toHaveBeenCalledWith(
+        expect.any(Function),
+        expect.any(Function),
+        'OneSignalPush',
+        methodName,
+        [],
+      );
 
-        // call to process listener
-        mockExec.mock.calls[0][0](data);
+      // call to process listener
+      mockExec.mock.calls[0][0](data);
 
-        expect(mockListener).toHaveBeenCalledWith(data);
-      },
-    );
+      expect(mockListener).toHaveBeenCalledWith(data);
+    });
 
     test('should not add listener for unknown event type', () => {
       const mockListener = vi.fn();
@@ -194,9 +177,7 @@ describe('InAppMessages', () => {
     });
 
     test('should handle non-array input gracefully', () => {
-      const consoleSpy = vi
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       inAppMessages.removeTriggers('not-an-array' as any);
 
@@ -222,20 +203,17 @@ describe('InAppMessages', () => {
   });
 
   describe('setPaused', () => {
-    test.each([[true], [false]])(
-      'should call cordova.exec for setPaused with %s',
-      (pauseValue) => {
-        inAppMessages.setPaused(pauseValue);
+    test.each([[true], [false]])('should call cordova.exec for setPaused with %s', (pauseValue) => {
+      inAppMessages.setPaused(pauseValue);
 
-        expect(window.cordova.exec).toHaveBeenCalledWith(
-          expect.any(Function),
-          expect.any(Function),
-          'OneSignalPush',
-          'setPaused',
-          [pauseValue],
-        );
-      },
-    );
+      expect(window.cordova.exec).toHaveBeenCalledWith(
+        expect.any(Function),
+        expect.any(Function),
+        'OneSignalPush',
+        'setPaused',
+        [pauseValue],
+      );
+    });
   });
 
   describe('getPaused', () => {

@@ -20,9 +20,7 @@ export default class Session {
    * @returns void
    */
   addUniqueOutcome(name: string): void {
-    window.cordova.exec(noop, noop, 'OneSignalPush', 'addUniqueOutcome', [
-      name,
-    ]);
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'addUniqueOutcome', [name]);
   }
 
   /**
@@ -32,9 +30,6 @@ export default class Session {
    * @returns void
    */
   addOutcomeWithValue(name: string, value: number): void {
-    window.cordova.exec(noop, noop, 'OneSignalPush', 'addOutcomeWithValue', [
-      name,
-      value,
-    ]);
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'addOutcomeWithValue', [name, value]);
   }
 }

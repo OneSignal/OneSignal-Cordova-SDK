@@ -1,17 +1,5 @@
-import OneSignal, {
-  LogLevel,
-  type NotificationWillDisplayEvent,
-} from 'onesignal-cordova-plugin';
-import {
-  createContext,
-  createElement,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-  type ReactNode,
-} from 'react';
+import OneSignal, { LogLevel, type NotificationWillDisplayEvent } from 'onesignal-cordova-plugin';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { NotificationType } from '../models/NotificationType';
 import OneSignalApiService from '../services/OneSignalApiService';
@@ -33,19 +21,13 @@ async function postNotification(type: NotificationType): Promise<boolean> {
   return apiService.sendNotification(type, subscriptionId);
 }
 
-async function postCustomNotification(
-  title: string,
-  body: string,
-): Promise<boolean> {
+async function postCustomNotification(title: string, body: string): Promise<boolean> {
   const subscriptionId = await OneSignal.User.pushSubscription.getIdAsync();
   if (!subscriptionId) return false;
   return apiService.sendCustomNotification(title, body, subscriptionId);
 }
 
-function mergePairs<V>(
-  prev: [string, V][],
-  next: Record<string, V>,
-): [string, V][] {
+function mergePairs<V>(prev: [string, V][], next: Record<string, V>): [string, V][] {
   const merged = new Map(prev);
   for (const [k, v] of Object.entries(next)) merged.set(k, v);
   return Array.from(merged.entries());
@@ -102,11 +84,7 @@ export type UseOneSignalReturn = {
   trackEvent: (name: string, properties?: Record<string, unknown>) => void;
   setLocationShared: (shared: boolean) => Promise<void>;
   requestLocationPermission: () => void;
-  startDefaultLiveActivity: (
-    activityId: string,
-    attributes: object,
-    content: object,
-  ) => void;
+  startDefaultLiveActivity: (activityId: string, attributes: object, content: object) => void;
   updateLiveActivity: (
     activityId: string,
     eventUpdates: Record<string, unknown>,
@@ -114,19 +92,14 @@ export type UseOneSignalReturn = {
   endLiveActivity: (activityId: string) => Promise<boolean>;
 };
 
-function useOneSignalState(): UseOneSignalReturn {
+export function useOneSignal(): UseOneSignalReturn {
   const [appId] = useState(resolveAppId);
   const [consentRequired, setConsentRequiredState] = useState(false);
   const [privacyConsentGiven, setPrivacyConsentGivenState] = useState(false);
-  const [externalUserId, setExternalUserId] = useState<string | undefined>(
-    undefined,
-  );
-  const [pushSubscriptionId, setPushSubscriptionId] = useState<
-    string | undefined
-  >(undefined);
+  const [externalUserId, setExternalUserId] = useState<string | undefined>(undefined);
+  const [pushSubscriptionId, setPushSubscriptionId] = useState<string | undefined>(undefined);
   const [isPushEnabled, setIsPushEnabled] = useState(false);
-  const [hasNotificationPermission, setHasNotificationPermission] =
-    useState(false);
+  const [hasNotificationPermission, setHasNotificationPermission] = useState(false);
   const [inAppMessagesPaused, setInAppMessagesPaused] = useState(false);
   const [locationShared, setLocationSharedState] = useState(false);
   const [aliasesList, setAliasesList] = useState<[string, string][]>([]);
@@ -189,7 +162,7 @@ function useOneSignalState(): UseOneSignalReturn {
     const handleForegroundWillDisplay = (e: NotificationWillDisplayEvent) => {
       console.log(`Notification foregroundWillDisplay: ${e.getNotification().title ?? ''}`);
 
-     // If you want to test preventDefault, you can uncomment the following line:
+      // If you want to test preventDefault, you can uncomment the following line:
       // e.preventDefault(); // prevent the notification from displaying immediately
       // setTimeout(() => {
       //   e.getNotification().display(); // display the notification after 5 seconds (overrides the preventDefault)
@@ -242,10 +215,7 @@ function useOneSignalState(): UseOneSignalReturn {
         OneSignal.login(storedExternalUserId);
       }
 
-      OneSignal.Notifications.addEventListener(
-        'permissionChange',
-        handlePermissionChange,
-      );
+      OneSignal.Notifications.addEventListener('permissionChange', handlePermissionChange);
       // Required so foreground pushes actually display: registering this
       // listener wires up the native `addForegroundLifecycleListener` bridge.
       // Without it the SDK never resolves `proceedWithWillDisplay` and the
@@ -254,10 +224,7 @@ function useOneSignalState(): UseOneSignalReturn {
         'foregroundWillDisplay',
         handleForegroundWillDisplay,
       );
-      OneSignal.User.pushSubscription.addEventListener(
-        'change',
-        handlePushSubscriptionChange,
-      );
+      OneSignal.User.pushSubscription.addEventListener('change', handlePushSubscriptionChange);
       OneSignal.User.addEventListener('change', handleUserChange);
 
       setHasNotificationPermission(OneSignal.Notifications.hasPermission());
@@ -277,18 +244,12 @@ function useOneSignalState(): UseOneSignalReturn {
 
     return () => {
       cancelled = true;
-      OneSignal.Notifications.removeEventListener(
-        'permissionChange',
-        handlePermissionChange,
-      );
+      OneSignal.Notifications.removeEventListener('permissionChange', handlePermissionChange);
       OneSignal.Notifications.removeEventListener(
         'foregroundWillDisplay',
         handleForegroundWillDisplay,
       );
-      OneSignal.User.pushSubscription.removeEventListener(
-        'change',
-        handlePushSubscriptionChange,
-      );
+      OneSignal.User.pushSubscription.removeEventListener('change', handlePushSubscriptionChange);
       OneSignal.User.removeEventListener('change', handleUserChange);
     };
   }, [fetchUserDataFromApi]);
@@ -340,10 +301,7 @@ function useOneSignalState(): UseOneSignalReturn {
 
   // Memoized so HomeScreen's push-prompt useEffect dependency doesn't
   // re-fire on unrelated state changes in this provider.
-  const promptPush = useCallback(
-    () => OneSignal.Notifications.requestPermission(true),
-    [],
-  );
+  const promptPush = useCallback(() => OneSignal.Notifications.requestPermission(true), []);
 
   const setPushEnabled = (enabled: boolean) => {
     if (enabled) {
@@ -357,16 +315,12 @@ function useOneSignalState(): UseOneSignalReturn {
 
   const sendNotification = async (type: NotificationType) => {
     const success = await postNotification(type);
-    console.log(
-      success ? `Notification sent: ${type}` : 'Failed to send notification',
-    );
+    console.log(success ? `Notification sent: ${type}` : 'Failed to send notification');
   };
 
   const sendCustomNotification = async (title: string, body: string) => {
     const success = await postCustomNotification(title, body);
-    console.log(
-      success ? `Notification sent: ${title}` : 'Failed to send notification',
-    );
+    console.log(success ? `Notification sent: ${title}` : 'Failed to send notification');
   };
 
   const clearAllNotifications = () => {
@@ -491,20 +445,14 @@ function useOneSignalState(): UseOneSignalReturn {
     setLocationSharedState(shared);
     OneSignal.Location.setShared(shared);
     preferences.setLocationShared(shared);
-    console.log(
-      shared ? 'Location sharing enabled' : 'Location sharing disabled',
-    );
+    console.log(shared ? 'Location sharing enabled' : 'Location sharing disabled');
   };
 
   const requestLocationPermission = () => {
     OneSignal.Location.requestPermission();
   };
 
-  const startDefaultLiveActivity = (
-    activityId: string,
-    attributes: object,
-    content: object,
-  ) => {
+  const startDefaultLiveActivity = (activityId: string, attributes: object, content: object) => {
     OneSignal.LiveActivities.startDefault(activityId, attributes, content);
     console.log(`Started Live Activity: ${activityId}`);
   };
@@ -513,15 +461,9 @@ function useOneSignalState(): UseOneSignalReturn {
     activityId: string,
     eventUpdates: Record<string, unknown>,
   ): Promise<boolean> => {
-    const success = await apiService.updateLiveActivity(
-      activityId,
-      'update',
-      eventUpdates,
-    );
+    const success = await apiService.updateLiveActivity(activityId, 'update', eventUpdates);
     console.log(
-      success
-        ? `Updated Live Activity: ${activityId}`
-        : 'Failed to update Live Activity',
+      success ? `Updated Live Activity: ${activityId}` : 'Failed to update Live Activity',
     );
     return success;
   };
@@ -530,11 +472,7 @@ function useOneSignalState(): UseOneSignalReturn {
     const success = await apiService.updateLiveActivity(activityId, 'end', {
       data: {},
     });
-    console.log(
-      success
-        ? `Ended Live Activity: ${activityId}`
-        : 'Failed to end Live Activity',
-    );
+    console.log(success ? `Ended Live Activity: ${activityId}` : 'Failed to end Live Activity');
     return success;
   };
 
@@ -589,23 +527,4 @@ function useOneSignalState(): UseOneSignalReturn {
     updateLiveActivity,
     endLiveActivity,
   };
-}
-
-const OneSignalContext = createContext<UseOneSignalReturn | null>(null);
-
-interface ProviderProps {
-  children: ReactNode;
-}
-
-export function OneSignalProvider({ children }: ProviderProps) {
-  const value = useOneSignalState();
-  return createElement(OneSignalContext.Provider, { value }, children);
-}
-
-export function useOneSignal(): UseOneSignalReturn {
-  const ctx = useContext(OneSignalContext);
-  if (!ctx) {
-    throw new Error('useOneSignal must be used within <OneSignalProvider>');
-  }
-  return ctx;
 }

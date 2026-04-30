@@ -9,6 +9,7 @@ import ActionButton from '../components/ActionButton';
 import TooltipModal from '../components/modals/TooltipModal';
 import AliasesSection from '../components/sections/AliasesSection';
 import AppSection from '../components/sections/AppSection';
+import CustomEventsSection from '../components/sections/CustomEventsSection';
 import EmailsSection from '../components/sections/EmailsSection';
 import InAppSection from '../components/sections/InAppSection';
 import LiveActivitySection from '../components/sections/LiveActivitySection';
@@ -19,13 +20,13 @@ import SendIamSection from '../components/sections/SendIamSection';
 import SendPushSection from '../components/sections/SendPushSection';
 import SmsSection from '../components/sections/SmsSection';
 import TagsSection from '../components/sections/TagsSection';
-import CustomEventsSection from '../components/sections/CustomEventsSection';
 import TriggersSection from '../components/sections/TriggersSection';
 import UserSection from '../components/sections/UserSection';
 import { useOneSignal } from '../hooks/useOneSignal';
 import OneSignalApiService from '../services/OneSignalApiService';
 import TooltipHelper from '../services/TooltipHelper';
 import type { TooltipData } from '../services/TooltipHelper';
+
 import './HomeScreen.css';
 
 const HomeScreen: FC = () => {

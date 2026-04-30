@@ -1,19 +1,48 @@
-import { defineConfig } from 'vite';
-import dts from 'vite-plugin-dts';
+import { defineConfig } from 'vite-plus';
 
 export default defineConfig({
-  plugins: [dts({ exclude: ['**/*.test.ts', 'mocks/**'], rollupTypes: true })],
-  build: {
-    outDir: 'dist',
-    emptyOutDir: true,
-    lib: {
-      entry: 'www/index.ts',
-      formats: ['cjs'],
-      fileName: () => 'index.js',
+  staged: {
+    '*': 'vp check --fix',
+  },
+  fmt: {
+    singleQuote: true,
+    sortImports: {
+      enabled: true,
     },
-    rollupOptions: {
-      output: {
-        exports: 'named',
+  },
+  lint: {
+    plugins: ['react'],
+    options: { typeAware: true, typeCheck: true },
+    rules: {
+      'react/exhaustive-deps': 'warn',
+    },
+    ignorePatterns: ['examples/demo/platforms/'],
+  },
+  pack: {
+    entry: 'www/index.ts',
+    dts: true,
+    format: 'cjs',
+    minify: true,
+    outExtensions: () => ({ js: '.cjs', dts: '.d.ts' }),
+    outputOptions: {
+      exports: 'named',
+    },
+  },
+  test: {
+    clearMocks: true,
+    environment: 'happy-dom',
+    include: ['**/*.test.ts', '**/*.test.tsx'],
+    coverage: {
+      exclude: ['mocks/**', 'www/helpers.ts'],
+      enabled: true,
+      reporter: ['text-summary', 'lcov'],
+      reportOnFailure: true,
+      reportsDirectory: 'coverage',
+      thresholds: {
+        statements: 95,
+        branches: 95,
+        functions: 95,
+        lines: 95,
       },
     },
   },

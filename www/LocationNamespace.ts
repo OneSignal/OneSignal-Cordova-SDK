@@ -10,13 +10,7 @@ export default class Location {
    * @returns void
    */
   requestPermission(): void {
-    window.cordova.exec(
-      noop,
-      noop,
-      'OneSignalPush',
-      'requestLocationPermission',
-      [],
-    );
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'requestLocationPermission', []);
   }
 
   /**
@@ -25,9 +19,7 @@ export default class Location {
    * @returns void
    */
   setShared(shared: boolean): void {
-    window.cordova.exec(noop, noop, 'OneSignalPush', 'setLocationShared', [
-      shared,
-    ]);
+    window.cordova.exec(noop, noop, 'OneSignalPush', 'setLocationShared', [shared]);
   }
 
   /**
@@ -36,13 +28,7 @@ export default class Location {
    */
   isShared(): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
-      window.cordova.exec(
-        resolve,
-        reject,
-        'OneSignalPush',
-        'isLocationShared',
-        [],
-      );
+      window.cordova.exec(resolve, reject, 'OneSignalPush', 'isLocationShared', []);
     });
   }
 }

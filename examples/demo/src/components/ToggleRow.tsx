@@ -9,13 +9,7 @@ interface ToggleRowProps {
   testID?: string;
 }
 
-const ToggleRow: FC<ToggleRowProps> = ({
-  label,
-  description,
-  checked,
-  onToggle,
-  testID,
-}) => (
+const ToggleRow: FC<ToggleRowProps> = ({ label, description, checked, onToggle, testID }) => (
   <div className="card toggle-card">
     <div>
       <div className="label">{label}</div>

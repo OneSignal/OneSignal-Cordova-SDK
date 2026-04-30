@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { FC } from 'react';
+
 import ModalShell from './ModalShell';
 
 interface MultiSelectRemoveModalProps {
@@ -39,9 +40,7 @@ const MultiSelectRemoveModal: FC<MultiSelectRemoveModalProps> = ({
                   if (event.target.checked) {
                     setSelectedKeys((prev) => [...prev, key]);
                   } else {
-                    setSelectedKeys((prev) =>
-                      prev.filter((selectedKey) => selectedKey !== key),
-                    );
+                    setSelectedKeys((prev) => prev.filter((selectedKey) => selectedKey !== key));
                   }
                 }}
                 data-testid={`remove_checkbox_${key}`}

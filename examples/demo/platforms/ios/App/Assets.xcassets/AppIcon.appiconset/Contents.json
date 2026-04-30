@@ -1,20 +1,20 @@
 {
-  "images" : [
+  "images": [
     {
-      "filename" : "icon.png",
-      "idiom" : "universal",
+      "filename": "icon.png",
+      "idiom": "universal",
       "platform": "ios",
-      "size" : "1024x1024"
+      "size": "1024x1024"
     },
     {
-      "filename" : "icon.png",
-      "idiom" : "universal",
+      "filename": "icon.png",
+      "idiom": "universal",
       "platform": "watchos",
-      "size" : "1024x1024"
+      "size": "1024x1024"
     }
   ],
-  "info" : {
-    "version" : 1,
-    "author" : "xcode"
+  "info": {
+    "version": 1,
+    "author": "xcode"
   }
 }

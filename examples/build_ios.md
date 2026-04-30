@@ -283,6 +283,7 @@ After syncing, open `ios/App/App.xcworkspace` in Xcode and verify:
 - **OneSignalWidgetExtension**: bundle ID `com.onesignal.example.OneSignalWidgetExtension`, team `99SW8E36CT`, deployment target iOS 16.2, `SUPPORTS_LIVE_ACTIVITIES = YES`
 
 To add App Groups capability (shows up in Signing & Capabilities), select each target in Xcode and use **+ Capability > App Groups**, then add `group.com.onesignal.example.onesignal`. Do this for:
+
 - `App`
 - `OneSignalNotificationServiceExtension`
 

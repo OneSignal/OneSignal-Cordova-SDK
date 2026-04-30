@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import { useMemo, useState } from 'react';
+
 import ActionButton from '../ActionButton';
 import { PairList } from '../ListWidgets';
 import MultiPairInputModal from '../modals/MultiPairInputModal';
@@ -28,10 +29,7 @@ const TriggersSection: FC<TriggersSectionProps> = ({
   const [addMultipleOpen, setAddMultipleOpen] = useState(false);
   const [removeOpen, setRemoveOpen] = useState(false);
 
-  const items = useMemo(
-    () => triggers.map(([key, value]) => ({ key, value })),
-    [triggers],
-  );
+  const items = useMemo(() => triggers.map(([key, value]) => ({ key, value })), [triggers]);
 
   return (
     <SectionCard title="TRIGGERS" onInfoTap={onInfoTap} sectionKey="triggers">
@@ -41,11 +39,7 @@ const TriggersSection: FC<TriggersSectionProps> = ({
         onRemove={(key) => onRemoveSelected([key])}
         sectionKey="triggers"
       />
-      <ActionButton
-        type="button"
-        onClick={() => setAddOpen(true)}
-        data-testid="add_trigger_button"
-      >
+      <ActionButton type="button" onClick={() => setAddOpen(true)} data-testid="add_trigger_button">
         ADD TRIGGER
       </ActionButton>
       <ActionButton

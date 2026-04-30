@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import { useState } from 'react';
+
 import ActionButton from '../ActionButton';
 import { SingleList } from '../ListWidgets';
 import SingleInputModal from '../modals/SingleInputModal';
@@ -31,11 +32,7 @@ const EmailsSection: FC<EmailsSectionProps> = ({
         onRemove={(email) => onRemove(email)}
         sectionKey="emails"
       />
-      <ActionButton
-        type="button"
-        onClick={() => setAddOpen(true)}
-        data-testid="add_email_button"
-      >
+      <ActionButton type="button" onClick={() => setAddOpen(true)} data-testid="add_email_button">
         ADD EMAIL
       </ActionButton>
       <SingleInputModal

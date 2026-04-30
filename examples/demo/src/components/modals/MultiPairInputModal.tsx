@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { FC } from 'react';
 import { MdClose } from 'react-icons/md';
+
 import ModalShell from './ModalShell';
 
 type Row = { key: string; value: string };
@@ -33,9 +34,7 @@ const MultiPairInputModal: FC<MultiPairInputModalProps> = ({
   const isValid = useMemo(
     () =>
       rows.length > 0 &&
-      rows.every(
-        (row) => row.key.trim().length > 0 && row.value.trim().length > 0,
-      ),
+      rows.every((row) => row.key.trim().length > 0 && row.value.trim().length > 0),
     [rows],
   );
 
@@ -62,9 +61,7 @@ const MultiPairInputModal: FC<MultiPairInputModalProps> = ({
                 onChange={(event) =>
                   setRows((prev) =>
                     prev.map((entry, entryIndex) =>
-                      entryIndex === index
-                        ? { ...entry, key: event.target.value }
-                        : entry,
+                      entryIndex === index ? { ...entry, key: event.target.value } : entry,
                     ),
                   )
                 }
@@ -76,9 +73,7 @@ const MultiPairInputModal: FC<MultiPairInputModalProps> = ({
                 onChange={(event) =>
                   setRows((prev) =>
                     prev.map((entry, entryIndex) =>
-                      entryIndex === index
-                        ? { ...entry, value: event.target.value }
-                        : entry,
+                      entryIndex === index ? { ...entry, value: event.target.value } : entry,
                     ),
                   )
                 }
@@ -90,18 +85,14 @@ const MultiPairInputModal: FC<MultiPairInputModalProps> = ({
                   type="button"
                   className="delete-btn"
                   onClick={() =>
-                    setRows((prev) =>
-                      prev.filter((_, entryIndex) => entryIndex !== index),
-                    )
+                    setRows((prev) => prev.filter((_, entryIndex) => entryIndex !== index))
                   }
                 >
                   <MdClose />
                 </button>
               ) : null}
             </div>
-            {index < rows.length - 1 ? (
-              <div className="multi-row-divider" />
-            ) : null}
+            {index < rows.length - 1 ? <div className="multi-row-divider" /> : null}
           </div>
         ))}
         <button
@@ -116,11 +107,7 @@ const MultiPairInputModal: FC<MultiPairInputModalProps> = ({
           <button type="button" onClick={onClose}>
             Cancel
           </button>
-          <button
-            type="submit"
-            disabled={!isValid}
-            data-testid="multipair_confirm_button"
-          >
+          <button type="submit" disabled={!isValid} data-testid="multipair_confirm_button">
             Add All
           </button>
         </div>

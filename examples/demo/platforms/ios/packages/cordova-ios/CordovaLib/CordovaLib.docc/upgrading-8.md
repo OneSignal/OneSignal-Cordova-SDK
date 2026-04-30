@@ -1,4 +1,5 @@
 # Upgrading Plugins to Cordova iOS 8.x
+
 <!--
 #
 # Licensed to the Apache Software Foundation (ASF) under one
@@ -8,9 +9,9 @@
 # to you under the Apache License, Version 2.0 (the
 # "License"); you may not use this file except in compliance
 # with the License.  You may obtain a copy of the License at
-# 
+#
 # http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing,
 # software distributed under the License is distributed on an
 # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -26,7 +27,7 @@ Cordova iOS 8 introduces some significant changes to the exposed API for plugin 
 
 Many plugins will notice new deprecation warnings when built against Cordova iOS 8, rather than outright breaking changes. This document aims to explain the changes, the rationale behind the changes, and offer sample code for plugin authors to ensure their plugin code is compatible with future versions of Cordova iOS.
 
-In cases where different behavior is required for different Cordova versions, the ``CORDOVA_VERSION_MIN_REQUIRED`` macro can be used in Objective-C code to test the current Cordova version:
+In cases where different behavior is required for different Cordova versions, the `CORDOVA_VERSION_MIN_REQUIRED` macro can be used in Objective-C code to test the current Cordova version:
 
 ```objc
 #if defined(__CORDOVA_8_0_0) && CORDOVA_VERSION_MIN_REQUIRED >= __CORDOVA_8_0_0
@@ -37,7 +38,9 @@ In cases where different behavior is required for different Cordova versions, th
 ```
 
 ## Major Breaking Changes
+
 ### Minimum iOS version update
+
 The Cordova iOS framework has increased the minimum supported iOS version from 11.0 to 13.0.
 
 The minimum supported Xcode version for the Cordova tooling and generated template app is now Xcode 15.
@@ -77,11 +80,11 @@ Moving to a consistent name for the Xcode project and target resolves a number o
 
 Using the cordova-ios JavaScript API ensures that plugins and the Cordova tooling treat projects the same way. The `locations` object contains properties for several useful paths:
 
-* `root` - The platform root directory
-* `www` - The platform's generated web content folder
-* `pbxproj` - The Xcode project file (the project.pbxproj file)
-* `xcodeProjDir` - The Xcode project path (the .xcodeproj directory)
-* `xcodeCordovaProj` - The platform folder containing the Cordova iOS app code
+- `root` - The platform root directory
+- `www` - The platform's generated web content folder
+- `pbxproj` - The Xcode project file (the project.pbxproj file)
+- `xcodeProjDir` - The Xcode project path (the .xcodeproj directory)
+- `xcodeCordovaProj` - The platform folder containing the Cordova iOS app code
 
 You can find the app's Info.plist file in a backwards-compatible way by doing something like this:
 
@@ -89,12 +92,12 @@ You can find the app's Info.plist file in a backwards-compatible way by doing so
 const projName = path.basename(iosProject.locations.xcodeCordovaProj);
 const infoPlistPath = path.join(iosProject.locations.xcodeCordovaProj, `${projName}-Info.plist`);
 ```
-  
+
 ### CDVAppDelegate window deprecation
 
 The generated app template now uses the iOS scene API (using `UISceneDelegate`) to support multiple windows, which means that it's no longer a safe assumption that an app has only a single window.
 
-The ``CDVAppDelegate/window`` property of ``CDVAppDelegate`` is deprecated as a result.  This property will always have a `nil` value.
+The `CDVAppDelegate/window` property of `CDVAppDelegate` is deprecated as a result. This property will always have a `nil` value.
 
 In a plugin class, you should retrieve the `UIWindow` for the current view controller:
 
@@ -113,10 +116,10 @@ There may be other cases where things that previously assumed a single window (s
 
 ### CDVAppDelegate viewController deprecation
 
-The ``CDVAppDelegate/viewController`` property of ``CDVAppDelegate`` is deprecated, and may return `nil` if a `CDVViewController` has not yet been initialized.
+The `CDVAppDelegate/viewController` property of `CDVAppDelegate` is deprecated, and may return `nil` if a `CDVViewController` has not yet been initialized.
 
-Plugins should prefer accessing the view controller using their ``CDVPlugin/viewController`` property (which is now typed as ``CDVViewController``).
-  
+Plugins should prefer accessing the view controller using their `CDVPlugin/viewController` property (which is now typed as `CDVViewController`).
+
 ### UIView scrollView property deprecation
 
 The `scrollView` property added as a global category extension to `UIView` by Cordova is now deprecated in Objective C code and **removed entirely in Swift code**. This is to prevent conflicts with other Swift classes that extend `UIView` and have their own `scrollView` properties. You can read more about the scrollView property in the Cordova discussion [Cordova iOS 8.x Upgrade Guide: UIView scrollView property deprecation](https://github.com/apache/cordova/discussions/565#discussioncomment-14621123).
@@ -188,9 +191,10 @@ self.commandDelegate.send(result, callbackId: callback)
 ```
 
 ## Other Major Changes
+
 ### Deprecating AppDelegate category extensions
 
-Please extend the ``CDVAppDelegate`` base class instead:
+Please extend the `CDVAppDelegate` base class instead:
 
 ```objc
 // Old code
@@ -210,13 +214,13 @@ Please extend the ``CDVAppDelegate`` base class instead:
 @end
 ```
 
-It was never a completely safe assumption that an app using Cordova would include a class named `AppDelegate` that was a subclass of `CDVAppDelegate` due to the ability to embed CordovaLib in an existing iOS app project as a library. If your plugin needs to add behaviour to the app delegate, it should do so to the ``CDVAppDelegate`` base class.
+It was never a completely safe assumption that an app using Cordova would include a class named `AppDelegate` that was a subclass of `CDVAppDelegate` due to the ability to embed CordovaLib in an existing iOS app project as a library. If your plugin needs to add behaviour to the app delegate, it should do so to the `CDVAppDelegate` base class.
 
 The updated code is backwards compatible with several existing Cordova iOS versions.
-  
+
 ### Deprecating MainViewController category extensions
- 
-Please extend the ``CDVViewController`` base class instead:
+
+Please extend the `CDVViewController` base class instead:
 
 ```objc
 // Old code
@@ -236,10 +240,10 @@ Please extend the ``CDVViewController`` base class instead:
 @end
 ```
 
-It was never a completely safe assumption that an app using Cordova would include a class named `MainViewController` that was a subclass of `CDVViewController` due to the ability to embed CordovaLib in an existing iOS app project as a library. If your plugin needs to add behaviour to the Cordova view controller, it should do so to the ``CDVViewController`` base class.
+It was never a completely safe assumption that an app using Cordova would include a class named `MainViewController` that was a subclass of `CDVViewController` due to the ability to embed CordovaLib in an existing iOS app project as a library. If your plugin needs to add behaviour to the Cordova view controller, it should do so to the `CDVViewController` base class.
 
 This updated code is backwards compatible with several existing Cordova iOS versions.
-  
+
 ### Deprecating CDVCommandStatus constants in Swift
 
 For plugins written in Swift, the old `CDVCommandStatus_*` constants are deprecated in favour of the enum based aliases:
@@ -254,7 +258,7 @@ self.commandDelegate.send(CDVPluginResult(status: CDVCommandStatus_OK), callback
 self.commandDelegate.send(CDVPluginResult(status: .ok), callbackId: command.callbackId);
 ```
 
-These aliases were introduced in and are backwards compatible with all existing versions since Cordova iOS 5.0.0. See ``CDVCommandStatus`` for a list of the enum values.
+These aliases were introduced in and are backwards compatible with all existing versions since Cordova iOS 5.0.0. See `CDVCommandStatus` for a list of the enum values.
 
 ### Deprecating CDVWebViewProcessPoolFactory
 
@@ -263,87 +267,89 @@ Apple has deprecated the `WKProcessPool` API, saying that it has no effect in iO
 The `CDVWebViewProcessPoolFactory` API was also problematic because it exposed WebKit-specific API types to the public API interface of Cordova, potentially causing issues if those APIs need to change in the future. With this deprecation and eventual removal, Cordova is better insulated from upstream WebView changes.
 
 ## Public API Removals
+
 The following classes were previously exposed as part of the Cordova iOS public API, but were only used as internal implementation details. To better establish the public/private API boundary within Cordova iOS, they have been removed from the public API in Cordova iOS 8.
 
-* `CDVAllowList`
-* `CDVURLSchemeHandler`
+- `CDVAllowList`
+- `CDVURLSchemeHandler`
 
 The following headers are deprecated due to adding global category extensions to system classes and will be removed in a future version of Cordova iOS:
 
-* `<Cordova/NSDictionary+CordovaPreferences.h>`  
-  Use the new ``CDVSettingsDictionary`` class, which provides all the same methods.
+- `<Cordova/NSDictionary+CordovaPreferences.h>`  
+  Use the new `CDVSettingsDictionary` class, which provides all the same methods.
 
-* `<Cordova/NSMutableArray+QueueAdditions.h>`  
+- `<Cordova/NSMutableArray+QueueAdditions.h>`  
   This was only ever intended as an internal implementation detail.
 
-* `<Cordova/CDV.h>`  
+- `<Cordova/CDV.h>`  
   Use `<Cordova/Cordova.h>` instead.
 
 ## Other Changes
-* ``CDVCommandDelegate``
-  * The ``CDVCommandDelegate/urlTransformer`` property is deprecated.  
+
+- `CDVCommandDelegate`
+  - The `CDVCommandDelegate/urlTransformer` property is deprecated.  
     This property was never used, and does not need to be a required part of the protocol.
 
-  * The ``CDVCommandDelegate/settings`` property is now typed as ``CDVSettingsDictionary``.  
+  - The `CDVCommandDelegate/settings` property is now typed as `CDVSettingsDictionary`.
 
-* ``CDVConfigParser``
-  * Added a ``CDVConfigParser/parseConfigFile:`` class method.
+- `CDVConfigParser`
+  - Added a `CDVConfigParser/parseConfigFile:` class method.
 
-  * Added a ``CDVConfigParser/parseConfigFile:withDelegate:`` class method.  
+  - Added a `CDVConfigParser/parseConfigFile:withDelegate:` class method.
 
-* ``CDVPlugin``
-  * The ``CDVPlugin/viewController`` property is now typed as ``CDVViewController``.  
+- `CDVPlugin`
+  - The `CDVPlugin/viewController` property is now typed as `CDVViewController`.  
     Previously this was typed as the more generic `UIViewController`.
 
-  * Plugin classes that intend to override WebKit scheme handling should implement the ``CDVPluginSchemeHandler`` protocol to ensure compliance with the required methods.
+  - Plugin classes that intend to override WebKit scheme handling should implement the `CDVPluginSchemeHandler` protocol to ensure compliance with the required methods.
 
-  * The ``CDVPluginHandleOpenURLWithAppSourceAndAnnotationNotification`` notification is now deprecated.  
-    The existing ``CDVPluginHandleOpenURLNotification`` notification now includes the source and annotation in its `userInfo` dictionary.
+  - The `CDVPluginHandleOpenURLWithAppSourceAndAnnotationNotification` notification is now deprecated.  
+    The existing `CDVPluginHandleOpenURLNotification` notification now includes the source and annotation in its `userInfo` dictionary.
 
-* ``CDVPluginAuthenticationHandler``
-  * Newly added protocol for plugins wishing to handle server authentication requests.
+- `CDVPluginAuthenticationHandler`
+  - Newly added protocol for plugins wishing to handle server authentication requests.
 
-* ``CDVPluginNavigationHandler``
-  * Newly added protocol for plugins wishing to handle navigation request permitting or denying within the webview.
+- `CDVPluginNavigationHandler`
+  - Newly added protocol for plugins wishing to handle navigation request permitting or denying within the webview.
 
-* ``CDVPluginSchemeHandler``
-  * Newly added protocol for plugins wishing to override WebKit scheme handling for web requests.
+- `CDVPluginSchemeHandler`
+  - Newly added protocol for plugins wishing to override WebKit scheme handling for web requests.
 
-* ``CDVScreenOrientationDelegate``
-  * This protocol is now deprecated and no longer used.
+- `CDVScreenOrientationDelegate`
+  - This protocol is now deprecated and no longer used.
 
-* ``CDVSettingsDictionary``
-  * Newly added class to provide `NSDictionary`-like access to config.xml preferences, without relying on global category extensions to `NSDictionary`.
+- `CDVSettingsDictionary`
+  - Newly added class to provide `NSDictionary`-like access to config.xml preferences, without relying on global category extensions to `NSDictionary`.
 
-* ``CDVViewController``
-  * The ``CDVViewController/settings`` property is now typed as ``CDVSettingsDictionary``.  
+- `CDVViewController`
+  - The `CDVViewController/settings` property is now typed as `CDVSettingsDictionary`.
 
-  * The ``CDVViewController/wwwFolderName`` property is deprecated.  
-    This property has been renamed to ``CDVViewController/webContentFolderName``.
+  - The `CDVViewController/wwwFolderName` property is deprecated.  
+    This property has been renamed to `CDVViewController/webContentFolderName`.
 
-  * The ``CDVViewController/appURLScheme`` property is deprecated.  
+  - The `CDVViewController/appURLScheme` property is deprecated.  
     This property was not used internally by Cordova iOS and should not be used by plugins.
 
-  * The ``CDVViewController/pluginsMap`` and ``CDVViewController/pluginObjects`` properties are deprecated.  
+  - The `CDVViewController/pluginsMap` and `CDVViewController/pluginObjects` properties are deprecated.  
     These were internal implementation details that should not have been exposed.
 
-  * Added an ``CDVViewController/enumerablePlugins`` property that can safely be iterated to loop over all loaded plugins.
+  - Added an `CDVViewController/enumerablePlugins` property that can safely be iterated to loop over all loaded plugins.
 
-  * The ``CDVViewController/configParser`` property is deprecated due to not being used.
+  - The `CDVViewController/configParser` property is deprecated due to not being used.
 
-  * The ``CDVViewController/parseSettingsWithParser:`` method is deprecated.  
-    Use the ``CDVConfigParser/parseConfigFile:withDelegate:`` class method on ``CDVConfigParser`` instead.
+  - The `CDVViewController/parseSettingsWithParser:` method is deprecated.  
+    Use the `CDVConfigParser/parseConfigFile:withDelegate:` class method on `CDVConfigParser` instead.
 
-  * Added a new ``CDVViewController/showInitialSplashScreen`` property.  
+  - Added a new `CDVViewController/showInitialSplashScreen` property.  
     This property is inspectable in Interface Builder for embedding apps to indicate if the splash screen should be displayed during web content loading.
 
-  * Added a new ``CDVViewController/backgroundColor`` property.  
+  - Added a new `CDVViewController/backgroundColor` property.  
     This property is inspectable in Interface Builder for embedding apps to set the view controller background color.
 
-  * Added a new ``CDVViewController/splashBackgroundColor`` property.  
+  - Added a new `CDVViewController/splashBackgroundColor` property.  
     This property is inspectable in Interface Builder for embedding apps to set the splash screen background color.
 
-  * The ``CDVViewController/showLaunchScreen:`` method is deprecated.  
-    This method has been renamed to ``CDVViewController/showSplashScreen:``.
+  - The `CDVViewController/showLaunchScreen:` method is deprecated.  
+    This method has been renamed to `CDVViewController/showSplashScreen:`.
 
-  * Added a new ``CDVViewController/loadStartPage`` method to load the initial starting page in the web view, replacing any existing content.
+  - Added a new `CDVViewController/loadStartPage` method to load the initial starting page in the web view, replacing any existing content.

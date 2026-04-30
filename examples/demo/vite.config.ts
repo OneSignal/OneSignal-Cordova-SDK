@@ -1,8 +1,11 @@
-import legacy from '@vitejs/plugin-legacy';
 import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vite-plus';
 
-// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), legacy()],
+  plugins: [react()],
+  build: {
+    // lightningcss doesn't recognize Ionic's `:host-context()` selectors and
+    // logs a warning per usage. esbuild minifies the CSS without complaining.
+    cssMinify: 'esbuild',
+  },
 });

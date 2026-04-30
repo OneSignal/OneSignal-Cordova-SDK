@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import { useMemo, useState } from 'react';
+
 import ActionButton from '../ActionButton';
 import { PairList } from '../ListWidgets';
 import MultiPairInputModal from '../modals/MultiPairInputModal';
@@ -36,17 +37,8 @@ const AliasesSection: FC<AliasesSectionProps> = ({
 
   return (
     <SectionCard title="ALIASES" onInfoTap={onInfoTap} sectionKey="aliases">
-      <PairList
-        items={items}
-        emptyText="No aliases added"
-        loading={loading}
-        sectionKey="aliases"
-      />
-      <ActionButton
-        type="button"
-        onClick={() => setAddOpen(true)}
-        data-testid="add_alias_button"
-      >
+      <PairList items={items} emptyText="No aliases added" loading={loading} sectionKey="aliases" />
+      <ActionButton type="button" onClick={() => setAddOpen(true)} data-testid="add_alias_button">
         ADD ALIAS
       </ActionButton>
       <ActionButton
