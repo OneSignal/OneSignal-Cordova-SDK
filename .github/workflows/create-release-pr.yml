@@ -175,13 +175,18 @@ jobs:
 
       - name: Refresh demo Podfile.lock
         run: |
-          # Runs after all version edits (package.json + plugin.xml) so the
-          # repacked plugin tarball and OneSignalXCFramework pin both reflect
-          # the new release. setup.sh runs `cap sync` which runs `pod install`,
-          # regenerating Podfile.lock entries for the path-based plugin and
-          # any changed native pins in a single resolve.
+          # plugin.xml's OneSignalXCFramework pin just changed. cap sync's
+          # `pod install` refuses to silently mutate the committed
+          # Podfile.lock for transitive dev-pod constraints, so the first
+          # setup attempt fails after generating capacitor-cordova-ios-plugins/.
+          # We then bump the lock explicitly and re-run setup, which now
+          # finds the lock consistent with the new pin and succeeds. The
+          # second setup is cheap — SDK_STAMP was already written, so only
+          # cap sync re-runs.
           (
             cd examples/demo
+            vp run setup || true
+            (cd ios/App && pod update OneSignalXCFramework --no-repo-update)
             vp run setup
           )
           echo "✓ Refreshed examples/demo/ios/App/Podfile.lock"
