@@ -1,5 +1,6 @@
 name: 'Setup Demo'
-description: 'Installs toolchains, builds the SDK, sets up the Capacitor demo app, and creates the .env file'
+description: 'Installs toolchains, builds the SDK, sets up the Capacitor demo
+  app, and creates the .env file'
 inputs:
   onesignal-app-id:
     description: 'OneSignal App ID for the demo .env'
@@ -8,45 +9,34 @@ inputs:
     description: 'OneSignal API Key for the demo .env'
     required: true
   install-pods:
-    description: 'Whether to run cap sync + pod update for iOS (handled inside examples/setup.sh)'
+    description: 'Whether to run cap sync + pod update for iOS (handled inside
+      examples/setup.sh)'
     required: false
     default: 'false'
 runs:
   using: 'composite'
   steps:
-    - name: Set up Bun
-      uses: oven-sh/setup-bun@v2
-
-    - name: Cache SDK bun dependencies
-      uses: actions/cache@v5
+    - name: Set up Vite+
+      uses: voidzero-dev/setup-vp@v1
       with:
-        path: node_modules
-        key: bun-sdk-${{ runner.os }}-${{ hashFiles('bun.lock') }}
-        restore-keys: bun-sdk-${{ runner.os }}-
+        cache: true
+        run-install: true
 
-    - name: Cache demo bun dependencies
+    - name: Cache demo Vite+ dependencies
       uses: actions/cache@v5
       with:
         path: examples/demo/node_modules
-        key: bun-demo-${{ runner.os }}-${{ hashFiles('examples/demo/bun.lock') }}
-        restore-keys: bun-demo-${{ runner.os }}-
-
-    - name: Install SDK dependencies
-      shell: bash
-      run: bun install --frozen-lockfile
+        key: vp-demo-${{ runner.os }}-${{ hashFiles('examples/demo/bun.lock') }}
+        restore-keys: vp-demo-${{ runner.os }}-
 
     - name: Cache CocoaPods
       if: inputs.install-pods == 'true'
       uses: actions/cache@v5
       with:
         path: examples/demo/ios/App/Pods
-        key: pods-${{ runner.os }}-${{ hashFiles('examples/demo/ios/App/Podfile.lock') }}
+        key: pods-${{ runner.os }}-${{ hashFiles('examples/demo/ios/App/Podfile.lock')
+          }}
         restore-keys: pods-${{ runner.os }}-
-
-    - name: Set up demo
-      shell: bash
-      working-directory: examples/demo
-      run: bun run setup
 
     - name: Create demo .env
       shell: bash
@@ -55,3 +45,8 @@ runs:
         echo "ONESIGNAL_APP_ID=${{ inputs.onesignal-app-id }}" > .env
         echo "ONESIGNAL_API_KEY=${{ inputs.onesignal-api-key }}" >> .env
         echo "E2E_MODE=true" >> .env
+
+    - name: Set up demo
+      shell: bash
+      working-directory: examples/demo
+      run: vp run setup
