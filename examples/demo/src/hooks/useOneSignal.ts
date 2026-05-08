@@ -1,15 +1,26 @@
-import OneSignal, { LogLevel, type NotificationWillDisplayEvent } from 'onesignal-cordova-plugin';
+import OneSignal, {
+  LogLevel,
+  type InAppMessageClickEvent,
+  type InAppMessageDidDismissEvent,
+  type InAppMessageDidDisplayEvent,
+  type InAppMessageWillDismissEvent,
+  type InAppMessageWillDisplayEvent,
+  type NotificationClickEvent,
+  type NotificationWillDisplayEvent,
+  type PushSubscriptionChangedState,
+  type UserChangedState,
+} from 'onesignal-cordova-plugin';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { NotificationType } from '../models/NotificationType';
 import OneSignalApiService from '../services/OneSignalApiService';
 import PreferencesService from '../services/PreferencesService';
 
+const APP_ID = import.meta.env.VITE_ONESIGNAL_APP_ID as string | undefined;
 const DEFAULT_APP_ID = '77e32082-ea27-42e3-a898-c72e141824ef';
 
 function resolveAppId(): string {
-  const envId = (import.meta.env.VITE_ONESIGNAL_APP_ID ?? '').trim();
-  return envId || DEFAULT_APP_ID;
+  return APP_ID?.trim() || DEFAULT_APP_ID;
 }
 
 const apiService = OneSignalApiService.getInstance();
@@ -83,8 +94,13 @@ export type UseOneSignalReturn = {
   clearTriggers: () => void;
   trackEvent: (name: string, properties?: Record<string, unknown>) => void;
   setLocationShared: (shared: boolean) => Promise<void>;
+  checkLocationShared: () => Promise<boolean>;
   requestLocationPermission: () => void;
-  startDefaultLiveActivity: (activityId: string, attributes: object, content: object) => void;
+  startDefaultLiveActivity: (
+    activityId: string,
+    attributes: Record<string, unknown>,
+    content: Record<string, unknown>,
+  ) => void;
   updateLiveActivity: (
     activityId: string,
     eventUpdates: Record<string, unknown>,
@@ -93,7 +109,7 @@ export type UseOneSignalReturn = {
 };
 
 export function useOneSignal(): UseOneSignalReturn {
-  const [appId] = useState(resolveAppId);
+  const [appId, setAppId] = useState(resolveAppId);
   const [consentRequired, setConsentRequiredState] = useState(false);
   const [privacyConsentGiven, setPrivacyConsentGivenState] = useState(false);
   const [externalUserId, setExternalUserId] = useState<string | undefined>(undefined);
@@ -143,43 +159,82 @@ export function useOneSignal(): UseOneSignalReturn {
   useEffect(() => {
     let cancelled = false;
 
-    const refreshPushState = async () => {
-      const [id, optedIn] = await Promise.all([
-        OneSignal.User.pushSubscription.getIdAsync(),
-        OneSignal.User.pushSubscription.getOptedInAsync(),
-      ]);
-      if (cancelled) return;
-      setPushSubscriptionId(id ?? undefined);
-      setIsPushEnabled(optedIn);
+    const handleIamWillDisplay = (e: InAppMessageWillDisplayEvent) => {
+      console.log(`IAM willDisplay: ${e.message.messageId}`);
     };
 
-    const handlePermissionChange = (granted: boolean) => {
-      if (cancelled) return;
-      setHasNotificationPermission(granted);
-      console.log(`Permission changed: ${granted}`);
+    const handleIamDidDisplay = (e: InAppMessageDidDisplayEvent) => {
+      console.log(`IAM didDisplay: ${e.message.messageId}`);
+    };
+
+    const handleIamWillDismiss = (e: InAppMessageWillDismissEvent) => {
+      console.log(`IAM willDismiss: ${e.message.messageId}`);
+    };
+
+    const handleIamDidDismiss = (e: InAppMessageDidDismissEvent) => {
+      console.log(`IAM didDismiss: ${e.message.messageId}`);
+    };
+
+    const handleIamClick = (e: InAppMessageClickEvent) => {
+      console.log(`IAM click: ${e.message.messageId}`);
+    };
+
+    const handleNotificationClick = (e: NotificationClickEvent) => {
+      console.log(`Notification click: ${e.notification.title ?? ''}`);
+      // Persist to localStorage so cold-start clicks are still inspectable
+      // after the Safari Web Inspector reattaches to the WKWebView.
+      try {
+        const existing = JSON.parse(localStorage.getItem('lastNotificationClicks') ?? '[]');
+        existing.push({
+          notificationId: e.notification.notificationId,
+          title: e.notification.title ?? null,
+          body: e.notification.body ?? null,
+          actionId: e.result.actionId ?? null,
+          url: e.result.url ?? null,
+          receivedAt: new Date().toISOString(),
+        });
+        localStorage.setItem('lastNotificationClicks', JSON.stringify(existing.slice(-20)));
+      } catch (err) {
+        console.warn('Failed to persist notification click to localStorage', err);
+      }
     };
 
     const handleForegroundWillDisplay = (e: NotificationWillDisplayEvent) => {
       console.log(`Notification foregroundWillDisplay: ${e.getNotification().title ?? ''}`);
-
-      // If you want to test preventDefault, you can uncomment the following line:
-      // e.preventDefault(); // prevent the notification from displaying immediately
-      // setTimeout(() => {
-      //   e.getNotification().display(); // display the notification after 5 seconds (overrides the preventDefault)
-      // }, 5000);
+      e.getNotification().display();
     };
 
-    const handlePushSubscriptionChange = () => {
-      if (cancelled) return;
-      void refreshPushState();
+    const pushSubHandler = (event: PushSubscriptionChangedState) => {
+      const { previous, current } = event;
+      const fmtToken = (t: string | undefined) => (t ? `${t.slice(0, 8)}…` : 'null');
+      console.log(
+        `Push subscription changed: id=${previous.id ?? 'null'} → ${current.id ?? 'null'}, optedIn=${previous.optedIn} → ${current.optedIn}, token=${fmtToken(previous.token)} → ${fmtToken(current.token)}`,
+      );
+      setPushSubscriptionId(current.id ?? undefined);
+      setIsPushEnabled(current.optedIn);
     };
 
-    const handleUserChange = () => {
-      if (cancelled) return;
-      fetchUserDataFromApi();
+    const permissionHandler = (granted: boolean) => {
+      console.log(`Permission changed: ${granted}`);
+      setHasNotificationPermission(granted);
     };
 
-    const init = async () => {
+    const userChangeHandler = (event: UserChangedState) => {
+      const nextOnesignalId = event.current.onesignalId ?? null;
+      console.log(
+        `User changed: onesignalId=${nextOnesignalId ?? 'null'}, externalId=${event.current.externalId ?? 'null'}`,
+      );
+
+      if (nextOnesignalId === null) return;
+      void fetchUserDataFromApi();
+    };
+
+    const load = async () => {
+      // Uncomment if you want so you have time to see logs while trying to open
+      // safari web inspector. Not an issue for chrome web inspector.
+      // await new Promise((resolve) => setTimeout(resolve, 10_000));
+      // if (cancelled) return;
+
       const nextAppId = resolveAppId();
       const nextConsentRequired = preferences.getConsentRequired();
       const nextPrivacyConsentGiven = preferences.getConsentGiven();
@@ -188,12 +243,6 @@ export function useOneSignal(): UseOneSignalReturn {
       const storedExternalUserId = preferences.getExternalUserId() ?? undefined;
 
       apiService.setAppId(nextAppId);
-
-      setConsentRequiredState(nextConsentRequired);
-      setPrivacyConsentGivenState(nextPrivacyConsentGiven);
-      setInAppMessagesPaused(nextIamPaused);
-      setLocationSharedState(nextLocationShared);
-      setExternalUserId(storedExternalUserId);
 
       // Verbose log level enables WKWebView.isInspectable on the IAM webview
       // (see OSInAppMessageView.m), which lets Appium's XCUITest driver
@@ -215,7 +264,13 @@ export function useOneSignal(): UseOneSignalReturn {
         OneSignal.login(storedExternalUserId);
       }
 
-      OneSignal.Notifications.addEventListener('permissionChange', handlePermissionChange);
+      OneSignal.InAppMessages.addEventListener('willDisplay', handleIamWillDisplay);
+      OneSignal.InAppMessages.addEventListener('didDisplay', handleIamDidDisplay);
+      OneSignal.InAppMessages.addEventListener('willDismiss', handleIamWillDismiss);
+      OneSignal.InAppMessages.addEventListener('didDismiss', handleIamDidDismiss);
+      OneSignal.InAppMessages.addEventListener('click', handleIamClick);
+      OneSignal.Notifications.addEventListener('click', handleNotificationClick);
+      OneSignal.Notifications.addEventListener('permissionChange', permissionHandler);
       // Required so foreground pushes actually display: registering this
       // listener wires up the native `addForegroundLifecycleListener` bridge.
       // Without it the SDK never resolves `proceedWithWillDisplay` and the
@@ -224,33 +279,60 @@ export function useOneSignal(): UseOneSignalReturn {
         'foregroundWillDisplay',
         handleForegroundWillDisplay,
       );
-      OneSignal.User.pushSubscription.addEventListener('change', handlePushSubscriptionChange);
-      OneSignal.User.addEventListener('change', handleUserChange);
 
-      setHasNotificationPermission(OneSignal.Notifications.hasPermission());
-      await refreshPushState();
+      OneSignal.User.pushSubscription.addEventListener('change', pushSubHandler);
+      OneSignal.User.addEventListener('change', userChangeHandler);
 
-      if (!cancelled) {
-        setIsReady(true);
-      }
+      console.log(`OneSignal initialized with app ID: ${nextAppId}`);
 
-      const onesignalId = await OneSignal.User.getOnesignalId();
-      if (!cancelled && onesignalId) {
+      const externalId = await OneSignal.User.getExternalId();
+      const [pushId, pushOptedIn, hasPerm] = await Promise.all([
+        OneSignal.User.pushSubscription.getIdAsync(),
+        OneSignal.User.pushSubscription.getOptedInAsync(),
+        OneSignal.Notifications.getPermissionAsync(),
+      ]);
+      if (cancelled) return;
+
+      setAppId(nextAppId);
+      setConsentRequiredState(nextConsentRequired);
+      setPrivacyConsentGivenState(nextPrivacyConsentGiven);
+      setInAppMessagesPaused(nextIamPaused);
+      setLocationSharedState(nextLocationShared);
+      setExternalUserId(externalId ?? storedExternalUserId);
+      setPushSubscriptionId(pushId ?? undefined);
+      setIsPushEnabled(pushOptedIn);
+      setHasNotificationPermission(hasPerm);
+      setIsReady(true);
+
+      const initialOnesignalId = await OneSignal.User.getOnesignalId();
+      if (cancelled) return;
+      if (initialOnesignalId) {
         await fetchUserDataFromApi();
       }
     };
 
-    void init();
+    void load().catch((err) => {
+      console.error(`Initial load error: ${String(err)}`);
+      setIsLoading(false);
+    });
 
+    console.log('Loaded OneSignal');
     return () => {
       cancelled = true;
-      OneSignal.Notifications.removeEventListener('permissionChange', handlePermissionChange);
+      console.log('Cleaning up OneSignal listeners');
+      OneSignal.InAppMessages.removeEventListener('willDisplay', handleIamWillDisplay);
+      OneSignal.InAppMessages.removeEventListener('didDisplay', handleIamDidDisplay);
+      OneSignal.InAppMessages.removeEventListener('willDismiss', handleIamWillDismiss);
+      OneSignal.InAppMessages.removeEventListener('didDismiss', handleIamDidDismiss);
+      OneSignal.InAppMessages.removeEventListener('click', handleIamClick);
+      OneSignal.Notifications.removeEventListener('click', handleNotificationClick);
+      OneSignal.Notifications.removeEventListener('permissionChange', permissionHandler);
       OneSignal.Notifications.removeEventListener(
         'foregroundWillDisplay',
         handleForegroundWillDisplay,
       );
-      OneSignal.User.pushSubscription.removeEventListener('change', handlePushSubscriptionChange);
-      OneSignal.User.removeEventListener('change', handleUserChange);
+      OneSignal.User.pushSubscription.removeEventListener('change', pushSubHandler);
+      OneSignal.User.removeEventListener('change', userChangeHandler);
     };
   }, [fetchUserDataFromApi]);
 
@@ -448,11 +530,21 @@ export function useOneSignal(): UseOneSignalReturn {
     console.log(shared ? 'Location sharing enabled' : 'Location sharing disabled');
   };
 
+  const checkLocationShared = async () => {
+    const shared = await OneSignal.Location.isShared();
+    console.log(`Location shared: ${shared}`);
+    return shared;
+  };
+
   const requestLocationPermission = () => {
     OneSignal.Location.requestPermission();
   };
 
-  const startDefaultLiveActivity = (activityId: string, attributes: object, content: object) => {
+  const startDefaultLiveActivity = (
+    activityId: string,
+    attributes: Record<string, unknown>,
+    content: Record<string, unknown>,
+  ) => {
     OneSignal.LiveActivities.startDefault(activityId, attributes, content);
     console.log(`Started Live Activity: ${activityId}`);
   };
@@ -470,7 +562,7 @@ export function useOneSignal(): UseOneSignalReturn {
 
   const endLiveActivity = async (activityId: string): Promise<boolean> => {
     const success = await apiService.updateLiveActivity(activityId, 'end', {
-      data: {},
+      message: 'Ended Live Activity',
     });
     console.log(success ? `Ended Live Activity: ${activityId}` : 'Failed to end Live Activity');
     return success;
@@ -522,6 +614,7 @@ export function useOneSignal(): UseOneSignalReturn {
     clearTriggers,
     trackEvent,
     setLocationShared,
+    checkLocationShared,
     requestLocationPermission,
     startDefaultLiveActivity,
     updateLiveActivity,

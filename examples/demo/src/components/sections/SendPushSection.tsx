@@ -39,6 +39,13 @@ const SendPushSection: FC<SendPushSectionProps> = ({
       </ActionButton>
       <ActionButton
         type="button"
+        onClick={() => void onSendNotification(NotificationType.WithSound)}
+        data-testid="send_sound_button"
+      >
+        WITH SOUND
+      </ActionButton>
+      <ActionButton
+        type="button"
         onClick={() => setCustomOpen(true)}
         data-testid="send_custom_button"
       >
