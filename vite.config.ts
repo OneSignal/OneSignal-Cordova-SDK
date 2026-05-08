@@ -16,7 +16,6 @@ export default defineConfig({
     rules: {
       'react/exhaustive-deps': 'warn',
     },
-    ignorePatterns: ['examples/demo/platforms/'],
   },
   pack: {
     entry: 'www/index.ts',
