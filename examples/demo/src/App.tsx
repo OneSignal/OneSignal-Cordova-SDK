@@ -1,7 +1,7 @@
 import { StatusBar, Style } from '@capacitor/status-bar';
-import { IonApp, setupIonicReact } from '@ionic/react';
+import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { Redirect, Route, Switch } from 'react-router-dom';
+import { Redirect, Route } from 'react-router-dom';
 
 import HomeScreen from './pages/HomeScreen';
 import Secondary from './pages/Secondary';
@@ -31,7 +31,7 @@ setupIonicReact();
 const App: React.FC = () => (
   <IonApp>
     <IonReactRouter>
-      <Switch>
+      <IonRouterOutlet>
         <Route exact path="/home">
           <HomeScreen />
         </Route>
@@ -41,7 +41,7 @@ const App: React.FC = () => (
         <Route exact path="/">
           <Redirect to="/home" />
         </Route>
-      </Switch>
+      </IonRouterOutlet>
     </IonReactRouter>
   </IonApp>
 );
