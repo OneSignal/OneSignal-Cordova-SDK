@@ -18,10 +18,7 @@ import PreferencesService from '../services/PreferencesService';
 
 const APP_ID = import.meta.env.VITE_ONESIGNAL_APP_ID as string | undefined;
 const DEFAULT_APP_ID = '77e32082-ea27-42e3-a898-c72e141824ef';
-
-function resolveAppId(): string {
-  return APP_ID?.trim() || DEFAULT_APP_ID;
-}
+const RESOLVED_APP_ID = APP_ID?.trim() || DEFAULT_APP_ID;
 
 const apiService = OneSignalApiService.getInstance();
 const preferences = PreferencesService.getInstance();
@@ -47,6 +44,61 @@ function mergePairs<V>(prev: [string, V][], next: Record<string, V>): [string, V
 function mergeUnique<T>(prev: T[], next: T[]): T[] {
   return Array.from(new Set([...prev, ...next]));
 }
+
+// Resolves once Cordova's native bridge is ready. `deviceready` is a sticky
+// event in cordova.js, so late subscribers (e.g. registering after the event
+// already fired) are still invoked. Resolves immediately in non-browser
+// environments (SSR, unit tests under Node).
+const onDeviceReady: Promise<void> = new Promise((resolve) => {
+  if (typeof document === 'undefined') {
+    resolve();
+    return;
+  }
+  document.addEventListener('deviceready', () => resolve(), { once: true });
+});
+
+// One-shot SDK initialization, gated on `deviceready`. Reuses the same Promise
+// across every caller so React StrictMode dual-mounts, route remounts, and HMR
+// all share a single underlying init. The downstream `OneSignal.initialize`
+// short-circuits on the native side anyway, but this keeps the JS-side log
+// noise and listener-registration ordering clean.
+const initOneSignal: () => Promise<void> = (() => {
+  let inflight: Promise<void> | null = null;
+  return () => {
+    if (inflight) return inflight;
+    inflight = onDeviceReady.then(() => {
+      apiService.setAppId(RESOLVED_APP_ID);
+
+      // Verbose log level enables WKWebView.isInspectable on the IAM webview
+      // (see OSInAppMessageView.m), which lets Appium's XCUITest driver
+      // enumerate the IAM context for E2E tests on iOS 16.4+.
+      OneSignal.Debug.setLogLevel(LogLevel.Verbose);
+      OneSignal.setConsentRequired(preferences.getConsentRequired());
+      OneSignal.setConsentGiven(preferences.getConsentGiven());
+      OneSignal.initialize(RESOLVED_APP_ID);
+
+      OneSignal.LiveActivities.setupDefault({
+        enablePushToStart: true,
+        enablePushToUpdate: true,
+      });
+
+      OneSignal.InAppMessages.setPaused(preferences.getIamPaused());
+      OneSignal.Location.setShared(preferences.getLocationShared());
+
+      const storedExternalUserId = preferences.getExternalUserId();
+      if (storedExternalUserId) {
+        OneSignal.login(storedExternalUserId);
+      }
+
+      console.log(`OneSignal initialized with app ID: ${RESOLVED_APP_ID}`);
+    });
+    return inflight;
+  };
+})();
+
+// Kick init off at module-eval time so it races with React's first render
+// instead of waiting for the hook's effect to mount.
+void initOneSignal();
 
 export type UseOneSignalReturn = {
   appId: string;
@@ -109,7 +161,6 @@ export type UseOneSignalReturn = {
 };
 
 export function useOneSignal(): UseOneSignalReturn {
-  const [appId, setAppId] = useState(resolveAppId);
   const [consentRequired, setConsentRequiredState] = useState(false);
   const [privacyConsentGiven, setPrivacyConsentGivenState] = useState(false);
   const [externalUserId, setExternalUserId] = useState<string | undefined>(undefined);
@@ -235,34 +286,11 @@ export function useOneSignal(): UseOneSignalReturn {
       // await new Promise((resolve) => setTimeout(resolve, 10_000));
       // if (cancelled) return;
 
-      const nextAppId = resolveAppId();
-      const nextConsentRequired = preferences.getConsentRequired();
-      const nextPrivacyConsentGiven = preferences.getConsentGiven();
-      const nextIamPaused = preferences.getIamPaused();
-      const nextLocationShared = preferences.getLocationShared();
-      const storedExternalUserId = preferences.getExternalUserId() ?? undefined;
-
-      apiService.setAppId(nextAppId);
-
-      // Verbose log level enables WKWebView.isInspectable on the IAM webview
-      // (see OSInAppMessageView.m), which lets Appium's XCUITest driver
-      // enumerate the IAM context for E2E tests on iOS 16.4+.
-      OneSignal.Debug.setLogLevel(LogLevel.Verbose);
-      OneSignal.setConsentRequired(nextConsentRequired);
-      OneSignal.setConsentGiven(nextPrivacyConsentGiven);
-      OneSignal.initialize(nextAppId);
-
-      OneSignal.LiveActivities.setupDefault({
-        enablePushToStart: true,
-        enablePushToUpdate: true,
-      });
-
-      OneSignal.InAppMessages.setPaused(nextIamPaused);
-      OneSignal.Location.setShared(nextLocationShared);
-
-      if (storedExternalUserId) {
-        OneSignal.login(storedExternalUserId);
-      }
+      // Wait for the one-shot module-scope SDK init (gated on `deviceready`).
+      // After this resolves, OneSignal.initialize has been called and downstream
+      // SDK calls will queue safely against the native bridge.
+      await initOneSignal();
+      if (cancelled) return;
 
       OneSignal.InAppMessages.addEventListener('willDisplay', handleIamWillDisplay);
       OneSignal.InAppMessages.addEventListener('didDisplay', handleIamDidDisplay);
@@ -283,31 +311,27 @@ export function useOneSignal(): UseOneSignalReturn {
       OneSignal.User.pushSubscription.addEventListener('change', pushSubHandler);
       OneSignal.User.addEventListener('change', userChangeHandler);
 
-      console.log(`OneSignal initialized with app ID: ${nextAppId}`);
-
-      const externalId = await OneSignal.User.getExternalId();
-      const [pushId, pushOptedIn, hasPerm] = await Promise.all([
+      const storedExternalUserId = preferences.getExternalUserId() ?? undefined;
+      const [externalId, pushId, pushOptedIn, hasPerm, initialOnesignalId] = await Promise.all([
+        OneSignal.User.getExternalId(),
         OneSignal.User.pushSubscription.getIdAsync(),
         OneSignal.User.pushSubscription.getOptedInAsync(),
         OneSignal.Notifications.getPermissionAsync(),
+        OneSignal.User.getOnesignalId(),
       ]);
-      if (cancelled) return;
 
-      setAppId(nextAppId);
-      setConsentRequiredState(nextConsentRequired);
-      setPrivacyConsentGivenState(nextPrivacyConsentGiven);
-      setInAppMessagesPaused(nextIamPaused);
-      setLocationSharedState(nextLocationShared);
+      setConsentRequiredState(preferences.getConsentRequired());
+      setPrivacyConsentGivenState(preferences.getConsentGiven());
+      setInAppMessagesPaused(preferences.getIamPaused());
+      setLocationSharedState(preferences.getLocationShared());
       setExternalUserId(externalId ?? storedExternalUserId);
       setPushSubscriptionId(pushId ?? undefined);
       setIsPushEnabled(pushOptedIn);
       setHasNotificationPermission(hasPerm);
       setIsReady(true);
 
-      const initialOnesignalId = await OneSignal.User.getOnesignalId();
-      if (cancelled) return;
       if (initialOnesignalId) {
-        await fetchUserDataFromApi();
+        fetchUserDataFromApi();
       }
     };
 
@@ -569,7 +593,7 @@ export function useOneSignal(): UseOneSignalReturn {
   };
 
   return {
-    appId,
+    appId: RESOLVED_APP_ID,
     consentRequired,
     privacyConsentGiven,
     externalUserId,
