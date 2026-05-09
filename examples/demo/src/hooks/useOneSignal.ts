@@ -1,10 +1,5 @@
 import OneSignal, {
   LogLevel,
-  type InAppMessageClickEvent,
-  type InAppMessageDidDismissEvent,
-  type InAppMessageDidDisplayEvent,
-  type InAppMessageWillDismissEvent,
-  type InAppMessageWillDisplayEvent,
   type NotificationClickEvent,
   type NotificationWillDisplayEvent,
   type PushSubscriptionChangedState,
@@ -161,14 +156,18 @@ export type UseOneSignalReturn = {
 };
 
 export function useOneSignal(): UseOneSignalReturn {
-  const [consentRequired, setConsentRequiredState] = useState(false);
-  const [privacyConsentGiven, setPrivacyConsentGivenState] = useState(false);
+  const [consentRequired, setConsentRequiredState] = useState(() =>
+    preferences.getConsentRequired(),
+  );
+  const [privacyConsentGiven, setPrivacyConsentGivenState] = useState(() =>
+    preferences.getConsentGiven(),
+  );
   const [externalUserId, setExternalUserId] = useState<string | undefined>(undefined);
   const [pushSubscriptionId, setPushSubscriptionId] = useState<string | undefined>(undefined);
   const [isPushEnabled, setIsPushEnabled] = useState(false);
   const [hasNotificationPermission, setHasNotificationPermission] = useState(false);
-  const [inAppMessagesPaused, setInAppMessagesPaused] = useState(false);
-  const [locationShared, setLocationSharedState] = useState(false);
+  const [inAppMessagesPaused, setInAppMessagesPaused] = useState(() => preferences.getIamPaused());
+  const [locationShared, setLocationSharedState] = useState(() => preferences.getLocationShared());
   const [aliasesList, setAliasesList] = useState<[string, string][]>([]);
   const [emailsList, setEmailsList] = useState<string[]>([]);
   const [smsNumbersList, setSmsNumbersList] = useState<string[]>([]);
@@ -210,25 +209,14 @@ export function useOneSignal(): UseOneSignalReturn {
   useEffect(() => {
     let cancelled = false;
 
-    const handleIamWillDisplay = (e: InAppMessageWillDisplayEvent) => {
-      console.log(`IAM willDisplay: ${e.message.messageId}`);
-    };
+    const logIam = (kind: string) => (e: { message: { messageId: string } }) =>
+      console.log(`IAM ${kind}: ${e.message.messageId}`);
 
-    const handleIamDidDisplay = (e: InAppMessageDidDisplayEvent) => {
-      console.log(`IAM didDisplay: ${e.message.messageId}`);
-    };
-
-    const handleIamWillDismiss = (e: InAppMessageWillDismissEvent) => {
-      console.log(`IAM willDismiss: ${e.message.messageId}`);
-    };
-
-    const handleIamDidDismiss = (e: InAppMessageDidDismissEvent) => {
-      console.log(`IAM didDismiss: ${e.message.messageId}`);
-    };
-
-    const handleIamClick = (e: InAppMessageClickEvent) => {
-      console.log(`IAM click: ${e.message.messageId}`);
-    };
+    const handleIamWillDisplay = logIam('willDisplay');
+    const handleIamDidDisplay = logIam('didDisplay');
+    const handleIamWillDismiss = logIam('willDismiss');
+    const handleIamDidDismiss = logIam('didDismiss');
+    const handleIamClick = logIam('click');
 
     const handleNotificationClick = (e: NotificationClickEvent) => {
       console.log(`Notification click: ${e.notification.title ?? ''}`);
@@ -311,7 +299,6 @@ export function useOneSignal(): UseOneSignalReturn {
       OneSignal.User.pushSubscription.addEventListener('change', pushSubHandler);
       OneSignal.User.addEventListener('change', userChangeHandler);
 
-      const storedExternalUserId = preferences.getExternalUserId() ?? undefined;
       const [externalId, pushId, pushOptedIn, hasPerm, initialOnesignalId] = await Promise.all([
         OneSignal.User.getExternalId(),
         OneSignal.User.pushSubscription.getIdAsync(),
@@ -320,11 +307,7 @@ export function useOneSignal(): UseOneSignalReturn {
         OneSignal.User.getOnesignalId(),
       ]);
 
-      setConsentRequiredState(preferences.getConsentRequired());
-      setPrivacyConsentGivenState(preferences.getConsentGiven());
-      setInAppMessagesPaused(preferences.getIamPaused());
-      setLocationSharedState(preferences.getLocationShared());
-      setExternalUserId(externalId ?? storedExternalUserId);
+      setExternalUserId(externalId ?? preferences.getExternalUserId() ?? undefined);
       setPushSubscriptionId(pushId ?? undefined);
       setIsPushEnabled(pushOptedIn);
       setHasNotificationPermission(hasPerm);
@@ -360,12 +343,16 @@ export function useOneSignal(): UseOneSignalReturn {
     };
   }, [fetchUserDataFromApi]);
 
-  const loginUser = async (nextExternalUserId: string) => {
+  const clearUserData = () => {
     setAliasesList([]);
     setEmailsList([]);
     setSmsNumbersList([]);
     setTagsList([]);
     setTriggersList([]);
+  };
+
+  const loginUser = async (nextExternalUserId: string) => {
+    clearUserData();
     setIsLoading(true);
 
     try {
@@ -385,11 +372,7 @@ export function useOneSignal(): UseOneSignalReturn {
     OneSignal.logout();
     preferences.setExternalUserId(null);
     setExternalUserId(undefined);
-    setAliasesList([]);
-    setEmailsList([]);
-    setSmsNumbersList([]);
-    setTagsList([]);
-    setTriggersList([]);
+    clearUserData();
     console.log('Logged out');
   };
 
