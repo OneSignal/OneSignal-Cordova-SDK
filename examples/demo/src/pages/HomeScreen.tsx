@@ -203,7 +203,7 @@ const HomeScreen: FC = () => {
                 onClick={() => history.push('/secondary')}
                 data-testid="next_screen_button"
               >
-                NEXT ACTIVITY
+                NEXT SCREEN
               </ActionButton>
             </section>
           </main>
