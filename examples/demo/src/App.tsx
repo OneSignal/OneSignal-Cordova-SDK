@@ -1,6 +1,8 @@
+import { App as CapacitorApp } from '@capacitor/app';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
+import { useEffect } from 'react';
 import { Redirect, Route } from 'react-router-dom';
 
 import HomeScreen from './pages/HomeScreen';
@@ -28,22 +30,36 @@ StatusBar.setStyle({ style: Style.Dark }).catch(() => {});
 
 setupIonicReact();
 
-const App: React.FC = () => (
-  <IonApp>
-    <IonReactRouter>
-      <IonRouterOutlet>
-        <Route exact path="/home">
-          <HomeScreen />
-        </Route>
-        <Route exact path="/secondary">
-          <Secondary />
-        </Route>
-        <Route exact path="/">
-          <Redirect to="/home" />
-        </Route>
-      </IonRouterOutlet>
-    </IonReactRouter>
-  </IonApp>
-);
+const App: React.FC = () => {
+  // Capacitor 5+ removed the default auto-exit when hardware back is pressed
+  // at the root route. Without an explicit handler, Android back button does
+  // nothing on `/home`. IonRouterOutlet handles the canGoBack=true case.
+  useEffect(() => {
+    const handle = CapacitorApp.addListener('backButton', ({ canGoBack }) => {
+      if (!canGoBack) void CapacitorApp.exitApp();
+    });
+    return () => {
+      void handle.then((h) => h.remove());
+    };
+  }, []);
+
+  return (
+    <IonApp>
+      <IonReactRouter>
+        <IonRouterOutlet>
+          <Route exact path="/home">
+            <HomeScreen />
+          </Route>
+          <Route exact path="/secondary">
+            <Secondary />
+          </Route>
+          <Route exact path="/">
+            <Redirect to="/home" />
+          </Route>
+        </IonRouterOutlet>
+      </IonReactRouter>
+    </IonApp>
+  );
+};
 
 export default App;
