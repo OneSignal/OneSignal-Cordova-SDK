@@ -401,24 +401,34 @@ public class OneSignalPush extends CordovaPlugin
     /**
      * Forward the missed activity-resume to the SDK so isInForeground is
      * correct on cold start. No-op if the SDK already saw the resume.
+     *
+     * TODO: Replace with a public native-SDK entry point (e.g.
+     * OneSignal.onActivityForegrounded(Activity)) once the Android SDK
+     * exposes one, instead of casting IApplicationService to
+     * ActivityLifecycleCallbacks here.
      */
     private void nudgeApplicationServiceForeground() {
-        Activity activity = this.cordova.getActivity();
+        final Activity activity = this.cordova.getActivity();
         if (activity == null) return;
 
-        IApplicationService appSvc;
-        try {
-            appSvc = OneSignal.INSTANCE.getServices().getServiceOrNull(IApplicationService.class);
-        } catch (Throwable t) {
-            return;
-        }
-        if (appSvc == null) return;
-        if (appSvc.isInForeground() && appSvc.getCurrent() == activity) return;
-        if (!(appSvc instanceof Application.ActivityLifecycleCallbacks)) return;
+        // cordova.execute() runs on the WebView thread, but Android's
+        // ActivityLifecycleCallbacks are normally invoked on the main thread.
+        // Hop to the UI thread so we don't race real framework callbacks.
+        activity.runOnUiThread(() -> {
+            IApplicationService appSvc;
+            try {
+                appSvc = OneSignal.INSTANCE.getServices().getServiceOrNull(IApplicationService.class);
+            } catch (Throwable t) {
+                return;
+            }
+            if (appSvc == null) return;
+            if (appSvc.isInForeground() && appSvc.getCurrent() == activity) return;
+            if (!(appSvc instanceof Application.ActivityLifecycleCallbacks)) return;
 
-        Application.ActivityLifecycleCallbacks callbacks = (Application.ActivityLifecycleCallbacks) appSvc;
-        callbacks.onActivityStarted(activity);
-        callbacks.onActivityResumed(activity);
+            Application.ActivityLifecycleCallbacks callbacks = (Application.ActivityLifecycleCallbacks) appSvc;
+            callbacks.onActivityStarted(activity);
+            callbacks.onActivityResumed(activity);
+        });
     }
 
     @Override
