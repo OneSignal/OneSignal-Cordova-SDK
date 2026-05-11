@@ -416,8 +416,7 @@ public class OneSignalPush extends CordovaPlugin
         if (appSvc.isInForeground() && appSvc.getCurrent() == activity) return;
         if (!(appSvc instanceof Application.ActivityLifecycleCallbacks)) return;
 
-        Application.ActivityLifecycleCallbacks callbacks =
-                (Application.ActivityLifecycleCallbacks) appSvc;
+        Application.ActivityLifecycleCallbacks callbacks = (Application.ActivityLifecycleCallbacks) appSvc;
         callbacks.onActivityStarted(activity);
         callbacks.onActivityResumed(activity);
     }
