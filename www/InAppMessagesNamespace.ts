@@ -15,13 +15,11 @@ export default class InAppMessages {
   private _didDisplayInAppMessageListeners: ((event: InAppMessageDidDisplayEvent) => void)[] = [];
   private _willDismissInAppMessageListeners: ((event: InAppMessageWillDismissEvent) => void)[] = [];
   private _didDismissInAppMessageListeners: ((event: InAppMessageDidDismissEvent) => void)[] = [];
-
-  // Track whether native handlers have been registered to avoid duplicate registrations
-  private _clickHandlerRegistered = false;
-  private _willDisplayHandlerRegistered = false;
-  private _didDisplayHandlerRegistered = false;
-  private _willDismissHandlerRegistered = false;
-  private _didDismissHandlerRegistered = false;
+  private _hasRegisteredClickListener = false;
+  private _hasRegisteredWillDisplayListener = false;
+  private _hasRegisteredDidDisplayListener = false;
+  private _hasRegisteredWillDismissListener = false;
+  private _hasRegisteredDidDismissListener = false;
 
   private _processFunctionList<T>(array: ((event: T) => void)[], param: T): void {
     for (let i = 0; i < array.length; i++) {
@@ -31,9 +29,8 @@ export default class InAppMessages {
 
   /**
    * Add event listeners for In-App Message click and/or lifecycle events.
-   * @param event
-   * @param listener
-   * @returns
+   * Each native bridge channel is registered once per namespace instance;
+   * subsequent subscribers append to the local list to avoid orphaned handlers.
    */
   addEventListener<K extends InAppMessageEventName>(
     event: K,
@@ -41,10 +38,8 @@ export default class InAppMessages {
   ): void {
     if (event === 'click') {
       this._inAppMessageClickListeners.push(listener as (event: InAppMessageClickEvent) => void);
-
-      // Only register the native handler once
-      if (!this._clickHandlerRegistered) {
-        this._clickHandlerRegistered = true;
+      if (!this._hasRegisteredClickListener) {
+        this._hasRegisteredClickListener = true;
         const inAppMessageClickListener = (json: InAppMessageClickEvent) => {
           this._processFunctionList(this._inAppMessageClickListeners, json);
         };
@@ -60,10 +55,8 @@ export default class InAppMessages {
       this._willDisplayInAppMessageListeners.push(
         listener as (event: InAppMessageWillDisplayEvent) => void,
       );
-
-      // Only register the native handler once
-      if (!this._willDisplayHandlerRegistered) {
-        this._willDisplayHandlerRegistered = true;
+      if (!this._hasRegisteredWillDisplayListener) {
+        this._hasRegisteredWillDisplayListener = true;
         const willDisplayCallBackProcessor = (event: InAppMessageWillDisplayEvent) => {
           this._processFunctionList(this._willDisplayInAppMessageListeners, event);
         };
@@ -79,10 +72,8 @@ export default class InAppMessages {
       this._didDisplayInAppMessageListeners.push(
         listener as (event: InAppMessageDidDisplayEvent) => void,
       );
-
-      // Only register the native handler once
-      if (!this._didDisplayHandlerRegistered) {
-        this._didDisplayHandlerRegistered = true;
+      if (!this._hasRegisteredDidDisplayListener) {
+        this._hasRegisteredDidDisplayListener = true;
         const didDisplayCallBackProcessor = (event: InAppMessageDidDisplayEvent) => {
           this._processFunctionList(this._didDisplayInAppMessageListeners, event);
         };
@@ -98,10 +89,8 @@ export default class InAppMessages {
       this._willDismissInAppMessageListeners.push(
         listener as (event: InAppMessageWillDismissEvent) => void,
       );
-
-      // Only register the native handler once
-      if (!this._willDismissHandlerRegistered) {
-        this._willDismissHandlerRegistered = true;
+      if (!this._hasRegisteredWillDismissListener) {
+        this._hasRegisteredWillDismissListener = true;
         const willDismissInAppMessageProcessor = (event: InAppMessageWillDismissEvent) => {
           this._processFunctionList(this._willDismissInAppMessageListeners, event);
         };
@@ -117,10 +106,8 @@ export default class InAppMessages {
       this._didDismissInAppMessageListeners.push(
         listener as (event: InAppMessageDidDismissEvent) => void,
       );
-
-      // Only register the native handler once
-      if (!this._didDismissHandlerRegistered) {
-        this._didDismissHandlerRegistered = true;
+      if (!this._hasRegisteredDidDismissListener) {
+        this._hasRegisteredDidDismissListener = true;
         const didDismissInAppMessageCallBackProcessor = (event: InAppMessageDidDismissEvent) => {
           this._processFunctionList(this._didDismissInAppMessageListeners, event);
         };

@@ -19,11 +19,9 @@ export default class Notifications {
   private _permissionObserverList: ((event: boolean) => void)[] = [];
   private _notificationClickedListeners: ((event: NotificationClickEvent) => void)[] = [];
   private _notificationWillDisplayListeners: ((event: NotificationWillDisplayEvent) => void)[] = [];
-
-  // Track whether native handlers have been registered to avoid duplicate registrations
-  private _clickHandlerRegistered = false;
-  private _foregroundWillDisplayHandlerRegistered = false;
-  private _permissionChangeHandlerRegistered = false;
+  private _hasRegisteredClickListener = false;
+  private _hasRegisteredForegroundWillDisplayListener = false;
+  private _hasRegisteredPermissionListener = false;
 
   private _processFunctionList<T>(array: ((event: T) => void)[], param: T): void {
     for (let i = 0; i < array.length; i++) {
@@ -126,9 +124,8 @@ export default class Notifications {
 
   /**
    * Add listeners for notification events.
-   * @param event
-   * @param listener
-   * @returns
+   * Each native bridge channel is registered once per namespace instance;
+   * subsequent subscribers append to the local list to avoid orphaned handlers.
    */
   addEventListener<K extends NotificationEventName>(
     event: K,
@@ -136,10 +133,8 @@ export default class Notifications {
   ): void {
     if (event === 'click') {
       this._notificationClickedListeners.push(listener as (event: NotificationClickEvent) => void);
-
-      // Only register the native handler once
-      if (!this._clickHandlerRegistered) {
-        this._clickHandlerRegistered = true;
+      if (!this._hasRegisteredClickListener) {
+        this._hasRegisteredClickListener = true;
         const clickParsingHandler = (json: NotificationClickEvent) => {
           this._processFunctionList(this._notificationClickedListeners, json);
         };
@@ -155,10 +150,8 @@ export default class Notifications {
       this._notificationWillDisplayListeners.push(
         listener as (event: NotificationWillDisplayEvent) => void,
       );
-
-      // Only register the native handler once
-      if (!this._foregroundWillDisplayHandlerRegistered) {
-        this._foregroundWillDisplayHandlerRegistered = true;
+      if (!this._hasRegisteredForegroundWillDisplayListener) {
+        this._hasRegisteredForegroundWillDisplayListener = true;
         const foregroundParsingHandler = (notification: OSNotification) => {
           this._notificationWillDisplayListeners.forEach((listener) => {
             listener(new NotificationWillDisplayEvent(notification));
@@ -177,10 +170,8 @@ export default class Notifications {
       }
     } else if (event === 'permissionChange') {
       this._permissionObserverList.push(listener as (event: boolean) => void);
-
-      // Only register the native handler once
-      if (!this._permissionChangeHandlerRegistered) {
-        this._permissionChangeHandlerRegistered = true;
+      if (!this._hasRegisteredPermissionListener) {
+        this._hasRegisteredPermissionListener = true;
         const permissionCallBackProcessor = (state: boolean) => {
           this._processFunctionList(this._permissionObserverList, state);
         };
