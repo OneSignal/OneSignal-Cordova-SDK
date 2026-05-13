@@ -415,6 +415,9 @@ public class OneSignalPush extends CordovaPlugin
         // ActivityLifecycleCallbacks are normally invoked on the main thread.
         // Hop to the UI thread so we don't race real framework callbacks.
         activity.runOnUiThread(() -> {
+            final Activity currentActivity = this.cordova.getActivity();
+            if (currentActivity == null) return;
+
             IApplicationService appSvc;
             try {
                 appSvc = OneSignal.INSTANCE.getServices().getServiceOrNull(IApplicationService.class);
@@ -422,12 +425,12 @@ public class OneSignalPush extends CordovaPlugin
                 return;
             }
             if (appSvc == null) return;
-            if (appSvc.isInForeground() && appSvc.getCurrent() == activity) return;
+            if (appSvc.isInForeground() && appSvc.getCurrent() == currentActivity) return;
             if (!(appSvc instanceof Application.ActivityLifecycleCallbacks)) return;
 
             Application.ActivityLifecycleCallbacks callbacks = (Application.ActivityLifecycleCallbacks) appSvc;
-            callbacks.onActivityStarted(activity);
-            callbacks.onActivityResumed(activity);
+            callbacks.onActivityStarted(currentActivity);
+            callbacks.onActivityResumed(currentActivity);
         });
     }
 
