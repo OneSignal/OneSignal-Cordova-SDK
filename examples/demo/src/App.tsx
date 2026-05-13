@@ -1,15 +1,12 @@
+import { App as CapacitorApp } from '@capacitor/app';
 import { StatusBar, Style } from '@capacitor/status-bar';
-import { IonApp, IonRouterOutlet, IonToast, setupIonicReact } from '@ionic/react';
+import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Redirect, Route } from 'react-router-dom';
 
 import HomeScreen from './pages/HomeScreen';
 import Secondary from './pages/Secondary';
-import TooltipHelper from './services/TooltipHelper';
-import { subscribeSnackbar } from './utils/showSnackbar';
-
-StatusBar.setStyle({ style: Style.Dark }).catch(() => {});
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -24,37 +21,26 @@ import '@ionic/react/css/float-elements.css';
 import '@ionic/react/css/padding.css';
 import '@ionic/react/css/text-alignment.css';
 import '@ionic/react/css/text-transformation.css';
-/**
- * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
- */
-/* import '@ionic/react/css/palettes/dark.always.css'; */
-/* import '@ionic/react/css/palettes/dark.class.css'; */
+/* Ionic Dark Mode */
 import '@ionic/react/css/palettes/dark.system.css';
 /* Theme variables */
 import './theme/variables.css';
 
+StatusBar.setStyle({ style: Style.Dark }).catch(() => {});
+
 setupIonicReact();
 
 const App: React.FC = () => {
-  const [toastMessage, setToastMessage] = useState('');
-  const [toastOpen, setToastOpen] = useState(false);
-
+  // Capacitor 5+ removed the default auto-exit when hardware back is pressed
+  // at the root route. Without an explicit handler, Android back button does
+  // nothing on `/home`. IonRouterOutlet handles the canGoBack=true case.
   useEffect(() => {
-    void TooltipHelper.getInstance().init();
-    // Close-then-open on a fresh tick so consecutive snackbars (e.g. tests
-    // sending three outcomes in a row) reliably restart IonToast's timer and
-    // re-render the new message. Calling setToastOpen(true) while already true
-    // is a no-op for IonToast and the new `message` is often ignored mid-flight.
-    return subscribeSnackbar((message) => {
-      setToastOpen(false);
-      setTimeout(() => {
-        setToastMessage(message);
-        setToastOpen(true);
-      }, 0);
+    const handle = CapacitorApp.addListener('backButton', ({ canGoBack }) => {
+      if (!canGoBack) void CapacitorApp.exitApp();
     });
+    return () => {
+      void handle.then((h) => h.remove());
+    };
   }, []);
 
   return (
@@ -72,13 +58,6 @@ const App: React.FC = () => {
           </Route>
         </IonRouterOutlet>
       </IonReactRouter>
-      <IonToast
-        isOpen={toastOpen}
-        message={toastMessage}
-        duration={1600}
-        onDidDismiss={() => setToastOpen(false)}
-        data-testid="snackbar_toast"
-      />
     </IonApp>
   );
 };

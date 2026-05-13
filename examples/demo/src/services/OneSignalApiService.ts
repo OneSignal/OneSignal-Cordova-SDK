@@ -4,17 +4,9 @@ import { NotificationType } from '../models/NotificationType';
 import { userDataFromJson } from '../models/UserData';
 import type { UserData } from '../models/UserData';
 
-export const IMAGE_NOTIFICATION_URL =
-  'https://media.onesignal.com/automated_push_templates/ratings_template.png';
-
-export const IMAGE_NOTIFICATION_PAYLOAD = {
-  big_picture: IMAGE_NOTIFICATION_URL,
-  ios_attachments: {
-    image: IMAGE_NOTIFICATION_URL,
-  },
-} as const;
-
-const API_KEY = (import.meta.env.VITE_ONESIGNAL_API_KEY ?? '').trim();
+export const API_KEY = import.meta.env.VITE_ONESIGNAL_API_KEY?.trim();
+const ANDROID_CHANNEL_ID = import.meta.env.VITE_ONESIGNAL_ANDROID_CHANNEL_ID as string | undefined;
+const DEFAULT_ANDROID_CHANNEL_ID = 'b3b015d9-c050-4042-8548-dcc34aa44aa4';
 
 class OneSignalApiService {
   private static instance: OneSignalApiService;
@@ -36,25 +28,33 @@ class OneSignalApiService {
     return this.appId;
   }
 
-  hasApiKey(): boolean {
-    return API_KEY.length > 0;
-  }
-
   async sendNotification(type: NotificationType, subscriptionId: string): Promise<boolean> {
     let headings: Record<string, string>;
     let contents: Record<string, string>;
     const extra: Record<string, unknown> = {};
 
-    if (type === NotificationType.Simple) {
-      headings = { en: 'Simple Notification' };
-      contents = { en: 'This is a simple push notification' };
-    } else if (type === NotificationType.WithImage) {
-      headings = { en: 'Image Notification' };
-      contents = { en: 'This notification includes an image' };
-      extra.big_picture = IMAGE_NOTIFICATION_PAYLOAD.big_picture;
-      extra.ios_attachments = IMAGE_NOTIFICATION_PAYLOAD.ios_attachments;
-    } else {
-      return false;
+    switch (type) {
+      case NotificationType.Simple:
+        headings = { en: 'Simple Notification' };
+        contents = { en: 'This is a simple push notification' };
+        break;
+      case NotificationType.WithImage:
+        headings = { en: 'Image Notification' };
+        contents = { en: 'This notification includes an image' };
+        extra.big_picture =
+          'https://media.onesignal.com/automated_push_templates/ratings_template.png';
+        extra.ios_attachments = {
+          image: 'https://media.onesignal.com/automated_push_templates/ratings_template.png',
+        };
+        break;
+      case NotificationType.WithSound:
+        headings = { en: 'Sound Notification' };
+        contents = { en: 'This notification plays a custom sound' };
+        extra.ios_sound = 'vine_boom.wav';
+        extra.android_channel_id = ANDROID_CHANNEL_ID?.trim() || DEFAULT_ANDROID_CHANNEL_ID;
+        break;
+      default:
+        return false;
     }
 
     return this.postNotification(headings, contents, subscriptionId, extra);
@@ -74,10 +74,6 @@ class OneSignalApiService {
     subscriptionId: string,
     extra: Record<string, unknown>,
   ): Promise<boolean> {
-    if (!this.appId || !subscriptionId) {
-      return false;
-    }
-
     try {
       const body = {
         app_id: this.appId,
@@ -87,18 +83,17 @@ class OneSignalApiService {
         ...extra,
       };
 
-      const response = await fetch('https://onesignal.com/api/v1/notifications', {
-        method: 'POST',
+      const response = await CapacitorHttp.post({
+        url: 'https://onesignal.com/api/v1/notifications',
         headers: {
           Accept: 'application/vnd.onesignal.v1+json',
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(body),
+        data: body,
       });
 
-      if (!response.ok) {
-        const text = await response.text();
-        console.error(`Send notification failed: ${text}`);
+      if (response.status < 200 || response.status >= 300) {
+        console.error(`Send notification failed: ${JSON.stringify(response.data)}`);
         return false;
       }
 
@@ -114,13 +109,9 @@ class OneSignalApiService {
     event: 'update' | 'end',
     eventUpdates: Record<string, unknown> = {},
   ): Promise<boolean> {
-    if (!this.appId || !this.hasApiKey()) {
-      return false;
-    }
-
     try {
       const url = `https://api.onesignal.com/apps/${this.appId}/live_activities/${encodeURIComponent(activityId)}/notifications`;
-      const data: Record<string, unknown> = {
+      const payload: Record<string, unknown> = {
         event,
         event_updates: eventUpdates,
         name: event === 'end' ? 'End Live Activity' : 'Live Activity Update',
@@ -128,7 +119,7 @@ class OneSignalApiService {
       };
 
       if (event === 'end') {
-        data.dismissal_date = Math.floor(Date.now() / 1000);
+        payload.dismissal_date = Math.floor(Date.now() / 1000);
       }
 
       const response = await CapacitorHttp.post({
@@ -137,7 +128,7 @@ class OneSignalApiService {
           'Content-Type': 'application/json',
           Authorization: `Key ${API_KEY}`,
         },
-        data,
+        data: payload,
       });
 
       if (response.status < 200 || response.status >= 300) {
@@ -153,19 +144,14 @@ class OneSignalApiService {
   }
 
   async fetchUser(onesignalId: string): Promise<UserData | null> {
-    if (!this.appId || !onesignalId) {
-      return null;
-    }
-
     try {
       const url = `https://api.onesignal.com/apps/${this.appId}/users/by/onesignal_id/${onesignalId}`;
-      const response = await fetch(url);
-      if (!response.ok) {
+      const response = await CapacitorHttp.get({ url });
+      if (response.status < 200 || response.status >= 300) {
         console.warn(`fetchUser failed: ${response.status}`);
         return null;
       }
-      const json = (await response.json()) as Record<string, unknown>;
-      return userDataFromJson(json);
+      return userDataFromJson(response.data as Record<string, unknown>);
     } catch (err) {
       console.error(`fetchUser error: ${String(err)}`);
       return null;

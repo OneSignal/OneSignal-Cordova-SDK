@@ -17,11 +17,11 @@ const Secondary: React.FC = () => (
         <IonButtons slot="start">
           <IonBackButton defaultHref="/home" text="" />
         </IonButtons>
-        <IonTitle>Secondary Activity</IonTitle>
+        <IonTitle>Secondary Screen</IonTitle>
       </IonToolbar>
     </IonHeader>
     <IonContent>
-      <div className="secondary-body">Secondary Activity</div>
+      <div className="secondary-body">Secondary Screen</div>
     </IonContent>
   </IonPage>
 );

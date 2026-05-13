@@ -20,6 +20,7 @@
 		BB10000500000000000000BB /* OneSignalWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB10000200000000000000BB /* OneSignalWidgetBundle.swift */; };
 		CC10000200000000000000CC /* OneSignalNotificationServiceExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = AA10000500000000000000AA /* OneSignalNotificationServiceExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		CC10000300000000000000CC /* OneSignalWidgetExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = BB10000600000000000000BB /* OneSignalWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		DC4254A74A9979AC4EA1688E /* vine_boom.wav in Resources */ = {isa = PBXBuildFile; fileRef = B8258CC73594FD0E3E720D32 /* vine_boom.wav */; };
 		F1FB335B0BB7537621D556A8 /* Pods_OneSignalWidgetExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68D92EAB70CFEE577ABF69A0 /* Pods_OneSignalWidgetExtension.framework */; };
 		F932B1B193CBDE85A7524CC8 /* Pods_OneSignalNotificationServiceExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 799C0E332178070507CCD573 /* Pods_OneSignalNotificationServiceExtension.framework */; };
 /* End PBXBuildFile section */
@@ -78,6 +79,7 @@
 		AA10000500000000000000AA /* OneSignalNotificationServiceExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OneSignalNotificationServiceExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		AF277DCFFFF123FFC6DF26C7 /* Pods_App.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_App.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AF51FD2D460BCFE21FA515B2 /* Pods-App.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App.release.xcconfig"; path = "Pods/Target Support Files/Pods-App/Pods-App.release.xcconfig"; sourceTree = "<group>"; };
+		B8258CC73594FD0E3E720D32 /* vine_boom.wav */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.wav; path = vine_boom.wav; sourceTree = "<group>"; };
 		BB10000100000000000000BB /* OneSignalWidgetLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneSignalWidgetLiveActivity.swift; sourceTree = "<group>"; };
 		BB10000200000000000000BB /* OneSignalWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneSignalWidgetBundle.swift; sourceTree = "<group>"; };
 		BB10000300000000000000BB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -158,6 +160,7 @@
 				CC10000100000000000000CC /* App.entitlements */,
 				2FAD9762203C412B000D30F8 /* config.xml */,
 				50B271D01FEDC1A000F3C39B /* public */,
+				B8258CC73594FD0E3E720D32 /* vine_boom.wav */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -311,6 +314,7 @@
 				50379B232058CBB4000EE86E /* capacitor.config.json in Resources */,
 				504EC30D1FED79650016851F /* Main.storyboard in Resources */,
 				2FAD9763203C412B000D30F8 /* config.xml in Resources */,
+				DC4254A74A9979AC4EA1688E /* vine_boom.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

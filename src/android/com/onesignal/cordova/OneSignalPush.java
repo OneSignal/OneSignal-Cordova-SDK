@@ -26,8 +26,11 @@
  */
 package com.onesignal.cordova;
 
+import android.app.Activity;
+import android.app.Application;
 import com.onesignal.OneSignal;
 import com.onesignal.common.OneSignalWrapper;
+import com.onesignal.core.internal.application.IApplicationService;
 import com.onesignal.debug.internal.logging.Logging;
 import com.onesignal.inAppMessages.IInAppMessage;
 import com.onesignal.inAppMessages.IInAppMessageClickEvent;
@@ -375,6 +378,13 @@ public class OneSignalPush extends CordovaPlugin
             String appId = data.getString(0);
             OneSignal.initWithContext(this.cordova.getActivity(), appId);
 
+            // If the SDK was initialized from a non-Activity context (FCM/work
+            // managers, SyncJobService) before this call, initWithContext above
+            // short-circuits and ApplicationService.start never re-runs, so its
+            // ALC missed MainActivity.onResume and isInForeground stays false.
+            // Forward the missed events now.
+            nudgeApplicationServiceForeground();
+
             // add listeners
             OneSignal.getInAppMessages().addLifecycleListener(this);
             OneSignal.getInAppMessages().addClickListener(this);
@@ -386,6 +396,42 @@ public class OneSignalPush extends CordovaPlugin
             Logging.error(TAG + "execute: Got JSON Exception " + e.getMessage(), null);
             return false;
         }
+    }
+
+    /**
+     * Forward the missed activity-resume to the SDK so isInForeground is
+     * correct on cold start. No-op if the SDK already saw the resume.
+     *
+     * TODO: Replace with a public native-SDK entry point (e.g.
+     * OneSignal.onActivityForegrounded(Activity)) once the Android SDK
+     * exposes one, instead of casting IApplicationService to
+     * ActivityLifecycleCallbacks here.
+     */
+    private void nudgeApplicationServiceForeground() {
+        final Activity activity = this.cordova.getActivity();
+        if (activity == null) return;
+
+        // cordova.execute() runs on the WebView thread, but Android's
+        // ActivityLifecycleCallbacks are normally invoked on the main thread.
+        // Hop to the UI thread so we don't race real framework callbacks.
+        activity.runOnUiThread(() -> {
+            final Activity currentActivity = this.cordova.getActivity();
+            if (currentActivity == null) return;
+
+            IApplicationService appSvc;
+            try {
+                appSvc = OneSignal.INSTANCE.getServices().getServiceOrNull(IApplicationService.class);
+            } catch (Throwable t) {
+                return;
+            }
+            if (appSvc == null) return;
+            if (appSvc.isInForeground() && appSvc.getCurrent() == currentActivity) return;
+            if (!(appSvc instanceof Application.ActivityLifecycleCallbacks)) return;
+
+            Application.ActivityLifecycleCallbacks callbacks = (Application.ActivityLifecycleCallbacks) appSvc;
+            callbacks.onActivityStarted(currentActivity);
+            callbacks.onActivityResumed(currentActivity);
+        });
     }
 
     @Override

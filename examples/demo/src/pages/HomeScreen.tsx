@@ -1,5 +1,5 @@
 import { Capacitor } from '@capacitor/core';
-import { IonContent, IonPage } from '@ionic/react';
+import { IonContent, IonPage, IonToast } from '@ionic/react';
 import { useEffect, useState } from 'react';
 import type { FC } from 'react';
 import { useHistory } from 'react-router-dom';
@@ -23,9 +23,10 @@ import TagsSection from '../components/sections/TagsSection';
 import TriggersSection from '../components/sections/TriggersSection';
 import UserSection from '../components/sections/UserSection';
 import { useOneSignal } from '../hooks/useOneSignal';
-import OneSignalApiService from '../services/OneSignalApiService';
+import { API_KEY } from '../services/OneSignalApiService';
 import TooltipHelper from '../services/TooltipHelper';
 import type { TooltipData } from '../services/TooltipHelper';
+import { subscribeSnackbar } from '../utils/showSnackbar';
 
 import './HomeScreen.css';
 
@@ -34,12 +35,33 @@ const HomeScreen: FC = () => {
   const history = useHistory();
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const [activeTooltip, setActiveTooltip] = useState<TooltipData | null>(null);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastOpen, setToastOpen] = useState(false);
 
   useEffect(() => {
-    if (os.isReady) {
-      void os.promptPush();
+    void TooltipHelper.getInstance().init();
+  }, []);
+
+  useEffect(() => {
+    // Close-then-open on a fresh tick so consecutive snackbars (e.g. tests
+    // sending three outcomes in a row) reliably restart IonToast's timer and
+    // re-render the new message. Calling setToastOpen(true) while already true
+    // is a no-op for IonToast and the new `message` is often ignored mid-flight.
+    return subscribeSnackbar((message) => {
+      setToastOpen(false);
+      setTimeout(() => {
+        setToastMessage(message);
+        setToastOpen(true);
+      }, 0);
+    });
+  }, []);
+
+  const { isReady, promptPush } = os;
+  useEffect(() => {
+    if (isReady) {
+      void promptPush();
     }
-  }, [os.isReady, os.promptPush]);
+  }, [isReady, promptPush]);
 
   const showTooltipModal = (key: string): void => {
     const tooltip = TooltipHelper.getInstance().getTooltip(key);
@@ -167,7 +189,7 @@ const HomeScreen: FC = () => {
 
             {Capacitor.getPlatform() === 'ios' && (
               <LiveActivitySection
-                hasApiKey={OneSignalApiService.getInstance().hasApiKey()}
+                hasApiKey={!!API_KEY}
                 onStart={os.startDefaultLiveActivity}
                 onUpdate={os.updateLiveActivity}
                 onEnd={os.endLiveActivity}
@@ -181,7 +203,7 @@ const HomeScreen: FC = () => {
                 onClick={() => history.push('/secondary')}
                 data-testid="next_screen_button"
               >
-                NEXT ACTIVITY
+                NEXT SCREEN
               </ActionButton>
             </section>
           </main>
@@ -191,6 +213,14 @@ const HomeScreen: FC = () => {
           open={tooltipVisible}
           tooltip={activeTooltip}
           onClose={() => setTooltipVisible(false)}
+        />
+
+        <IonToast
+          isOpen={toastOpen}
+          message={toastMessage}
+          duration={1600}
+          onDidDismiss={() => setToastOpen(false)}
+          data-testid="snackbar_toast"
         />
       </IonContent>
     </IonPage>
