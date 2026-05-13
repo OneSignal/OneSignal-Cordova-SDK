@@ -16,6 +16,7 @@ export default class User {
   pushSubscription: PushSubscription = new PushSubscription();
 
   private _userStateObserverList: ((event: UserChangedState) => void)[] = [];
+  private _hasRegisteredChangeListener = false;
 
   private _processFunctionList(
     array: ((event: UserChangedState) => void)[],
@@ -181,16 +182,18 @@ export default class User {
 
   /**
    * Add a callback that fires when the OneSignal User state changes.
-   * Important: When using the observer to retrieve the onesignalId, check the externalId as well to confirm the values are associated with the expected user.
-   * @param  {(event: UserChangedState)=>void} listener
-   * @returns void
+   * The native bridge subscription is registered once per namespace instance;
+   * subsequent subscribers append to the local list to avoid orphaned handlers.
    */
   addEventListener(event: 'change', listener: (event: UserChangedState) => void) {
     this._userStateObserverList.push(listener as (event: UserChangedState) => void);
-    const userCallBackProcessor = (state: UserChangedState) => {
-      this._processFunctionList(this._userStateObserverList, state);
-    };
-    window.cordova.exec(userCallBackProcessor, noop, 'OneSignalPush', 'addUserStateObserver', []);
+    if (!this._hasRegisteredChangeListener) {
+      this._hasRegisteredChangeListener = true;
+      const userCallBackProcessor = (state: UserChangedState) => {
+        this._processFunctionList(this._userStateObserverList, state);
+      };
+      window.cordova.exec(userCallBackProcessor, noop, 'OneSignalPush', 'addUserStateObserver', []);
+    }
   }
 
   /**

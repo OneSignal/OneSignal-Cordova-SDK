@@ -18,6 +18,7 @@ export default class PushSubscription {
   private _optedIn?: boolean;
 
   private _subscriptionObserverList: ((event: PushSubscriptionChangedState) => void)[] = [];
+  private _hasRegisteredChangeListener = false;
 
   private _processFunctionList(
     array: ((event: PushSubscriptionChangedState) => void)[],
@@ -132,21 +133,24 @@ export default class PushSubscription {
 
   /**
    * Add a callback that fires when the OneSignal push subscription state changes.
-   * @param  {(event: PushSubscriptionChangedState)=>void} listener
-   * @returns void
+   * The native bridge subscription is registered once per namespace instance;
+   * subsequent subscribers append to the local list to avoid orphaned handlers.
    */
   addEventListener(event: 'change', listener: (event: PushSubscriptionChangedState) => void) {
     this._subscriptionObserverList.push(listener as (event: PushSubscriptionChangedState) => void);
-    const subscriptionCallBackProcessor = (state: PushSubscriptionChangedState) => {
-      this._processFunctionList(this._subscriptionObserverList, state);
-    };
-    window.cordova.exec(
-      subscriptionCallBackProcessor,
-      noop,
-      'OneSignalPush',
-      'addPushSubscriptionObserver',
-      [],
-    );
+    if (!this._hasRegisteredChangeListener) {
+      this._hasRegisteredChangeListener = true;
+      const subscriptionCallBackProcessor = (state: PushSubscriptionChangedState) => {
+        this._processFunctionList(this._subscriptionObserverList, state);
+      };
+      window.cordova.exec(
+        subscriptionCallBackProcessor,
+        noop,
+        'OneSignalPush',
+        'addPushSubscriptionObserver',
+        [],
+      );
+    }
   }
 
   /**

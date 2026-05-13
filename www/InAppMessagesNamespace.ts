@@ -15,6 +15,11 @@ export default class InAppMessages {
   private _didDisplayInAppMessageListeners: ((event: InAppMessageDidDisplayEvent) => void)[] = [];
   private _willDismissInAppMessageListeners: ((event: InAppMessageWillDismissEvent) => void)[] = [];
   private _didDismissInAppMessageListeners: ((event: InAppMessageDidDismissEvent) => void)[] = [];
+  private _hasRegisteredClickListener = false;
+  private _hasRegisteredWillDisplayListener = false;
+  private _hasRegisteredDidDisplayListener = false;
+  private _hasRegisteredWillDismissListener = false;
+  private _hasRegisteredDidDismissListener = false;
 
   private _processFunctionList<T>(array: ((event: T) => void)[], param: T): void {
     for (let i = 0; i < array.length; i++) {
@@ -24,9 +29,8 @@ export default class InAppMessages {
 
   /**
    * Add event listeners for In-App Message click and/or lifecycle events.
-   * @param event
-   * @param listener
-   * @returns
+   * Each native bridge channel is registered once per namespace instance;
+   * subsequent subscribers append to the local list to avoid orphaned handlers.
    */
   addEventListener<K extends InAppMessageEventName>(
     event: K,
@@ -34,72 +38,87 @@ export default class InAppMessages {
   ): void {
     if (event === 'click') {
       this._inAppMessageClickListeners.push(listener as (event: InAppMessageClickEvent) => void);
-      const inAppMessageClickListener = (json: InAppMessageClickEvent) => {
-        this._processFunctionList(this._inAppMessageClickListeners, json);
-      };
-      window.cordova.exec(
-        inAppMessageClickListener,
-        noop,
-        'OneSignalPush',
-        'setInAppMessageClickHandler',
-        [],
-      );
+      if (!this._hasRegisteredClickListener) {
+        this._hasRegisteredClickListener = true;
+        const inAppMessageClickListener = (json: InAppMessageClickEvent) => {
+          this._processFunctionList(this._inAppMessageClickListeners, json);
+        };
+        window.cordova.exec(
+          inAppMessageClickListener,
+          noop,
+          'OneSignalPush',
+          'setInAppMessageClickHandler',
+          [],
+        );
+      }
     } else if (event === 'willDisplay') {
       this._willDisplayInAppMessageListeners.push(
         listener as (event: InAppMessageWillDisplayEvent) => void,
       );
-      const willDisplayCallBackProcessor = (event: InAppMessageWillDisplayEvent) => {
-        this._processFunctionList(this._willDisplayInAppMessageListeners, event);
-      };
-      window.cordova.exec(
-        willDisplayCallBackProcessor,
-        noop,
-        'OneSignalPush',
-        'setOnWillDisplayInAppMessageHandler',
-        [],
-      );
+      if (!this._hasRegisteredWillDisplayListener) {
+        this._hasRegisteredWillDisplayListener = true;
+        const willDisplayCallBackProcessor = (event: InAppMessageWillDisplayEvent) => {
+          this._processFunctionList(this._willDisplayInAppMessageListeners, event);
+        };
+        window.cordova.exec(
+          willDisplayCallBackProcessor,
+          noop,
+          'OneSignalPush',
+          'setOnWillDisplayInAppMessageHandler',
+          [],
+        );
+      }
     } else if (event === 'didDisplay') {
       this._didDisplayInAppMessageListeners.push(
         listener as (event: InAppMessageDidDisplayEvent) => void,
       );
-      const didDisplayCallBackProcessor = (event: InAppMessageDidDisplayEvent) => {
-        this._processFunctionList(this._didDisplayInAppMessageListeners, event);
-      };
-      window.cordova.exec(
-        didDisplayCallBackProcessor,
-        noop,
-        'OneSignalPush',
-        'setOnDidDisplayInAppMessageHandler',
-        [],
-      );
+      if (!this._hasRegisteredDidDisplayListener) {
+        this._hasRegisteredDidDisplayListener = true;
+        const didDisplayCallBackProcessor = (event: InAppMessageDidDisplayEvent) => {
+          this._processFunctionList(this._didDisplayInAppMessageListeners, event);
+        };
+        window.cordova.exec(
+          didDisplayCallBackProcessor,
+          noop,
+          'OneSignalPush',
+          'setOnDidDisplayInAppMessageHandler',
+          [],
+        );
+      }
     } else if (event === 'willDismiss') {
       this._willDismissInAppMessageListeners.push(
         listener as (event: InAppMessageWillDismissEvent) => void,
       );
-      const willDismissInAppMessageProcessor = (event: InAppMessageWillDismissEvent) => {
-        this._processFunctionList(this._willDismissInAppMessageListeners, event);
-      };
-      window.cordova.exec(
-        willDismissInAppMessageProcessor,
-        noop,
-        'OneSignalPush',
-        'setOnWillDismissInAppMessageHandler',
-        [],
-      );
+      if (!this._hasRegisteredWillDismissListener) {
+        this._hasRegisteredWillDismissListener = true;
+        const willDismissInAppMessageProcessor = (event: InAppMessageWillDismissEvent) => {
+          this._processFunctionList(this._willDismissInAppMessageListeners, event);
+        };
+        window.cordova.exec(
+          willDismissInAppMessageProcessor,
+          noop,
+          'OneSignalPush',
+          'setOnWillDismissInAppMessageHandler',
+          [],
+        );
+      }
     } else if (event === 'didDismiss') {
       this._didDismissInAppMessageListeners.push(
         listener as (event: InAppMessageDidDismissEvent) => void,
       );
-      const didDismissInAppMessageCallBackProcessor = (event: InAppMessageDidDismissEvent) => {
-        this._processFunctionList(this._didDismissInAppMessageListeners, event);
-      };
-      window.cordova.exec(
-        didDismissInAppMessageCallBackProcessor,
-        noop,
-        'OneSignalPush',
-        'setOnDidDismissInAppMessageHandler',
-        [],
-      );
+      if (!this._hasRegisteredDidDismissListener) {
+        this._hasRegisteredDidDismissListener = true;
+        const didDismissInAppMessageCallBackProcessor = (event: InAppMessageDidDismissEvent) => {
+          this._processFunctionList(this._didDismissInAppMessageListeners, event);
+        };
+        window.cordova.exec(
+          didDismissInAppMessageCallBackProcessor,
+          noop,
+          'OneSignalPush',
+          'setOnDidDismissInAppMessageHandler',
+          [],
+        );
+      }
     }
   }
 

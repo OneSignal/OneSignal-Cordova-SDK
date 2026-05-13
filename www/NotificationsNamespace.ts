@@ -19,6 +19,9 @@ export default class Notifications {
   private _permissionObserverList: ((event: boolean) => void)[] = [];
   private _notificationClickedListeners: ((event: NotificationClickEvent) => void)[] = [];
   private _notificationWillDisplayListeners: ((event: NotificationWillDisplayEvent) => void)[] = [];
+  private _hasRegisteredClickListener = false;
+  private _hasRegisteredForegroundWillDisplayListener = false;
+  private _hasRegisteredPermissionListener = false;
 
   private _processFunctionList<T>(array: ((event: T) => void)[], param: T): void {
     for (let i = 0; i < array.length; i++) {
@@ -121,9 +124,8 @@ export default class Notifications {
 
   /**
    * Add listeners for notification events.
-   * @param event
-   * @param listener
-   * @returns
+   * Each native bridge channel is registered once per namespace instance;
+   * subsequent subscribers append to the local list to avoid orphaned handlers.
    */
   addEventListener<K extends NotificationEventName>(
     event: K,
@@ -131,47 +133,56 @@ export default class Notifications {
   ): void {
     if (event === 'click') {
       this._notificationClickedListeners.push(listener as (event: NotificationClickEvent) => void);
-      const clickParsingHandler = (json: NotificationClickEvent) => {
-        this._processFunctionList(this._notificationClickedListeners, json);
-      };
-      window.cordova.exec(
-        clickParsingHandler,
-        noop,
-        'OneSignalPush',
-        'addNotificationClickListener',
-        [],
-      );
+      if (!this._hasRegisteredClickListener) {
+        this._hasRegisteredClickListener = true;
+        const clickParsingHandler = (json: NotificationClickEvent) => {
+          this._processFunctionList(this._notificationClickedListeners, json);
+        };
+        window.cordova.exec(
+          clickParsingHandler,
+          noop,
+          'OneSignalPush',
+          'addNotificationClickListener',
+          [],
+        );
+      }
     } else if (event === 'foregroundWillDisplay') {
       this._notificationWillDisplayListeners.push(
         listener as (event: NotificationWillDisplayEvent) => void,
       );
-      const foregroundParsingHandler = (notification: OSNotification) => {
-        this._notificationWillDisplayListeners.forEach((listener) => {
-          listener(new NotificationWillDisplayEvent(notification));
-        });
-        window.cordova.exec(noop, noop, 'OneSignalPush', 'proceedWithWillDisplay', [
-          notification.notificationId,
-        ]);
-      };
-      window.cordova.exec(
-        foregroundParsingHandler,
-        noop,
-        'OneSignalPush',
-        'addForegroundLifecycleListener',
-        [],
-      );
+      if (!this._hasRegisteredForegroundWillDisplayListener) {
+        this._hasRegisteredForegroundWillDisplayListener = true;
+        const foregroundParsingHandler = (notification: OSNotification) => {
+          this._notificationWillDisplayListeners.forEach((listener) => {
+            listener(new NotificationWillDisplayEvent(notification));
+          });
+          window.cordova.exec(noop, noop, 'OneSignalPush', 'proceedWithWillDisplay', [
+            notification.notificationId,
+          ]);
+        };
+        window.cordova.exec(
+          foregroundParsingHandler,
+          noop,
+          'OneSignalPush',
+          'addForegroundLifecycleListener',
+          [],
+        );
+      }
     } else if (event === 'permissionChange') {
       this._permissionObserverList.push(listener as (event: boolean) => void);
-      const permissionCallBackProcessor = (state: boolean) => {
-        this._processFunctionList(this._permissionObserverList, state);
-      };
-      window.cordova.exec(
-        permissionCallBackProcessor,
-        noop,
-        'OneSignalPush',
-        'addPermissionObserver',
-        [],
-      );
+      if (!this._hasRegisteredPermissionListener) {
+        this._hasRegisteredPermissionListener = true;
+        const permissionCallBackProcessor = (state: boolean) => {
+          this._processFunctionList(this._permissionObserverList, state);
+        };
+        window.cordova.exec(
+          permissionCallBackProcessor,
+          noop,
+          'OneSignalPush',
+          'addPermissionObserver',
+          [],
+        );
+      }
     }
   }
 
