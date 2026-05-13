@@ -4,7 +4,7 @@ import { NotificationType } from '../models/NotificationType';
 import { userDataFromJson } from '../models/UserData';
 import type { UserData } from '../models/UserData';
 
-export const API_KEY = import.meta.env.VITE_ONESIGNAL_API_KEY as string | undefined;
+export const API_KEY = import.meta.env.VITE_ONESIGNAL_API_KEY?.trim();
 const ANDROID_CHANNEL_ID = import.meta.env.VITE_ONESIGNAL_ANDROID_CHANNEL_ID as string | undefined;
 const DEFAULT_ANDROID_CHANNEL_ID = 'b3b015d9-c050-4042-8548-dcc34aa44aa4';
 
