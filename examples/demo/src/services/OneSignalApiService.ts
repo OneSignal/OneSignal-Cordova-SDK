@@ -110,7 +110,7 @@ class OneSignalApiService {
     eventUpdates: Record<string, unknown> = {},
   ): Promise<boolean> {
     try {
-      const url = `https://api.onesignal.com/apps/${this.appId}/live_activities/${activityId}/notifications`;
+      const url = `https://api.onesignal.com/apps/${this.appId}/live_activities/${encodeURIComponent(activityId)}/notifications`;
       const payload: Record<string, unknown> = {
         event,
         event_updates: eventUpdates,
