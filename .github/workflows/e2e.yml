@@ -57,15 +57,19 @@ jobs:
         with:
           version: ${{ steps.android-sdk-version.outputs.version }}
 
-      - name: Build release APK
+      - name: Build debug APK
         working-directory: examples/demo/android
-        run: ./gradlew assembleRelease --quiet --console=plain --warning-mode=summary
+        # Debug build is faster (no R8/proguard, no release signing) and ships
+        # `android:debuggable=true`, which enables WebView remote debugging
+        # automatically as a belt-and-suspenders alongside the explicit
+        # WebView.setWebContentsDebuggingEnabled(true) in MainActivity.
+        run: ./gradlew assembleDebug --quiet --console=plain --warning-mode=summary
 
       - name: Upload APK
         uses: actions/upload-artifact@v7
         with:
           name: demo-apk
-          path: examples/demo/android/app/build/outputs/apk/release/app-release.apk
+          path: examples/demo/android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 1
           compression-level: 0
 
@@ -150,7 +154,7 @@ jobs:
     with:
       platform: android
       app-artifact: demo-apk
-      app-filename: app-release.apk
+      app-filename: app-debug.apk
       sdk-type: cordova
       build-name: cordova-android-${{ github.ref_name }}-${{ github.run_number }}
 

@@ -1,6 +1,5 @@
 import type { FC } from 'react';
 
-import { showSnackbar } from '../../utils/showSnackbar';
 import ActionButton from '../ActionButton';
 import SectionCard from '../SectionCard';
 import ToggleRow from '../ToggleRow';
@@ -10,6 +9,7 @@ interface LocationSectionProps {
   onSetLocationShared: (shared: boolean) => void | Promise<void>;
   onRequestLocationPermission: () => void;
   onInfoTap: () => void;
+  onShowToast: (message: string) => void;
 }
 
 const LocationSection: FC<LocationSectionProps> = ({
@@ -17,6 +17,7 @@ const LocationSection: FC<LocationSectionProps> = ({
   onSetLocationShared,
   onRequestLocationPermission,
   onInfoTap,
+  onShowToast,
 }) => (
   <SectionCard title="LOCATION" onInfoTap={onInfoTap} sectionKey="location">
     <ToggleRow
@@ -38,7 +39,7 @@ const LocationSection: FC<LocationSectionProps> = ({
     <ActionButton
       type="button"
       onClick={() => {
-        showSnackbar(`Location shared: ${locationShared}`);
+        onShowToast(`Location shared: ${locationShared}`);
       }}
       data-testid="check_location_button"
     >
