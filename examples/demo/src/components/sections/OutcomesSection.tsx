@@ -1,7 +1,6 @@
 import type { FC } from 'react';
 import { useState } from 'react';
 
-import { showSnackbar } from '../../utils/showSnackbar';
 import ActionButton from '../ActionButton';
 import OutcomeModal from '../modals/OutcomeModal';
 import SectionCard from '../SectionCard';
@@ -11,6 +10,7 @@ interface OutcomesSectionProps {
   onSendUnique: (name: string) => void;
   onSendWithValue: (name: string, value: number) => void;
   onInfoTap: () => void;
+  onShowToast: (message: string) => void;
 }
 
 const OutcomesSection: FC<OutcomesSectionProps> = ({
@@ -18,6 +18,7 @@ const OutcomesSection: FC<OutcomesSectionProps> = ({
   onSendUnique,
   onSendWithValue,
   onInfoTap,
+  onShowToast,
 }) => {
   const [open, setOpen] = useState(false);
 
@@ -32,13 +33,13 @@ const OutcomesSection: FC<OutcomesSectionProps> = ({
         onSubmit={(name, mode, value) => {
           if (mode === 'unique') {
             onSendUnique(name);
-            showSnackbar(`Unique outcome sent: ${name}`);
+            onShowToast(`Unique outcome sent: ${name}`);
           } else if (mode === 'value' && value !== null) {
             onSendWithValue(name, value);
-            showSnackbar(`Outcome sent: ${name} = ${value}`);
+            onShowToast(`Outcome sent: ${name} = ${value}`);
           } else {
             onSendNormal(name);
-            showSnackbar(`Outcome sent: ${name}`);
+            onShowToast(`Outcome sent: ${name}`);
           }
           setOpen(false);
         }}

@@ -1,7 +1,6 @@
 import type { FC } from 'react';
 import { useState } from 'react';
 
-import { showSnackbar } from '../../utils/showSnackbar';
 import ActionButton from '../ActionButton';
 import SingleInputModal from '../modals/SingleInputModal';
 import SectionCard from '../SectionCard';
@@ -10,16 +9,17 @@ interface UserSectionProps {
   externalUserId: string | undefined;
   onLogin: (externalUserId: string) => Promise<void>;
   onLogout: () => Promise<void>;
+  onShowToast: (message: string) => void;
 }
 
-const UserSection: FC<UserSectionProps> = ({ externalUserId, onLogin, onLogout }) => {
+const UserSection: FC<UserSectionProps> = ({ externalUserId, onLogin, onLogout, onShowToast }) => {
   const [loginOpen, setLoginOpen] = useState(false);
   const isLoggedIn = Boolean(externalUserId);
 
   const handleLogin = async (value: string) => {
     try {
       await onLogin(value);
-      showSnackbar(`Logged in as ${value}`);
+      onShowToast(`Logged in as ${value}`);
     } finally {
       setLoginOpen(false);
     }
@@ -27,7 +27,7 @@ const UserSection: FC<UserSectionProps> = ({ externalUserId, onLogin, onLogout }
 
   const handleLogout = async () => {
     await onLogout();
-    showSnackbar('User logged out');
+    onShowToast('User logged out');
   };
 
   return (

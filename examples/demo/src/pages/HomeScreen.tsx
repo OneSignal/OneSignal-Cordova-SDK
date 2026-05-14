@@ -1,6 +1,6 @@
 import { Capacitor } from '@capacitor/core';
-import { IonContent, IonPage, useIonToast } from '@ionic/react';
-import { useEffect, useState } from 'react';
+import { IonContent, IonPage, IonToast } from '@ionic/react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { FC } from 'react';
 import { useHistory } from 'react-router-dom';
 
@@ -26,32 +26,29 @@ import { useOneSignal } from '../hooks/useOneSignal';
 import { API_KEY } from '../services/OneSignalApiService';
 import TooltipHelper from '../services/TooltipHelper';
 import type { TooltipData } from '../services/TooltipHelper';
-import { subscribeSnackbar } from '../utils/showSnackbar';
 
 import './HomeScreen.css';
+
+type ToastState = { id: number; message: string };
+
+const TOAST_DURATION_MS = 1600;
 
 const HomeScreen: FC = () => {
   const os = useOneSignal();
   const history = useHistory();
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const [activeTooltip, setActiveTooltip] = useState<TooltipData | null>(null);
-  const [presentToast, dismissToast] = useIonToast();
+  const [toast, setToast] = useState<ToastState | null>(null);
+  const toastCounterRef = useRef(0);
+
+  const showToast = useCallback((message: string): void => {
+    toastCounterRef.current += 1;
+    setToast({ id: toastCounterRef.current, message });
+  }, []);
 
   useEffect(() => {
     void TooltipHelper.getInstance().init();
   }, []);
-
-  useEffect(() => {
-    return subscribeSnackbar((message) => {
-      void dismissToast().finally(() => {
-        void presentToast({
-          message,
-          duration: 1600,
-          htmlAttributes: { 'data-testid': 'snackbar_toast' },
-        });
-      });
-    });
-  }, [presentToast, dismissToast]);
 
   const { isReady, promptPush } = os;
   useEffect(() => {
@@ -92,6 +89,7 @@ const HomeScreen: FC = () => {
               externalUserId={os.externalUserId}
               onLogin={os.loginUser}
               onLogout={os.logoutUser}
+              onShowToast={showToast}
             />
 
             <PushSection
@@ -161,6 +159,7 @@ const HomeScreen: FC = () => {
               onSendUnique={os.sendUniqueOutcome}
               onSendWithValue={os.sendOutcomeWithValue}
               onInfoTap={() => showTooltipModal('outcomes')}
+              onShowToast={showToast}
             />
 
             <TriggersSection
@@ -175,6 +174,7 @@ const HomeScreen: FC = () => {
             <CustomEventsSection
               onTrackEvent={os.trackEvent}
               onInfoTap={() => showTooltipModal('customEvents')}
+              onShowToast={showToast}
             />
 
             <LocationSection
@@ -182,6 +182,7 @@ const HomeScreen: FC = () => {
               onSetLocationShared={os.setLocationShared}
               onRequestLocationPermission={os.requestLocationPermission}
               onInfoTap={() => showTooltipModal('location')}
+              onShowToast={showToast}
             />
 
             {Capacitor.getPlatform() === 'ios' && (
@@ -211,6 +212,17 @@ const HomeScreen: FC = () => {
           tooltip={activeTooltip}
           onClose={() => setTooltipVisible(false)}
         />
+
+        {toast && (
+          <IonToast
+            key={toast.id}
+            isOpen
+            message={toast.message}
+            duration={TOAST_DURATION_MS}
+            onDidDismiss={() => setToast((current) => (current?.id === toast.id ? null : current))}
+            data-testid="snackbar_toast"
+          />
+        )}
       </IonContent>
     </IonPage>
   );

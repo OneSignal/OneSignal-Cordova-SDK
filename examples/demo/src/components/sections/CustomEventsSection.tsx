@@ -1,7 +1,6 @@
 import type { FC } from 'react';
 import { useState } from 'react';
 
-import { showSnackbar } from '../../utils/showSnackbar';
 import ActionButton from '../ActionButton';
 import TrackEventModal from '../modals/TrackEventModal';
 import SectionCard from '../SectionCard';
@@ -9,9 +8,14 @@ import SectionCard from '../SectionCard';
 interface CustomEventsSectionProps {
   onTrackEvent: (name: string, properties?: Record<string, unknown>) => void;
   onInfoTap: () => void;
+  onShowToast: (message: string) => void;
 }
 
-const CustomEventsSection: FC<CustomEventsSectionProps> = ({ onTrackEvent, onInfoTap }) => {
+const CustomEventsSection: FC<CustomEventsSectionProps> = ({
+  onTrackEvent,
+  onInfoTap,
+  onShowToast,
+}) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -24,7 +28,7 @@ const CustomEventsSection: FC<CustomEventsSectionProps> = ({ onTrackEvent, onInf
         onClose={() => setOpen(false)}
         onSubmit={(name, properties) => {
           onTrackEvent(name, properties);
-          showSnackbar(`Event tracked: ${name}`);
+          onShowToast(`Event tracked: ${name}`);
           setOpen(false);
         }}
       />

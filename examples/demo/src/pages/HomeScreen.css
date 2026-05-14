@@ -45,6 +45,7 @@
 
 .brand-header {
   background: var(--os-primary);
+  border-bottom: 1px solid #fff;
   color: #fff;
   min-height: var(--demo-header-height);
   padding-top: var(--ion-safe-area-top);
