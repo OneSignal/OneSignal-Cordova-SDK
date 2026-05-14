@@ -1,5 +1,5 @@
 import { Capacitor } from '@capacitor/core';
-import { IonContent, IonPage, IonToast } from '@ionic/react';
+import { IonContent, IonPage, useIonToast } from '@ionic/react';
 import { useEffect, useState } from 'react';
 import type { FC } from 'react';
 import { useHistory } from 'react-router-dom';
@@ -35,26 +35,23 @@ const HomeScreen: FC = () => {
   const history = useHistory();
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const [activeTooltip, setActiveTooltip] = useState<TooltipData | null>(null);
-  const [toastMessage, setToastMessage] = useState('');
-  const [toastOpen, setToastOpen] = useState(false);
+  const [presentToast, dismissToast] = useIonToast();
 
   useEffect(() => {
     void TooltipHelper.getInstance().init();
   }, []);
 
   useEffect(() => {
-    // Close-then-open on a fresh tick so consecutive snackbars (e.g. tests
-    // sending three outcomes in a row) reliably restart IonToast's timer and
-    // re-render the new message. Calling setToastOpen(true) while already true
-    // is a no-op for IonToast and the new `message` is often ignored mid-flight.
     return subscribeSnackbar((message) => {
-      setToastOpen(false);
-      setTimeout(() => {
-        setToastMessage(message);
-        setToastOpen(true);
-      }, 0);
+      void dismissToast().finally(() => {
+        void presentToast({
+          message,
+          duration: 1600,
+          htmlAttributes: { 'data-testid': 'snackbar_toast' },
+        });
+      });
     });
-  }, []);
+  }, [presentToast, dismissToast]);
 
   const { isReady, promptPush } = os;
   useEffect(() => {
@@ -213,14 +210,6 @@ const HomeScreen: FC = () => {
           open={tooltipVisible}
           tooltip={activeTooltip}
           onClose={() => setTooltipVisible(false)}
-        />
-
-        <IonToast
-          isOpen={toastOpen}
-          message={toastMessage}
-          duration={1600}
-          onDidDismiss={() => setToastOpen(false)}
-          data-testid="snackbar_toast"
         />
       </IonContent>
     </IonPage>
