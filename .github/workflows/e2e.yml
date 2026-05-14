@@ -154,7 +154,7 @@ jobs:
     with:
       platform: android
       app-artifact: demo-apk
-      app-filename: app-release.apk
+      app-filename: app-debug.apk
       sdk-type: cordova
       build-name: cordova-android-${{ github.ref_name }}-${{ github.run_number }}
 
