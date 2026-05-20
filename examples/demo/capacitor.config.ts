@@ -13,6 +13,11 @@ const config: CapacitorConfig = {
     // the WebView. Test-only convenience for the demo app.
     webContentsDebuggingEnabled: true,
   },
+  plugins: {
+    SplashScreen: {
+      backgroundColor: '#ffffff',
+    },
+  },
 };
 
 export default config;

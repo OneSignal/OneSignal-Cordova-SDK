@@ -4,7 +4,7 @@ const E2E_MODE = (import.meta.env.VITE_E2E_MODE ?? '').trim() === 'true';
 const MASK_CHAR = '•';
 
 export function maskValue(value: string): string {
-  if (E2E_MODE) {
+  if (E2E_MODE && value !== '—') {
     return MASK_CHAR.repeat(value.length);
   }
   return value;

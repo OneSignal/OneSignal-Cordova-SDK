@@ -43,7 +43,7 @@ const UserSection: FC<UserSectionProps> = ({ externalUserId, onLogin, onLogout, 
         <div className="kv-row">
           <span>External ID</span>
           <span className="id-value" data-testid="user_external_id_value">
-            {externalUserId ?? '–'}
+            {externalUserId ?? '—'}
           </span>
         </div>
       </div>
