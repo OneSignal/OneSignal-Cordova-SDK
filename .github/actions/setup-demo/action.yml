@@ -45,7 +45,6 @@ runs:
         echo "VITE_ONESIGNAL_APP_ID=${{ inputs.onesignal-app-id }}" > .env
         echo "VITE_ONESIGNAL_API_KEY=${{ inputs.onesignal-api-key }}" >> .env
         echo "VITE_ONESIGNAL_ANDROID_CHANNEL_ID=7ec2ece9-c538-4656-9516-1316f48a005c" >> .env
-        echo "VITE_E2E_MODE=true" >> .env
 
     - name: Set up demo
       shell: bash
