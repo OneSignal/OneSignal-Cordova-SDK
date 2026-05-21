@@ -154,6 +154,8 @@
 .kv-card .kv-row .id-value {
   font-size: var(--font-size-body-small);
   font-family: monospace;
+  user-select: all;
+  -webkit-user-select: all;
 }
 
 .divider {
