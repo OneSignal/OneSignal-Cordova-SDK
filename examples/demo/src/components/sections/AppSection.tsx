@@ -1,7 +1,6 @@
 import { IonToggle } from '@ionic/react';
 import type { FC } from 'react';
 
-import { maskValue } from '../../utils/maskValue';
 import SectionCard from '../SectionCard';
 
 interface AppSectionProps {
@@ -25,7 +24,7 @@ const AppSection: FC<AppSectionProps> = ({
         <div className="kv-row">
           <span>App ID</span>
           <span className="id-value" data-testid="app_id_value">
-            {maskValue(appId)}
+            {appId}
           </span>
         </div>
       </div>
