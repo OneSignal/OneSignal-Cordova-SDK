@@ -5,6 +5,7 @@ import { IonReactRouter } from '@ionic/react-router';
 import { useEffect } from 'react';
 import { Redirect, Route } from 'react-router-dom';
 
+import { ToastProvider } from './components/ToastProvider';
 import HomeScreen from './pages/HomeScreen';
 import Secondary from './pages/Secondary';
 
@@ -45,19 +46,21 @@ const App: React.FC = () => {
 
   return (
     <IonApp>
-      <IonReactRouter>
-        <IonRouterOutlet>
-          <Route exact path="/home">
-            <HomeScreen />
-          </Route>
-          <Route exact path="/secondary">
-            <Secondary />
-          </Route>
-          <Route exact path="/">
-            <Redirect to="/home" />
-          </Route>
-        </IonRouterOutlet>
-      </IonReactRouter>
+      <ToastProvider>
+        <IonReactRouter>
+          <IonRouterOutlet>
+            <Route exact path="/home">
+              <HomeScreen />
+            </Route>
+            <Route exact path="/secondary">
+              <Secondary />
+            </Route>
+            <Route exact path="/">
+              <Redirect to="/home" />
+            </Route>
+          </IonRouterOutlet>
+        </IonReactRouter>
+      </ToastProvider>
     </IonApp>
   );
 };

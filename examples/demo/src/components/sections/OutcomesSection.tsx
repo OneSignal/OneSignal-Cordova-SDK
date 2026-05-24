@@ -4,13 +4,13 @@ import { useState } from 'react';
 import ActionButton from '../ActionButton';
 import OutcomeModal from '../modals/OutcomeModal';
 import SectionCard from '../SectionCard';
+import { useSnackbar } from '../ToastProvider';
 
 interface OutcomesSectionProps {
   onSendNormal: (name: string) => void;
   onSendUnique: (name: string) => void;
   onSendWithValue: (name: string, value: number) => void;
   onInfoTap: () => void;
-  onShowToast: (message: string) => void;
 }
 
 const OutcomesSection: FC<OutcomesSectionProps> = ({
@@ -18,12 +18,12 @@ const OutcomesSection: FC<OutcomesSectionProps> = ({
   onSendUnique,
   onSendWithValue,
   onInfoTap,
-  onShowToast,
 }) => {
   const [open, setOpen] = useState(false);
+  const showSnackbar = useSnackbar();
 
   return (
-    <SectionCard title="OUTCOME EVENTS" onInfoTap={onInfoTap} sectionKey="outcomes">
+    <SectionCard title="OUTCOME EVENTS" sectionKey="outcomes" onInfoTap={onInfoTap}>
       <ActionButton type="button" onClick={() => setOpen(true)} data-testid="send_outcome_button">
         SEND OUTCOME
       </ActionButton>
@@ -33,13 +33,13 @@ const OutcomesSection: FC<OutcomesSectionProps> = ({
         onSubmit={(name, mode, value) => {
           if (mode === 'unique') {
             onSendUnique(name);
-            onShowToast(`Unique outcome sent: ${name}`);
+            showSnackbar(`Unique outcome sent: ${name}`);
           } else if (mode === 'value' && value !== null) {
             onSendWithValue(name, value);
-            onShowToast(`Outcome sent: ${name} = ${value}`);
+            showSnackbar(`Outcome sent: ${name} = ${value}`);
           } else {
             onSendNormal(name);
-            onShowToast(`Outcome sent: ${name}`);
+            showSnackbar(`Outcome sent: ${name}`);
           }
           setOpen(false);
         }}

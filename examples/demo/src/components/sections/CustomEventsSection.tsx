@@ -4,22 +4,19 @@ import { useState } from 'react';
 import ActionButton from '../ActionButton';
 import TrackEventModal from '../modals/TrackEventModal';
 import SectionCard from '../SectionCard';
+import { useSnackbar } from '../ToastProvider';
 
 interface CustomEventsSectionProps {
   onTrackEvent: (name: string, properties?: Record<string, unknown>) => void;
   onInfoTap: () => void;
-  onShowToast: (message: string) => void;
 }
 
-const CustomEventsSection: FC<CustomEventsSectionProps> = ({
-  onTrackEvent,
-  onInfoTap,
-  onShowToast,
-}) => {
+const CustomEventsSection: FC<CustomEventsSectionProps> = ({ onTrackEvent, onInfoTap }) => {
   const [open, setOpen] = useState(false);
+  const showSnackbar = useSnackbar();
 
   return (
-    <SectionCard title="CUSTOM EVENTS" onInfoTap={onInfoTap} sectionKey="custom_events">
+    <SectionCard title="CUSTOM EVENTS" sectionKey="custom_events" onInfoTap={onInfoTap}>
       <ActionButton type="button" onClick={() => setOpen(true)} data-testid="track_event_button">
         TRACK EVENT
       </ActionButton>
@@ -28,7 +25,7 @@ const CustomEventsSection: FC<CustomEventsSectionProps> = ({
         onClose={() => setOpen(false)}
         onSubmit={(name, properties) => {
           onTrackEvent(name, properties);
-          onShowToast(`Event tracked: ${name}`);
+          showSnackbar(`Event tracked: ${name}`);
           setOpen(false);
         }}
       />

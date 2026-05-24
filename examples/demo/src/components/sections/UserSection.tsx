@@ -9,17 +9,15 @@ interface UserSectionProps {
   externalUserId: string | undefined;
   onLogin: (externalUserId: string) => Promise<void>;
   onLogout: () => Promise<void>;
-  onShowToast: (message: string) => void;
 }
 
-const UserSection: FC<UserSectionProps> = ({ externalUserId, onLogin, onLogout, onShowToast }) => {
+const UserSection: FC<UserSectionProps> = ({ externalUserId, onLogin, onLogout }) => {
   const [loginOpen, setLoginOpen] = useState(false);
   const isLoggedIn = Boolean(externalUserId);
 
   const handleLogin = async (value: string) => {
     try {
       await onLogin(value);
-      onShowToast(`Logged in as ${value}`);
     } finally {
       setLoginOpen(false);
     }
@@ -27,7 +25,6 @@ const UserSection: FC<UserSectionProps> = ({ externalUserId, onLogin, onLogout, 
 
   const handleLogout = async () => {
     await onLogout();
-    onShowToast('User logged out');
   };
 
   return (

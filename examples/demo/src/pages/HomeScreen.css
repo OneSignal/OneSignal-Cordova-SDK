@@ -117,8 +117,15 @@
 
 .section-head .icon-btn {
   margin-left: auto;
+  margin-right: -11px;
   color: var(--os-grey-500);
   font-size: 18px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .card {
@@ -218,17 +225,6 @@
   display: inline-flex;
   align-items: center;
   font-size: 18px;
-}
-
-.action-btn.iam-btn {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 0 18px;
-}
-
-.action-btn.iam-btn .action-btn-content {
-  justify-content: flex-start;
 }
 
 .action-btn:disabled {

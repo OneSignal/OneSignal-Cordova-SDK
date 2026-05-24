@@ -8,6 +8,18 @@ export const API_KEY = import.meta.env.VITE_ONESIGNAL_API_KEY?.trim();
 const ANDROID_CHANNEL_ID = import.meta.env.VITE_ONESIGNAL_ANDROID_CHANNEL_ID as string | undefined;
 const DEFAULT_ANDROID_CHANNEL_ID = 'b3b015d9-c050-4042-8548-dcc34aa44aa4';
 
+function isTransientSendFailure(data: unknown): boolean {
+  if (!data || typeof data !== 'object') return false;
+  const record = data as { id?: unknown; errors?: unknown; recipients?: unknown };
+  const errors = record.errors;
+  const hasErrors =
+    (Array.isArray(errors) && errors.length > 0) ||
+    (errors != null && typeof errors === 'object' && Object.keys(errors).length > 0);
+  const missingId = typeof record.id !== 'string' || record.id.length === 0;
+  const zeroRecipients = typeof record.recipients === 'number' && record.recipients === 0;
+  return hasErrors || missingId || zeroRecipients;
+}
+
 class OneSignalApiService {
   private static instance: OneSignalApiService;
 
@@ -85,9 +97,14 @@ class OneSignalApiService {
     const maxAttempts = 5;
     const backoffMs = (n: number) => 2_000 * 2 ** (n - 1);
 
-    // Retry on `invalid_player_ids` to absorb the brief race where the
-    // subscription has been created locally but is not yet visible to the
-    // /notifications endpoint.
+    // Retry while the OneSignal backend hasn't yet indexed the freshly
+    // created subscription. The /notifications endpoint reports this race in
+    // a few different shapes, all of which return HTTP 200:
+    //   {"id":"...","recipients":0}                       (user just switched, push token not yet attached)
+    //   {"id":"...","errors":{"invalid_player_ids":[...]}}
+    //   {"id":"","errors":["All included players are not subscribed"]}
+    //   {"id":"","errors":[...]}
+    // Treat any 200 response with no real id, populated errors, or recipients=0 as transient.
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         const response = await CapacitorHttp.post({
@@ -104,15 +121,12 @@ class OneSignalApiService {
           return false;
         }
 
-        const invalidIds = response.data?.errors?.invalid_player_ids;
-        if (Array.isArray(invalidIds) && invalidIds.length > 0) {
+        if (isTransientSendFailure(response.data)) {
           if (attempt < maxAttempts) {
             await new Promise((resolve) => setTimeout(resolve, backoffMs(attempt)));
             continue;
           }
-          console.error(
-            `Send notification failed: invalid_player_ids ${JSON.stringify(invalidIds)}`,
-          );
+          console.error(`Send notification failed: ${JSON.stringify(response.data)}`);
           return false;
         }
 

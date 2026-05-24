@@ -1,6 +1,6 @@
 import { Capacitor } from '@capacitor/core';
-import { IonContent, IonPage, IonToast } from '@ionic/react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { IonContent, IonPage } from '@ionic/react';
+import { useEffect, useState } from 'react';
 import type { FC } from 'react';
 import { useHistory } from 'react-router-dom';
 
@@ -29,22 +29,11 @@ import type { TooltipData } from '../services/TooltipHelper';
 
 import './HomeScreen.css';
 
-type ToastState = { id: number; message: string };
-
-const TOAST_DURATION_MS = 1600;
-
 const HomeScreen: FC = () => {
   const os = useOneSignal();
   const history = useHistory();
-  const [tooltipVisible, setTooltipVisible] = useState(false);
+  const [tooltipOpen, setTooltipOpen] = useState(false);
   const [activeTooltip, setActiveTooltip] = useState<TooltipData | null>(null);
-  const [toast, setToast] = useState<ToastState | null>(null);
-  const toastCounterRef = useRef(0);
-
-  const showToast = useCallback((message: string): void => {
-    toastCounterRef.current += 1;
-    setToast({ id: toastCounterRef.current, message });
-  }, []);
 
   useEffect(() => {
     void TooltipHelper.getInstance().init();
@@ -61,7 +50,7 @@ const HomeScreen: FC = () => {
     const tooltip = TooltipHelper.getInstance().getTooltip(key);
     if (tooltip) {
       setActiveTooltip(tooltip);
-      setTooltipVisible(true);
+      setTooltipOpen(true);
     }
   };
 
@@ -89,7 +78,6 @@ const HomeScreen: FC = () => {
               externalUserId={os.externalUserId}
               onLogin={os.loginUser}
               onLogout={os.logoutUser}
-              onShowToast={showToast}
             />
 
             <PushSection
@@ -159,7 +147,6 @@ const HomeScreen: FC = () => {
               onSendUnique={os.sendUniqueOutcome}
               onSendWithValue={os.sendOutcomeWithValue}
               onInfoTap={() => showTooltipModal('outcomes')}
-              onShowToast={showToast}
             />
 
             <TriggersSection
@@ -174,15 +161,14 @@ const HomeScreen: FC = () => {
             <CustomEventsSection
               onTrackEvent={os.trackEvent}
               onInfoTap={() => showTooltipModal('customEvents')}
-              onShowToast={showToast}
             />
 
             <LocationSection
               locationShared={os.locationShared}
               onSetLocationShared={os.setLocationShared}
               onRequestLocationPermission={os.requestLocationPermission}
+              onCheckLocationShared={os.checkLocationShared}
               onInfoTap={() => showTooltipModal('location')}
-              onShowToast={showToast}
             />
 
             {Capacitor.getPlatform() === 'ios' && (
@@ -208,21 +194,10 @@ const HomeScreen: FC = () => {
         </div>
 
         <TooltipModal
-          open={tooltipVisible}
+          open={tooltipOpen}
           tooltip={activeTooltip}
-          onClose={() => setTooltipVisible(false)}
+          onClose={() => setTooltipOpen(false)}
         />
-
-        {toast && (
-          <IonToast
-            key={toast.id}
-            isOpen
-            message={toast.message}
-            duration={TOAST_DURATION_MS}
-            onDidDismiss={() => setToast((current) => (current?.id === toast.id ? null : current))}
-            data-testid="snackbar_toast"
-          />
-        )}
       </IonContent>
     </IonPage>
   );
