@@ -4,8 +4,17 @@ set -euo pipefail
 # Run from inside any examples/<demo> directory.
 ORIGINAL_DIR=$(pwd)
 SDK_ROOT=$(cd "$ORIGINAL_DIR/../.." && pwd)
+SYNC_PLATFORM="${1:-all}"
 
 info() { echo -e "\033[0;32m[setup]\033[0m $*"; }
+
+case "$SYNC_PLATFORM" in
+  all|android|ios) ;;
+  *)
+    echo "Usage: $0 [all|android|ios]" >&2
+    exit 2
+    ;;
+esac
 
 # ── Plugin tarball cache ─────────────────────────────────────────────────────
 # Skip rebuild/repack/`vp add` when plugin sources haven't changed.
@@ -43,14 +52,32 @@ info "Building web bundle (vite)..."
 vp run build
 
 # ── Capacitor sync cache ─────────────────────────────────────────────────────
-# `cap sync` runs `pod install` + `xcodebuild clean` (~30-60s); skip when
-# inputs are unchanged. Hash sources (not `dist/`) since bundlers emit
-# content-hashed chunk names that can drift between identical builds.
-SYNC_STAMP="$ORIGINAL_DIR/.cap-sync.stamp"
-SYNC_HASH=$(find "$ORIGINAL_DIR/src" "$ORIGINAL_DIR/index.html" \
-                 "$ORIGINAL_DIR/capacitor.config.ts" "$ORIGINAL_DIR/vite.config.ts" \
-                 "$ORIGINAL_DIR/package.json" "$ORIGINAL_DIR/bun.lock" \
-                 "$ORIGINAL_DIR/ios/App" \
+# `cap sync` can run `pod install` + `xcodebuild clean` (~30-60s); skip when
+# inputs are unchanged. Use per-platform stamps so Android-only runs do not
+# touch iOS when CocoaPods is available locally.
+SYNC_STAMP="$ORIGINAL_DIR/.cap-sync-${SYNC_PLATFORM}.stamp"
+SYNC_INPUTS=(
+  "$ORIGINAL_DIR/src"
+  "$ORIGINAL_DIR/index.html"
+  "$ORIGINAL_DIR/capacitor.config.ts"
+  "$ORIGINAL_DIR/vite.config.ts"
+  "$ORIGINAL_DIR/package.json"
+  "$ORIGINAL_DIR/bun.lock"
+)
+
+case "$SYNC_PLATFORM" in
+  android)
+    SYNC_INPUTS+=("$ORIGINAL_DIR/android")
+    ;;
+  ios)
+    SYNC_INPUTS+=("$ORIGINAL_DIR/ios/App")
+    ;;
+  all)
+    SYNC_INPUTS+=("$ORIGINAL_DIR/android" "$ORIGINAL_DIR/ios/App")
+    ;;
+esac
+
+SYNC_HASH=$(find "${SYNC_INPUTS[@]}" \
             -type f \
             ! -path "*/node_modules/*" \
             ! -path "*/Pods/*" \
@@ -69,8 +96,30 @@ SYNC_HASH=$(find "$ORIGINAL_DIR/src" "$ORIGINAL_DIR/index.html" \
             | awk '{print $1}')
 SYNC_HASH="${SYNC_HASH}-${SDK_SRC_HASH}"
 
-if [[ -d "$ORIGINAL_DIR/ios/App/App/public" ]] && [[ -f "$SYNC_STAMP" ]] && [[ "$(cat "$SYNC_STAMP")" == "$SYNC_HASH" ]]; then
+sync_outputs_exist() {
+  case "$SYNC_PLATFORM" in
+    android)
+      [[ -d "$ORIGINAL_DIR/android/app/src/main/assets/public" ]]
+      ;;
+    ios)
+      [[ -d "$ORIGINAL_DIR/ios/App/App/public" ]]
+      ;;
+    all)
+      [[ -d "$ORIGINAL_DIR/android/app/src/main/assets/public" && -d "$ORIGINAL_DIR/ios/App/App/public" ]]
+      ;;
+  esac
+}
+
+if sync_outputs_exist && [[ -f "$SYNC_STAMP" ]] && [[ "$(cat "$SYNC_STAMP")" == "$SYNC_HASH" ]]; then
   info "Capacitor sync inputs unchanged, skipping cap sync"
+elif [[ "$SYNC_PLATFORM" == "android" ]]; then
+  info "Syncing Capacitor Android..."
+  vpx cap sync android
+  echo "$SYNC_HASH" > "$SYNC_STAMP"
+elif [[ "$SYNC_PLATFORM" == "ios" ]]; then
+  info "Syncing Capacitor iOS..."
+  vpx cap sync ios
+  echo "$SYNC_HASH" > "$SYNC_STAMP"
 elif ! command -v pod >/dev/null 2>&1; then
   # CI Android jobs run on Linux where CocoaPods isn't installed.
   # Sync only Android so plain `cap sync` doesn't shell out to pod.

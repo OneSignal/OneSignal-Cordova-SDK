@@ -183,7 +183,7 @@ jobs:
           (
             cd examples/demo
             vp run setup || echo "::notice::expected pod install conflict; bumping OneSignalXCFramework"
-            (cd ios/App && pod update OneSignalXCFramework --no-repo-update)
+            (cd ios/App && pod update OneSignalXCFramework)
           )
           echo "✓ Refreshed examples/demo/ios/App/Podfile.lock"
 
