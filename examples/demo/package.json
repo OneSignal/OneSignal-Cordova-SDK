@@ -5,14 +5,16 @@
   "description": "OneSignal Sample App",
   "scripts": {
     "setup": "../setup.sh",
-    "preandroid": "vp run setup",
-    "preios": "vp run setup",
+    "setup:android": "../setup.sh android",
+    "setup:ios": "../setup.sh ios",
+    "preandroid": "vp run setup:android",
+    "preios": "vp run setup:ios",
     "build": "tsc && vp build",
     "android:sync": "ionic cap sync android",
     "ios:sync": "ionic cap sync ios",
     "android": "ionic cap run android -l --external",
     "ios": "ionic cap run ios -l --external",
-    "update:pods": "(cd ios/App && pod update OneSignalXCFramework --no-repo-update)"
+    "update:pods": "(cd ios/App && pod update OneSignalXCFramework)"
   },
   "dependencies": {
     "@capacitor/android": "^8.3.1",
