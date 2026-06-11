@@ -19,6 +19,7 @@ def capacitor_pods
 end
 
 target 'App' do
+  pod 'OneSignalCordovaDependencies', :path => '../../node_modules/onesignal-cordova-plugin'
   capacitor_pods
   # Add your Pods here
 end

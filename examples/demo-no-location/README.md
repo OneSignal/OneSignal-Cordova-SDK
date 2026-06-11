@@ -43,7 +43,7 @@ vpx cap add ios --packagemanager CocoaPods
 
 If an existing generated `ios/` folder is using SPM, the setup script recreates it with CocoaPods.
 
-The setup script also adds the local `OneSignalCordovaDependencies` pod path to the generated `ios/App/Podfile` before rerunning CocoaPods.
+The setup script also adds the local `OneSignalCordovaDependencies` pod to the generated `ios/App/Podfile` before rerunning CocoaPods.
 
 The generated iOS app is patched with the Push Notifications entitlement (`aps-environment`) after sync.
 

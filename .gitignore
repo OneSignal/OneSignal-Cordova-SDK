@@ -11,6 +11,7 @@ coverage/
 *.tgz
 .cordova-sdk-source.stamp
 .cap-sync.stamp
+.tmp-*/
 
 .DS_Store
 # Coverage

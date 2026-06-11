@@ -44,12 +44,12 @@ See OneSignal's [Client SDK Reference](https://documentation.onesignal.com/docs/
 
 If your app does not use `OneSignal.Location`, you can exclude the native OneSignal location module from iOS and Android builds.
 
-Set `ONESIGNAL_DISABLE_LOCATION=true` in the environment before resolving or building native dependencies. The value is case-insensitive, and `1` is also accepted.
+Set `ONESIGNAL_DISABLE_LOCATION=true` in the environment before installing the plugin or adding the native platform, because this flag is read when native dependencies are resolved. The value is case-insensitive, and `1` is also accepted.
 
 ```bash
-ONESIGNAL_DISABLE_LOCATION=true cordova prepare
-ONESIGNAL_DISABLE_LOCATION=true cordova build ios
-ONESIGNAL_DISABLE_LOCATION=true cordova build android
+ONESIGNAL_DISABLE_LOCATION=true cordova plugin add onesignal-cordova-plugin
+ONESIGNAL_DISABLE_LOCATION=true cordova platform add ios
+ONESIGNAL_DISABLE_LOCATION=true cordova platform add android
 ```
 
 In CI, set it once at the job or step level so CocoaPods and Gradle inherit it:
@@ -61,7 +61,17 @@ env:
 
 With the location module disabled, calls to `OneSignal.Location` are ignored and `OneSignal.Location.isShared()` resolves `false`.
 
-The environment variable is read when native dependencies are resolved. If you change it in an existing project, clear the relevant native dependency state and re-resolve in a shell where the variable is exported.
+For Capacitor apps using the Cordova plugin, add the local dependency pod to `ios/App/Podfile` before running `npx cap sync ios`:
+
+```ruby
+target 'App' do
+  pod 'OneSignalCordovaDependencies', :path => '../../node_modules/onesignal-cordova-plugin'
+end
+```
+
+Capacitor's Cordova plugin podspec generator emits a dependency on `OneSignalCordovaDependencies`, but it does not add the local pod source to the generated Podfile.
+
+If you change this setting in an existing project, clear the relevant native dependency state and re-resolve in a shell where the variable is exported.
 
 ```bash
 cd platforms/ios

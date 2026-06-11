@@ -92,8 +92,8 @@ jobs:
 
           # Get versions from target branch (not the release branch)
           CURRENT_VERSION=$(git show origin/${{ inputs.target_branch }}:package.json | jq -r .version)
-          ANDROID_VERSION=$(git show origin/${{ inputs.target_branch }}:plugin.xml | sed -n 's/.*com\.onesignal:OneSignal:\([0-9.]*\).*/\1/p' | head -1)
-          IOS_VERSION=$(git show origin/${{ inputs.target_branch }}:plugin.xml | sed -n 's/.*OneSignalXCFramework.*spec="\([0-9.]*\)".*/\1/p' | head -1)
+          ANDROID_VERSION=$(git show origin/${{ inputs.target_branch }}:build-extras-onesignal.gradle | sed -n "s/.*def oneSignalVersion = '\([0-9.]*\)'.*/\1/p" | head -1)
+          IOS_VERSION=$(git show origin/${{ inputs.target_branch }}:OneSignalCordovaDependencies.podspec | sed -n "s/.*onesignal_xcframework_version = '\([0-9.]*\)'.*/\1/p" | head -1)
 
           echo "cordova_from=$CURRENT_VERSION" >> $GITHUB_OUTPUT
           echo "android_from=$ANDROID_VERSION" >> $GITHUB_OUTPUT
@@ -113,10 +113,10 @@ jobs:
             exit 1
           fi
 
-          # Update plugin.xml with new version
+          # Update Android native SDK version
           # mac os sed syntax
-          sed -i '' 's|<framework src="com\.onesignal:OneSignal:[^"]*" />|<framework src="com.onesignal:OneSignal:'"$VERSION"'" />|' plugin.xml
-          echo "✓ Updated plugin.xml with Android SDK ${VERSION}"
+          sed -i '' "s|def oneSignalVersion = '[^']*'|def oneSignalVersion = '${VERSION}'|" build-extras-onesignal.gradle
+          echo "✓ Updated build-extras-onesignal.gradle with Android SDK ${VERSION}"
 
           # Only commit if there are changes
           git add -A
@@ -137,10 +137,10 @@ jobs:
             exit 1
           fi
 
-          # Update plugin.xml with new version
+          # Update iOS native SDK version
           # mac os sed syntax
-          sed -i '' "s|<pod name=\"OneSignalXCFramework\" spec=\"[^\"]*\" />|<pod name=\"OneSignalXCFramework\" spec=\"${VERSION}\" />|" plugin.xml
-          echo "✓ Updated plugin.xml with iOS SDK ${VERSION}"
+          sed -i '' "s|onesignal_xcframework_version = '[^']*'|onesignal_xcframework_version = '${VERSION}'|" OneSignalCordovaDependencies.podspec
+          echo "✓ Updated OneSignalCordovaDependencies.podspec with iOS SDK ${VERSION}"
 
           # Only commit if there are changes
           git add -A

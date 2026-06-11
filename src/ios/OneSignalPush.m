@@ -95,19 +95,6 @@ void failureCallback(NSString *callbackId, NSDictionary *data) {
   [pluginCommandDelegate sendPluginResult:commandResult callbackId:callbackId];
 }
 
-void logLocationModuleNotAvailable(NSException *exception) {
-  NSString *message =
-      exception.reason
-          ? [NSString
-                stringWithFormat:
-                    @"OneSignal location module is not available. Add the "
-                    @"location dependency to use OneSignal.Location. %@",
-                    exception.reason]
-          : @"OneSignal location module is not available. Add the location "
-            @"dependency to use OneSignal.Location.";
-  [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:message];
-}
-
 void processForegroundLifecycleListener(
     OSNotificationWillDisplayEvent *_notif) {
   NSString *data = [_notif.notification stringify];
@@ -681,28 +668,15 @@ static Class delegateClass = nil;
  */
 
 - (void)requestLocationPermission:(CDVInvokedUrlCommand *)command {
-  @try {
-    [OneSignal.Location requestPermission];
-  } @catch (NSException *exception) {
-    logLocationModuleNotAvailable(exception);
-  }
+  [OneSignal.Location requestPermission];
 }
 
 - (void)setLocationShared:(CDVInvokedUrlCommand *)command {
-  @try {
-    [OneSignal.Location setShared:[command.arguments[0] boolValue]];
-  } @catch (NSException *exception) {
-    logLocationModuleNotAvailable(exception);
-  }
+  [OneSignal.Location setShared:[command.arguments[0] boolValue]];
 }
 
 - (void)isLocationShared:(CDVInvokedUrlCommand *)command {
-  bool isShared = false;
-  @try {
-    isShared = [OneSignal.Location isShared];
-  } @catch (NSException *exception) {
-    logLocationModuleNotAvailable(exception);
-  }
+  bool isShared = [OneSignal.Location isShared];
   successCallbackBoolean(command.callbackId, isShared);
 }
 
