@@ -28,6 +28,7 @@
   "files": [
     "dist",
     "plugin.xml",
+    "OneSignalCordovaDependencies.podspec",
     "src",
     "build-extras-onesignal.gradle"
   ],

@@ -40,6 +40,38 @@ See the [Documentation](https://documentation.onesignal.com/docs) for installati
 
 See OneSignal's [Client SDK Reference](https://documentation.onesignal.com/docs/sdk-reference) page for a list of all available methods.
 
+#### Disabling OneSignal Location
+
+If your app does not use `OneSignal.Location`, you can exclude the native OneSignal location module from iOS and Android builds.
+
+Set `ONESIGNAL_DISABLE_LOCATION=true` in the environment before resolving or building native dependencies. The value is case-insensitive, and `1` is also accepted.
+
+```bash
+ONESIGNAL_DISABLE_LOCATION=true cordova prepare
+ONESIGNAL_DISABLE_LOCATION=true cordova build ios
+ONESIGNAL_DISABLE_LOCATION=true cordova build android
+```
+
+In CI, set it once at the job or step level so CocoaPods and Gradle inherit it:
+
+```yaml
+env:
+  ONESIGNAL_DISABLE_LOCATION: true
+```
+
+With the location module disabled, calls to `OneSignal.Location` are ignored and `OneSignal.Location.isShared()` resolves `false`.
+
+The environment variable is read when native dependencies are resolved. If you change it in an existing project, clear the relevant native dependency state and re-resolve in a shell where the variable is exported.
+
+```bash
+cd platforms/ios
+pod deintegrate
+rm -rf Pods Podfile.lock
+ONESIGNAL_DISABLE_LOCATION=true pod install
+```
+
+When using Xcode or Android Studio, launch the IDE from a terminal that has `ONESIGNAL_DISABLE_LOCATION` exported. An IDE launched from the Dock/Finder does not inherit variables set only in your shell profile.
+
 #### Change Log
 
 See this repository's [release tags](https://github.com/OneSignal/OneSignal-Cordova-SDK/releases) for a complete change log of every released version.
