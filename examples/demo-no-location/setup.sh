@@ -17,16 +17,53 @@ patch_ios_podfile() {
 
   PODFILE="$podfile" python3 <<'PY'
 import os
+import re
 from pathlib import Path
 
 podfile = Path(os.environ["PODFILE"])
 text = podfile.read_text()
 pod_line = "  pod 'OneSignalCordovaDependencies', :path => '../../node_modules/onesignal-cordova-plugin'"
 
-if "OneSignalCordovaDependencies" not in text:
+text = re.sub(r"^.*pod 'OneSignalCordovaDependencies'.*\n", "", text, flags=re.MULTILINE)
+
+if "  pod 'CordovaPluginsStatic'" in text:
+    text = text.replace("  pod 'CordovaPluginsStatic'", f"{pod_line}\n  pod 'CordovaPluginsStatic'", 1)
+elif "  pod 'CordovaPlugins'" in text:
+    text = text.replace("  pod 'CordovaPlugins'", f"{pod_line}\n  pod 'CordovaPlugins'", 1)
+else:
     text = text.replace("target 'App' do\n", f"target 'App' do\n{pod_line}\n", 1)
-    podfile.write_text(text)
+
+podfile.write_text(text)
 PY
+}
+
+run_capacitor_sync() {
+  local platform="${1:-all}"
+  local status=0
+
+  case "$platform" in
+    android)
+      (cd "$DEMO_DIR" && vpx cap sync android)
+      return
+      ;;
+    ios)
+      (cd "$DEMO_DIR" && vpx cap sync ios) || status=$?
+      ;;
+    all)
+      (cd "$DEMO_DIR" && vpx cap sync) || status=$?
+      ;;
+  esac
+
+  if [[ ! -f "$DEMO_DIR/ios/App/Podfile" ]]; then
+    return "$status"
+  fi
+
+  patch_ios_podfile
+  (cd "$DEMO_DIR/ios/App" && pod install)
+
+  if [[ "$status" -ne 0 ]]; then
+    info "Recovered iOS sync after repointing OneSignalCordovaDependencies to the local plugin."
+  fi
 }
 
 patch_ios_apns_capability() {
@@ -151,16 +188,16 @@ fi
 info "Syncing Capacitor with ONESIGNAL_DISABLE_LOCATION=${ONESIGNAL_DISABLE_LOCATION:-}"
 case "$SYNC_PLATFORM" in
   android)
-    (cd "$DEMO_DIR" && vpx cap sync android)
+    run_capacitor_sync android
     ;;
   ios)
     patch_ios_podfile
-    (cd "$DEMO_DIR" && vpx cap sync ios)
+    run_capacitor_sync ios
     patch_ios_apns_capability
     ;;
   all)
     patch_ios_podfile
-    (cd "$DEMO_DIR" && vpx cap sync)
+    run_capacitor_sync all
     patch_ios_apns_capability
     ;;
 esac

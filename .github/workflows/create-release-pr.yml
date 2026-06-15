@@ -161,6 +161,9 @@ jobs:
 
           # Update plugin.xml cordova plugin version (target <plugin> element specifically)
           sed -i '' '/<plugin/,/>/ { s/version="[^"]*"/version="'"$NEW_VERSION"'"/; }' plugin.xml
+          # The shared publish workflow creates this tag after npm publish; installs
+          # started in that short window can retry once the GitHub release exists.
+          sed -i '' '/<pod name="OneSignalCordovaDependencies"/ { s/tag="[^"]*"/tag="'"$NEW_VERSION"'"/; }' plugin.xml
 
           # Update OneSignalPush.java wrapper version
           sed -i '' "s/OneSignalWrapper\.setSdkVersion(\"[^\"]*\")/OneSignalWrapper.setSdkVersion(\"$WRAPPER_VERSION\")/g" src/android/com/onesignal/cordova/OneSignalPush.java

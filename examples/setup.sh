@@ -8,6 +8,64 @@ SYNC_PLATFORM="${1:-all}"
 
 info() { echo -e "\033[0;32m[setup]\033[0m $*"; }
 
+patch_ios_podfile() {
+  local podfile="$ORIGINAL_DIR/ios/App/Podfile"
+
+  if [[ ! -f "$podfile" ]]; then
+    return
+  fi
+
+  PODFILE="$podfile" python3 <<'PY'
+import os
+import re
+from pathlib import Path
+
+podfile = Path(os.environ["PODFILE"])
+text = podfile.read_text()
+pod_line = "  pod 'OneSignalCordovaDependencies', :path => '../../node_modules/onesignal-cordova-plugin'"
+
+text = re.sub(r"^.*pod 'OneSignalCordovaDependencies'.*\n", "", text, flags=re.MULTILINE)
+
+if "  pod 'CordovaPluginsStatic'" in text:
+    text = text.replace("  pod 'CordovaPluginsStatic'", f"{pod_line}\n  pod 'CordovaPluginsStatic'", 1)
+elif "  pod 'CordovaPlugins'" in text:
+    text = text.replace("  pod 'CordovaPlugins'", f"{pod_line}\n  pod 'CordovaPlugins'", 1)
+else:
+    text = text.replace("target 'App' do\n", f"target 'App' do\n{pod_line}\n", 1)
+
+podfile.write_text(text)
+PY
+}
+
+run_capacitor_sync() {
+  local platform="${1:-all}"
+  local status=0
+
+  case "$platform" in
+    android)
+      vpx cap sync android
+      return
+      ;;
+    ios)
+      vpx cap sync ios || status=$?
+      ;;
+    all)
+      vpx cap sync || status=$?
+      ;;
+  esac
+
+  if [[ ! -f "$ORIGINAL_DIR/ios/App/Podfile" ]]; then
+    return "$status"
+  fi
+
+  patch_ios_podfile
+  (cd "$ORIGINAL_DIR/ios/App" && pod install)
+
+  if [[ "$status" -ne 0 ]]; then
+    info "Recovered iOS sync after repointing OneSignalCordovaDependencies to the local plugin."
+  fi
+}
+
 case "$SYNC_PLATFORM" in
   all|android|ios) ;;
   *)
@@ -23,6 +81,7 @@ INSTALLED_DIR="$ORIGINAL_DIR/node_modules/onesignal-cordova-plugin"
 
 SDK_SRC_HASH=$(find "$SDK_ROOT/src" "$SDK_ROOT/www" \
                     "$SDK_ROOT/package.json" "$SDK_ROOT/plugin.xml" \
+                    "$SDK_ROOT/OneSignalCordovaDependencies.podspec" \
                     "$SDK_ROOT/build-extras-onesignal.gradle" \
                -type f 2>/dev/null \
                | sort \
@@ -114,11 +173,11 @@ if sync_outputs_exist && [[ -f "$SYNC_STAMP" ]] && [[ "$(cat "$SYNC_STAMP")" == 
   info "Capacitor sync inputs unchanged, skipping cap sync"
 elif [[ "$SYNC_PLATFORM" == "android" ]]; then
   info "Syncing Capacitor Android..."
-  vpx cap sync android
+  run_capacitor_sync android
   echo "$SYNC_HASH" > "$SYNC_STAMP"
 elif [[ "$SYNC_PLATFORM" == "ios" ]]; then
   info "Syncing Capacitor iOS..."
-  vpx cap sync ios
+  run_capacitor_sync ios
   echo "$SYNC_HASH" > "$SYNC_STAMP"
 elif ! command -v pod >/dev/null 2>&1; then
   # CI Android jobs run on Linux where CocoaPods isn't installed.
@@ -128,6 +187,6 @@ elif ! command -v pod >/dev/null 2>&1; then
   echo "$SYNC_HASH" > "$SYNC_STAMP"
 else
   info "Syncing Capacitor..."
-  vpx cap sync
+  run_capacitor_sync all
   echo "$SYNC_HASH" > "$SYNC_STAMP"
 fi
