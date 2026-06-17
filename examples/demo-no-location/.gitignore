@@ -2,6 +2,5 @@ node_modules/
 dist/
 bun.lock
 .env
-.cap-sync-*.stamp
 android/
 ios/
