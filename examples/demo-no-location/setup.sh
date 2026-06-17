@@ -168,21 +168,23 @@ if [[ "$SYNC_PLATFORM" == "all" || "$SYNC_PLATFORM" == "ios" ]]; then
       exit 1
     fi
     SYNC_PLATFORM="android"
-  elif [[ -d "$DEMO_DIR/ios" && ! -f "$DEMO_DIR/ios/App/Podfile" ]]; then
-    info "Recreating iOS platform with CocoaPods..."
-    rm -rf "$DEMO_DIR/ios"
-  fi
-
-  if [[ ! -d "$DEMO_DIR/ios" ]]; then
-    info "Adding iOS platform..."
-    if ! (cd "$DEMO_DIR" && vpx cap add ios --packagemanager CocoaPods); then
-      if [[ ! -f "$DEMO_DIR/ios/App/Podfile" ]]; then
-        exit 1
-      fi
-      info "Patching generated Podfile before rerunning CocoaPods..."
+  else
+    if [[ -d "$DEMO_DIR/ios" && ! -f "$DEMO_DIR/ios/App/Podfile" ]]; then
+      info "Recreating iOS platform with CocoaPods..."
+      rm -rf "$DEMO_DIR/ios"
     fi
+
+    if [[ ! -d "$DEMO_DIR/ios" ]]; then
+      info "Adding iOS platform..."
+      if ! (cd "$DEMO_DIR" && vpx cap add ios --packagemanager CocoaPods); then
+        if [[ ! -f "$DEMO_DIR/ios/App/Podfile" ]]; then
+          exit 1
+        fi
+        info "Patching generated Podfile before rerunning CocoaPods..."
+      fi
+    fi
+    patch_ios_podfile
   fi
-  patch_ios_podfile
 fi
 
 info "Syncing Capacitor with ONESIGNAL_DISABLE_LOCATION=${ONESIGNAL_DISABLE_LOCATION:-}"
