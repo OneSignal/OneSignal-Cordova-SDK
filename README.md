@@ -70,8 +70,19 @@ With the location module disabled, calls to `OneSignal.Location` are ignored and
 
 If you change this setting in an existing project, clear the relevant native dependency state and re-resolve in a shell where the variable is exported.
 
+For Cordova:
+
 ```bash
 cd platforms/ios
+pod deintegrate
+rm -rf Pods Podfile.lock
+ONESIGNAL_DISABLE_LOCATION=true pod install
+```
+
+For Capacitor:
+
+```bash
+cd ios/App
 pod deintegrate
 rm -rf Pods Podfile.lock
 ONESIGNAL_DISABLE_LOCATION=true pod install
