@@ -26,7 +26,6 @@
   </engines>
 
   <platform name="android">
-    <framework src="com.onesignal:OneSignal:5.9.4" />
     <framework src="build-extras-onesignal.gradle" custom="true" type="gradleReference" />
 
     <config-file target="res/xml/config.xml" parent="/*">
@@ -73,7 +72,7 @@
             <source url="https://cdn.cocoapods.org/"/>
         </config>
         <pods use-frameworks="true">
-            <pod name="OneSignalXCFramework" spec="5.5.3" />
+            <pod name="OneSignalCordovaDependencies" git="https://github.com/OneSignal/OneSignal-Cordova-SDK.git" tag="5.4.0" />
         </pods>
     </podspec>
 

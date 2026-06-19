@@ -12,10 +12,12 @@ PODS:
     - Capacitor
   - CordovaPluginsStatic (8.3.1):
     - CapacitorCordova
-    - OneSignalXCFramework (= 5.5.3)
-  - OneSignalXCFramework (5.5.3):
-    - OneSignalXCFramework/OneSignalComplete (= 5.5.3)
-  - OneSignalXCFramework/OneSignal (5.5.3):
+    - OneSignalCordovaDependencies
+  - OneSignalCordovaDependencies (5.3.11):
+    - OneSignalXCFramework (= 5.5.2)
+  - OneSignalXCFramework (5.5.2):
+    - OneSignalXCFramework/OneSignalComplete (= 5.5.2)
+  - OneSignalXCFramework/OneSignal (5.5.2):
     - OneSignalXCFramework/OneSignalCore
     - OneSignalXCFramework/OneSignalExtension
     - OneSignalXCFramework/OneSignalLiveActivities
@@ -71,6 +73,7 @@ DEPENDENCIES:
   - "CapacitorKeyboard (from `../../node_modules/@capacitor/keyboard`)"
   - "CapacitorStatusBar (from `../../node_modules/@capacitor/status-bar`)"
   - CordovaPluginsStatic (from `../capacitor-cordova-ios-plugins`)
+  - OneSignalCordovaDependencies (from `../../node_modules/onesignal-cordova-plugin`)
   - OneSignalXCFramework (< 6.0, >= 5.0.0)
 
 SPEC REPOS:
@@ -92,17 +95,20 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/status-bar"
   CordovaPluginsStatic:
     :path: "../capacitor-cordova-ios-plugins"
+  OneSignalCordovaDependencies:
+    :path: "../../node_modules/onesignal-cordova-plugin"
 
 SPEC CHECKSUMS:
   Capacitor: 66895d1f43f02264d13e9eb1ea3fbc9c3e02224b
   CapacitorApp: a4d8d936cc4390859a3766f141048abe55d4076f
   CapacitorCordova: 9010447fe25e869705fcf525e5f490facde87608
-  CapacitorHaptics: 4e1e84c2b74fb5918e403fb8f0e73a07d05937df
-  CapacitorKeyboard: ad22f33de28070c8e16ecb119084af06915724e2
-  CapacitorStatusBar: b692a4cf12b3fe3a7b7ece86da62106065d78fdc
-  CordovaPluginsStatic: 5b969dce0111ea4c9dfb6f77c8cddb376e47b509
-  OneSignalXCFramework: f4505256255ae5fccfd33ba2eb1871ba2d4ce2bb
+  CapacitorHaptics: 296f771ecd89c7a1bd92a7b6826a7d268e2e70f5
+  CapacitorKeyboard: 31c8285d92c9d1410071d52449f16d2c6673b6f4
+  CapacitorStatusBar: 01d5763b4ed720de5ce2edbc938de6a98f4c8f32
+  CordovaPluginsStatic: 4f45b329e013a402b361c251628627e6774346b4
+  OneSignalCordovaDependencies: 39921fded1ab05f190a3c8031a803e356612d48e
+  OneSignalXCFramework: 2f46ff87ccefd9afe8e3b5f9fe357072191205ff
 
-PODFILE CHECKSUM: 892242555b0dc410fc880efd419fbc59f99aa3c7
+PODFILE CHECKSUM: 82a91c3e1495dadbc5694e747bd1fb2cdb79ddab
 
 COCOAPODS: 1.16.2

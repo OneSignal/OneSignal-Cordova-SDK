@@ -15,6 +15,7 @@ def capacitor_pods
   pod 'CapacitorHaptics', :path => '../../node_modules/@capacitor/haptics'
   pod 'CapacitorKeyboard', :path => '../../node_modules/@capacitor/keyboard'
   pod 'CapacitorStatusBar', :path => '../../node_modules/@capacitor/status-bar'
+  pod 'OneSignalCordovaDependencies', :path => '../../node_modules/onesignal-cordova-plugin'
   pod 'CordovaPluginsStatic', :path => '../capacitor-cordova-ios-plugins'
 end
 

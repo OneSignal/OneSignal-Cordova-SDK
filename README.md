@@ -40,6 +40,56 @@ See the [Documentation](https://documentation.onesignal.com/docs) for installati
 
 See OneSignal's [Client SDK Reference](https://documentation.onesignal.com/docs/sdk-reference) page for a list of all available methods.
 
+#### Disabling OneSignal Location
+
+If your app does not use `OneSignal.Location`, you can exclude the native OneSignal location module from iOS and Android builds.
+
+Set `ONESIGNAL_DISABLE_LOCATION=true` in the environment before installing the plugin or syncing native platforms, because this flag is read when native dependencies are resolved. The value is case-insensitive, and `1` is also accepted.
+
+```bash
+ONESIGNAL_DISABLE_LOCATION=true cordova plugin add onesignal-cordova-plugin
+ONESIGNAL_DISABLE_LOCATION=true cordova platform add ios
+ONESIGNAL_DISABLE_LOCATION=true cordova platform add android
+```
+
+Capacitor apps using this Cordova plugin do not need to edit `ios/App/Podfile`; run Capacitor sync in an environment where the flag is set:
+
+```bash
+ONESIGNAL_DISABLE_LOCATION=true npx cap sync ios
+ONESIGNAL_DISABLE_LOCATION=true npx cap sync android
+```
+
+In CI, set the flag once at the job or step level so CocoaPods and Gradle inherit it:
+
+```yaml
+env:
+  ONESIGNAL_DISABLE_LOCATION: true
+```
+
+With the location module disabled, calls to `OneSignal.Location` are ignored and `OneSignal.Location.isShared()` resolves `false`.
+
+If you change this setting in an existing project, clear the relevant native dependency state and re-resolve in a shell where the variable is exported.
+
+For Cordova:
+
+```bash
+cd platforms/ios
+pod deintegrate
+rm -rf Pods Podfile.lock
+ONESIGNAL_DISABLE_LOCATION=true pod install
+```
+
+For Capacitor:
+
+```bash
+cd ios/App
+pod deintegrate
+rm -rf Pods Podfile.lock
+ONESIGNAL_DISABLE_LOCATION=true pod install
+```
+
+When using Xcode or Android Studio, launch the IDE from a terminal that has `ONESIGNAL_DISABLE_LOCATION` exported. An IDE launched from the Dock/Finder does not inherit variables set only in your shell profile.
+
 #### Change Log
 
 See this repository's [release tags](https://github.com/OneSignal/OneSignal-Cordova-SDK/releases) for a complete change log of every released version.

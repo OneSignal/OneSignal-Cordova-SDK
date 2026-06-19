@@ -44,6 +44,20 @@ bun run ios:sync
 
 Local plugin setup: reference local plugin tarball through `examples/setup.sh` workflow.
 
+### No-Location Demo
+
+`examples/demo-no-location/` is a smaller Capacitor-hosted app that verifies the Cordova plugin can be built with `ONESIGNAL_DISABLE_LOCATION=true`.
+
+Use it when testing the native dependency split:
+
+```bash
+cd examples/demo-no-location
+vp run ios
+vp run android
+```
+
+The demo setup script packs the local Cordova plugin, installs the app dependencies, creates native platforms if needed, and runs Capacitor sync with `ONESIGNAL_DISABLE_LOCATION=true` in the environment. Its normal app flow initializes OneSignal and requests push permission without calling `OneSignal.Location`; the explicit location test button confirms those calls resolve safely when the native location module is absent.
+
 ### vite-plus / vp toolchain
 
 The demo's `package.json` scripts use `vp` (not plain `bun` or `vite`). `vite.config.ts` imports from `vite-plus` rather than `vite`:

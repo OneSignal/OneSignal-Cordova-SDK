@@ -3,6 +3,25 @@ import java.nio.file.Files
 // Required for Android Support Library 26.0.0+ and Google Play services 11.+
 repositories {
   maven { url 'https://maven.google.com' }
+  mavenCentral()
+}
+
+def isOneSignalEnvFlagEnabled(String envName) {
+  def value = System.getenv(envName)?.trim()
+  return value?.equalsIgnoreCase('true') || value == '1'
+}
+
+def oneSignalVersion = '5.9.4'
+def oneSignalDisableLocation = isOneSignalEnvFlagEnabled('ONESIGNAL_DISABLE_LOCATION')
+
+dependencies {
+   if (oneSignalDisableLocation) {
+      implementation "com.onesignal:core:$oneSignalVersion"
+      implementation "com.onesignal:notifications:$oneSignalVersion"
+      implementation "com.onesignal:in-app-messages:$oneSignalVersion"
+   } else {
+      implementation "com.onesignal:OneSignal:$oneSignalVersion"
+   }
 }
 
 gradle.afterProject { project ->

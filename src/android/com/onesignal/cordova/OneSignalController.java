@@ -3,6 +3,7 @@ package com.onesignal.cordova;
 import com.onesignal.Continue;
 import com.onesignal.OneSignal;
 import com.onesignal.debug.LogLevel;
+import com.onesignal.debug.internal.logging.Logging;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,6 +15,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class OneSignalController {
+    private static final String LOCATION_MODULE_NOT_AVAILABLE =
+            "OneSignal location module is not available. Add the location dependency to use OneSignal.Location.";
+
+    private static void logLocationModuleNotAvailable(Throwable throwable) {
+        Logging.error(LOCATION_MODULE_NOT_AVAILABLE, throwable);
+    }
 
     /**
      * Misc
@@ -295,7 +302,11 @@ public class OneSignalController {
      * Location
      */
     public static boolean requestLocationPermission() {
-        OneSignal.getLocation().requestPermission(Continue.none());
+        try {
+            OneSignal.getLocation().requestPermission(Continue.none());
+        } catch (Throwable t) {
+            logLocationModuleNotAvailable(t);
+        }
         return true;
     }
 
@@ -304,11 +315,18 @@ public class OneSignalController {
             OneSignal.getLocation().setShared(data.getBoolean(0));
         } catch (JSONException e) {
             e.printStackTrace();
+        } catch (Throwable t) {
+            logLocationModuleNotAvailable(t);
         }
     }
 
     public static boolean isLocationShared(CallbackContext callbackContext) {
-        boolean isShared = OneSignal.getLocation().isShared();
+        boolean isShared = false;
+        try {
+            isShared = OneSignal.getLocation().isShared();
+        } catch (Throwable t) {
+            logLocationModuleNotAvailable(t);
+        }
         CallbackHelper.callbackSuccessBoolean(callbackContext, isShared);
         return true;
     }
