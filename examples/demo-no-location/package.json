@@ -5,13 +5,16 @@
   "type": "module",
   "scripts": {
     "setup": "bash ./setup.sh",
+    "setup:local": "bash ./setup.sh --local-pod",
     "setup:android": "bash ./setup.sh android",
     "setup:ios": "bash ./setup.sh ios",
+    "setup:ios:local": "bash ./setup.sh ios --local-pod",
     "preandroid": "vp run setup:android",
     "preios": "vp run setup:ios",
     "build": "tsc && vp build",
     "android": "ONESIGNAL_DISABLE_LOCATION=true vpx cap run android --no-sync",
     "ios": "ONESIGNAL_DISABLE_LOCATION=true vpx cap run ios --no-sync",
+    "ios:local": "vp run setup:ios:local && ONESIGNAL_DISABLE_LOCATION=true vpx cap run ios --no-sync",
     "android:sync": "ONESIGNAL_DISABLE_LOCATION=true vpx cap sync android",
     "ios:sync": "ONESIGNAL_DISABLE_LOCATION=true vpx cap sync ios"
   },
