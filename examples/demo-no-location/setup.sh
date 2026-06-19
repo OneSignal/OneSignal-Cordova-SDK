@@ -59,7 +59,10 @@ run_capacitor_sync() {
   fi
 
   patch_ios_podfile
-  (cd "$DEMO_DIR/ios/App" && pod install)
+  if ! (cd "$DEMO_DIR/ios/App" && pod install); then
+    info "Refreshing OneSignalXCFramework after local dependency changes..."
+    (cd "$DEMO_DIR/ios/App" && pod update OneSignalXCFramework)
+  fi
 
   if [[ "$status" -ne 0 ]]; then
     info "Recovered iOS sync after repointing OneSignalCordovaDependencies to the local plugin."
