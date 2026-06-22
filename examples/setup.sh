@@ -19,14 +19,37 @@ usage() {
   echo "Usage: $0 [all|android|ios] [--local-pod] [--spm|--pods]" >&2
 }
 
+prepare_installed_plugin_for_spm_sync() {
+  local plugin_xml="$ORIGINAL_DIR/node_modules/onesignal-cordova-plugin/plugin.xml"
+
+  if [[ "$IOS_PACKAGE_MANAGER" != "spm" || ! -f "$plugin_xml" ]]; then
+    return 0
+  fi
+
+  PLUGIN_XML="$plugin_xml" python3 <<'PY'
+import os
+from pathlib import Path
+
+plugin_xml = Path(os.environ["PLUGIN_XML"])
+text = plugin_xml.read_text()
+text = text.replace('<pods use-frameworks="true">', '<pods>')
+plugin_xml.write_text(text)
+PY
+}
+
 patch_ios_spm_cordova_plugin_package() {
   local cordova_plugins_dir="$ORIGINAL_DIR/ios/capacitor-cordova-ios-plugins"
+  local source_dir="$cordova_plugins_dir/sources/OnesignalCordovaPlugin"
   local static_dir="$cordova_plugins_dir/sourcesstatic/OnesignalCordovaPlugin"
   local package_dir="$cordova_plugins_dir/sources/OnesignalCordovaPlugin"
   local package_file="$package_dir/Package.swift"
   local ios_sdk_version
 
-  if [[ ! -d "$static_dir" || ! -d "$ORIGINAL_DIR/ios/App/CapApp-SPM" ]]; then
+  if [[ ! -d "$source_dir" && ! -d "$static_dir" ]]; then
+    return 0
+  fi
+
+  if [[ ! -d "$ORIGINAL_DIR/ios/App/CapApp-SPM" ]]; then
     return 0
   fi
 
@@ -36,9 +59,10 @@ patch_ios_spm_cordova_plugin_package() {
     return 1
   fi
 
-  rm -rf "$package_dir"
-  mkdir -p "$package_dir"
-  cp -R "$static_dir/." "$package_dir/"
+  if [[ ! -d "$package_dir" ]]; then
+    mkdir -p "$package_dir"
+    cp -R "$static_dir/." "$package_dir/"
+  fi
 
   cat > "$package_file" <<SWIFT
 // swift-tools-version: 5.9
@@ -200,6 +224,7 @@ run_capacitor_sync() {
       return
       ;;
     ios)
+      prepare_installed_plugin_for_spm_sync
       vpx cap sync ios || status=$?
       if [[ "$IOS_PACKAGE_MANAGER" == "pods" ]]; then
         if finish_pods_sync "$status"; then
@@ -212,6 +237,7 @@ run_capacitor_sync() {
       fi
       ;;
     all)
+      prepare_installed_plugin_for_spm_sync
       vpx cap sync || status=$?
       if [[ "$IOS_PACKAGE_MANAGER" == "pods" ]]; then
         if finish_pods_sync "$status"; then

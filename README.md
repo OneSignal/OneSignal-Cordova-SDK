@@ -46,6 +46,66 @@ Cordova iOS apps using `cordova-ios` 8 or newer can resolve this plugin with Swi
 
 Capacitor apps using Swift Package Manager must use plugins that support SPM. The demo app in `examples/demo` validates that path.
 
+#### Manual iOS Dependency Tests
+
+Use these checks from a clean checkout when changing iOS dependency resolution.
+
+Swift Package Manager:
+
+```bash
+vp install
+vp run build
+
+TMP_DIR=$(mktemp -d)
+vpx cordova create "$TMP_DIR/spm-app" com.onesignal.spmtest SPMTest
+cd "$TMP_DIR/spm-app"
+vpx cordova platform add ios@8
+vpx cordova plugin add /path/to/OneSignal-Cordova-SDK
+vpx cordova prepare ios
+
+# The OneSignal pod should be skipped when SPM is active.
+! grep -R "OneSignalCordovaDependencies" platforms/ios/Podfile
+
+APP_NAME=$(basename platforms/ios/*.xcodeproj .xcodeproj)
+xcodebuild -resolvePackageDependencies -project "platforms/ios/${APP_NAME}.xcodeproj"
+xcodebuild -workspace "platforms/ios/${APP_NAME}.xcworkspace" \
+  -scheme "$APP_NAME" \
+  -configuration Debug \
+  -sdk iphonesimulator \
+  -destination 'generic/platform=iOS Simulator' \
+  -derivedDataPath build \
+  -quiet build \
+  CODE_SIGNING_ALLOWED=NO \
+  COMPILER_INDEX_STORE_ENABLE=NO
+```
+
+Replace `/path/to/OneSignal-Cordova-SDK` with the path to this repository. A passing test resolves `OneSignal-XCFramework` through SPM and builds without adding `OneSignalCordovaDependencies` to the Podfile.
+
+CocoaPods:
+
+```bash
+vp install
+vp run build
+
+cd examples/demo-pods
+rm -rf node_modules dist ios/App/App/public ios/capacitor-cordova-ios-plugins ios/App/Pods ios/App/build .cap-sync-*.stamp
+vp install
+vp run setup:ios
+
+grep "OneSignalCordovaDependencies" ios/App/Podfile
+xcodebuild -workspace ios/App/App.xcworkspace \
+  -scheme App \
+  -configuration Debug \
+  -sdk iphonesimulator \
+  -destination 'generic/platform=iOS Simulator' \
+  -derivedDataPath ios/App/build \
+  -quiet build \
+  CODE_SIGNING_ALLOWED=NO \
+  COMPILER_INDEX_STORE_ENABLE=NO
+```
+
+Use `vp run setup:ios:local` in `examples/demo-pods` when manually validating local podspec changes before release.
+
 #### Disabling OneSignal Location
 
 If your app does not use `OneSignal.Location`, you can exclude the native OneSignal location module from Android builds and iOS CocoaPods builds.
