@@ -93,8 +93,7 @@ Package scripts:
     "ios": "ionic cap run ios -l --external",
     "android:sync": "ionic cap sync android",
     "ios:sync": "ionic cap sync ios",
-    "ios:resolve": "xcodebuild -resolvePackageDependencies -project ios/App/App.xcodeproj",
-    "update:spm": "vp run ios:resolve"
+    "ios:resolve": "xcodebuild -resolvePackageDependencies -project ios/App/App.xcodeproj"
   }
 }
 ```

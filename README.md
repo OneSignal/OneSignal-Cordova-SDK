@@ -88,8 +88,8 @@ vp install
 vp run build
 
 cd examples/demo-pods
-rm -rf node_modules dist ios/App/App/public ios/capacitor-cordova-ios-plugins ios/App/Pods ios/App/build .cap-sync-*.stamp
 vp install
+vp run clean:ios
 vp run setup:ios
 
 grep "OneSignalCordovaDependencies" ios/App/Podfile
