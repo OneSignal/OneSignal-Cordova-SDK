@@ -115,6 +115,7 @@ run_capacitor_sync() {
 
   if [[ "$USE_LOCAL_POD" == true ]]; then
     patch_ios_podfile_local
+    info "Using OneSignalCordovaDependencies from the local plugin path."
     install_or_update_pods
 
     if [[ "$status" -ne 0 ]]; then
@@ -123,13 +124,20 @@ run_capacitor_sync() {
     return
   fi
 
-  if [[ "$status" -ne 0 ]]; then
-    if ! patch_ios_podfile_git_branch; then
-      return "$status"
-    fi
+  if patch_ios_podfile_git_branch; then
     install_or_update_pods
-    info "Recovered iOS sync after repointing OneSignalCordovaDependencies to the release branch."
+
+    if [[ "$status" -ne 0 ]]; then
+      info "Recovered iOS sync after repointing OneSignalCordovaDependencies to the release branch."
+    fi
+    return
   fi
+
+  if [[ "$status" -ne 0 ]]; then
+    return "$status"
+  fi
+
+  info "Using OneSignalCordovaDependencies from the generated git tag."
 }
 
 patch_ios_apns_capability() {

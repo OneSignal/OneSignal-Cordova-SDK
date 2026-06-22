@@ -58,6 +58,8 @@ vp run android
 
 The demo setup script packs the local Cordova plugin, installs the app dependencies, creates native platforms if needed, and runs Capacitor sync with `ONESIGNAL_DISABLE_LOCATION=true` in the environment. Its normal app flow initializes OneSignal and requests push permission without calling `OneSignal.Location`; the explicit location test button confirms those calls resolve safely when the native location module is absent.
 
+By default, iOS setup validates the generated `OneSignalCordovaDependencies` git source. On `rel/*` branches, the generated Podfile is repointed from the release tag to the matching remote release branch so pre-release validation tests branch HEAD. Use `vp run ios:local` from a demo directory to patch the generated Podfile to the locally packed plugin path while iterating on the podspec.
+
 ### vite-plus / vp toolchain
 
 The demo's `package.json` scripts use `vp` (not plain `bun` or `vite`). `vite.config.ts` imports from `vite-plus` rather than `vite`:

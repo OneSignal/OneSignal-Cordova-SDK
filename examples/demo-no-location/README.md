@@ -11,6 +11,16 @@ vp run ios
 vp run android
 ```
 
+`vp run ios` validates the same CocoaPods source path that consumers use. The generated Podfile resolves `OneSignalCordovaDependencies` from this repository by git tag; when the Cordova SDK checkout is on a `rel/*` branch, setup repoints that generated pod line to the matching remote git branch so pre-release validation exercises branch HEAD before the release tag exists.
+
+For local podspec iteration, use:
+
+```sh
+vp run ios:local
+```
+
+`ios:local` patches the generated Podfile to use the locally packed plugin path instead of the remote git source.
+
 ## Setup
 
 Copy `.env.example` to `.env` and set your OneSignal app ID:
@@ -43,7 +53,7 @@ vpx cap add ios --packagemanager CocoaPods
 
 If an existing generated `ios/` folder is using SPM, the setup script recreates it with CocoaPods.
 
-The setup script also adds the local `OneSignalCordovaDependencies` pod to the generated `ios/App/Podfile` before rerunning CocoaPods.
+By default, setup leaves `OneSignalCordovaDependencies` on the generated git source. Use `vp run ios:local` when you need the helper podspec to come from the local checkout.
 
 The generated iOS app is patched with the Push Notifications entitlement (`aps-environment`) after sync.
 
