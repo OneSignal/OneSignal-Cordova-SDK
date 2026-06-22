@@ -8,9 +8,8 @@ inputs:
   onesignal-api-key:
     description: 'OneSignal API Key for the demo .env'
     required: true
-  install-pods:
-    description: 'Whether to run cap sync + pod update for iOS (handled inside
-      examples/setup.sh)'
+  resolve-ios-packages:
+    description: 'Whether to resolve Swift Package Manager dependencies for iOS'
     required: false
     default: 'false'
 runs:
@@ -29,14 +28,17 @@ runs:
         key: vp-demo-${{ runner.os }}-${{ hashFiles('examples/demo/bun.lock') }}
         restore-keys: vp-demo-${{ runner.os }}-
 
-    - name: Cache CocoaPods
-      if: inputs.install-pods == 'true'
+    - name: Cache Swift packages
+      if: inputs.resolve-ios-packages == 'true'
       uses: actions/cache@v5
       with:
-        path: examples/demo/ios/App/Pods
-        key: pods-${{ runner.os }}-${{ hashFiles('examples/demo/ios/App/Podfile.lock')
+        path: |
+          ~/Library/Caches/org.swift.swiftpm
+          ~/Library/Developer/Xcode/DerivedData/SourcePackages
+        key:
+          spm-${{ runner.os }}-${{ hashFiles('examples/demo/ios/App/App.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved')
           }}
-        restore-keys: pods-${{ runner.os }}-
+        restore-keys: spm-${{ runner.os }}-
 
     - name: Create demo .env
       shell: bash
@@ -50,3 +52,9 @@ runs:
       shell: bash
       working-directory: examples/demo
       run: vp run setup
+
+    - name: Resolve iOS Swift packages
+      if: inputs.resolve-ios-packages == 'true'
+      shell: bash
+      working-directory: examples/demo
+      run: vp run ios:resolve

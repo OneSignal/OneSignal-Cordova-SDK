@@ -5,91 +5,69 @@ set -euo pipefail
 ORIGINAL_DIR=$(pwd)
 SDK_ROOT=$(cd "$ORIGINAL_DIR/../.." && pwd)
 SYNC_PLATFORM="all"
-USE_LOCAL_POD=false
 
 info() { echo -e "\033[0;32m[setup]\033[0m $*"; }
 
 usage() {
-  echo "Usage: $0 [all|android|ios] [--local-pod]" >&2
+  echo "Usage: $0 [all|android|ios]" >&2
 }
 
-patch_ios_podfile_local() {
-  local podfile="$ORIGINAL_DIR/ios/App/Podfile"
+patch_ios_spm_cordova_plugin_package() {
+  local cordova_plugins_dir="$ORIGINAL_DIR/ios/capacitor-cordova-ios-plugins"
+  local static_dir="$cordova_plugins_dir/sourcesstatic/OnesignalCordovaPlugin"
+  local package_dir="$cordova_plugins_dir/sources/OnesignalCordovaPlugin"
+  local package_file="$package_dir/Package.swift"
+  local ios_sdk_version
 
-  if [[ ! -f "$podfile" ]]; then
+  if [[ ! -d "$static_dir" || ! -d "$ORIGINAL_DIR/ios/App/CapApp-SPM" ]]; then
+    return 0
+  fi
+
+  ios_sdk_version=$(sed -n 's|.*OneSignal-XCFramework.git", exact: "\([^"]*\)".*|\1|p' "$SDK_ROOT/Package.swift" | head -n1)
+  if [[ -z "$ios_sdk_version" ]]; then
+    echo "Unable to resolve OneSignal iOS SDK version from Package.swift" >&2
     return 1
   fi
 
-  PODFILE="$podfile" python3 <<'PY'
-import os
-import re
-from pathlib import Path
+  rm -rf "$package_dir"
+  mkdir -p "$package_dir"
+  cp -R "$static_dir/." "$package_dir/"
 
-podfile = Path(os.environ["PODFILE"])
-text = podfile.read_text()
-pod_line = "  pod 'OneSignalCordovaDependencies', :path => '../../node_modules/onesignal-cordova-plugin'"
+  cat > "$package_file" <<SWIFT
+// swift-tools-version: 5.9
 
-text = re.sub(r"^.*pod 'OneSignalCordovaDependencies'.*\n", "", text, flags=re.MULTILINE)
+import PackageDescription
 
-if "  pod 'CordovaPluginsStatic'" in text:
-    text = text.replace("  pod 'CordovaPluginsStatic'", f"{pod_line}\n  pod 'CordovaPluginsStatic'", 1)
-elif "  pod 'CordovaPlugins'" in text:
-    text = text.replace("  pod 'CordovaPlugins'", f"{pod_line}\n  pod 'CordovaPlugins'", 1)
-else:
-    text = text.replace("target 'App' do\n", f"target 'App' do\n{pod_line}\n", 1)
-
-podfile.write_text(text)
-PY
-}
-
-patch_ios_podfile_git_branch() {
-  local podfile="$ORIGINAL_DIR/ios/App/Podfile"
-  local branch
-
-  if [[ ! -f "$podfile" ]]; then
-    return 1
-  fi
-
-  branch=$(git -C "$SDK_ROOT" rev-parse --abbrev-ref HEAD 2>/dev/null || true)
-  if [[ "$branch" != rel/* ]]; then
-    return 1
-  fi
-
-  info "Repointing OneSignalCordovaDependencies pod to git branch ${branch}..."
-  PODFILE="$podfile" BRANCH="$branch" python3 <<'PY'
-import os
-import re
-from pathlib import Path
-
-podfile = Path(os.environ["PODFILE"])
-branch = os.environ["BRANCH"]
-text = podfile.read_text()
-pod_line = (
-    "  pod 'OneSignalCordovaDependencies', "
-    ":git => 'https://github.com/OneSignal/OneSignal-Cordova-SDK.git', "
-    f":branch => '{branch}'"
+let package = Package(
+    name: "OnesignalCordovaPlugin",
+    platforms: [.iOS(.v15)],
+    products: [
+        .library(
+            name: "OnesignalCordovaPlugin",
+            targets: ["OnesignalCordovaPlugin"]
+        )
+    ],
+    dependencies: [
+        .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", from: "8.3.1"),
+        .package(url: "https://github.com/OneSignal/OneSignal-XCFramework.git", exact: "$ios_sdk_version")
+    ],
+    targets: [
+        .target(
+            name: "OnesignalCordovaPlugin",
+            dependencies: [
+                .product(name: "Cordova", package: "capacitor-swift-pm"),
+                .product(name: "OneSignalFramework", package: "OneSignal-XCFramework"),
+                .product(name: "OneSignalInAppMessages", package: "OneSignal-XCFramework"),
+                .product(name: "OneSignalLocation", package: "OneSignal-XCFramework")
+            ],
+            path: ".",
+            publicHeadersPath: "."
+        )
+    ]
 )
+SWIFT
 
-text, count = re.subn(
-    r"^.*pod 'OneSignalCordovaDependencies'.*\n",
-    f"{pod_line}\n",
-    text,
-    flags=re.MULTILINE,
-)
-if count == 0:
-    raise SystemExit("Unable to find OneSignalCordovaDependencies pod in Podfile")
-
-podfile.write_text(text)
-PY
-}
-
-install_or_update_pods() {
-  local app_dir="$ORIGINAL_DIR/ios/App"
-
-  if ! (cd "$app_dir" && pod install); then
-    info "Refreshing OneSignalXCFramework after local dependency changes..."
-    (cd "$app_dir" && pod update OneSignalXCFramework)
-  fi
+  info "Prepared generated Cordova plugin SPM package."
 }
 
 run_capacitor_sync() {
@@ -103,41 +81,14 @@ run_capacitor_sync() {
       ;;
     ios)
       vpx cap sync ios || status=$?
+      patch_ios_spm_cordova_plugin_package
       ;;
     all)
       vpx cap sync || status=$?
+      patch_ios_spm_cordova_plugin_package
       ;;
   esac
-
-  if [[ ! -f "$ORIGINAL_DIR/ios/App/Podfile" ]]; then
-    return "$status"
-  fi
-
-  if [[ "$USE_LOCAL_POD" == true ]]; then
-    patch_ios_podfile_local
-    info "Using OneSignalCordovaDependencies from the local plugin path."
-    install_or_update_pods
-
-    if [[ "$status" -ne 0 ]]; then
-      info "Recovered iOS sync after repointing OneSignalCordovaDependencies to the local plugin."
-    fi
-    return
-  fi
-
-  if patch_ios_podfile_git_branch; then
-    install_or_update_pods
-
-    if [[ "$status" -ne 0 ]]; then
-      info "Recovered iOS sync after repointing OneSignalCordovaDependencies to the release branch."
-    fi
-    return
-  fi
-
-  if [[ "$status" -ne 0 ]]; then
-    return "$status"
-  fi
-
-  info "Using OneSignalCordovaDependencies from the generated git tag."
+  return "$status"
 }
 
 for arg in "$@"; do
@@ -145,8 +96,8 @@ for arg in "$@"; do
     all|android|ios)
       SYNC_PLATFORM="$arg"
       ;;
-    --local-pod)
-      USE_LOCAL_POD=true
+    --local-pod|--local-package)
+      info "$arg is no longer needed; the SPM demo always installs the local packed plugin."
       ;;
     *)
       usage
@@ -162,6 +113,7 @@ INSTALLED_DIR="$ORIGINAL_DIR/node_modules/onesignal-cordova-plugin"
 
 SDK_SRC_HASH=$(find "$SDK_ROOT/src" "$SDK_ROOT/www" \
                     "$SDK_ROOT/package.json" "$SDK_ROOT/plugin.xml" \
+                    "$SDK_ROOT/Package.swift" \
                     "$SDK_ROOT/OneSignalCordovaDependencies.podspec" \
                     "$SDK_ROOT/build-extras-onesignal.gradle" \
                -type f 2>/dev/null \
@@ -192,9 +144,9 @@ info "Building web bundle (vite)..."
 vp run build
 
 # ── Capacitor sync cache ─────────────────────────────────────────────────────
-# `cap sync` can run `pod install` + `xcodebuild clean` (~30-60s); skip when
+# `cap sync` can refresh native projects and package metadata; skip when
 # inputs are unchanged. Use per-platform stamps so Android-only runs do not
-# touch iOS when CocoaPods is available locally.
+# touch iOS in CI.
 SYNC_STAMP="$ORIGINAL_DIR/.cap-sync-${SYNC_PLATFORM}.stamp"
 SYNC_INPUTS=(
   "$ORIGINAL_DIR/src"
@@ -224,11 +176,12 @@ SYNC_HASH=$(find "${SYNC_INPUTS[@]}" \
             ! -path "*/build/*" \
             ! -path "*/DerivedData/*" \
             ! -path "*/xcuserdata/*" \
-            \( -name "Podfile" -o -name "build.gradle" \
+            \( -name "Podfile" -o -name "Package.swift" \
+               -o -name "Package.resolved" -o -name "build.gradle" \
                -o -name "*.ts" -o -name "*.tsx" \
                -o -name "*.json" -o -name "*.html" -o -name "*.js" \
                -o -name "*.css" -o -name "*.svg" -o -name "*.xml" \
-               -o -name "*.lock" \) \
+               -o -name "*.lock" -o -name "*.xcconfig" \) \
             2>/dev/null \
             | sort \
             | xargs shasum 2>/dev/null \
@@ -260,10 +213,9 @@ elif [[ "$SYNC_PLATFORM" == "ios" ]]; then
   info "Syncing Capacitor iOS..."
   run_capacitor_sync ios
   echo "$SYNC_HASH" > "$SYNC_STAMP"
-elif ! command -v pod >/dev/null 2>&1; then
-  # CI Android jobs run on Linux where CocoaPods isn't installed.
-  # Sync only Android so plain `cap sync` doesn't shell out to pod.
-  info "CocoaPods not found, syncing Android only..."
+elif [[ "$(uname -s)" != "Darwin" ]]; then
+  # CI Android jobs run on Linux; keep native iOS project updates on macOS.
+  info "Non-macOS host detected, syncing Android only..."
   vpx cap sync android
   echo "$SYNC_HASH" > "$SYNC_STAMP"
 else

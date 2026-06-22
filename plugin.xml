@@ -46,7 +46,7 @@
   </platform>
 
   <!-- ios -->
-  <platform name="ios">
+  <platform name="ios" package="swift">
 
     <config-file target="config.xml" parent="/*">
       <feature name="OneSignalPush">
@@ -72,7 +72,7 @@
             <source url="https://cdn.cocoapods.org/"/>
         </config>
         <pods use-frameworks="true">
-            <pod name="OneSignalCordovaDependencies" git="https://github.com/OneSignal/OneSignal-Cordova-SDK.git" tag="5.4.1" />
+            <pod name="OneSignalCordovaDependencies" git="https://github.com/OneSignal/OneSignal-Cordova-SDK.git" tag="5.4.1" nospm="true" />
         </pods>
     </podspec>
 

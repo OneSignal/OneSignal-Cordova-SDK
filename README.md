@@ -40,11 +40,17 @@ See the [Documentation](https://documentation.onesignal.com/docs) for installati
 
 See OneSignal's [Client SDK Reference](https://documentation.onesignal.com/docs/sdk-reference) page for a list of all available methods.
 
+#### iOS Native Dependencies
+
+Cordova iOS apps using `cordova-ios` 8 or newer can resolve this plugin with Swift Package Manager. Older Cordova iOS apps continue to use CocoaPods through `OneSignalCordovaDependencies`.
+
+Capacitor apps using Swift Package Manager must use plugins that support SPM. The demo app in `examples/demo` validates that path.
+
 #### Disabling OneSignal Location
 
-If your app does not use `OneSignal.Location`, you can exclude the native OneSignal location module from iOS and Android builds.
+If your app does not use `OneSignal.Location`, you can exclude the native OneSignal location module from Android builds and iOS CocoaPods builds.
 
-Set `ONESIGNAL_DISABLE_LOCATION=true` in the environment before installing the plugin or syncing native platforms, because this flag is read when native dependencies are resolved. The value is case-insensitive, and `1` is also accepted.
+Set `ONESIGNAL_DISABLE_LOCATION=true` in the environment before installing the plugin or syncing native platforms, because this flag is read when native dependencies are resolved. The value is case-insensitive, and `1` is also accepted. The iOS Swift Package Manager path currently includes the full OneSignal package set.
 
 ```bash
 ONESIGNAL_DISABLE_LOCATION=true cordova plugin add onesignal-cordova-plugin
@@ -52,7 +58,7 @@ ONESIGNAL_DISABLE_LOCATION=true cordova platform add ios
 ONESIGNAL_DISABLE_LOCATION=true cordova platform add android
 ```
 
-Capacitor apps using this Cordova plugin do not need to edit `ios/App/Podfile`; run Capacitor sync in an environment where the flag is set:
+Capacitor apps using CocoaPods do not need to edit `ios/App/Podfile`; run Capacitor sync in an environment where the flag is set:
 
 ```bash
 ONESIGNAL_DISABLE_LOCATION=true npx cap sync ios
