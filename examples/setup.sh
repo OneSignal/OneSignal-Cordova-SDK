@@ -19,88 +19,6 @@ usage() {
   echo "Usage: $0 [all|android|ios] [--local-pod] [--spm|--pods]" >&2
 }
 
-prepare_installed_plugin_for_spm_sync() {
-  local plugin_xml="$ORIGINAL_DIR/node_modules/onesignal-cordova-plugin/plugin.xml"
-
-  if [[ "$IOS_PACKAGE_MANAGER" != "spm" || ! -f "$plugin_xml" ]]; then
-    return 0
-  fi
-
-  PLUGIN_XML="$plugin_xml" python3 <<'PY'
-import os
-from pathlib import Path
-
-plugin_xml = Path(os.environ["PLUGIN_XML"])
-text = plugin_xml.read_text()
-text = text.replace('<pods use-frameworks="true">', '<pods>')
-plugin_xml.write_text(text)
-PY
-}
-
-patch_ios_spm_cordova_plugin_package() {
-  local cordova_plugins_dir="$ORIGINAL_DIR/ios/capacitor-cordova-ios-plugins"
-  local source_dir="$cordova_plugins_dir/sources/OnesignalCordovaPlugin"
-  local static_dir="$cordova_plugins_dir/sourcesstatic/OnesignalCordovaPlugin"
-  local package_dir="$cordova_plugins_dir/sources/OnesignalCordovaPlugin"
-  local package_file="$package_dir/Package.swift"
-  local ios_sdk_version
-
-  if [[ ! -d "$source_dir" && ! -d "$static_dir" ]]; then
-    return 0
-  fi
-
-  if [[ ! -d "$ORIGINAL_DIR/ios/App/CapApp-SPM" ]]; then
-    return 0
-  fi
-
-  ios_sdk_version=$(sed -n 's|.*OneSignal-XCFramework.git", exact: "\([^"]*\)".*|\1|p' "$SDK_ROOT/Package.swift" | head -n1)
-  if [[ -z "$ios_sdk_version" ]]; then
-    echo "Unable to resolve OneSignal iOS SDK version from Package.swift" >&2
-    return 1
-  fi
-
-  if [[ ! -d "$package_dir" ]]; then
-    mkdir -p "$package_dir"
-    cp -R "$static_dir/." "$package_dir/"
-  fi
-
-  cat > "$package_file" <<SWIFT
-// swift-tools-version: 5.9
-
-import PackageDescription
-
-let package = Package(
-    name: "OnesignalCordovaPlugin",
-    platforms: [.iOS(.v15)],
-    products: [
-        .library(
-            name: "OnesignalCordovaPlugin",
-            targets: ["OnesignalCordovaPlugin"]
-        )
-    ],
-    dependencies: [
-        .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", from: "8.3.1"),
-        .package(url: "https://github.com/OneSignal/OneSignal-XCFramework.git", exact: "$ios_sdk_version")
-    ],
-    targets: [
-        .target(
-            name: "OnesignalCordovaPlugin",
-            dependencies: [
-                .product(name: "Cordova", package: "capacitor-swift-pm"),
-                .product(name: "OneSignalFramework", package: "OneSignal-XCFramework"),
-                .product(name: "OneSignalInAppMessages", package: "OneSignal-XCFramework"),
-                .product(name: "OneSignalLocation", package: "OneSignal-XCFramework")
-            ],
-            path: ".",
-            publicHeadersPath: "."
-        )
-    ]
-)
-SWIFT
-
-  info "Prepared generated Cordova plugin SPM package."
-}
-
 patch_ios_podfile_local() {
   local podfile="$ORIGINAL_DIR/ios/App/Podfile"
 
@@ -224,7 +142,6 @@ run_capacitor_sync() {
       return
       ;;
     ios)
-      prepare_installed_plugin_for_spm_sync
       vpx cap sync ios || status=$?
       if [[ "$IOS_PACKAGE_MANAGER" == "pods" ]]; then
         if finish_pods_sync "$status"; then
@@ -232,12 +149,9 @@ run_capacitor_sync() {
         else
           status=$?
         fi
-      else
-        patch_ios_spm_cordova_plugin_package
       fi
       ;;
     all)
-      prepare_installed_plugin_for_spm_sync
       vpx cap sync || status=$?
       if [[ "$IOS_PACKAGE_MANAGER" == "pods" ]]; then
         if finish_pods_sync "$status"; then
@@ -245,8 +159,6 @@ run_capacitor_sync() {
         else
           status=$?
         fi
-      else
-        patch_ios_spm_cordova_plugin_package
       fi
       ;;
   esac
