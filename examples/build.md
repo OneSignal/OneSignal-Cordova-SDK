@@ -44,6 +44,16 @@ bun run ios:sync
 
 Local plugin setup: reference local plugin tarball through `examples/setup.sh` workflow.
 
+### CocoaPods Demo
+
+`examples/demo-pods/` mirrors the main demo but keeps iOS on CocoaPods. Use it when validating the `OneSignalCordovaDependencies` podspec, Podfile lock updates, or release behavior for consumers that have not moved to Swift Package Manager.
+
+```bash
+cd examples/demo-pods
+vp run setup:ios
+vp run update:pods
+```
+
 ### No-Location Demo
 
 `examples/demo-no-location/` is a smaller Capacitor-hosted app that verifies the Cordova plugin can be built with `ONESIGNAL_DISABLE_LOCATION=true`.
@@ -58,7 +68,7 @@ vp run android
 
 The demo setup script packs the local Cordova plugin, installs the app dependencies, creates native platforms if needed, and runs Capacitor sync with `ONESIGNAL_DISABLE_LOCATION=true` in the environment. Its normal app flow initializes OneSignal and requests push permission without calling `OneSignal.Location`; the explicit location test button confirms those calls resolve safely when the native location module is absent.
 
-The main demo validates Swift Package Manager on iOS. `examples/setup.sh` packs the local Cordova plugin, syncs Capacitor, and prepares the generated Cordova plugin package that `CapApp-SPM` references. The no-location demo still validates the CocoaPods dependency split because `ONESIGNAL_DISABLE_LOCATION` is evaluated by the podspec.
+The main demo validates Swift Package Manager on iOS. `examples/setup.sh` packs the local Cordova plugin, syncs Capacitor, and prepares the generated Cordova plugin package that `CapApp-SPM` references. `examples/demo-pods` validates the standard CocoaPods install, while the no-location demo validates the CocoaPods dependency split because `ONESIGNAL_DISABLE_LOCATION` is evaluated by the podspec.
 
 ### vite-plus / vp toolchain
 

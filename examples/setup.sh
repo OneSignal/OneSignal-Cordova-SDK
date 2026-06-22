@@ -4,12 +4,19 @@ set -euo pipefail
 # Run from inside any examples/<demo> directory.
 ORIGINAL_DIR=$(pwd)
 SDK_ROOT=$(cd "$ORIGINAL_DIR/../.." && pwd)
+DEMO_NAME=$(basename "$ORIGINAL_DIR")
 SYNC_PLATFORM="all"
+IOS_PACKAGE_MANAGER="spm"
+USE_LOCAL_POD=false
+
+if [[ "$DEMO_NAME" == "demo-pods" ]]; then
+  IOS_PACKAGE_MANAGER="pods"
+fi
 
 info() { echo -e "\033[0;32m[setup]\033[0m $*"; }
 
 usage() {
-  echo "Usage: $0 [all|android|ios]" >&2
+  echo "Usage: $0 [all|android|ios] [--local-pod] [--spm|--pods]" >&2
 }
 
 patch_ios_spm_cordova_plugin_package() {
@@ -70,6 +77,119 @@ SWIFT
   info "Prepared generated Cordova plugin SPM package."
 }
 
+patch_ios_podfile_local() {
+  local podfile="$ORIGINAL_DIR/ios/App/Podfile"
+
+  if [[ ! -f "$podfile" ]]; then
+    return 1
+  fi
+
+  PODFILE="$podfile" python3 <<'PY'
+import os
+import re
+from pathlib import Path
+
+podfile = Path(os.environ["PODFILE"])
+text = podfile.read_text()
+pod_line = "  pod 'OneSignalCordovaDependencies', :path => '../../node_modules/onesignal-cordova-plugin'"
+
+text = re.sub(r"^.*pod 'OneSignalCordovaDependencies'.*\n", "", text, flags=re.MULTILINE)
+
+if "  pod 'CordovaPluginsStatic'" in text:
+    text = text.replace("  pod 'CordovaPluginsStatic'", f"{pod_line}\n  pod 'CordovaPluginsStatic'", 1)
+elif "  pod 'CordovaPlugins'" in text:
+    text = text.replace("  pod 'CordovaPlugins'", f"{pod_line}\n  pod 'CordovaPlugins'", 1)
+else:
+    text = text.replace("target 'App' do\n", f"target 'App' do\n{pod_line}\n", 1)
+
+podfile.write_text(text)
+PY
+}
+
+patch_ios_podfile_git_branch() {
+  local podfile="$ORIGINAL_DIR/ios/App/Podfile"
+  local branch
+
+  if [[ ! -f "$podfile" ]]; then
+    return 1
+  fi
+
+  branch=$(git -C "$SDK_ROOT" rev-parse --abbrev-ref HEAD 2>/dev/null || true)
+  if [[ "$branch" != rel/* ]]; then
+    return 1
+  fi
+
+  info "Repointing OneSignalCordovaDependencies pod to git branch ${branch}..."
+  PODFILE="$podfile" BRANCH="$branch" python3 <<'PY'
+import os
+import re
+from pathlib import Path
+
+podfile = Path(os.environ["PODFILE"])
+branch = os.environ["BRANCH"]
+text = podfile.read_text()
+pod_line = (
+    "  pod 'OneSignalCordovaDependencies', "
+    ":git => 'https://github.com/OneSignal/OneSignal-Cordova-SDK.git', "
+    f":branch => '{branch}'"
+)
+
+text, count = re.subn(
+    r"^.*pod 'OneSignalCordovaDependencies'.*\n",
+    f"{pod_line}\n",
+    text,
+    flags=re.MULTILINE,
+)
+if count == 0:
+    raise SystemExit("Unable to find OneSignalCordovaDependencies pod in Podfile")
+
+podfile.write_text(text)
+PY
+}
+
+install_or_update_pods() {
+  local app_dir="$ORIGINAL_DIR/ios/App"
+
+  if ! (cd "$app_dir" && pod install); then
+    info "Refreshing OneSignalXCFramework after local dependency changes..."
+    (cd "$app_dir" && pod update OneSignalXCFramework)
+  fi
+}
+
+finish_pods_sync() {
+  local status="${1:-0}"
+
+  if [[ ! -f "$ORIGINAL_DIR/ios/App/Podfile" ]]; then
+    return "$status"
+  fi
+
+  if [[ "$USE_LOCAL_POD" == true ]]; then
+    patch_ios_podfile_local
+    info "Using OneSignalCordovaDependencies from the local plugin path."
+    install_or_update_pods
+
+    if [[ "$status" -ne 0 ]]; then
+      info "Recovered iOS sync after repointing OneSignalCordovaDependencies to the local plugin."
+    fi
+    return
+  fi
+
+  if patch_ios_podfile_git_branch; then
+    install_or_update_pods
+
+    if [[ "$status" -ne 0 ]]; then
+      info "Recovered iOS sync after repointing OneSignalCordovaDependencies to the release branch."
+    fi
+    return
+  fi
+
+  if [[ "$status" -ne 0 ]]; then
+    return "$status"
+  fi
+
+  info "Using OneSignalCordovaDependencies from the generated git tag."
+}
+
 run_capacitor_sync() {
   local platform="${1:-all}"
   local status=0
@@ -81,11 +201,27 @@ run_capacitor_sync() {
       ;;
     ios)
       vpx cap sync ios || status=$?
-      patch_ios_spm_cordova_plugin_package
+      if [[ "$IOS_PACKAGE_MANAGER" == "pods" ]]; then
+        if finish_pods_sync "$status"; then
+          status=0
+        else
+          status=$?
+        fi
+      else
+        patch_ios_spm_cordova_plugin_package
+      fi
       ;;
     all)
       vpx cap sync || status=$?
-      patch_ios_spm_cordova_plugin_package
+      if [[ "$IOS_PACKAGE_MANAGER" == "pods" ]]; then
+        if finish_pods_sync "$status"; then
+          status=0
+        else
+          status=$?
+        fi
+      else
+        patch_ios_spm_cordova_plugin_package
+      fi
       ;;
   esac
   return "$status"
@@ -96,8 +232,17 @@ for arg in "$@"; do
     all|android|ios)
       SYNC_PLATFORM="$arg"
       ;;
-    --local-pod|--local-package)
+    --local-pod)
+      USE_LOCAL_POD=true
+      ;;
+    --local-package)
       info "$arg is no longer needed; the SPM demo always installs the local packed plugin."
+      ;;
+    --spm)
+      IOS_PACKAGE_MANAGER="spm"
+      ;;
+    --pods)
+      IOS_PACKAGE_MANAGER="pods"
       ;;
     *)
       usage
