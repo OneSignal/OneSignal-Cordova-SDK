@@ -10,7 +10,7 @@ PODS:
     - Capacitor
   - CapacitorStatusBar (8.0.2):
     - Capacitor
-  - CordovaPluginsStatic (8.3.1):
+  - CordovaPlugins (8.3.1):
     - CapacitorCordova
     - OneSignalCordovaDependencies
   - OneSignalCordovaDependencies (5.4.0):
@@ -72,7 +72,7 @@ DEPENDENCIES:
   - "CapacitorHaptics (from `../../node_modules/@capacitor/haptics`)"
   - "CapacitorKeyboard (from `../../node_modules/@capacitor/keyboard`)"
   - "CapacitorStatusBar (from `../../node_modules/@capacitor/status-bar`)"
-  - CordovaPluginsStatic (from `../capacitor-cordova-ios-plugins`)
+  - CordovaPlugins (from `../capacitor-cordova-ios-plugins`)
   - OneSignalCordovaDependencies (from `https://github.com/OneSignal/OneSignal-Cordova-SDK.git`, tag `5.4.0`)
   - OneSignalXCFramework (< 6.0, >= 5.0.0)
 
@@ -93,7 +93,7 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/keyboard"
   CapacitorStatusBar:
     :path: "../../node_modules/@capacitor/status-bar"
-  CordovaPluginsStatic:
+  CordovaPlugins:
     :path: "../capacitor-cordova-ios-plugins"
   OneSignalCordovaDependencies:
     :git: https://github.com/OneSignal/OneSignal-Cordova-SDK.git
@@ -111,10 +111,10 @@ SPEC CHECKSUMS:
   CapacitorHaptics: 296f771ecd89c7a1bd92a7b6826a7d268e2e70f5
   CapacitorKeyboard: 31c8285d92c9d1410071d52449f16d2c6673b6f4
   CapacitorStatusBar: 01d5763b4ed720de5ce2edbc938de6a98f4c8f32
-  CordovaPluginsStatic: 4f45b329e013a402b361c251628627e6774346b4
+  CordovaPlugins: de8811ad294fd657a6be86ec9ce12f8b0cdc2380
   OneSignalCordovaDependencies: 78aff5a33f7e668a32d84ce71d9a1c3288574fe8
   OneSignalXCFramework: f4505256255ae5fccfd33ba2eb1871ba2d4ce2bb
 
-PODFILE CHECKSUM: 41493d2e61efb661f5db5bac4ca58c0471d9f36f
+PODFILE CHECKSUM: 907502420f900b5c7a1e007f3228d9a9e858cbf7
 
 COCOAPODS: 1.16.2

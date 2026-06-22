@@ -16,7 +16,7 @@ def capacitor_pods
   pod 'CapacitorKeyboard', :path => '../../node_modules/@capacitor/keyboard'
   pod 'CapacitorStatusBar', :path => '../../node_modules/@capacitor/status-bar'
   pod 'OneSignalCordovaDependencies', :git => 'https://github.com/OneSignal/OneSignal-Cordova-SDK.git', :tag => '5.4.0'
-  pod 'CordovaPluginsStatic', :path => '../capacitor-cordova-ios-plugins'
+  pod 'CordovaPlugins', :path => '../capacitor-cordova-ios-plugins'
 end
 
 target 'App' do
