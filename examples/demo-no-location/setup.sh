@@ -3,16 +3,21 @@ set -euo pipefail
 
 DEMO_DIR=$(cd "$(dirname "$0")" && pwd)
 SDK_ROOT=$(cd "$DEMO_DIR/../.." && pwd)
-SYNC_PLATFORM="${1:-all}"
+SYNC_PLATFORM="all"
+USE_LOCAL_POD=false
 export ONESIGNAL_DISABLE_LOCATION=true
 
 info() { echo -e "\033[0;32m[demo-no-location]\033[0m $*"; }
 
-patch_ios_podfile() {
+usage() {
+  echo "Usage: $0 [all|android|ios] [--local-pod]" >&2
+}
+
+patch_ios_podfile_local() {
   local podfile="$DEMO_DIR/ios/App/Podfile"
 
   if [[ ! -f "$podfile" ]]; then
-    return
+    return 1
   fi
 
   PODFILE="$podfile" python3 <<'PY'
@@ -37,6 +42,56 @@ podfile.write_text(text)
 PY
 }
 
+patch_ios_podfile_git_branch() {
+  local podfile="$DEMO_DIR/ios/App/Podfile"
+  local branch
+
+  if [[ ! -f "$podfile" ]]; then
+    return 1
+  fi
+
+  branch=$(git -C "$SDK_ROOT" rev-parse --abbrev-ref HEAD 2>/dev/null || true)
+  if [[ "$branch" != rel/* ]]; then
+    return 1
+  fi
+
+  info "Repointing OneSignalCordovaDependencies pod to git branch ${branch}..."
+  PODFILE="$podfile" BRANCH="$branch" python3 <<'PY'
+import os
+import re
+from pathlib import Path
+
+podfile = Path(os.environ["PODFILE"])
+branch = os.environ["BRANCH"]
+text = podfile.read_text()
+pod_line = (
+    "  pod 'OneSignalCordovaDependencies', "
+    ":git => 'https://github.com/OneSignal/OneSignal-Cordova-SDK.git', "
+    f":branch => '{branch}'"
+)
+
+text, count = re.subn(
+    r"^.*pod 'OneSignalCordovaDependencies'.*\n",
+    f"{pod_line}\n",
+    text,
+    flags=re.MULTILINE,
+)
+if count == 0:
+    raise SystemExit("Unable to find OneSignalCordovaDependencies pod in Podfile")
+
+podfile.write_text(text)
+PY
+}
+
+install_or_update_pods() {
+  local app_dir="$DEMO_DIR/ios/App"
+
+  if ! (cd "$app_dir" && pod install); then
+    info "Refreshing OneSignalXCFramework after local dependency changes..."
+    (cd "$app_dir" && pod update OneSignalXCFramework)
+  fi
+}
+
 run_capacitor_sync() {
   local platform="${1:-all}"
   local status=0
@@ -58,15 +113,31 @@ run_capacitor_sync() {
     return "$status"
   fi
 
-  patch_ios_podfile
-  if ! (cd "$DEMO_DIR/ios/App" && pod install); then
-    info "Refreshing OneSignalXCFramework after local dependency changes..."
-    (cd "$DEMO_DIR/ios/App" && pod update OneSignalXCFramework)
+  if [[ "$USE_LOCAL_POD" == true ]]; then
+    patch_ios_podfile_local
+    info "Using OneSignalCordovaDependencies from the local plugin path."
+    install_or_update_pods
+
+    if [[ "$status" -ne 0 ]]; then
+      info "Recovered iOS sync after repointing OneSignalCordovaDependencies to the local plugin."
+    fi
+    return
+  fi
+
+  if patch_ios_podfile_git_branch; then
+    install_or_update_pods
+
+    if [[ "$status" -ne 0 ]]; then
+      info "Recovered iOS sync after repointing OneSignalCordovaDependencies to the release branch."
+    fi
+    return
   fi
 
   if [[ "$status" -ne 0 ]]; then
-    info "Recovered iOS sync after repointing OneSignalCordovaDependencies to the local plugin."
+    return "$status"
   fi
+
+  info "Using OneSignalCordovaDependencies from the generated git tag."
 }
 
 patch_ios_apns_capability() {
@@ -129,13 +200,20 @@ project_file.write_text(text)
 PY
 }
 
-case "$SYNC_PLATFORM" in
-  all|android|ios) ;;
-  *)
-    echo "Usage: $0 [all|android|ios]" >&2
-    exit 2
-    ;;
-esac
+for arg in "$@"; do
+  case "$arg" in
+    all|android|ios)
+      SYNC_PLATFORM="$arg"
+      ;;
+    --local-pod)
+      USE_LOCAL_POD=true
+      ;;
+    *)
+      usage
+      exit 2
+      ;;
+  esac
+done
 
 info "Building Cordova plugin and packing local tarball..."
 (cd "$SDK_ROOT" && vp run build)
@@ -186,7 +264,11 @@ if [[ "$SYNC_PLATFORM" == "all" || "$SYNC_PLATFORM" == "ios" ]]; then
         info "Patching generated Podfile before rerunning CocoaPods..."
       fi
     fi
-    patch_ios_podfile
+    if [[ "$USE_LOCAL_POD" == true ]]; then
+      patch_ios_podfile_local
+    else
+      patch_ios_podfile_git_branch || true
+    fi
   fi
 fi
 
@@ -196,12 +278,10 @@ case "$SYNC_PLATFORM" in
     run_capacitor_sync android
     ;;
   ios)
-    patch_ios_podfile
     run_capacitor_sync ios
     patch_ios_apns_capability
     ;;
   all)
-    patch_ios_podfile
     run_capacitor_sync all
     patch_ios_apns_capability
     ;;
