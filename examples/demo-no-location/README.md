@@ -1,8 +1,10 @@
-# OneSignal Cordova No-Location Demo
+# OneSignal Cordova No-Location SPM Demo
 
-This lightweight runnable example shows the native build flag for apps that use OneSignal push, but do not use `OneSignal.Location`.
+This temporary runnable example shows the native build flag for apps that use OneSignal push with Swift Package Manager, but do not use `OneSignal.Location`.
 
 The demo uses package/bundle id `com.onesignal.example`.
+
+Current finding: the Cordova plugin's evaluated SwiftPM target dependencies exclude `OneSignalLocation` when `ONESIGNAL_DISABLE_LOCATION=true`, and Xcode does not link or embed `OneSignalLocation.framework` as long as the same environment variable is present for the `xcodebuild` process.
 
 Run it with:
 
@@ -11,15 +13,7 @@ vp run ios
 vp run android
 ```
 
-`vp run ios` validates the same CocoaPods source path that consumers use. The generated Podfile resolves `OneSignalCordovaDependencies` from this repository by git tag; when the Cordova SDK checkout is on a `rel/*` branch, setup repoints that generated pod line to the matching remote git branch so pre-release validation exercises branch HEAD before the release tag exists.
-
-For local podspec iteration, use:
-
-```sh
-vp run ios:local
-```
-
-`ios:local` patches the generated Podfile to use the locally packed plugin path instead of the remote git source.
+`vp run ios` validates the Capacitor SPM source path. The generated `CapApp-SPM/Package.swift` resolves the local packed `onesignal-cordova-plugin` package from `node_modules`.
 
 ## Setup
 
@@ -35,7 +29,7 @@ Then edit `.env`:
 VITE_ONESIGNAL_APP_ID=your-onesignal-app-id
 ```
 
-The `setup` script exports `ONESIGNAL_DISABLE_LOCATION=true` before packing the local Cordova plugin and running Capacitor sync, so Android Gradle and iOS CocoaPods resolve OneSignal without the location module.
+The `setup` script exports `ONESIGNAL_DISABLE_LOCATION=true` before packing the local Cordova plugin and running Capacitor sync, so Android Gradle and iOS Swift Package Manager resolve OneSignal without the location module.
 
 ## iOS
 
@@ -45,19 +39,15 @@ The `ios` script runs `setup`, which syncs Capacitor with:
 ONESIGNAL_DISABLE_LOCATION=true
 ```
 
-Cordova iOS support uses CocoaPods. The setup script adds iOS with:
+This demo requires Capacitor 8.4.0 or newer for Cordova plugin SPM package support. The setup script adds iOS with:
 
 ```sh
-vpx cap add ios --packagemanager CocoaPods
+vpx cap add ios --packagemanager SPM
 ```
 
-If an existing generated `ios/` folder is using SPM, the setup script recreates it with CocoaPods.
+If an existing generated `ios/` folder is using CocoaPods, delete it before running setup so Capacitor recreates it with SPM.
 
-By default, setup leaves `OneSignalCordovaDependencies` on the generated git source. Use `vp run ios:local` when you need the helper podspec to come from the local checkout.
-
-The generated iOS app is patched with the Push Notifications entitlement (`aps-environment`) after sync.
-
-If you run `vpx cap sync ios`, Xcode, or CocoaPods manually, set `ONESIGNAL_DISABLE_LOCATION=true` in that environment too.
+If you run `vpx cap sync ios`, Xcode, or `xcodebuild` manually, set `ONESIGNAL_DISABLE_LOCATION=true` in that environment too.
 
 ## Android
 
