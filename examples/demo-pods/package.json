@@ -18,7 +18,7 @@
     "android:sync": "ionic cap sync android",
     "ios:sync": "ionic cap sync ios",
     "android": "ionic cap run android -l --external",
-    "ios": "ionic cap run ios -l --external",
+    "ios": "ionic cap run ios -l --external --no-sync",
     "ios:local": "vp run setup:ios:local && ionic cap run ios -l --external --no-sync",
     "update:pods": "(cd ios/App && pod update OneSignalXCFramework)"
   },

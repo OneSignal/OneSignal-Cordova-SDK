@@ -34,7 +34,7 @@ runs:
       with:
         path: |
           ~/Library/Caches/org.swift.swiftpm
-          ~/Library/Developer/Xcode/DerivedData/SourcePackages
+          ~/Library/Developer/Xcode/DerivedData/*/SourcePackages
         key:
           spm-${{ runner.os }}-${{ hashFiles('examples/demo/ios/App/App.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved')
           }}
