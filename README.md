@@ -44,7 +44,7 @@ See OneSignal's [Client SDK Reference](https://documentation.onesignal.com/docs/
 
 Cordova iOS apps using `cordova-ios` 8 or newer can resolve this plugin with Swift Package Manager. Older Cordova iOS apps continue to use CocoaPods through `OneSignalCordovaDependencies`.
 
-Capacitor apps using Swift Package Manager must use plugins that support SPM. The demo app in `examples/demo` validates that path.
+Capacitor apps using Swift Package Manager must use Capacitor 8.4.0 or newer so Capacitor can read this plugin's root `Package.swift`. The demo app in `examples/demo` validates that path.
 
 #### Manual iOS Dependency Tests
 
@@ -108,9 +108,9 @@ Use `vp run setup:ios:local` in `examples/demo-pods` when manually validating lo
 
 #### Disabling OneSignal Location
 
-If your app does not use `OneSignal.Location`, you can exclude the native OneSignal location module from Android builds and iOS CocoaPods builds.
+If your app does not use `OneSignal.Location`, you can exclude the native OneSignal location module from Android, iOS CocoaPods, and iOS Swift Package Manager builds.
 
-Set `ONESIGNAL_DISABLE_LOCATION=true` in the environment before installing the plugin or syncing native platforms, because this flag is read when native dependencies are resolved. The value is case-insensitive, and `1` is also accepted. The iOS Swift Package Manager path currently includes the full OneSignal package set.
+Set `ONESIGNAL_DISABLE_LOCATION=true` in the environment before installing the plugin or syncing native platforms, because this flag is read when native dependencies are resolved. The value is case-insensitive, and `1` is also accepted. For iOS Swift Package Manager, also set the flag for the actual Xcode build process so `Package.swift` is evaluated with location disabled.
 
 ```bash
 ONESIGNAL_DISABLE_LOCATION=true cordova plugin add onesignal-cordova-plugin
@@ -118,11 +118,12 @@ ONESIGNAL_DISABLE_LOCATION=true cordova platform add ios
 ONESIGNAL_DISABLE_LOCATION=true cordova platform add android
 ```
 
-Capacitor apps using CocoaPods do not need to edit `ios/App/Podfile`; run Capacitor sync in an environment where the flag is set:
+Capacitor apps do not need to edit `ios/App/Podfile` or `CapApp-SPM/Package.swift`; run Capacitor sync in an environment where the flag is set:
 
 ```bash
 ONESIGNAL_DISABLE_LOCATION=true npx cap sync ios
 ONESIGNAL_DISABLE_LOCATION=true npx cap sync android
+ONESIGNAL_DISABLE_LOCATION=true npx cap run ios --no-sync
 ```
 
 In CI, set the flag once at the job or step level so CocoaPods and Gradle inherit it:
@@ -152,6 +153,14 @@ cd ios/App
 pod deintegrate
 rm -rf Pods Podfile.lock
 ONESIGNAL_DISABLE_LOCATION=true pod install
+```
+
+For SPM:
+
+```bash
+rm -rf ~/Library/Developer/Xcode/DerivedData
+ONESIGNAL_DISABLE_LOCATION=true xcodebuild -resolvePackageDependencies -project ios/App/App.xcodeproj
+ONESIGNAL_DISABLE_LOCATION=true xcodebuild -project ios/App/App.xcodeproj -scheme App
 ```
 
 When using Xcode or Android Studio, launch the IDE from a terminal that has `ONESIGNAL_DISABLE_LOCATION` exported. An IDE launched from the Dock/Finder does not inherit variables set only in your shell profile.
