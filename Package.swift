@@ -1,6 +1,24 @@
 // swift-tools-version:5.9
 
 import PackageDescription
+import Foundation
+
+func oneSignalEnvFlag(_ name: String) -> Bool {
+    let value = Context.environment[name]?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+    return value == "true" || value == "1"
+}
+
+let oneSignalDisableLocation = oneSignalEnvFlag("ONESIGNAL_DISABLE_LOCATION")
+
+var oneSignalDependencies: [Target.Dependency] = [
+    .product(name: "Cordova", package: "cordova-ios"),
+    .product(name: "OneSignalFramework", package: "OneSignal-XCFramework"),
+    .product(name: "OneSignalInAppMessages", package: "OneSignal-XCFramework"),
+]
+
+if !oneSignalDisableLocation {
+    oneSignalDependencies.append(.product(name: "OneSignalLocation", package: "OneSignal-XCFramework"))
+}
 
 let package = Package(
     name: "onesignal-cordova-plugin",
@@ -20,12 +38,7 @@ let package = Package(
     targets: [
         .target(
             name: "onesignal-cordova-plugin",
-            dependencies: [
-                .product(name: "Cordova", package: "cordova-ios"),
-                .product(name: "OneSignalFramework", package: "OneSignal-XCFramework"),
-                .product(name: "OneSignalInAppMessages", package: "OneSignal-XCFramework"),
-                .product(name: "OneSignalLocation", package: "OneSignal-XCFramework"),
-            ],
+            dependencies: oneSignalDependencies,
             path: "src/ios",
             publicHeadersPath: "."
         ),
