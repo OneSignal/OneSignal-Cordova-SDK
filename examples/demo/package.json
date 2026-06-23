@@ -17,14 +17,14 @@
     "ios:sync": "ionic cap sync ios",
     "ios:resolve": "xcodebuild -resolvePackageDependencies -project ios/App/App.xcodeproj",
     "android": "ionic cap run android -l --external",
-    "ios": "ionic cap run ios -l --external"
+    "ios": "ionic cap run ios -l --external --no-sync"
   },
   "dependencies": {
-    "@capacitor/android": "^8.3.1",
+    "@capacitor/android": "^8.4.1",
     "@capacitor/app": "^8.1.0",
-    "@capacitor/core": "^8.3.1",
+    "@capacitor/core": "^8.4.1",
     "@capacitor/haptics": "^8.0.2",
-    "@capacitor/ios": "^8.3.1",
+    "@capacitor/ios": "^8.4.1",
     "@capacitor/keyboard": "^8.0.3",
     "@capacitor/status-bar": "^8.0.2",
     "@ionic/react": "^8.5.0",
@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",
-    "@capacitor/cli": "^8.3.1",
+    "@capacitor/cli": "^8.4.1",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
