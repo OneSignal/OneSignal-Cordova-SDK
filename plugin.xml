@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="onesignal-cordova-plugin"
-    version="5.4.0">
+    version="5.4.1">
 
   <name>OneSignal Push Notifications</name>
   <author>Josh Kasten, Bradley Hesse, Rodrigo Gomez-Palacio</author>
@@ -72,7 +72,7 @@
             <source url="https://cdn.cocoapods.org/"/>
         </config>
         <pods use-frameworks="true">
-            <pod name="OneSignalCordovaDependencies" git="https://github.com/OneSignal/OneSignal-Cordova-SDK.git" tag="5.4.0" />
+            <pod name="OneSignalCordovaDependencies" git="https://github.com/OneSignal/OneSignal-Cordova-SDK.git" tag="5.4.1" />
         </pods>
     </podspec>
 
