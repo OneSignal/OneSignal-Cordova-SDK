@@ -71,7 +71,7 @@
         <config>
             <source url="https://cdn.cocoapods.org/"/>
         </config>
-        <pods>
+        <pods use-frameworks="true">
             <pod name="OneSignalCordovaDependencies" git="https://github.com/OneSignal/OneSignal-Cordova-SDK.git" tag="5.4.1" nospm="true" />
         </pods>
     </podspec>
