@@ -157,9 +157,15 @@ ONESIGNAL_DISABLE_LOCATION=true pod install
 For SPM:
 
 ```bash
-rm -rf ~/Library/Developer/Xcode/DerivedData
-ONESIGNAL_DISABLE_LOCATION=true xcodebuild -resolvePackageDependencies -project ios/App/App.xcodeproj
-ONESIGNAL_DISABLE_LOCATION=true xcodebuild -project ios/App/App.xcodeproj -scheme App
+rm -rf ios/App/App.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+ONESIGNAL_DISABLE_LOCATION=true xcodebuild \
+  -resolvePackageDependencies \
+  -project ios/App/App.xcodeproj \
+  -derivedDataPath ios/App/build
+ONESIGNAL_DISABLE_LOCATION=true xcodebuild \
+  -project ios/App/App.xcodeproj \
+  -scheme App \
+  -derivedDataPath ios/App/build
 ```
 
 When using Xcode or Android Studio, launch the IDE from a terminal that has `ONESIGNAL_DISABLE_LOCATION` exported. An IDE launched from the Dock/Finder does not inherit variables set only in your shell profile.
