@@ -88,7 +88,6 @@ vp install
 vp run build
 
 cd examples/demo-pods
-vp install
 vp run clean:ios
 vp run setup:ios
 
