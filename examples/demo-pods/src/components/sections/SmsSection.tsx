@@ -1,1 +1,0 @@
-../../../../demo/src/components/sections/SmsSection.tsx

@@ -1,1 +1,0 @@
-../../demo/src/vite-env.d.ts
