@@ -16,7 +16,7 @@
     "android:sync": "ionic cap sync android",
     "ios:sync": "ionic cap sync ios",
     "ios:resolve": "xcodebuild -resolvePackageDependencies -project ios/App/App.xcodeproj",
-    "android": "ionic cap run android -l --external",
+    "android": "ionic cap run android -l --external --no-sync",
     "ios": "ionic cap run ios -l --external --no-sync"
   },
   "dependencies": {

@@ -68,7 +68,7 @@ vp run android
 
 The demo setup script packs the local Cordova plugin, installs the app dependencies, creates native platforms if needed, and runs Capacitor sync with `ONESIGNAL_DISABLE_LOCATION=true` in the environment. Its normal app flow initializes OneSignal and requests push permission without calling `OneSignal.Location`; the explicit location test button confirms those calls resolve safely when the native location module is absent.
 
-The main demo validates Swift Package Manager on iOS. `examples/setup.sh` packs the local Cordova plugin, syncs Capacitor, and prepares the generated Cordova plugin package that `CapApp-SPM` references. `examples/demo-pods` validates the standard CocoaPods install, while the no-location demo validates the CocoaPods dependency split because `ONESIGNAL_DISABLE_LOCATION` is evaluated by the podspec.
+The main demo validates Swift Package Manager on iOS. `examples/setup.sh` packs the local Cordova plugin, syncs Capacitor, and prepares the generated Cordova plugin package that `CapApp-SPM` references. `examples/demo-pods` validates the standard CocoaPods install, while `examples/demo-no-location` validates the SPM dependency split because `ONESIGNAL_DISABLE_LOCATION` is evaluated by `Package.swift`. `examples/demo-no-location-pods` validates the CocoaPods dependency split through the podspec.
 
 ### vite-plus / vp toolchain
 
@@ -97,7 +97,7 @@ Package scripts:
     "android:sync": "ionic cap sync android",
     "ios:sync": "ionic cap sync ios",
     "ios:resolve": "xcodebuild -resolvePackageDependencies -project ios/App/App.xcodeproj",
-    "android": "ionic cap run android -l --external",
+    "android": "ionic cap run android -l --external --no-sync",
     "ios": "ionic cap run ios -l --external --no-sync"
   }
 }

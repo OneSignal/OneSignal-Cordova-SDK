@@ -132,6 +132,102 @@ finish_pods_sync() {
   info "Using OneSignalCordovaDependencies from the generated git tag."
 }
 
+ensure_capacitor_platforms() {
+  if [[ "$SYNC_PLATFORM" == "all" || "$SYNC_PLATFORM" == "android" ]]; then
+    if [[ ! -d "$ORIGINAL_DIR/android" ]]; then
+      info "Adding Android platform..."
+      vpx cap add android
+    fi
+  fi
+
+  if [[ "$SYNC_PLATFORM" == "all" || "$SYNC_PLATFORM" == "ios" ]]; then
+    if [[ "$(uname -s)" != "Darwin" ]]; then
+      return
+    fi
+
+    if [[ "$IOS_PACKAGE_MANAGER" == "spm" && -f "$ORIGINAL_DIR/ios/App/Podfile" ]]; then
+      info "Recreating iOS platform with Swift Package Manager..."
+      rm -rf "$ORIGINAL_DIR/ios"
+    elif [[ "$IOS_PACKAGE_MANAGER" == "pods" && -d "$ORIGINAL_DIR/ios" && ! -f "$ORIGINAL_DIR/ios/App/Podfile" ]]; then
+      info "Recreating iOS platform with CocoaPods..."
+      rm -rf "$ORIGINAL_DIR/ios"
+    fi
+
+    if [[ ! -d "$ORIGINAL_DIR/ios" ]]; then
+      info "Adding iOS platform..."
+      if [[ "$IOS_PACKAGE_MANAGER" == "pods" ]]; then
+        vpx cap add ios --packagemanager CocoaPods
+      else
+        vpx cap add ios --packagemanager SPM
+      fi
+    fi
+  fi
+}
+
+patch_ios_apns_capability() {
+  local app_dir="$ORIGINAL_DIR/ios/App/App"
+  local project_file="$ORIGINAL_DIR/ios/App/App.xcodeproj/project.pbxproj"
+  local entitlements_file="$app_dir/App.entitlements"
+
+  if [[ "$DEMO_NAME" != "demo-no-location" ]]; then
+    return
+  fi
+
+  if [[ ! -f "$project_file" || ! -d "$app_dir" ]]; then
+    return
+  fi
+
+  cat > "$entitlements_file" <<'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>aps-environment</key>
+	<string>development</string>
+</dict>
+</plist>
+EOF
+
+  PROJECT_FILE="$project_file" python3 <<'PY'
+import os
+import re
+from pathlib import Path
+
+project_file = Path(os.environ["PROJECT_FILE"])
+text = project_file.read_text()
+
+text = re.sub(
+    r"PRODUCT_BUNDLE_IDENTIFIER = [^;]+;",
+    "PRODUCT_BUNDLE_IDENTIFIER = com.onesignal.example;",
+    text,
+)
+
+text = text.replace(
+    "CODE_SIGN_STYLE = Automatic;\n",
+    "CODE_SIGN_STYLE = Automatic;\n\t\t\t\tCODE_SIGN_ENTITLEMENTS = App/App.entitlements;\n",
+)
+text = re.sub(
+    r"(\t+CODE_SIGN_ENTITLEMENTS = App/App\.entitlements;\n)(\t+CODE_SIGN_ENTITLEMENTS = App/App\.entitlements;\n)+",
+    r"\1",
+    text,
+)
+
+if "SystemCapabilities" not in text:
+    text = text.replace(
+        "\t\t\t\t\t\tProvisioningStyle = Automatic;\n",
+        "\t\t\t\t\t\tProvisioningStyle = Automatic;\n"
+        "\t\t\t\t\t\tSystemCapabilities = {\n"
+        "\t\t\t\t\t\t\tcom.apple.Push = {\n"
+        "\t\t\t\t\t\t\t\tenabled = 1;\n"
+        "\t\t\t\t\t\t\t};\n"
+        "\t\t\t\t\t\t};\n",
+        1,
+    )
+
+project_file.write_text(text)
+PY
+}
+
 run_capacitor_sync() {
   local platform="${1:-all}"
   local status=0
@@ -226,6 +322,8 @@ fi
 info "Building web bundle (vite)..."
 vp run build
 
+ensure_capacitor_platforms
+
 # ── Capacitor sync cache ─────────────────────────────────────────────────────
 # `cap sync` can refresh native projects and package metadata; skip when
 # inputs are unchanged. Use per-platform stamps so Android-only runs do not
@@ -295,6 +393,7 @@ elif [[ "$SYNC_PLATFORM" == "android" ]]; then
 elif [[ "$SYNC_PLATFORM" == "ios" ]]; then
   info "Syncing Capacitor iOS..."
   run_capacitor_sync ios
+  patch_ios_apns_capability
   echo "$SYNC_HASH" > "$SYNC_STAMP"
 elif [[ "$(uname -s)" != "Darwin" ]]; then
   # CI Android jobs run on Linux; keep native iOS project updates on macOS.
@@ -304,5 +403,6 @@ elif [[ "$(uname -s)" != "Darwin" ]]; then
 else
   info "Syncing Capacitor..."
   run_capacitor_sync all
+  patch_ios_apns_capability
   echo "$SYNC_HASH" > "$SYNC_STAMP"
 fi
