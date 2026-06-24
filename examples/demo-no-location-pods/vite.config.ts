@@ -1,6 +1,1 @@
-import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vite-plus';
-
-export default defineConfig({
-  plugins: [react()],
-});
+../demo-no-location/vite.config.ts

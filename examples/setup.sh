@@ -174,12 +174,19 @@ ensure_capacitor_platforms() {
     if [[ ! -d "$ORIGINAL_DIR/ios" ]]; then
       info "Adding iOS platform..."
       if [[ "$IOS_PACKAGE_MANAGER" == "pods" ]]; then
-        vpx cap add ios --packagemanager CocoaPods
+        if ! vpx cap add ios --packagemanager CocoaPods; then
+          if [[ ! -f "$ORIGINAL_DIR/ios/App/Podfile" ]]; then
+            exit 1
+          fi
+          info "Patching generated Podfile before rerunning CocoaPods..."
+        fi
       else
         vpx cap add ios --packagemanager SPM
       fi
     fi
   fi
+
+  return 0
 }
 
 patch_ios_apns_capability() {
@@ -372,7 +379,14 @@ case "$SYNC_PLATFORM" in
     ;;
 esac
 
-SYNC_HASH=$(find "${SYNC_INPUTS[@]}" \
+SYNC_EXISTING_INPUTS=()
+for input in "${SYNC_INPUTS[@]}"; do
+  if [[ -e "$input" || -L "$input" ]]; then
+    SYNC_EXISTING_INPUTS+=("$input")
+  fi
+done
+
+SYNC_HASH=$(find -H "${SYNC_EXISTING_INPUTS[@]}" \
             -type f \
             ! -path "*/node_modules/*" \
             ! -path "*/Pods/*" \

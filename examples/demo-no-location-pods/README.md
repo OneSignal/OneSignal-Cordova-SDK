@@ -4,6 +4,10 @@ This lightweight runnable example shows the native build flag for apps that use 
 
 The demo uses package/bundle id `com.onesignal.example`.
 
+## Shared App Source
+
+Most app source, assets, and package-manager-neutral config files are symlinked from `examples/demo-no-location`. Keep CocoaPods-specific files such as `package.json`, `bun.lock`, `ios/`, and `android/` local to this directory.
+
 Run it with:
 
 ```sh
