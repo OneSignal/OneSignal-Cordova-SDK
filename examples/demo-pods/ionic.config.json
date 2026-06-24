@@ -1,7 +1,1 @@
-{
-  "name": "demo",
-  "integrations": {
-    "capacitor": {}
-  },
-  "type": "react-vite"
-}
+../demo/ionic.config.json

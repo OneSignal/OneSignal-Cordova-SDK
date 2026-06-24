@@ -1,1 +1,2 @@
-../../../demo/android/app/.gitignore
+/build/*
+!/build/.npmkeep
