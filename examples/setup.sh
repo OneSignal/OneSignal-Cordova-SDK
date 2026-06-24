@@ -9,9 +9,11 @@ SYNC_PLATFORM="all"
 IOS_PACKAGE_MANAGER="spm"
 USE_LOCAL_POD=false
 
-if [[ "$DEMO_NAME" == "demo-pods" ]]; then
-  IOS_PACKAGE_MANAGER="pods"
-fi
+case "$DEMO_NAME" in
+  demo-pods|demo-no-location-pods)
+    IOS_PACKAGE_MANAGER="pods"
+    ;;
+esac
 
 info() { echo -e "\033[0;32m[setup]\033[0m $*"; }
 
@@ -106,23 +108,23 @@ finish_pods_sync() {
   fi
 
   if [[ "$USE_LOCAL_POD" == true ]]; then
-    patch_ios_podfile_local
+    patch_ios_podfile_local || return $?
     info "Using OneSignalCordovaDependencies from the local plugin path."
-    install_or_update_pods
+    install_or_update_pods || return $?
 
     if [[ "$status" -ne 0 ]]; then
       info "Recovered iOS sync after repointing OneSignalCordovaDependencies to the local plugin."
     fi
-    return
+    return 0
   fi
 
   if patch_ios_podfile_git_branch; then
-    install_or_update_pods
+    install_or_update_pods || return $?
 
     if [[ "$status" -ne 0 ]]; then
       info "Recovered iOS sync after repointing OneSignalCordovaDependencies to the release branch."
     fi
-    return
+    return 0
   fi
 
   if [[ "$status" -ne 0 ]]; then
@@ -134,6 +136,12 @@ finish_pods_sync() {
 
 ensure_capacitor_platforms() {
   if [[ "$SYNC_PLATFORM" == "all" || "$SYNC_PLATFORM" == "android" ]]; then
+    if [[ -f "$ORIGINAL_DIR/android/app/build.gradle" ]] &&
+       ! grep -q 'applicationId "com.onesignal.example"' "$ORIGINAL_DIR/android/app/build.gradle"; then
+      info "Recreating Android platform with package com.onesignal.example..."
+      rm -rf "$ORIGINAL_DIR/android"
+    fi
+
     if [[ ! -d "$ORIGINAL_DIR/android" ]]; then
       info "Adding Android platform..."
       vpx cap add android
@@ -145,7 +153,17 @@ ensure_capacitor_platforms() {
       return
     fi
 
-    if [[ "$IOS_PACKAGE_MANAGER" == "spm" && -f "$ORIGINAL_DIR/ios/App/Podfile" ]]; then
+    if [[ "$IOS_PACKAGE_MANAGER" == "pods" ]] && ! command -v pod >/dev/null 2>&1; then
+      info "CocoaPods not found, skipping iOS platform setup."
+      if [[ "$SYNC_PLATFORM" == "ios" ]]; then
+        exit 1
+      fi
+      SYNC_PLATFORM="android"
+      return
+    fi
+
+    if [[ "$IOS_PACKAGE_MANAGER" == "spm" ]] &&
+       { [[ -f "$ORIGINAL_DIR/ios/App/Podfile" ]] || [[ -d "$ORIGINAL_DIR/ios" && ! -f "$ORIGINAL_DIR/ios/App/CapApp-SPM/Package.swift" ]]; }; then
       info "Recreating iOS platform with Swift Package Manager..."
       rm -rf "$ORIGINAL_DIR/ios"
     elif [[ "$IOS_PACKAGE_MANAGER" == "pods" && -d "$ORIGINAL_DIR/ios" && ! -f "$ORIGINAL_DIR/ios/App/Podfile" ]]; then
@@ -169,9 +187,13 @@ patch_ios_apns_capability() {
   local project_file="$ORIGINAL_DIR/ios/App/App.xcodeproj/project.pbxproj"
   local entitlements_file="$app_dir/App.entitlements"
 
-  if [[ "$DEMO_NAME" != "demo-no-location" ]]; then
-    return
-  fi
+  case "$DEMO_NAME" in
+    demo-no-location|demo-no-location-pods)
+      ;;
+    *)
+      return
+      ;;
+  esac
 
   if [[ ! -f "$project_file" || ! -d "$app_dir" ]]; then
     return
