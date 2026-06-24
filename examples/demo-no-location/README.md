@@ -1,10 +1,8 @@
 # OneSignal Cordova No-Location SPM Demo
 
-This temporary runnable example shows the native build flag for apps that use OneSignal push with Swift Package Manager, but do not use `OneSignal.Location`.
+This lightweight runnable example shows how to integrate OneSignal push with Swift Package Manager without linking the `OneSignalLocation` native module.
 
 The demo uses package/bundle id `com.onesignal.example`.
-
-Current finding: the Cordova plugin's evaluated SwiftPM target dependencies exclude `OneSignalLocation` when `ONESIGNAL_DISABLE_LOCATION=true`, and Xcode does not link or embed `OneSignalLocation.framework` as long as the same environment variable is present for the `xcodebuild` process.
 
 Run it with:
 

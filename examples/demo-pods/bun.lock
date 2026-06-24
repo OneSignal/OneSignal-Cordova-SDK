@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "OneSignal Demo",
+      "name": "OneSignal Demo Pods",
       "dependencies": {
         "@capacitor/android": "^8.3.1",
         "@capacitor/app": "^8.1.0",
