@@ -7,7 +7,7 @@ SYNC_PLATFORM="all"
 USE_LOCAL_POD=false
 export ONESIGNAL_DISABLE_LOCATION=true
 
-info() { echo -e "\033[0;32m[demo-no-location]\033[0m $*"; }
+info() { echo -e "\033[0;32m[demo-no-location-pods]\033[0m $*"; }
 
 usage() {
   echo "Usage: $0 [all|android|ios] [--local-pod]" >&2

@@ -1,4 +1,4 @@
-# OneSignal Cordova No-Location Demo
+# OneSignal Cordova No-Location CocoaPods Demo
 
 This lightweight runnable example shows the native build flag for apps that use OneSignal push, but do not use `OneSignal.Location`.
 

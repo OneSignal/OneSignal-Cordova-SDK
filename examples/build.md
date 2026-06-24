@@ -86,14 +86,19 @@ Package scripts:
 {
   "scripts": {
     "setup": "../setup.sh",
-    "preandroid": "vp run setup",
-    "preios": "vp run setup",
+    "setup:android": "../setup.sh android",
+    "setup:ios": "../setup.sh ios",
+    "clean": "vp run clean:android && vp run clean:ios && rm -rf dist",
+    "clean:android": "rm -rf android/.gradle android/build android/app/build android/app/src/main/assets/public .cap-sync-android.stamp",
+    "clean:ios": "rm -rf ios/App/App/public ios/App/build ios/capacitor-cordova-ios-plugins .cap-sync-ios.stamp",
+    "preandroid": "vp run setup:android",
+    "preios": "vp run setup:ios",
     "build": "tsc && vp build",
-    "android": "ionic cap run android -l --external",
-    "ios": "ionic cap run ios -l --external",
     "android:sync": "ionic cap sync android",
     "ios:sync": "ionic cap sync ios",
-    "ios:resolve": "xcodebuild -resolvePackageDependencies -project ios/App/App.xcodeproj"
+    "ios:resolve": "xcodebuild -resolvePackageDependencies -project ios/App/App.xcodeproj",
+    "android": "ionic cap run android -l --external",
+    "ios": "ionic cap run ios -l --external --no-sync"
   }
 }
 ```
@@ -135,7 +140,7 @@ bun run setup && bun install && npx cap sync
 
 Android `strings.xml`: set `app_name` and `title_activity_main` to `OneSignal Demo`.
 
-The committed demo iOS project uses Swift Package Manager. If package resolution changes, run `bun run setup:ios` and `bun run ios:resolve` from `examples/demo`.
+The committed demo iOS project uses Swift Package Manager. If package resolution changes, run `vp run setup:ios` and `vp run ios:resolve` from `examples/demo`.
 
 ---
 
