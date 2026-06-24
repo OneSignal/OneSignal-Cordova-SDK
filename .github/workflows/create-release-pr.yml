@@ -140,7 +140,10 @@ jobs:
           # Update iOS native SDK version
           # mac os sed syntax
           sed -i '' "s|onesignal_xcframework_version = '[^']*'|onesignal_xcframework_version = '${VERSION}'|" OneSignalCordovaDependencies.podspec
+          sed -i '' "s|OneSignal-XCFramework.git\", exact: \"[^\"]*\"|OneSignal-XCFramework.git\", exact: \"${VERSION}\"|" Package.swift
+          sed -i '' '/XCRemoteSwiftPackageReference "OneSignal-XCFramework"/,/};/ { s|version = [^;]*;|version = '"${VERSION}"';|; }' examples/demo/ios/App/App.xcodeproj/project.pbxproj
           echo "✓ Updated OneSignalCordovaDependencies.podspec with iOS SDK ${VERSION}"
+          echo "✓ Updated Package.swift and demo SPM requirement with iOS SDK ${VERSION}"
 
           # Only commit if there are changes
           git add -A
@@ -176,24 +179,20 @@ jobs:
           git diff --staged --quiet && exit 0
           git commit -m "Release $NEW_VERSION" && git push
 
-      - name: Refresh demo Podfile.lock
+      - name: Refresh demo Swift package resolution
         if: inputs.ios_version != ''
         run: |
-          # `pod install` (last step of cap sync) bails on the committed
-          # Podfile.lock when plugin.xml's OneSignalXCFramework pin moved.
-          # Everything before it succeeds, so `pod update` can then bump
-          # just that entry against the regenerated cordova-ios-plugins shim.
           (
             cd examples/demo
-            vp run setup || echo "::notice::expected pod install conflict; bumping OneSignalXCFramework"
-            (cd ios/App && pod update OneSignalXCFramework)
+            vp run setup:ios
+            vp run ios:resolve
           )
-          echo "✓ Refreshed examples/demo/ios/App/Podfile.lock"
+          echo "✓ Refreshed examples/demo SPM package resolution"
 
           # Only commit if there are changes
           git add -A
           git diff --staged --quiet && exit 0
-          git commit -m "Update demo Podfile.lock" && git push
+          git commit -m "Update demo SPM resolution" && git push
 
   create-pr:
     needs: [prep, update_version]

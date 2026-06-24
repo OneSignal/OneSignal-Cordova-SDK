@@ -43,6 +43,14 @@ The Cordova SDK accesses the OneSignal native iOS and Android SDKs. For this upd
 
 ## iOS
 
+### Native Dependency Manager Support
+
+The Cordova SDK continues to support CocoaPods through `OneSignalCordovaDependencies`. Apps using `cordova-ios` 8 or newer can also resolve the iOS native dependencies with Swift Package Manager.
+
+For Ionic Capacitor apps that use Swift Package Manager, use Capacitor 8.4.0 or newer. Earlier Capacitor versions generate a Cordova-only Swift package for Cordova plugins and do not preserve this SDK's `OneSignal-XCFramework` dependency.
+
+If your app does not use `OneSignal.Location`, set `ONESIGNAL_DISABLE_LOCATION=true` before resolving native dependencies. For Swift Package Manager builds, the variable must also be present during the actual Xcode build so `Package.swift` is evaluated with the location module disabled.
+
 ### Notification Service Extension Changes
 
 In your Project Root > ios > Podfile, update the notification service extension:

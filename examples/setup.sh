@@ -4,13 +4,21 @@ set -euo pipefail
 # Run from inside any examples/<demo> directory.
 ORIGINAL_DIR=$(pwd)
 SDK_ROOT=$(cd "$ORIGINAL_DIR/../.." && pwd)
+DEMO_NAME=$(basename "$ORIGINAL_DIR")
 SYNC_PLATFORM="all"
+IOS_PACKAGE_MANAGER="spm"
 USE_LOCAL_POD=false
+
+case "$DEMO_NAME" in
+  demo-pods|demo-no-location-pods)
+    IOS_PACKAGE_MANAGER="pods"
+    ;;
+esac
 
 info() { echo -e "\033[0;32m[setup]\033[0m $*"; }
 
 usage() {
-  echo "Usage: $0 [all|android|ios] [--local-pod]" >&2
+  echo "Usage: $0 [all|android|ios] [--local-pod] [--spm|--pods]" >&2
 }
 
 patch_ios_podfile_local() {
@@ -92,6 +100,163 @@ install_or_update_pods() {
   fi
 }
 
+finish_pods_sync() {
+  local status="${1:-0}"
+
+  if [[ ! -f "$ORIGINAL_DIR/ios/App/Podfile" ]]; then
+    return "$status"
+  fi
+
+  if [[ "$USE_LOCAL_POD" == true ]]; then
+    patch_ios_podfile_local || return $?
+    info "Using OneSignalCordovaDependencies from the local plugin path."
+    install_or_update_pods || return $?
+
+    if [[ "$status" -ne 0 ]]; then
+      info "Recovered iOS sync after repointing OneSignalCordovaDependencies to the local plugin."
+    fi
+    return 0
+  fi
+
+  if patch_ios_podfile_git_branch; then
+    install_or_update_pods || return $?
+
+    if [[ "$status" -ne 0 ]]; then
+      info "Recovered iOS sync after repointing OneSignalCordovaDependencies to the release branch."
+    fi
+    return 0
+  fi
+
+  if [[ "$status" -ne 0 ]]; then
+    return "$status"
+  fi
+
+  info "Using OneSignalCordovaDependencies from the generated git tag."
+}
+
+ensure_capacitor_platforms() {
+  if [[ "$SYNC_PLATFORM" == "all" || "$SYNC_PLATFORM" == "android" ]]; then
+    if [[ -f "$ORIGINAL_DIR/android/app/build.gradle" ]] &&
+       ! grep -q 'applicationId "com.onesignal.example"' "$ORIGINAL_DIR/android/app/build.gradle"; then
+      info "Recreating Android platform with package com.onesignal.example..."
+      rm -rf "$ORIGINAL_DIR/android"
+    fi
+
+    if [[ ! -d "$ORIGINAL_DIR/android" ]]; then
+      info "Adding Android platform..."
+      vpx cap add android
+    fi
+  fi
+
+  if [[ "$SYNC_PLATFORM" == "all" || "$SYNC_PLATFORM" == "ios" ]]; then
+    if [[ "$(uname -s)" != "Darwin" ]]; then
+      return
+    fi
+
+    if [[ "$IOS_PACKAGE_MANAGER" == "pods" ]] && ! command -v pod >/dev/null 2>&1; then
+      info "CocoaPods not found, skipping iOS platform setup."
+      if [[ "$SYNC_PLATFORM" == "ios" ]]; then
+        exit 1
+      fi
+      SYNC_PLATFORM="android"
+      return
+    fi
+
+    if [[ "$IOS_PACKAGE_MANAGER" == "spm" ]] &&
+       { [[ -f "$ORIGINAL_DIR/ios/App/Podfile" ]] || [[ -d "$ORIGINAL_DIR/ios" && ! -f "$ORIGINAL_DIR/ios/App/CapApp-SPM/Package.swift" ]]; }; then
+      info "Recreating iOS platform with Swift Package Manager..."
+      rm -rf "$ORIGINAL_DIR/ios"
+    elif [[ "$IOS_PACKAGE_MANAGER" == "pods" && -d "$ORIGINAL_DIR/ios" && ! -f "$ORIGINAL_DIR/ios/App/Podfile" ]]; then
+      info "Recreating iOS platform with CocoaPods..."
+      rm -rf "$ORIGINAL_DIR/ios"
+    fi
+
+    if [[ ! -d "$ORIGINAL_DIR/ios" ]]; then
+      info "Adding iOS platform..."
+      if [[ "$IOS_PACKAGE_MANAGER" == "pods" ]]; then
+        if ! vpx cap add ios --packagemanager CocoaPods; then
+          if [[ ! -f "$ORIGINAL_DIR/ios/App/Podfile" ]]; then
+            exit 1
+          fi
+          info "Patching generated Podfile before rerunning CocoaPods..."
+        fi
+      else
+        vpx cap add ios --packagemanager SPM
+      fi
+    fi
+  fi
+
+  return 0
+}
+
+patch_ios_apns_capability() {
+  local app_dir="$ORIGINAL_DIR/ios/App/App"
+  local project_file="$ORIGINAL_DIR/ios/App/App.xcodeproj/project.pbxproj"
+  local entitlements_file="$app_dir/App.entitlements"
+
+  case "$DEMO_NAME" in
+    demo-no-location|demo-no-location-pods)
+      ;;
+    *)
+      return
+      ;;
+  esac
+
+  if [[ ! -f "$project_file" || ! -d "$app_dir" ]]; then
+    return
+  fi
+
+  cat > "$entitlements_file" <<'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>aps-environment</key>
+	<string>development</string>
+</dict>
+</plist>
+EOF
+
+  PROJECT_FILE="$project_file" python3 <<'PY'
+import os
+import re
+from pathlib import Path
+
+project_file = Path(os.environ["PROJECT_FILE"])
+text = project_file.read_text()
+
+text = re.sub(
+    r"PRODUCT_BUNDLE_IDENTIFIER = [^;]+;",
+    "PRODUCT_BUNDLE_IDENTIFIER = com.onesignal.example;",
+    text,
+)
+
+text = text.replace(
+    "CODE_SIGN_STYLE = Automatic;\n",
+    "CODE_SIGN_STYLE = Automatic;\n\t\t\t\tCODE_SIGN_ENTITLEMENTS = App/App.entitlements;\n",
+)
+text = re.sub(
+    r"(\t+CODE_SIGN_ENTITLEMENTS = App/App\.entitlements;\n)(\t+CODE_SIGN_ENTITLEMENTS = App/App\.entitlements;\n)+",
+    r"\1",
+    text,
+)
+
+if "SystemCapabilities" not in text:
+    text = text.replace(
+        "\t\t\t\t\t\tProvisioningStyle = Automatic;\n",
+        "\t\t\t\t\t\tProvisioningStyle = Automatic;\n"
+        "\t\t\t\t\t\tSystemCapabilities = {\n"
+        "\t\t\t\t\t\t\tcom.apple.Push = {\n"
+        "\t\t\t\t\t\t\t\tenabled = 1;\n"
+        "\t\t\t\t\t\t\t};\n"
+        "\t\t\t\t\t\t};\n",
+        1,
+    )
+
+project_file.write_text(text)
+PY
+}
+
 run_capacitor_sync() {
   local platform="${1:-all}"
   local status=0
@@ -103,41 +268,26 @@ run_capacitor_sync() {
       ;;
     ios)
       vpx cap sync ios || status=$?
+      if [[ "$IOS_PACKAGE_MANAGER" == "pods" ]]; then
+        if finish_pods_sync "$status"; then
+          status=0
+        else
+          status=$?
+        fi
+      fi
       ;;
     all)
       vpx cap sync || status=$?
+      if [[ "$IOS_PACKAGE_MANAGER" == "pods" ]]; then
+        if finish_pods_sync "$status"; then
+          status=0
+        else
+          status=$?
+        fi
+      fi
       ;;
   esac
-
-  if [[ ! -f "$ORIGINAL_DIR/ios/App/Podfile" ]]; then
-    return "$status"
-  fi
-
-  if [[ "$USE_LOCAL_POD" == true ]]; then
-    patch_ios_podfile_local
-    info "Using OneSignalCordovaDependencies from the local plugin path."
-    install_or_update_pods
-
-    if [[ "$status" -ne 0 ]]; then
-      info "Recovered iOS sync after repointing OneSignalCordovaDependencies to the local plugin."
-    fi
-    return
-  fi
-
-  if patch_ios_podfile_git_branch; then
-    install_or_update_pods
-
-    if [[ "$status" -ne 0 ]]; then
-      info "Recovered iOS sync after repointing OneSignalCordovaDependencies to the release branch."
-    fi
-    return
-  fi
-
-  if [[ "$status" -ne 0 ]]; then
-    return "$status"
-  fi
-
-  info "Using OneSignalCordovaDependencies from the generated git tag."
+  return "$status"
 }
 
 for arg in "$@"; do
@@ -147,6 +297,15 @@ for arg in "$@"; do
       ;;
     --local-pod)
       USE_LOCAL_POD=true
+      ;;
+    --local-package)
+      info "$arg is no longer needed; the SPM demo always installs the local packed plugin."
+      ;;
+    --spm)
+      IOS_PACKAGE_MANAGER="spm"
+      ;;
+    --pods)
+      IOS_PACKAGE_MANAGER="pods"
       ;;
     *)
       usage
@@ -162,6 +321,7 @@ INSTALLED_DIR="$ORIGINAL_DIR/node_modules/onesignal-cordova-plugin"
 
 SDK_SRC_HASH=$(find "$SDK_ROOT/src" "$SDK_ROOT/www" \
                     "$SDK_ROOT/package.json" "$SDK_ROOT/plugin.xml" \
+                    "$SDK_ROOT/Package.swift" \
                     "$SDK_ROOT/OneSignalCordovaDependencies.podspec" \
                     "$SDK_ROOT/build-extras-onesignal.gradle" \
                -type f 2>/dev/null \
@@ -191,10 +351,12 @@ fi
 info "Building web bundle (vite)..."
 vp run build
 
+ensure_capacitor_platforms
+
 # ── Capacitor sync cache ─────────────────────────────────────────────────────
-# `cap sync` can run `pod install` + `xcodebuild clean` (~30-60s); skip when
+# `cap sync` can refresh native projects and package metadata; skip when
 # inputs are unchanged. Use per-platform stamps so Android-only runs do not
-# touch iOS when CocoaPods is available locally.
+# touch iOS in CI.
 SYNC_STAMP="$ORIGINAL_DIR/.cap-sync-${SYNC_PLATFORM}.stamp"
 SYNC_INPUTS=(
   "$ORIGINAL_DIR/src"
@@ -217,18 +379,26 @@ case "$SYNC_PLATFORM" in
     ;;
 esac
 
-SYNC_HASH=$(find "${SYNC_INPUTS[@]}" \
+SYNC_EXISTING_INPUTS=()
+for input in "${SYNC_INPUTS[@]}"; do
+  if [[ -e "$input" || -L "$input" ]]; then
+    SYNC_EXISTING_INPUTS+=("$input")
+  fi
+done
+
+SYNC_HASH=$(find -H "${SYNC_EXISTING_INPUTS[@]}" \
             -type f \
             ! -path "*/node_modules/*" \
             ! -path "*/Pods/*" \
             ! -path "*/build/*" \
             ! -path "*/DerivedData/*" \
             ! -path "*/xcuserdata/*" \
-            \( -name "Podfile" -o -name "build.gradle" \
+            \( -name "Podfile" -o -name "Package.swift" \
+               -o -name "Package.resolved" -o -name "build.gradle" \
                -o -name "*.ts" -o -name "*.tsx" \
                -o -name "*.json" -o -name "*.html" -o -name "*.js" \
                -o -name "*.css" -o -name "*.svg" -o -name "*.xml" \
-               -o -name "*.lock" \) \
+               -o -name "*.lock" -o -name "*.xcconfig" \) \
             2>/dev/null \
             | sort \
             | xargs shasum 2>/dev/null \
@@ -259,15 +429,16 @@ elif [[ "$SYNC_PLATFORM" == "android" ]]; then
 elif [[ "$SYNC_PLATFORM" == "ios" ]]; then
   info "Syncing Capacitor iOS..."
   run_capacitor_sync ios
+  patch_ios_apns_capability
   echo "$SYNC_HASH" > "$SYNC_STAMP"
-elif ! command -v pod >/dev/null 2>&1; then
-  # CI Android jobs run on Linux where CocoaPods isn't installed.
-  # Sync only Android so plain `cap sync` doesn't shell out to pod.
-  info "CocoaPods not found, syncing Android only..."
+elif [[ "$(uname -s)" != "Darwin" ]]; then
+  # CI Android jobs run on Linux; keep native iOS project updates on macOS.
+  info "Non-macOS host detected, syncing Android only..."
   vpx cap sync android
   echo "$SYNC_HASH" > "$SYNC_STAMP"
 else
   info "Syncing Capacitor..."
   run_capacitor_sync all
+  patch_ios_apns_capability
   echo "$SYNC_HASH" > "$SYNC_STAMP"
 fi

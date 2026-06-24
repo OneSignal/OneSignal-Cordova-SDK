@@ -44,6 +44,16 @@ bun run ios:sync
 
 Local plugin setup: reference local plugin tarball through `examples/setup.sh` workflow.
 
+### CocoaPods Demo
+
+`examples/demo-pods/` mirrors the main demo but keeps iOS on CocoaPods. Use it when validating the `OneSignalCordovaDependencies` podspec, Podfile lock updates, or release behavior for consumers that have not moved to Swift Package Manager.
+
+```bash
+cd examples/demo-pods
+vp run setup:ios
+vp run update:pods
+```
+
 ### No-Location Demo
 
 `examples/demo-no-location/` is a smaller Capacitor-hosted app that verifies the Cordova plugin can be built with `ONESIGNAL_DISABLE_LOCATION=true`.
@@ -58,7 +68,7 @@ vp run android
 
 The demo setup script packs the local Cordova plugin, installs the app dependencies, creates native platforms if needed, and runs Capacitor sync with `ONESIGNAL_DISABLE_LOCATION=true` in the environment. Its normal app flow initializes OneSignal and requests push permission without calling `OneSignal.Location`; the explicit location test button confirms those calls resolve safely when the native location module is absent.
 
-By default, iOS setup validates the generated `OneSignalCordovaDependencies` git source. On `rel/*` branches, the generated Podfile is repointed from the release tag to the matching remote release branch so pre-release validation tests branch HEAD. Use `vp run ios:local` from a demo directory to patch the generated Podfile to the locally packed plugin path while iterating on the podspec.
+The main demo validates Swift Package Manager on iOS. `examples/setup.sh` packs the local Cordova plugin, syncs Capacitor, and prepares the generated Cordova plugin package that `CapApp-SPM` references. `examples/demo-pods` validates the standard CocoaPods install, while `examples/demo-no-location` validates the SPM dependency split because `ONESIGNAL_DISABLE_LOCATION` is evaluated by `Package.swift`. `examples/demo-no-location-pods` validates the CocoaPods dependency split through the podspec.
 
 ### vite-plus / vp toolchain
 
@@ -76,14 +86,19 @@ Package scripts:
 {
   "scripts": {
     "setup": "../setup.sh",
-    "preandroid": "vp run setup",
-    "preios": "vp run setup",
+    "setup:android": "../setup.sh android",
+    "setup:ios": "../setup.sh ios",
+    "clean": "vp run clean:android && vp run clean:ios && rm -rf dist",
+    "clean:android": "rm -rf android/.gradle android/build android/app/build android/app/src/main/assets/public .cap-sync-android.stamp",
+    "clean:ios": "rm -rf ios/App/App/public ios/App/build ios/capacitor-cordova-ios-plugins .cap-sync-ios.stamp",
+    "preandroid": "vp run setup:android",
+    "preios": "vp run setup:ios",
     "build": "tsc && vp build",
-    "android": "ionic cap run android -l --external",
-    "ios": "ionic cap run ios -l --external",
     "android:sync": "ionic cap sync android",
     "ios:sync": "ionic cap sync ios",
-    "update:pods": "(cd ios/App && pod update OneSignalXCFramework --no-repo-update)"
+    "ios:resolve": "xcodebuild -resolvePackageDependencies -project ios/App/App.xcodeproj",
+    "android": "ionic cap run android -l --external --no-sync",
+    "ios": "ionic cap run ios -l --external --no-sync"
   }
 }
 ```
@@ -125,7 +140,7 @@ bun run setup && bun install && npx cap sync
 
 Android `strings.xml`: set `app_name` and `title_activity_main` to `OneSignal Demo`.
 
-If iOS sync reports SPM issues, regenerate native projects and rerun setup/sync.
+The committed demo iOS project uses Swift Package Manager. If package resolution changes, run `vp run setup:ios` and `vp run ios:resolve` from `examples/demo`.
 
 ---
 

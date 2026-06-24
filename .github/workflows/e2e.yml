@@ -92,13 +92,13 @@ jobs:
         with:
           onesignal-app-id: ${{ vars.APPIUM_ONESIGNAL_APP_ID }}
           onesignal-api-key: ${{ secrets.APPIUM_ONESIGNAL_API_KEY }}
-          install-pods: 'true'
+          resolve-ios-packages: 'true'
 
       - name: Cache Xcode DerivedData
         uses: actions/cache@v5
         with:
           path: examples/demo/ios/App/build
-          key: deriveddata-${{ runner.os }}-${{ hashFiles('examples/demo/ios/App/Podfile.lock') }}
+          key: deriveddata-${{ runner.os }}-${{ hashFiles('examples/demo/ios/App/App.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
           restore-keys: deriveddata-${{ runner.os }}-
 
       - name: Set up iOS codesigning
@@ -114,7 +114,7 @@ jobs:
         working-directory: examples/demo/ios/App
         run: |
           xcodebuild archive \
-            -workspace App.xcworkspace \
+            -project App.xcodeproj \
             -scheme App \
             -configuration Release \
             -sdk iphoneos \

@@ -1,0 +1,1 @@
+../../demo/android/gradlew.bat
