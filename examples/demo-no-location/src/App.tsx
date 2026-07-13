@@ -48,6 +48,7 @@ export default function App() {
   const [requestingPermission, setRequestingPermission] = useState(false);
   const [sendingNotification, setSendingNotification] = useState(false);
   const [locationTestResult, setLocationTestResult] = useState<string>('Not run');
+  const [liveActivityResult, setLiveActivityResult] = useState<string>('Not run');
 
   const refreshPushState = useCallback(() => {
     const oneSignal = getOneSignal();
@@ -72,6 +73,10 @@ export default function App() {
       setSdkReady(true);
       oneSignal.Debug.setLogLevel(LogLevel.Verbose);
       oneSignal.initialize(ONESIGNAL_APP_ID);
+      oneSignal.LiveActivities.setupDefault({
+        enablePushToStart: true,
+        enablePushToUpdate: true,
+      });
       setInitialized(true);
       refreshPushState();
     });
@@ -135,6 +140,26 @@ export default function App() {
     } catch (error) {
       setLocationTestResult(`Unexpected JavaScript error: ${String(error)}`);
     }
+  }, []);
+
+  const testLiveActivity = useCallback(() => {
+    const oneSignal = getOneSignal();
+    if (!oneSignal) {
+      setLiveActivityResult('OneSignal SDK unavailable');
+      return;
+    }
+
+    const activityId = `no-location-${Date.now()}`;
+    oneSignal.LiveActivities.startDefault(
+      activityId,
+      { orderNumber: 'ORD-NO-LOCATION' },
+      {
+        status: 'preparing',
+        message: 'Live Activity started without location',
+        estimatedTime: '15 min',
+      },
+    );
+    setLiveActivityResult(`Started ${activityId}`);
   }, []);
 
   return (
@@ -223,6 +248,22 @@ export default function App() {
               disabled={!bridgeReady}
             >
               TEST LOCATION BRIDGE
+            </button>
+          </div>
+        </section>
+
+        <section className="section">
+          <h2>Live Activities</h2>
+          <div className="card">
+            <p>Starts a default Live Activity while the location module remains excluded.</p>
+            <dl>
+              <div>
+                <dt>Test Result</dt>
+                <dd>{liveActivityResult}</dd>
+              </div>
+            </dl>
+            <button type="button" onClick={testLiveActivity} disabled={!bridgeReady}>
+              TEST LIVE ACTIVITY
             </button>
           </div>
         </section>

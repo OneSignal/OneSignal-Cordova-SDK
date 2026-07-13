@@ -225,10 +225,9 @@ from pathlib import Path
 project_file = Path(os.environ["PROJECT_FILE"])
 text = project_file.read_text()
 
-text = re.sub(
-    r"PRODUCT_BUNDLE_IDENTIFIER = [^;]+;",
-    "PRODUCT_BUNDLE_IDENTIFIER = com.onesignal.example;",
-    text,
+text = text.replace(
+    "PRODUCT_BUNDLE_IDENTIFIER = com.onesignal.example.OneSignalWidgetExtension;",
+    "PRODUCT_BUNDLE_IDENTIFIER = com.onesignal.example.LA;",
 )
 
 text = text.replace(
