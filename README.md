@@ -134,6 +134,22 @@ env:
 
 With the location module disabled, calls to `OneSignal.Location` are ignored and `OneSignal.Location.isShared()` resolves `false`.
 
+If your iOS Podfile explicitly adds `OneSignalXCFramework` to a Notification Service Extension target, use the modular subspec instead. The aggregate pod resolves `OneSignalComplete`, which includes the location module:
+
+```ruby
+target 'OneSignalNotificationServiceExtension' do
+  pod 'OneSignalXCFramework/OneSignal', '>= 5.0.0', '< 6.0'
+end
+```
+
+If your app also has a Live Activity widget extension, add only its required subspec:
+
+```ruby
+target 'OneSignalWidgetExtension' do
+  pod 'OneSignalXCFramework/OneSignalLiveActivities', '>= 5.0.0', '< 6.0'
+end
+```
+
 If you change this setting in an existing project, clear the relevant native dependency state and re-resolve in a shell where the variable is exported.
 
 For Cordova:
