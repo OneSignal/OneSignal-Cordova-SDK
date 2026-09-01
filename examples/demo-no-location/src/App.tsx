@@ -65,7 +65,11 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+
     void onDeviceReady.then(() => {
+      if (cancelled) return;
+
       const oneSignal = getOneSignal();
       setBridgeReady(true);
       if (!oneSignal) return;
@@ -80,6 +84,10 @@ export default function App() {
       setInitialized(true);
       refreshPushState();
     });
+
+    return () => {
+      cancelled = true;
+    };
   }, [refreshPushState]);
 
   const requestPermission = useCallback(async () => {
