@@ -3,9 +3,11 @@ import { OSNotification } from './OSNotification';
 
 export class NotificationWillDisplayEvent {
   private notification: OSNotification;
+  private readonly onPreventDefault?: () => void;
 
-  constructor(displayEvent: OSNotification) {
+  constructor(displayEvent: OSNotification, onPreventDefault?: () => void) {
     this.notification = new OSNotification(displayEvent);
+    this.onPreventDefault = onPreventDefault;
   }
 
   /**
@@ -17,6 +19,7 @@ export class NotificationWillDisplayEvent {
    * possibility of displaying it in the future.
    */
   preventDefault(discard: boolean = false): void {
+    this.onPreventDefault?.();
     window.cordova.exec(noop, noop, 'OneSignalPush', 'preventDefault', [
       this.notification.notificationId,
       discard,

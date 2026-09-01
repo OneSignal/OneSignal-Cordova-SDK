@@ -251,8 +251,8 @@ describe('Notifications', () => {
       const notificationData = mockNotification();
       foregroundCallback(notificationData);
 
-      const displayEvent = new NotificationWillDisplayEvent(notificationData);
-      expect(mockListener).toHaveBeenCalledWith(displayEvent);
+      const displayEvent = mockListener.mock.calls[0][0];
+      expect(displayEvent).toBeInstanceOf(NotificationWillDisplayEvent);
       expect(mockListener2).toHaveBeenCalledWith(displayEvent);
 
       expect(window.cordova.exec).toHaveBeenCalledWith(
@@ -260,6 +260,43 @@ describe('Notifications', () => {
         expect.any(Function),
         'OneSignalPush',
         'proceedWithWillDisplay',
+        [notificationData.notificationId],
+      );
+    });
+
+    test('should not proceed automatically when a foreground listener prevents display', () => {
+      let displayEvent: NotificationWillDisplayEvent | undefined;
+      const mockListener = vi.fn((event: NotificationWillDisplayEvent) => {
+        displayEvent = event;
+        event.preventDefault();
+      });
+      notifications.addEventListener('foregroundWillDisplay', mockListener);
+
+      const foregroundCallback = mockExec.mock.calls[0][0];
+      const notificationData = mockNotification();
+      foregroundCallback(notificationData);
+
+      expect(window.cordova.exec).toHaveBeenCalledWith(
+        expect.any(Function),
+        expect.any(Function),
+        'OneSignalPush',
+        'preventDefault',
+        [notificationData.notificationId, false],
+      );
+      expect(window.cordova.exec).not.toHaveBeenCalledWith(
+        expect.any(Function),
+        expect.any(Function),
+        'OneSignalPush',
+        'proceedWithWillDisplay',
+        expect.anything(),
+      );
+
+      displayEvent?.getNotification().display();
+      expect(window.cordova.exec).toHaveBeenCalledWith(
+        expect.any(Function),
+        expect.any(Function),
+        'OneSignalPush',
+        'displayNotification',
         [notificationData.notificationId],
       );
     });
