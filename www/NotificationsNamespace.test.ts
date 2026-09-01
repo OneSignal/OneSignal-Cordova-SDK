@@ -253,7 +253,8 @@ describe('Notifications', () => {
 
       const displayEvent = mockListener.mock.calls[0][0];
       expect(displayEvent).toBeInstanceOf(NotificationWillDisplayEvent);
-      expect(mockListener2).toHaveBeenCalledWith(displayEvent);
+      expect(displayEvent.getNotification().notificationId).toBe(notificationData.notificationId);
+      expect(mockListener2.mock.calls[0][0]).toBe(displayEvent);
 
       expect(window.cordova.exec).toHaveBeenCalledWith(
         expect.any(Function),
@@ -298,6 +299,28 @@ describe('Notifications', () => {
         'OneSignalPush',
         'displayNotification',
         [notificationData.notificationId],
+      );
+    });
+
+    test('should not proceed when the second foreground listener prevents display', () => {
+      const firstListener = vi.fn();
+      const secondListener = vi.fn((event: NotificationWillDisplayEvent) => {
+        event.preventDefault();
+      });
+      notifications.addEventListener('foregroundWillDisplay', firstListener);
+      notifications.addEventListener('foregroundWillDisplay', secondListener);
+
+      const foregroundCallback = mockExec.mock.calls[0][0];
+      foregroundCallback(mockNotification());
+
+      expect(firstListener).toHaveBeenCalledOnce();
+      expect(secondListener).toHaveBeenCalledOnce();
+      expect(window.cordova.exec).not.toHaveBeenCalledWith(
+        expect.any(Function),
+        expect.any(Function),
+        'OneSignalPush',
+        'proceedWithWillDisplay',
+        expect.anything(),
       );
     });
 

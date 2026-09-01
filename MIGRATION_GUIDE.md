@@ -371,9 +371,9 @@ OneSignal.Notifications.removeEventListener('permissionChange', listener);
 
 ```typescript
 const listener = (event: NotificationWillDisplayEvent) => {
-  // Use preventDefault() to not display
+  // Call preventDefault() synchronously before starting any async work
   event.preventDefault();
-  // Use notification.display() to display the notification after some async work
+  // Use notification.display() within ~25 seconds to display after async work
   event.getNotification().display();
 };
 OneSignal.Notifications.addEventListener('foregroundWillDisplay', listener);

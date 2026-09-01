@@ -243,7 +243,7 @@ export function useOneSignal(): UseOneSignalReturn {
       // e.preventDefault();
 
       // can call this after preventDefault (within ~25 seconds) to force display of notification
-      // e.getNotification().display()
+      // e.getNotification().display();
     };
 
     const pushSubHandler = (event: PushSubscriptionChangedState) => {

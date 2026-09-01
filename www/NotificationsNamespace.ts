@@ -153,14 +153,9 @@ export default class Notifications {
       if (!this._hasRegisteredForegroundWillDisplayListener) {
         this._hasRegisteredForegroundWillDisplayListener = true;
         const foregroundParsingHandler = (notification: OSNotification) => {
-          let defaultPrevented = false;
-          const displayEvent = new NotificationWillDisplayEvent(notification, () => {
-            defaultPrevented = true;
-          });
-          this._notificationWillDisplayListeners.forEach((listener) => {
-            listener(displayEvent);
-          });
-          if (!defaultPrevented) {
+          const displayEvent = new NotificationWillDisplayEvent(notification);
+          this._processFunctionList(this._notificationWillDisplayListeners, displayEvent);
+          if (!displayEvent.defaultPrevented) {
             window.cordova.exec(noop, noop, 'OneSignalPush', 'proceedWithWillDisplay', [
               notification.notificationId,
             ]);
