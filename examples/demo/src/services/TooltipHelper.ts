@@ -16,6 +16,8 @@ class TooltipHelper {
 
   private initialized = false;
 
+  private initialization?: Promise<void>;
+
   private static readonly TOOLTIP_URL =
     'https://raw.githubusercontent.com/OneSignal/sdk-shared/main/demo/tooltip_content.json';
 
@@ -26,62 +28,66 @@ class TooltipHelper {
     return TooltipHelper.instance;
   }
 
-  async init(): Promise<void> {
+  init(): Promise<void> {
     if (this.initialized) {
-      return;
+      return Promise.resolve();
     }
 
-    try {
-      const response = await fetch(TooltipHelper.TOOLTIP_URL);
-      if (!response.ok) {
-        this.initialized = true;
-        return;
-      }
+    if (!this.initialization) {
+      this.initialization = (async () => {
+        try {
+          const response = await fetch(TooltipHelper.TOOLTIP_URL);
+          if (!response.ok) return;
 
-      const json = (await response.json()) as Record<string, unknown>;
-      const parsed: Record<string, TooltipData> = {};
+          const json = (await response.json()) as Record<string, unknown>;
+          const parsed: Record<string, TooltipData> = {};
 
-      Object.entries(json).forEach(([key, value]) => {
-        if (typeof value !== 'object' || value === null) {
-          return;
+          Object.entries(json).forEach(([key, value]) => {
+            if (typeof value !== 'object' || value === null) {
+              return;
+            }
+
+            const item = value as Record<string, unknown>;
+            const title = typeof item.title === 'string' ? item.title : '';
+            const description = typeof item.description === 'string' ? item.description : '';
+            const options = Array.isArray(item.options)
+              ? item.options
+                  .map((option) => {
+                    if (typeof option !== 'object' || option === null) {
+                      return null;
+                    }
+                    const optionRecord = option as Record<string, unknown>;
+                    const name = typeof optionRecord.name === 'string' ? optionRecord.name : '';
+                    const optionDescription =
+                      typeof optionRecord.description === 'string' ? optionRecord.description : '';
+
+                    if (!name || !optionDescription) {
+                      return null;
+                    }
+
+                    return { name, description: optionDescription };
+                  })
+                  .filter((option): option is TooltipOption => option !== null)
+              : undefined;
+
+            if (!title || !description) {
+              return;
+            }
+
+            parsed[key] = { title, description, options };
+          });
+
+          this.tooltips = parsed;
+          this.initialized = true;
+        } catch {
+          // Tooltips are non-critical; ignore failures and allow a later retry.
         }
-
-        const item = value as Record<string, unknown>;
-        const title = typeof item.title === 'string' ? item.title : '';
-        const description = typeof item.description === 'string' ? item.description : '';
-        const options = Array.isArray(item.options)
-          ? item.options
-              .map((option) => {
-                if (typeof option !== 'object' || option === null) {
-                  return null;
-                }
-                const optionRecord = option as Record<string, unknown>;
-                const name = typeof optionRecord.name === 'string' ? optionRecord.name : '';
-                const optionDescription =
-                  typeof optionRecord.description === 'string' ? optionRecord.description : '';
-
-                if (!name || !optionDescription) {
-                  return null;
-                }
-
-                return { name, description: optionDescription };
-              })
-              .filter((option): option is TooltipOption => option !== null)
-          : undefined;
-
-        if (!title || !description) {
-          return;
-        }
-
-        parsed[key] = { title, description, options };
+      })().finally(() => {
+        this.initialization = undefined;
       });
-
-      this.tooltips = parsed;
-    } catch {
-      this.tooltips = {};
     }
 
-    this.initialized = true;
+    return this.initialization;
   }
 
   getTooltip(key: string): TooltipData | undefined {
