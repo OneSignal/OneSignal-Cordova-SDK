@@ -25,9 +25,6 @@ jobs:
       security-events: write
       packages: read
 
-      # required to fetch internal or private CodeQL packs
-      packages: read
-
     strategy:
       fail-fast: false
       matrix:
