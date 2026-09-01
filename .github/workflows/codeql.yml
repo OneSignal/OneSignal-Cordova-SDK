@@ -7,9 +7,6 @@ concurrency:
 on:
   push:
     branches: ['main']
-  pull_request:
-    # The branches below must be a subset of the branches above
-    branches: ['main']
   schedule:
     - cron: '37 19 * * 0'
 
@@ -23,10 +20,9 @@ jobs:
     # Consider using larger runners or machines with greater resources for possible analysis time improvements.
     runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
     permissions:
-      # required for all workflows
+      actions: read
+      contents: read
       security-events: write
-
-      # required to fetch internal or private CodeQL packs
       packages: read
 
     strategy:
