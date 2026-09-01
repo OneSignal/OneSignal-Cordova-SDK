@@ -52,9 +52,7 @@ const MultiPairInputModal: FC<MultiPairInputModalProps> = ({
         onSubmit={(event) => {
           event.preventDefault();
           if (!isValid) return;
-          const pairs = Object.fromEntries(
-            rows.map((row) => [row.key.trim(), row.value.trim()]),
-          );
+          const pairs = Object.fromEntries(rows.map((row) => [row.key.trim(), row.value.trim()]));
           onSubmit(pairs);
         }}
       >
