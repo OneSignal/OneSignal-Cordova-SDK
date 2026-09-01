@@ -314,28 +314,34 @@ for arg in "$@"; do
 done
 
 # ── Plugin tarball cache ─────────────────────────────────────────────────────
-# Skip rebuild/repack/`vp add` when plugin sources haven't changed.
-SDK_STAMP="$SDK_ROOT/.cordova-sdk-source.stamp"
+TARBALL="$SDK_ROOT/onesignal-cordova-plugin.tgz"
+INSTALL_STAMP="$ORIGINAL_DIR/.cordova-sdk-source.stamp"
 INSTALLED_DIR="$ORIGINAL_DIR/node_modules/onesignal-cordova-plugin"
 
-SDK_SRC_HASH=$(find "$SDK_ROOT/src" "$SDK_ROOT/www" \
-                    "$SDK_ROOT/package.json" "$SDK_ROOT/plugin.xml" \
-                    "$SDK_ROOT/Package.swift" \
-                    "$SDK_ROOT/OneSignalCordovaDependencies.podspec" \
-                    "$SDK_ROOT/build-extras-onesignal.gradle" \
-               -type f 2>/dev/null \
-               | sort \
-               | xargs shasum 2>/dev/null \
-               | shasum \
-               | awk '{print $1}')
+info "Building Cordova plugin & packing tarball..."
+(cd "$SDK_ROOT" && vp run build)
+(cd "$SDK_ROOT" && rm -f onesignal-cordova-plugin-*.tgz && vp pm pack)
 
-if [[ -d "$INSTALLED_DIR" ]] && [[ -f "$SDK_STAMP" ]] && [[ "$(cat "$SDK_STAMP")" == "$SDK_SRC_HASH" ]]; then
-  info "Cordova SDK source unchanged, skipping rebuild + repack"
+packed_tarballs=("$SDK_ROOT"/onesignal-cordova-plugin-*.tgz)
+if [[ ${#packed_tarballs[@]} -ne 1 || ! -f "${packed_tarballs[0]}" ]]; then
+  echo "Expected exactly one packed Cordova plugin tarball." >&2
+  exit 1
+fi
+
+if [[ -f "$TARBALL" ]] && cmp -s "${packed_tarballs[0]}" "$TARBALL"; then
+  rm "${packed_tarballs[0]}"
+  info "Cordova SDK package unchanged, keeping cached tarball"
 else
-  info "Building Cordova plugin & packing tarball..."
-  (cd "$SDK_ROOT" && vp run build)
-  (cd "$SDK_ROOT" && rm -f onesignal-cordova-plugin*.tgz && vp pm pack && mv onesignal-cordova-plugin-*.tgz onesignal-cordova-plugin.tgz)
+  mv "${packed_tarballs[0]}" "$TARBALL"
+  info "Cordova SDK package changed, refreshed cached tarball"
+fi
 
+TARBALL_HASH=$(shasum "$TARBALL" | awk '{print $1}')
+if [[ -d "$INSTALLED_DIR" ]] &&
+   [[ -f "$INSTALL_STAMP" ]] &&
+   [[ "$(cat "$INSTALL_STAMP")" == "$TARBALL_HASH" ]]; then
+  info "Demo already has this Cordova SDK package, skipping reinstall"
+else
   # Remove before add so bun.lock's integrity hash refreshes against the new
   # tarball; otherwise `vp add` hits a dependency-loop error under bun 1.3+.
   # Keep the relative `file:../../...` path to match package.json's spec.
@@ -343,7 +349,7 @@ else
   vp remove onesignal-cordova-plugin 2>/dev/null || true
   vp add file:../../onesignal-cordova-plugin.tgz
 
-  echo "$SDK_SRC_HASH" > "$SDK_STAMP"
+  echo "$TARBALL_HASH" > "$INSTALL_STAMP"
 fi
 
 # ── Web bundle ───────────────────────────────────────────────────────────────
@@ -403,7 +409,7 @@ SYNC_HASH=$(find -H "${SYNC_EXISTING_INPUTS[@]}" \
             | xargs shasum 2>/dev/null \
             | shasum \
             | awk '{print $1}')
-SYNC_HASH="${SYNC_HASH}-${SDK_SRC_HASH}"
+SYNC_HASH="${SYNC_HASH}-${TARBALL_HASH}"
 
 sync_outputs_exist() {
   case "$SYNC_PLATFORM" in

@@ -3,22 +3,11 @@ import { CapacitorHttp } from '@capacitor/core';
 import { NotificationType } from '../models/NotificationType';
 import { userDataFromJson } from '../models/UserData';
 import type { UserData } from '../models/UserData';
+import { getNotificationResponseDisposition } from './NotificationResponse';
 
 export const API_KEY = import.meta.env.VITE_ONESIGNAL_API_KEY?.trim();
 const ANDROID_CHANNEL_ID = import.meta.env.VITE_ONESIGNAL_ANDROID_CHANNEL_ID as string | undefined;
 const DEFAULT_ANDROID_CHANNEL_ID = 'b3b015d9-c050-4042-8548-dcc34aa44aa4';
-
-function isTransientSendFailure(data: unknown): boolean {
-  if (!data || typeof data !== 'object') return false;
-  const record = data as { id?: unknown; errors?: unknown; recipients?: unknown };
-  const errors = record.errors;
-  const hasErrors =
-    (Array.isArray(errors) && errors.length > 0) ||
-    (errors != null && typeof errors === 'object' && Object.keys(errors).length > 0);
-  const missingId = typeof record.id !== 'string' || record.id.length === 0;
-  const zeroRecipients = typeof record.recipients === 'number' && record.recipients === 0;
-  return hasErrors || missingId || zeroRecipients;
-}
 
 class OneSignalApiService {
   private static instance: OneSignalApiService;
@@ -121,7 +110,8 @@ class OneSignalApiService {
           return false;
         }
 
-        if (isTransientSendFailure(response.data)) {
+        const disposition = getNotificationResponseDisposition(response.data);
+        if (disposition === 'retry') {
           if (attempt < maxAttempts) {
             await new Promise((resolve) => setTimeout(resolve, backoffMs(attempt)));
             continue;
@@ -130,7 +120,10 @@ class OneSignalApiService {
           return false;
         }
 
-        return true;
+        if (disposition === 'success') return true;
+
+        console.error(`Send notification failed: ${JSON.stringify(response.data)}`);
+        return false;
       } catch (err) {
         console.error(`Send notification error: ${String(err)}`);
         return false;
