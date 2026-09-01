@@ -57,6 +57,7 @@ jobs:
       # Need target_repo otherwise caller would set github.repository to the caller itself (e.g. sdk-shared)
       target_repo: OneSignal/OneSignal-Cordova-SDK
       version: ${{ inputs.cordova_version }}
+      target_branch: ${{ inputs.target_branch }}
 
   # Cordova specific steps
   update_version:
