@@ -34,7 +34,7 @@ const OutcomeModal: FC<OutcomeModalProps> = ({ open, onClose, onSubmit }) => {
           if (!trimmed) return;
           if (mode === 'value') {
             const numericValue = Number(value);
-            if (Number.isNaN(numericValue)) return;
+            if (!value.trim() || !Number.isFinite(numericValue)) return;
             onSubmit(trimmed, mode, numericValue);
             return;
           }

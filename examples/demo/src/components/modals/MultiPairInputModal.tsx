@@ -4,7 +4,14 @@ import { MdClose } from 'react-icons/md';
 
 import ModalShell from './ModalShell';
 
-type Row = { key: string; value: string };
+type Row = { id: number; key: string; value: string };
+
+let nextRowId = 0;
+
+function makeRow(): Row {
+  nextRowId += 1;
+  return { id: nextRowId, key: '', value: '' };
+}
 
 interface MultiPairInputModalProps {
   open: boolean;
@@ -23,11 +30,11 @@ const MultiPairInputModal: FC<MultiPairInputModalProps> = ({
   onClose,
   onSubmit,
 }) => {
-  const [rows, setRows] = useState<Row[]>([{ key: '', value: '' }]);
+  const [rows, setRows] = useState<Row[]>(() => [makeRow()]);
 
   useEffect(() => {
     if (open) {
-      setRows([{ key: '', value: '' }]);
+      setRows([makeRow()]);
     }
   }, [open]);
 
@@ -45,16 +52,15 @@ const MultiPairInputModal: FC<MultiPairInputModalProps> = ({
         onSubmit={(event) => {
           event.preventDefault();
           if (!isValid) return;
-          const pairs: Record<string, string> = {};
-          rows.forEach((row) => {
-            pairs[row.key.trim()] = row.value.trim();
-          });
+          const pairs = Object.fromEntries(
+            rows.map((row) => [row.key.trim(), row.value.trim()]),
+          );
           onSubmit(pairs);
         }}
       >
         <h3>{title}</h3>
         {rows.map((row, index) => (
-          <div key={`row-${index}`}>
+          <div key={row.id}>
             <div className="inline-fields row-with-remove">
               <input
                 value={row.key}
@@ -98,7 +104,7 @@ const MultiPairInputModal: FC<MultiPairInputModalProps> = ({
         <button
           type="button"
           className="text-btn text-btn-center"
-          onClick={() => setRows((prev) => [...prev, { key: '', value: '' }])}
+          onClick={() => setRows((prev) => [...prev, makeRow()])}
           data-testid="multipair_add_row_button"
         >
           + Add Row
