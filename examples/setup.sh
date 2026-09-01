@@ -409,7 +409,7 @@ SYNC_HASH=$(find -H "${SYNC_EXISTING_INPUTS[@]}" \
             | xargs shasum 2>/dev/null \
             | shasum \
             | awk '{print $1}')
-SYNC_HASH="${SYNC_HASH}-${SDK_SRC_HASH}"
+SYNC_HASH="${SYNC_HASH}-${TARBALL_HASH}"
 
 sync_outputs_exist() {
   case "$SYNC_PLATFORM" in
