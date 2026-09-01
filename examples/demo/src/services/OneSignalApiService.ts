@@ -8,16 +8,35 @@ export const API_KEY = import.meta.env.VITE_ONESIGNAL_API_KEY?.trim();
 const ANDROID_CHANNEL_ID = import.meta.env.VITE_ONESIGNAL_ANDROID_CHANNEL_ID as string | undefined;
 const DEFAULT_ANDROID_CHANNEL_ID = 'b3b015d9-c050-4042-8548-dcc34aa44aa4';
 
-function isTransientSendFailure(data: unknown): boolean {
-  if (!data || typeof data !== 'object') return false;
+function isResponseObject(data: unknown): data is Record<string, unknown> {
+  return data !== null && typeof data === 'object' && !Array.isArray(data);
+}
+
+function isTransientSubscriptionIndexingFailure(data: Record<string, unknown>): boolean {
   const record = data as { id?: unknown; errors?: unknown; recipients?: unknown };
   const errors = record.errors;
-  const hasErrors =
-    (Array.isArray(errors) && errors.length > 0) ||
-    (errors != null && typeof errors === 'object' && Object.keys(errors).length > 0);
-  const missingId = typeof record.id !== 'string' || record.id.length === 0;
+  const invalidPlayerIds =
+    isResponseObject(errors) &&
+    Array.isArray(errors.invalid_player_ids) &&
+    errors.invalid_player_ids.length > 0;
+  const notSubscribed =
+    Array.isArray(errors) &&
+    errors.some(
+      (error) =>
+        typeof error === 'string' &&
+        error.trim().toLowerCase() === 'all included players are not subscribed',
+    );
   const zeroRecipients = typeof record.recipients === 'number' && record.recipients === 0;
-  return hasErrors || missingId || zeroRecipients;
+  return invalidPlayerIds || notSubscribed || zeroRecipients;
+}
+
+function isSuccessfulSendResponse(data: Record<string, unknown>): boolean {
+  return (
+    typeof data.id === 'string' &&
+    data.id.length > 0 &&
+    data.recipients !== 0 &&
+    data.errors === undefined
+  );
 }
 
 class OneSignalApiService {
@@ -121,7 +140,12 @@ class OneSignalApiService {
           return false;
         }
 
-        if (isTransientSendFailure(response.data)) {
+        if (!isResponseObject(response.data)) {
+          console.error('Send notification failed: invalid response');
+          return false;
+        }
+
+        if (isTransientSubscriptionIndexingFailure(response.data)) {
           if (attempt < maxAttempts) {
             await new Promise((resolve) => setTimeout(resolve, backoffMs(attempt)));
             continue;
@@ -130,7 +154,10 @@ class OneSignalApiService {
           return false;
         }
 
-        return true;
+        if (isSuccessfulSendResponse(response.data)) return true;
+
+        console.error(`Send notification failed: ${JSON.stringify(response.data)}`);
+        return false;
       } catch (err) {
         console.error(`Send notification error: ${String(err)}`);
         return false;
