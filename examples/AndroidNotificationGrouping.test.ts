@@ -1,3 +1,5 @@
+import { readFile } from 'node:fs/promises';
+
 import { describe, expect, test } from 'vite-plus/test';
 
 const notificationDemoSources = [
@@ -9,7 +11,7 @@ const notificationDemoSources = [
 
 describe('Android notification grouping', () => {
   test.each(notificationDemoSources)('%s groups every REST notification send', async (_name, path) => {
-    const source = await Bun.file(new URL(path, import.meta.url)).text();
+    const source = await readFile(new URL(path, import.meta.url), 'utf8');
     const notificationSends =
       source.match(/url: 'https:\/\/onesignal\.com\/api\/v1\/notifications'/g) ?? [];
     const explicitlyGroupedSends = source.match(/android_group: 'demo-group'/g) ?? [];
