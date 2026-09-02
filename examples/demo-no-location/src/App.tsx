@@ -27,6 +27,7 @@ async function sendTestNotification(appId: string, subscriptionId: string): Prom
     data: {
       app_id: appId,
       include_subscription_ids: [subscriptionId],
+      android_group: 'demo-group',
       headings: { en: 'Test Notification' },
       contents: { en: 'This is a test notification from the no-location demo.' },
     },

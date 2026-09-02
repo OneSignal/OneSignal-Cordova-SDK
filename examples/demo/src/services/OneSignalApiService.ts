@@ -78,6 +78,7 @@ class OneSignalApiService {
     const body = {
       app_id: this.appId,
       include_subscription_ids: [subscriptionId],
+      android_group: 'demo-group',
       headings,
       contents,
       ...extra,
