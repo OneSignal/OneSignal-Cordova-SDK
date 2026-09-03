@@ -302,6 +302,20 @@ To add App Groups capability (shows up in Signing & Capabilities), select each t
 - `App`
 - `OneSignalNotificationServiceExtension`
 
+### Template action-button icons
+
+The SPM and CocoaPods demo projects include these loose resources in both the **App** and **OneSignalNotificationServiceExtension** targets:
+
+- `template-bookmark-icon.png`
+- `template-share-icon.png`
+
+To test them, create an image notification in the OneSignal dashboard with these action buttons:
+
+- **Save Story**: use `template-bookmark-icon` as the iOS icon
+- **Share**: use `template-share-icon` as the iOS icon
+
+Enter the icon names without the `.png` extension. On iOS 15 or newer, expand the received notification and verify that both icons appear beside their actions.
+
 ---
 
 ## 6. Sync and resolve packages
