@@ -5,6 +5,7 @@ import { mockNotification, mockNotificationClickEvent } from '../mocks/data';
 import * as helpers from './helpers';
 import { NotificationWillDisplayEvent } from './NotificationReceivedEvent';
 import Notifications, { OSNotificationPermission } from './NotificationsNamespace';
+import { OSNotification } from './OSNotification';
 
 describe('Notifications', () => {
   let notifications: Notifications;
@@ -227,6 +228,27 @@ describe('Notifications', () => {
       mockExec.mock.calls[0][0](clickEventData);
       expect(mockListener).toHaveBeenCalledWith(clickEventData);
       expect(mockListener2).toHaveBeenCalledWith(clickEventData);
+    });
+
+    test('should normalize notification data from the native click event', () => {
+      const listener = vi.fn();
+      notifications.addEventListener('click', listener);
+
+      mockExec.mock.calls[0][0]({
+        notification: {
+          notificationId: 'notification-id',
+          body: 'Notification body',
+          additionalData: {},
+          rawPayload: '{"custom":{"key":"value"}}',
+          groupedNotifications: [],
+        },
+        result: {},
+      });
+
+      const event = listener.mock.calls[0][0];
+      expect(event.notification).toBeInstanceOf(OSNotification);
+      expect(event.notification.rawPayload).toEqual({ custom: { key: 'value' } });
+      expect(event.notification.groupedNotifications).toEqual([]);
     });
 
     test('should call cordova.exec for foregroundWillDisplay event listener', () => {

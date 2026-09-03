@@ -183,7 +183,7 @@ export class OSNotification {
     /// (Android Only)
     /// Summary notifications grouped
     /// Notification payload will have the most recent notification received.
-    if (receivedEvent.groupedNotifications && receivedEvent.groupedNotifications.length) {
+    if (receivedEvent.groupedNotifications) {
       this.groupedNotifications = receivedEvent.groupedNotifications;
     }
 
