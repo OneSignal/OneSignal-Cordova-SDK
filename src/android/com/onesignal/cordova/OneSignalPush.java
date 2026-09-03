@@ -670,7 +670,9 @@ public class OneSignalPush extends CordovaPlugin
                 JSONObject actionButtonJson = new JSONObject();
                 actionButtonJson.put("id", actionButton.getId());
                 actionButtonJson.put("text", actionButton.getText());
-                actionButtonJson.put("icon", actionButton.getIcon());
+                actionButtonJson.put(
+                        "icon",
+                        actionButton.getIcon() != null ? actionButton.getIcon() : JSONObject.NULL);
                 actionButtons.put(actionButtonJson);
             }
             foregroundData.put("actionButtons", actionButtons);
