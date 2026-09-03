@@ -1,6 +1,6 @@
 import { noop, removeListener } from './helpers';
 import { NotificationWillDisplayEvent } from './NotificationReceivedEvent';
-import type { OSNotification } from './OSNotification';
+import { OSNotification } from './OSNotification';
 import type {
   NotificationClickEvent,
   NotificationEventName,
@@ -136,7 +136,12 @@ export default class Notifications {
       if (!this._hasRegisteredClickListener) {
         this._hasRegisteredClickListener = true;
         const clickParsingHandler = (json: NotificationClickEvent) => {
-          this._processFunctionList(this._notificationClickedListeners, json);
+          if (this._notificationClickedListeners.length === 0) return;
+          const event = {
+            ...json,
+            notification: new OSNotification(json.notification),
+          };
+          this._processFunctionList(this._notificationClickedListeners, event);
         };
         window.cordova.exec(
           clickParsingHandler,
