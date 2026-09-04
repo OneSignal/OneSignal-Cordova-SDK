@@ -38,6 +38,7 @@ import com.onesignal.inAppMessages.IInAppMessageDidDisplayEvent;
 import com.onesignal.inAppMessages.IInAppMessageLifecycleListener;
 import com.onesignal.inAppMessages.IInAppMessageWillDismissEvent;
 import com.onesignal.inAppMessages.IInAppMessageWillDisplayEvent;
+import com.onesignal.notifications.IActionButton;
 import com.onesignal.notifications.INotification;
 import com.onesignal.notifications.INotificationClickEvent;
 import com.onesignal.notifications.INotificationClickListener;
@@ -662,13 +663,38 @@ public class OneSignalPush extends CordovaPlugin
         foregroundData.put("sound", notification.getSound());
         foregroundData.put("title", notification.getTitle());
         foregroundData.put("launchURL", notification.getLaunchURL());
-        foregroundData.put("rawPayload", notification.getRawPayload());
-        foregroundData.put("actionButtons", notification.getActionButtons());
+        String rawPayload = notification.getRawPayload();
+        if (rawPayload == null || rawPayload.isEmpty()) {
+            foregroundData.put("rawPayload", new JSONObject());
+        } else {
+            try {
+                foregroundData.put("rawPayload", new JSONObject(rawPayload));
+            } catch (JSONException e) {
+                foregroundData.put("rawPayload", rawPayload);
+            }
+        }
+        if (notification.getActionButtons() != null) {
+            JSONArray actionButtons = new JSONArray();
+            for (IActionButton actionButton : notification.getActionButtons()) {
+                JSONObject actionButtonJson = new JSONObject();
+                actionButtonJson.put("id", actionButton.getId());
+                actionButtonJson.put("text", actionButton.getText());
+                actionButtonJson.put("icon", actionButton.getIcon() != null ? actionButton.getIcon() : JSONObject.NULL);
+                actionButtons.put(actionButtonJson);
+            }
+            foregroundData.put("actionButtons", actionButtons);
+        }
         foregroundData.put("additionalData", notification.getAdditionalData());
         foregroundData.put("notificationId", notification.getNotificationId());
         foregroundData.put("groupKey", notification.getGroupKey());
         foregroundData.put("groupMessage", notification.getGroupMessage());
-        foregroundData.put("groupedNotifications", notification.getGroupedNotifications());
+        if (notification.getGroupedNotifications() != null) {
+            JSONArray groupedNotifications = new JSONArray();
+            for (INotification groupedNotification : notification.getGroupedNotifications()) {
+                groupedNotifications.put(serializeNotification(groupedNotification));
+            }
+            foregroundData.put("groupedNotifications", groupedNotifications);
+        }
         foregroundData.put("ledColor", notification.getLedColor());
         foregroundData.put("priority", notification.getPriority());
         foregroundData.put("smallIcon", notification.getSmallIcon());

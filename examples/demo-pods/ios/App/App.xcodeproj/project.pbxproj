@@ -20,6 +20,10 @@
 		BB10000500000000000000BB /* OneSignalWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB10000200000000000000BB /* OneSignalWidgetBundle.swift */; };
 		CC10000200000000000000CC /* OneSignalNotificationServiceExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = AA10000500000000000000AA /* OneSignalNotificationServiceExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		CC10000300000000000000CC /* OneSignalWidgetExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = BB10000600000000000000BB /* OneSignalWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		DB5161010000000000000001 /* template-bookmark-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = DB5161030000000000000001 /* template-bookmark-icon.png */; };
+		DB5161010000000000000002 /* template-share-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = DB5161030000000000000002 /* template-share-icon.png */; };
+		DB5161020000000000000001 /* template-bookmark-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = DB5161030000000000000001 /* template-bookmark-icon.png */; };
+		DB5161020000000000000002 /* template-share-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = DB5161030000000000000002 /* template-share-icon.png */; };
 		DC4254A74A9979AC4EA1688E /* vine_boom.wav in Resources */ = {isa = PBXBuildFile; fileRef = B8258CC73594FD0E3E720D32 /* vine_boom.wav */; };
 		F1FB335B0BB7537621D556A8 /* Pods_OneSignalWidgetExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68D92EAB70CFEE577ABF69A0 /* Pods_OneSignalWidgetExtension.framework */; };
 		F932B1B193CBDE85A7524CC8 /* Pods_OneSignalNotificationServiceExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 799C0E332178070507CCD573 /* Pods_OneSignalNotificationServiceExtension.framework */; };
@@ -85,6 +89,8 @@
 		BB10000300000000000000BB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BB10000600000000000000BB /* OneSignalWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OneSignalWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC10000100000000000000CC /* App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; };
+		DB5161030000000000000001 /* template-bookmark-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "template-bookmark-icon.png"; sourceTree = "<group>"; };
+		DB5161030000000000000002 /* template-share-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "template-share-icon.png"; sourceTree = "<group>"; };
 		FC68EB0AF532CFC21C3344DD /* Pods-App.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App.debug.xcconfig"; path = "Pods/Target Support Files/Pods-App/Pods-App.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -161,6 +167,8 @@
 				2FAD9762203C412B000D30F8 /* config.xml */,
 				50B271D01FEDC1A000F3C39B /* public */,
 				B8258CC73594FD0E3E720D32 /* vine_boom.wav */,
+				DB5161030000000000000001 /* template-bookmark-icon.png */,
+				DB5161030000000000000002 /* template-share-icon.png */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -315,6 +323,8 @@
 				504EC30D1FED79650016851F /* Main.storyboard in Resources */,
 				2FAD9763203C412B000D30F8 /* config.xml in Resources */,
 				DC4254A74A9979AC4EA1688E /* vine_boom.wav in Resources */,
+				DB5161010000000000000001 /* template-bookmark-icon.png in Resources */,
+				DB5161010000000000000002 /* template-share-icon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -322,6 +332,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DB5161020000000000000001 /* template-bookmark-icon.png in Resources */,
+				DB5161020000000000000002 /* template-share-icon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
