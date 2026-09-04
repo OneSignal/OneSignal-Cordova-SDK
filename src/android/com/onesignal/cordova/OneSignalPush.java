@@ -663,16 +663,23 @@ public class OneSignalPush extends CordovaPlugin
         foregroundData.put("sound", notification.getSound());
         foregroundData.put("title", notification.getTitle());
         foregroundData.put("launchURL", notification.getLaunchURL());
-        foregroundData.put("rawPayload", new JSONObject(notification.getRawPayload()));
+        String rawPayload = notification.getRawPayload();
+        if (rawPayload == null || rawPayload.isEmpty()) {
+            foregroundData.put("rawPayload", new JSONObject());
+        } else {
+            try {
+                foregroundData.put("rawPayload", new JSONObject(rawPayload));
+            } catch (JSONException e) {
+                foregroundData.put("rawPayload", rawPayload);
+            }
+        }
         if (notification.getActionButtons() != null) {
             JSONArray actionButtons = new JSONArray();
             for (IActionButton actionButton : notification.getActionButtons()) {
                 JSONObject actionButtonJson = new JSONObject();
                 actionButtonJson.put("id", actionButton.getId());
                 actionButtonJson.put("text", actionButton.getText());
-                actionButtonJson.put(
-                        "icon",
-                        actionButton.getIcon() != null ? actionButton.getIcon() : JSONObject.NULL);
+                actionButtonJson.put("icon", actionButton.getIcon() != null ? actionButton.getIcon() : JSONObject.NULL);
                 actionButtons.put(actionButtonJson);
             }
             foregroundData.put("actionButtons", actionButtons);
