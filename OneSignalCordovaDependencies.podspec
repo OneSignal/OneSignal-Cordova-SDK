@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.author = 'OneSignal'
   s.homepage = 'https://github.com/OneSignal/OneSignal-Cordova-SDK'
   s.source = { :git => 'https://github.com/OneSignal/OneSignal-Cordova-SDK.git', :tag => s.version.to_s }
-  s.ios.deployment_target = '11.0'
+  s.ios.deployment_target = '12.0'
   s.preserve_paths = 'README.md'
 
   if onesignal_disable_location
