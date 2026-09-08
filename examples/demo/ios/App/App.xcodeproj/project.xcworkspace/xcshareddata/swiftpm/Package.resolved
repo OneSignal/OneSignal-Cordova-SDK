@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/OneSignal/OneSignal-XCFramework.git",
       "state" : {
-        "revision" : "1341884ef88315788182352a199e00cf02138b50",
-        "version" : "5.6.0"
+        "revision" : "2d6af6b0139d0eb31422092a866150183befc388",
+        "version" : "5.6.1"
       }
     }
   ],
