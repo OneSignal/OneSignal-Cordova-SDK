@@ -384,7 +384,7 @@
 			repositoryURL = "https://github.com/OneSignal/OneSignal-XCFramework.git";
 			requirement = {
 				kind = exactVersion;
-				version = 5.6.0;
+				version = 5.6.1;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
