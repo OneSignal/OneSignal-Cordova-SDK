@@ -1,7 +1,7 @@
 require 'json'
 
 package = JSON.parse(File.read(File.join(__dir__, 'package.json')))
-onesignal_xcframework_version = '5.5.6'
+onesignal_xcframework_version = '5.6.1'
 onesignal_disable_location_env = ENV['ONESIGNAL_DISABLE_LOCATION'].to_s.strip.downcase
 onesignal_disable_location = ['true', '1'].include?(onesignal_disable_location_env)
 
@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.author = 'OneSignal'
   s.homepage = 'https://github.com/OneSignal/OneSignal-Cordova-SDK'
   s.source = { :git => 'https://github.com/OneSignal/OneSignal-Cordova-SDK.git', :tag => s.version.to_s }
-  s.ios.deployment_target = '11.0'
+  s.ios.deployment_target = '12.0'
   s.preserve_paths = 'README.md'
 
   if onesignal_disable_location
