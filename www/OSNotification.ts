@@ -25,7 +25,7 @@ export class OSNotification {
   collapseId?: string;
   fromProjectNumber?: string;
   smallIconAccentColor?: string;
-  lockScreenVisibility?: string;
+  lockScreenVisibility?: number;
   androidNotificationId?: number;
   // ios only
   badge?: string;
@@ -169,14 +169,14 @@ export class OSNotification {
     ///  0 = Private (hidden from lock screen
     ///    if user set 'Hide Sensitive content')
     ///  -1 = Secret (doesn't appear at all)
-    if (receivedEvent.lockScreenVisibility) {
+    if (typeof receivedEvent.lockScreenVisibility !== 'undefined') {
       this.lockScreenVisibility = receivedEvent.lockScreenVisibility;
     }
 
     /// (Android Only)
     /// The android notification ID (not same as  the OneSignal
     /// notification ID)
-    if (receivedEvent.androidNotificationId) {
+    if (typeof receivedEvent.androidNotificationId !== 'undefined') {
       this.androidNotificationId = receivedEvent.androidNotificationId;
     }
 
