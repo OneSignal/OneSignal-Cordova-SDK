@@ -239,7 +239,7 @@ describe('Notifications', () => {
           notificationId: 'notification-id',
           body: 'Notification body',
           additionalData: {},
-          rawPayload: '{"custom":{"key":"value"}}',
+          rawPayload: { custom: '{"key":"value"}' },
           groupedNotifications: [],
         },
         result: {},
@@ -247,7 +247,7 @@ describe('Notifications', () => {
 
       const event = listener.mock.calls[0][0];
       expect(event.notification).toBeInstanceOf(OSNotification);
-      expect(event.notification.rawPayload).toEqual({ custom: { key: 'value' } });
+      expect(event.notification.rawPayload).toEqual({ custom: '{"key":"value"}' });
       expect(event.notification.groupedNotifications).toEqual([]);
     });
 
