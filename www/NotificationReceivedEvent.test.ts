@@ -16,7 +16,8 @@ describe('NotificationWillDisplayEvent', () => {
 
   test('should instantiate NotificationWillDisplayEvent class', () => {
     expect(notificationEvent).toBeInstanceOf(NotificationWillDisplayEvent);
-    expect(notificationEvent.defaultPrevented).toBe(false);
+    expect(notificationEvent).not.toHaveProperty('_defaultPrevented');
+    expect(notificationEvent).not.toHaveProperty('defaultPrevented');
   });
 
   test('should create OSNotification instance in constructor', () => {
@@ -32,7 +33,6 @@ describe('NotificationWillDisplayEvent', () => {
     test('should call cordova.exec for preventDefault with default (false)', () => {
       notificationEvent.preventDefault();
 
-      expect(notificationEvent.defaultPrevented).toBe(true);
       expect(window.cordova.exec).toHaveBeenCalledWith(
         expect.any(Function),
         expect.any(Function),

@@ -1,16 +1,17 @@
 import { noop } from './helpers';
 import { OSNotification } from './OSNotification';
 
+const defaultPreventedEvents = new WeakSet<NotificationWillDisplayEvent>();
+
+export function isDefaultPrevented(event: NotificationWillDisplayEvent): boolean {
+  return defaultPreventedEvents.has(event);
+}
+
 export class NotificationWillDisplayEvent {
   private notification: OSNotification;
-  private _defaultPrevented = false;
 
   constructor(displayEvent: OSNotification) {
     this.notification = new OSNotification(displayEvent);
-  }
-
-  get defaultPrevented(): boolean {
-    return this._defaultPrevented;
   }
 
   /**
@@ -23,7 +24,7 @@ export class NotificationWillDisplayEvent {
    * possibility of displaying it in the future.
    */
   preventDefault(discard: boolean = false): void {
-    this._defaultPrevented = true;
+    defaultPreventedEvents.add(this);
     window.cordova.exec(noop, noop, 'OneSignalPush', 'preventDefault', [
       this.notification.notificationId,
       discard,

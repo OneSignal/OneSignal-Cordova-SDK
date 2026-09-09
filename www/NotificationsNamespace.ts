@@ -1,5 +1,5 @@
 import { noop, removeListener } from './helpers';
-import { NotificationWillDisplayEvent } from './NotificationReceivedEvent';
+import { isDefaultPrevented, NotificationWillDisplayEvent } from './NotificationReceivedEvent';
 import { OSNotification } from './OSNotification';
 import type {
   NotificationClickEvent,
@@ -160,7 +160,7 @@ export default class Notifications {
         const foregroundParsingHandler = (notification: OSNotification) => {
           const displayEvent = new NotificationWillDisplayEvent(notification);
           this._processFunctionList(this._notificationWillDisplayListeners, displayEvent);
-          if (!displayEvent.defaultPrevented) {
+          if (!isDefaultPrevented(displayEvent)) {
             window.cordova.exec(noop, noop, 'OneSignalPush', 'proceedWithWillDisplay', [
               notification.notificationId,
             ]);
