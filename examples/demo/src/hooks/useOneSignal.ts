@@ -241,13 +241,16 @@ export function useOneSignal(): UseOneSignalReturn {
       console.log(`[OneSignal] Notification click: ${e.notification.title ?? ''}`);
 
       // uncomment to see the full event object
-      // console.log('[OneSignal] event: ', e);
+      // console.log('[OneSignal] click event: ', e);
     };
 
     const handleForegroundWillDisplay = (e: NotificationWillDisplayEvent) => {
       console.log(
         `[OneSignal] Notification foregroundWillDisplay: ${e.getNotification().title ?? ''}`,
       );
+
+      // uncomment to see the full event object
+      // console.log('[OneSignal] will display event: ', e.getNotification());
 
       // uncomment to test preventing the default display behavior
       // e.preventDefault();
