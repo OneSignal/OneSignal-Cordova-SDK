@@ -11,7 +11,7 @@ def isOneSignalEnvFlagEnabled(String envName) {
   return value?.equalsIgnoreCase('true') || value == '1'
 }
 
-def oneSignalVersion = '5.10.1'
+def oneSignalVersion = '5.10.2'
 def oneSignalDisableLocation = isOneSignalEnvFlagEnabled('ONESIGNAL_DISABLE_LOCATION')
 
 dependencies {
