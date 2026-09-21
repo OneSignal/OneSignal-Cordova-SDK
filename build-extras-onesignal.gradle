@@ -2,6 +2,7 @@ import java.nio.file.Files
 
 // Required for Android Support Library 26.0.0+ and Google Play services 11.+
 repositories {
+  mavenLocal()
   maven { url 'https://maven.google.com' }
   mavenCentral()
 }
@@ -11,10 +12,11 @@ def isOneSignalEnvFlagEnabled(String envName) {
   return value?.equalsIgnoreCase('true') || value == '1'
 }
 
-def oneSignalVersion = '5.10.2'
+def oneSignalVersion = '5.11.0-rc'
 def oneSignalDisableLocation = isOneSignalEnvFlagEnabled('ONESIGNAL_DISABLE_LOCATION')
 
 dependencies {
+   implementation "com.google.firebase:firebase-messaging:25.1.0"
    if (oneSignalDisableLocation) {
       implementation "com.onesignal:core:$oneSignalVersion"
       implementation "com.onesignal:notifications:$oneSignalVersion"
