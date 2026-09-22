@@ -25,7 +25,7 @@
  * THE SOFTWARE.
  */
 import Debug from './DebugNamespace';
-import { noop } from './helpers';
+import { noop, rejectNullOrEmpty } from './helpers';
 import InAppMessages from './InAppMessagesNamespace';
 import LiveActivities from './LiveActivitiesNamespace';
 import Location from './LocationNamespace';
@@ -58,6 +58,7 @@ export class OneSignalPlugin {
    * @returns void
    */
   initialize(appId: string): void {
+    if (rejectNullOrEmpty(appId, 'initialize: appId')) return;
     this._appID = appId;
 
     const observerCallback = () => {
@@ -74,6 +75,7 @@ export class OneSignalPlugin {
    * @returns void
    */
   login(externalId: string): void {
+    if (rejectNullOrEmpty(externalId, 'login: externalId')) return;
     window.cordova.exec(noop, noop, 'OneSignalPush', 'login', [externalId]);
   }
 

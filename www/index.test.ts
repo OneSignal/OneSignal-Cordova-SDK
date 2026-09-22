@@ -48,6 +48,12 @@ describe('OneSignalPlugin', () => {
     );
   });
 
+  test('should not initialize with an empty appId', () => {
+    plugin.initialize('');
+
+    expect(window.cordova.exec).not.toHaveBeenCalled();
+  });
+
   test('should call cordova.exec for login', () => {
     const externalId = 'test-user-123';
     plugin.login(externalId);
@@ -59,6 +65,18 @@ describe('OneSignalPlugin', () => {
       'login',
       [externalId],
     );
+  });
+
+  test('should not login with an empty externalId', () => {
+    plugin.login('');
+
+    expect(window.cordova.exec).not.toHaveBeenCalled();
+  });
+
+  test('should not login with a null externalId', () => {
+    plugin.login(null as unknown as string);
+
+    expect(window.cordova.exec).not.toHaveBeenCalled();
   });
 
   test('should call cordova.exec for logout', () => {
