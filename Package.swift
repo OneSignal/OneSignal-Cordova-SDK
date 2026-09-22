@@ -23,7 +23,7 @@ if !oneSignalDisableLocation {
 let package = Package(
     name: "onesignal-cordova-plugin",
     platforms: [
-        .iOS(.v13),
+        .iOS(.v15),
     ],
     products: [
         .library(
