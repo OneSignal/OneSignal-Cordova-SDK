@@ -39,7 +39,11 @@ export default class User {
    * @returns void
    */
   setLanguage(language: string): void {
-    if (rejectNullOrEmpty(language, 'setLanguage: language')) return;
+    // Empty string is the reset to the device language. Null is not.
+    if (typeof language !== 'string') {
+      console.error('OneSignal: setLanguage: language is required');
+      return;
+    }
     window.cordova.exec(noop, noop, 'OneSignalPush', 'setLanguage', [language]);
   }
 
