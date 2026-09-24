@@ -538,7 +538,6 @@ describe('User', () => {
 
   describe('empty inputs', () => {
     test('does not call native for missing strings', () => {
-      user.setLanguage('');
       user.addAlias('', 'id');
       user.addAlias('label', '');
       user.addAliases({ '': 'id' });
@@ -570,6 +569,24 @@ describe('User', () => {
         'addTags',
         [{ level: '' }],
       );
+    });
+
+    test('forwards an empty language so native can reset', () => {
+      user.setLanguage('');
+
+      expect(window.cordova.exec).toHaveBeenCalledWith(
+        expect.any(Function),
+        expect.any(Function),
+        'OneSignalPush',
+        'setLanguage',
+        [''],
+      );
+    });
+
+    test('does not set a null language', () => {
+      user.setLanguage(null as unknown as string);
+
+      expect(window.cordova.exec).not.toHaveBeenCalled();
     });
   });
 });
