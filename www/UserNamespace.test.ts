@@ -207,6 +207,12 @@ describe('User', () => {
         [{ [key]: value }],
       );
     });
+
+    test('should not add a tag with an empty key', () => {
+      user.addTag('', 'premium');
+
+      expect(window.cordova.exec).not.toHaveBeenCalled();
+    });
   });
 
   describe('addTags', () => {
@@ -527,6 +533,60 @@ describe('User', () => {
       expect(consoleSpy).toHaveBeenCalledWith('Properties must be a JSON-serializable object');
       expect(window.cordova.exec).not.toHaveBeenCalled();
       consoleSpy.mockRestore();
+    });
+  });
+
+  describe('empty inputs', () => {
+    test('does not call native for missing strings', () => {
+      user.addAlias('', 'id');
+      user.addAlias('label', '');
+      user.addAliases({ '': 'id' });
+      user.addAliases({ label: '' });
+      user.removeAlias('');
+      user.removeAliases(['']);
+      user.addEmail('');
+      user.removeEmail('');
+      user.addSms('');
+      user.removeSms('');
+      user.addTag('', 'value');
+      user.addTag('key', null as unknown as string);
+      user.addTags({ '': 'value' });
+      user.addTags(null as unknown as object);
+      user.removeTag('');
+      user.removeTags(['']);
+      user.trackEvent('');
+
+      expect(window.cordova.exec).not.toHaveBeenCalled();
+    });
+
+    test('allows an empty tag value', () => {
+      user.addTags({ level: '' });
+
+      expect(window.cordova.exec).toHaveBeenCalledWith(
+        expect.any(Function),
+        expect.any(Function),
+        'OneSignalPush',
+        'addTags',
+        [{ level: '' }],
+      );
+    });
+
+    test('forwards an empty language so native can reset', () => {
+      user.setLanguage('');
+
+      expect(window.cordova.exec).toHaveBeenCalledWith(
+        expect.any(Function),
+        expect.any(Function),
+        'OneSignalPush',
+        'setLanguage',
+        [''],
+      );
+    });
+
+    test('does not set a null language', () => {
+      user.setLanguage(null as unknown as string);
+
+      expect(window.cordova.exec).not.toHaveBeenCalled();
     });
   });
 });
