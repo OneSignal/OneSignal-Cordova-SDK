@@ -1,33 +1,33 @@
 import { describe, expect, test, vi } from 'vite-plus/test';
 
-import { rejectNullOrEmpty, rejectNullOrEmptyKeys } from './helpers';
+import { isMissing, hasMissingEntries } from './helpers';
 
-describe('rejectNullOrEmpty', () => {
+describe('isMissing', () => {
   test('rejects null, empty, and non-strings', () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    expect(rejectNullOrEmpty(null, 'login: externalId')).toBe(true);
-    expect(rejectNullOrEmpty(undefined, 'login: externalId')).toBe(true);
-    expect(rejectNullOrEmpty('', 'login: externalId')).toBe(true);
-    expect(rejectNullOrEmpty(1, 'login: externalId')).toBe(true);
-    expect(rejectNullOrEmpty('user', 'login: externalId')).toBe(false);
-    expect(rejectNullOrEmpty(' ', 'login: externalId')).toBe(false);
+    expect(isMissing(null, 'login: externalId')).toBe(true);
+    expect(isMissing(undefined, 'login: externalId')).toBe(true);
+    expect(isMissing('', 'login: externalId')).toBe(true);
+    expect(isMissing(1, 'login: externalId')).toBe(true);
+    expect(isMissing('user', 'login: externalId')).toBe(false);
+    expect(isMissing(' ', 'login: externalId')).toBe(false);
 
     error.mockRestore();
   });
 });
 
-describe('rejectNullOrEmptyKeys', () => {
+describe('hasMissingEntries', () => {
   test('rejects a missing map, an empty key, and an empty value', () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    expect(rejectNullOrEmptyKeys(null, 'addAliases')).toBe(true);
-    expect(rejectNullOrEmptyKeys(undefined, 'addAliases')).toBe(true);
-    expect(rejectNullOrEmptyKeys({ '': 'id' }, 'addAliases')).toBe(true);
-    expect(rejectNullOrEmptyKeys({ label: '' }, 'addAliases')).toBe(true);
-    expect(rejectNullOrEmptyKeys({ label: null }, 'addAliases', true)).toBe(true);
-    expect(rejectNullOrEmptyKeys({ label: '' }, 'addTags', true)).toBe(false);
-    expect(rejectNullOrEmptyKeys({ label: 'id' }, 'addAliases')).toBe(false);
+    expect(hasMissingEntries(null, 'addAliases')).toBe(true);
+    expect(hasMissingEntries(undefined, 'addAliases')).toBe(true);
+    expect(hasMissingEntries({ '': 'id' }, 'addAliases')).toBe(true);
+    expect(hasMissingEntries({ label: '' }, 'addAliases')).toBe(true);
+    expect(hasMissingEntries({ label: null }, 'addAliases', true)).toBe(true);
+    expect(hasMissingEntries({ label: '' }, 'addTags', true)).toBe(false);
+    expect(hasMissingEntries({ label: 'id' }, 'addAliases')).toBe(false);
 
     error.mockRestore();
   });

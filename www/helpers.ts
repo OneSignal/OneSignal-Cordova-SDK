@@ -1,17 +1,17 @@
-export function rejectNullOrEmpty(value: unknown, api: string): boolean {
+export function isMissing(value: unknown, api: string): boolean {
   if (typeof value === 'string' && value.length > 0) return false;
   console.error(`OneSignal: ${api} is required`);
   return true;
 }
 
-export function rejectNullOrEmptyKeys(
+export function hasMissingEntries(
   values: Record<string, unknown> | null | undefined,
   api: string,
   allowEmptyValue = false,
 ): boolean {
-  if (values == null) return rejectNullOrEmpty(values, api);
+  if (values == null) return isMissing(values, api);
   for (const key of Object.keys(values)) {
-    if (rejectNullOrEmpty(key, `${api}: key`)) return true;
+    if (isMissing(key, `${api}: key`)) return true;
     const item = values[key];
     if (item == null || (!allowEmptyValue && item === '')) {
       console.error(`OneSignal: ${api}: value is required`);

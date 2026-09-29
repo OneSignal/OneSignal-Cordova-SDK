@@ -1,8 +1,8 @@
 import {
   isObjectSerializable,
   noop,
-  rejectNullOrEmpty,
-  rejectNullOrEmptyKeys,
+  isMissing,
+  hasMissingEntries,
   removeListener,
 } from './helpers';
 import PushSubscription from './PushSubscriptionNamespace';
@@ -58,8 +58,7 @@ export default class User {
    * @returns void
    */
   addAlias(label: string, id: string): void {
-    if (rejectNullOrEmpty(label, 'addAlias: label') || rejectNullOrEmpty(id, 'addAlias: id'))
-      return;
+    if (isMissing(label, 'addAlias: label') || isMissing(id, 'addAlias: id')) return;
     const jsonKeyValue = { [label]: id };
     window.cordova.exec(noop, noop, 'OneSignalPush', 'addAliases', [jsonKeyValue]);
   }
@@ -70,7 +69,7 @@ export default class User {
    * @returns void
    */
   addAliases(aliases: object): void {
-    if (rejectNullOrEmptyKeys(aliases as Record<string, unknown>, 'addAliases')) return;
+    if (hasMissingEntries(aliases as Record<string, unknown>, 'addAliases')) return;
     window.cordova.exec(noop, noop, 'OneSignalPush', 'addAliases', [aliases]);
   }
 
@@ -80,7 +79,7 @@ export default class User {
    * @returns void
    */
   removeAlias(label: string): void {
-    if (rejectNullOrEmpty(label, 'removeAlias: label')) return;
+    if (isMissing(label, 'removeAlias: label')) return;
     window.cordova.exec(noop, noop, 'OneSignalPush', 'removeAliases', [label]);
   }
 
@@ -90,7 +89,7 @@ export default class User {
    * @returns void
    */
   removeAliases(labels: string[]): void {
-    if (labels.some((label) => rejectNullOrEmpty(label, 'removeAliases: label'))) return;
+    if (labels.some((label) => isMissing(label, 'removeAliases: label'))) return;
     window.cordova.exec(noop, noop, 'OneSignalPush', 'removeAliases', labels);
   }
 
@@ -104,7 +103,7 @@ export default class User {
    * @returns void
    */
   addEmail(email: string): void {
-    if (rejectNullOrEmpty(email, 'addEmail: email')) return;
+    if (isMissing(email, 'addEmail: email')) return;
     window.cordova.exec(noop, noop, 'OneSignalPush', 'addEmail', [email]);
   }
 
@@ -114,7 +113,7 @@ export default class User {
    * @returns void
    */
   removeEmail(email: string): void {
-    if (rejectNullOrEmpty(email, 'removeEmail: email')) return;
+    if (isMissing(email, 'removeEmail: email')) return;
     window.cordova.exec(noop, noop, 'OneSignalPush', 'removeEmail', [email]);
   }
 
@@ -128,7 +127,7 @@ export default class User {
    * @returns void
    */
   addSms(smsNumber: string): void {
-    if (rejectNullOrEmpty(smsNumber, 'addSms: smsNumber')) return;
+    if (isMissing(smsNumber, 'addSms: smsNumber')) return;
     window.cordova.exec(noop, noop, 'OneSignalPush', 'addSms', [smsNumber]);
   }
 
@@ -138,7 +137,7 @@ export default class User {
    * @returns void
    */
   removeSms(smsNumber: string): void {
-    if (rejectNullOrEmpty(smsNumber, 'removeSms: smsNumber')) return;
+    if (isMissing(smsNumber, 'removeSms: smsNumber')) return;
     window.cordova.exec(noop, noop, 'OneSignalPush', 'removeSms', [smsNumber]);
   }
 
@@ -153,7 +152,7 @@ export default class User {
    * @returns void
    */
   addTag(key: string, value: string): void {
-    if (rejectNullOrEmpty(key, 'addTag: key')) return;
+    if (isMissing(key, 'addTag: key')) return;
     if (value == null) {
       console.error('OneSignal: addTag: value is required');
       return;
@@ -169,7 +168,7 @@ export default class User {
    */
   addTags(tags: object): void {
     const convertedTags = tags as { [key: string]: unknown };
-    if (rejectNullOrEmptyKeys(convertedTags, 'addTags', true)) return;
+    if (hasMissingEntries(convertedTags, 'addTags', true)) return;
     Object.keys(tags).forEach(function (key) {
       // forces values to be string types
       if (typeof convertedTags[key] !== 'string') {
@@ -185,7 +184,7 @@ export default class User {
    * @returns void
    */
   removeTag(key: string): void {
-    if (rejectNullOrEmpty(key, 'removeTag: key')) return;
+    if (isMissing(key, 'removeTag: key')) return;
     window.cordova.exec(noop, noop, 'OneSignalPush', 'removeTags', [key]);
   }
 
@@ -195,7 +194,7 @@ export default class User {
    * @returns void
    */
   removeTags(keys: string[]): void {
-    if (keys.some((key) => rejectNullOrEmpty(key, 'removeTags: key'))) return;
+    if (keys.some((key) => isMissing(key, 'removeTags: key'))) return;
     window.cordova.exec(noop, noop, 'OneSignalPush', 'removeTags', keys);
   }
 
@@ -260,7 +259,7 @@ export default class User {
    * @returns void
    */
   trackEvent(name: string, properties?: object): void {
-    if (rejectNullOrEmpty(name, 'trackEvent: name')) return;
+    if (isMissing(name, 'trackEvent: name')) return;
     if (properties !== undefined && !isObjectSerializable(properties)) {
       console.error('Properties must be a JSON-serializable object');
       return;
