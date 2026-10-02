@@ -191,9 +191,37 @@ describe('InAppMessages', () => {
     });
 
     test('should not add a trigger with an empty key', () => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
       inAppMessages.addTrigger('', 'value');
 
+      expect(consoleSpy).toHaveBeenCalledWith('OneSignal: addTriggers: key is required');
       expect(window.cordova.exec).not.toHaveBeenCalled();
+
+      consoleSpy.mockRestore();
+    });
+
+    test.each([null, undefined])('should not add a trigger with a %s value', (value) => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      inAppMessages.addTrigger('key', value as unknown as string);
+
+      expect(consoleSpy).toHaveBeenCalledWith('OneSignal: addTriggers: value is required');
+      expect(window.cordova.exec).not.toHaveBeenCalled();
+
+      consoleSpy.mockRestore();
+    });
+
+    test('should allow an empty value', () => {
+      inAppMessages.addTrigger('key', '');
+
+      expect(window.cordova.exec).toHaveBeenCalledWith(
+        expect.any(Function),
+        expect.any(Function),
+        'OneSignalPush',
+        'addTriggers',
+        [{ key: '' }],
+      );
     });
   });
 
@@ -279,7 +307,7 @@ describe('InAppMessages', () => {
       inAppMessages.removeTriggers('not-an-array' as any);
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        'OneSignal: removeTriggers: argument must be of type Array',
+        'OneSignal: removeTriggers: keys must be an array of strings',
       );
       expect(window.cordova.exec).not.toHaveBeenCalled();
 

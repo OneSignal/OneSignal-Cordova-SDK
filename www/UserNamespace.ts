@@ -3,6 +3,7 @@ import {
   noop,
   isMissing,
   hasMissingEntries,
+  hasMissingItems,
   removeListener,
 } from './helpers';
 import PushSubscription from './PushSubscriptionNamespace';
@@ -58,9 +59,7 @@ export default class User {
    * @returns void
    */
   addAlias(label: string, id: string): void {
-    if (isMissing(label, 'addAlias: label') || isMissing(id, 'addAlias: id')) return;
-    const jsonKeyValue = { [label]: id };
-    window.cordova.exec(noop, noop, 'OneSignalPush', 'addAliases', [jsonKeyValue]);
+    this.addAliases({ [label]: id });
   }
 
   /**
@@ -79,8 +78,7 @@ export default class User {
    * @returns void
    */
   removeAlias(label: string): void {
-    if (isMissing(label, 'removeAlias: label')) return;
-    window.cordova.exec(noop, noop, 'OneSignalPush', 'removeAliases', [label]);
+    this.removeAliases([label]);
   }
 
   /**
@@ -89,7 +87,7 @@ export default class User {
    * @returns void
    */
   removeAliases(labels: string[]): void {
-    if (labels.some((label) => isMissing(label, 'removeAliases: label'))) return;
+    if (hasMissingItems(labels, 'removeAliases', 'label')) return;
     window.cordova.exec(noop, noop, 'OneSignalPush', 'removeAliases', labels);
   }
 
@@ -152,13 +150,7 @@ export default class User {
    * @returns void
    */
   addTag(key: string, value: string): void {
-    if (isMissing(key, 'addTag: key')) return;
-    if (value == null) {
-      console.error('OneSignal: addTag: value is required');
-      return;
-    }
-    const jsonKeyValue = { [key]: value };
-    window.cordova.exec(noop, noop, 'OneSignalPush', 'addTags', [jsonKeyValue]);
+    this.addTags({ [key]: value });
   }
 
   /**
@@ -184,8 +176,7 @@ export default class User {
    * @returns void
    */
   removeTag(key: string): void {
-    if (isMissing(key, 'removeTag: key')) return;
-    window.cordova.exec(noop, noop, 'OneSignalPush', 'removeTags', [key]);
+    this.removeTags([key]);
   }
 
   /**
@@ -194,7 +185,7 @@ export default class User {
    * @returns void
    */
   removeTags(keys: string[]): void {
-    if (keys.some((key) => isMissing(key, 'removeTags: key'))) return;
+    if (hasMissingItems(keys, 'removeTags', 'key')) return;
     window.cordova.exec(noop, noop, 'OneSignalPush', 'removeTags', keys);
   }
 
@@ -261,7 +252,7 @@ export default class User {
   trackEvent(name: string, properties?: object): void {
     if (isMissing(name, 'trackEvent: name')) return;
     if (properties !== undefined && !isObjectSerializable(properties)) {
-      console.error('Properties must be a JSON-serializable object');
+      console.error('OneSignal: trackEvent: properties must be a JSON-serializable object');
       return;
     }
     const args = properties ? [name, properties] : [name];

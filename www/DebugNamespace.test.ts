@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from 'vite-plus/test';
+import { beforeEach, describe, expect, test, vi } from 'vite-plus/test';
 
 import { mockCordova } from '../mocks/cordova';
 import Debug, { LogLevel } from './DebugNamespace';
@@ -54,4 +54,24 @@ describe('Debug', () => {
       [logLevelValue],
     );
   });
+
+  test.each([-1, 7, 99, 2.5, '2', 'None', null, undefined, NaN])(
+    'should not call cordova.exec for invalid log level %s',
+    (level) => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      debug.setLogLevel(level as unknown as LogLevel);
+      debug.setAlertLevel(level as unknown as LogLevel);
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'OneSignal: setLogLevel: level must be a LogLevel value',
+      );
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'OneSignal: setAlertLevel: level must be a LogLevel value',
+      );
+      expect(window.cordova.exec).not.toHaveBeenCalled();
+
+      consoleSpy.mockRestore();
+    },
+  );
 });

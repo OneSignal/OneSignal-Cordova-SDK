@@ -1,4 +1,4 @@
-import { noop, isMissing, hasMissingEntries, removeListener } from './helpers';
+import { noop, hasMissingEntries, hasMissingItems, removeListener } from './helpers';
 import type {
   InAppMessageClickEvent,
   InAppMessageDidDismissEvent,
@@ -152,13 +152,7 @@ export default class InAppMessages {
    * @returns void
    */
   addTrigger(key: string, value: string): void {
-    if (isMissing(key, 'addTrigger: key')) return;
-    if (value == null) {
-      console.error('OneSignal: addTrigger: value is required');
-      return;
-    }
-    const obj = { [key]: value };
-    this.addTriggers(obj);
+    this.addTriggers({ [key]: value });
   }
 
   /**
@@ -185,7 +179,6 @@ export default class InAppMessages {
    * @returns void
    */
   removeTrigger(key: string): void {
-    if (isMissing(key, 'removeTrigger: key')) return;
     this.removeTriggers([key]);
   }
 
@@ -195,11 +188,7 @@ export default class InAppMessages {
    * @returns void
    */
   removeTriggers(keys: string[]): void {
-    if (!Array.isArray(keys)) {
-      console.error('OneSignal: removeTriggers: argument must be of type Array');
-      return;
-    }
-    if (keys.some((key) => isMissing(key, 'removeTrigger: key'))) return;
+    if (hasMissingItems(keys, 'removeTriggers', 'key')) return;
 
     window.cordova.exec(noop, noop, 'OneSignalPush', 'removeTriggers', [keys]);
   }

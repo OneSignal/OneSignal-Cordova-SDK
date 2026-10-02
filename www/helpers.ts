@@ -9,16 +9,23 @@ export function hasMissingEntries(
   api: string,
   allowEmptyValue = false,
 ): boolean {
-  if (values == null) return isMissing(values, api);
-  for (const key of Object.keys(values)) {
-    if (isMissing(key, `${api}: key`)) return true;
-    const item = values[key];
-    if (item == null || (!allowEmptyValue && item === '')) {
-      console.error(`OneSignal: ${api}: value is required`);
-      return true;
-    }
+  if (typeof values !== 'object' || values === null || Array.isArray(values)) {
+    console.error(`OneSignal: ${api}: argument must be an object`);
+    return true;
   }
-  return false;
+  return Object.entries(values).some(([key, item]) => {
+    if (isMissing(key, `${api}: key`)) return true;
+    if (!allowEmptyValue) return isMissing(item, `${api}: value`);
+    return (item === null || item === undefined) && isMissing(item, `${api}: value`);
+  });
+}
+
+export function hasMissingItems(values: unknown, api: string, item: string): boolean {
+  if (!Array.isArray(values)) {
+    console.error(`OneSignal: ${api}: ${item}s must be an array of strings`);
+    return true;
+  }
+  return values.some((value) => isMissing(value, `${api}: ${item}`));
 }
 
 /**
