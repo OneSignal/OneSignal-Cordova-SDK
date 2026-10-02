@@ -207,6 +207,12 @@ describe('User', () => {
         [{ [key]: value }],
       );
     });
+
+    test('should not add a tag with an empty key', () => {
+      user.addTag('', 'premium');
+
+      expect(window.cordova.exec).not.toHaveBeenCalled();
+    });
   });
 
   describe('addTags', () => {
@@ -513,7 +519,9 @@ describe('User', () => {
 
       user.trackEvent(eventName, circularObj);
 
-      expect(consoleSpy).toHaveBeenCalledWith('Properties must be a JSON-serializable object');
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[OneSignal] trackEvent: properties must be a JSON-serializable object',
+      );
       expect(window.cordova.exec).not.toHaveBeenCalled();
       consoleSpy.mockRestore();
     });
@@ -524,9 +532,96 @@ describe('User', () => {
 
       user.trackEvent(eventName, ['item1', 'item2'] as unknown as object);
 
-      expect(consoleSpy).toHaveBeenCalledWith('Properties must be a JSON-serializable object');
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[OneSignal] trackEvent: properties must be a JSON-serializable object',
+      );
       expect(window.cordova.exec).not.toHaveBeenCalled();
       consoleSpy.mockRestore();
+    });
+  });
+
+  describe('empty inputs', () => {
+    test('does not call native for missing strings', () => {
+      user.addAlias('', 'id');
+      user.addAlias('label', '');
+      user.addAliases({ '': 'id' });
+      user.addAliases({ label: '' });
+      user.removeAlias('');
+      user.removeAliases(['']);
+      user.addEmail('');
+      user.removeEmail('');
+      user.addSms('');
+      user.removeSms('');
+      user.addTag('', 'value');
+      user.addTag('key', null as unknown as string);
+      user.addTags({ '': 'value' });
+      user.addTags(null as unknown as object);
+      user.removeTag('');
+      user.removeTags(['']);
+      user.trackEvent('');
+
+      expect(window.cordova.exec).not.toHaveBeenCalled();
+    });
+
+    test('does not call native for non-object maps', () => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      user.addTags('abc' as unknown as object);
+      user.addTags(['a'] as unknown as object);
+      user.addAliases(['x'] as unknown as object);
+
+      expect(consoleSpy).toHaveBeenCalledWith('[OneSignal] addTags: argument must be an object');
+      expect(consoleSpy).toHaveBeenCalledWith('[OneSignal] addAliases: argument must be an object');
+      expect(window.cordova.exec).not.toHaveBeenCalled();
+
+      consoleSpy.mockRestore();
+    });
+
+    test('does not call native for non-array removals', () => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      user.removeAliases(null as unknown as string[]);
+      user.removeTags('key' as unknown as string[]);
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[OneSignal] removeAliases: labels must be an array of strings',
+      );
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[OneSignal] removeTags: keys must be an array of strings',
+      );
+      expect(window.cordova.exec).not.toHaveBeenCalled();
+
+      consoleSpy.mockRestore();
+    });
+
+    test('allows an empty tag value', () => {
+      user.addTags({ level: '' });
+
+      expect(window.cordova.exec).toHaveBeenCalledWith(
+        expect.any(Function),
+        expect.any(Function),
+        'OneSignalPush',
+        'addTags',
+        [{ level: '' }],
+      );
+    });
+
+    test('forwards an empty language so native can reset', () => {
+      user.setLanguage('');
+
+      expect(window.cordova.exec).toHaveBeenCalledWith(
+        expect.any(Function),
+        expect.any(Function),
+        'OneSignalPush',
+        'setLanguage',
+        [''],
+      );
+    });
+
+    test('does not set a null language', () => {
+      user.setLanguage(null as unknown as string);
+
+      expect(window.cordova.exec).not.toHaveBeenCalled();
     });
   });
 });

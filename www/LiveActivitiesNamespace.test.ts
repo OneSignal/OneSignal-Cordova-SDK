@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test, vi } from 'vite-plus/test';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vite-plus/test';
 
 import { SUB_TOKEN } from '../mocks/constants';
 import { mockCordova } from '../mocks/cordova';
@@ -150,6 +150,96 @@ describe('LiveActivities', () => {
         'OneSignalPush',
         'startDefaultLiveActivity',
         [ACTIVITY_ID, attributes, content],
+      );
+    });
+  });
+
+  describe('invalid input', () => {
+    let consoleSpy: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      consoleSpy.mockRestore();
+    });
+
+    test.each([null, undefined, '', 1, {}])('does not call native for string arg %s', (value) => {
+      const bad = value as unknown as string;
+
+      liveActivities.enter(bad, SUB_TOKEN);
+      liveActivities.enter(ACTIVITY_ID, bad);
+      liveActivities.exit(bad);
+      liveActivities.setPushToStartToken(bad, SUB_TOKEN);
+      liveActivities.setPushToStartToken('Attrs', bad);
+      liveActivities.removePushToStartToken(bad);
+      liveActivities.startDefault(bad, {}, {});
+
+      expect(consoleSpy).toHaveBeenCalledWith('[OneSignal] enter: activityId is required');
+      expect(consoleSpy).toHaveBeenCalledWith('[OneSignal] enter: token is required');
+      expect(consoleSpy).toHaveBeenCalledWith('[OneSignal] exit: activityId is required');
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[OneSignal] setPushToStartToken: activityType is required',
+      );
+      expect(consoleSpy).toHaveBeenCalledWith('[OneSignal] setPushToStartToken: token is required');
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[OneSignal] removePushToStartToken: activityType is required',
+      );
+      expect(consoleSpy).toHaveBeenCalledWith('[OneSignal] startDefault: activityId is required');
+      expect(window.cordova.exec).not.toHaveBeenCalled();
+    });
+
+    test.each([null, 'x', 1, []])('does not call native for startDefault object %s', (value) => {
+      const bad = value as unknown as object;
+
+      liveActivities.startDefault(ACTIVITY_ID, bad, {});
+      liveActivities.startDefault(ACTIVITY_ID, {}, bad);
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[OneSignal] startDefault: attributes must be an object',
+      );
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[OneSignal] startDefault: content must be an object',
+      );
+      expect(window.cordova.exec).not.toHaveBeenCalled();
+    });
+
+    test.each([null, 'x', 1, []])('does not call native for setupDefault options %s', (value) => {
+      liveActivities.setupDefault(value as unknown as LiveActivitySetupOptions);
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[OneSignal] setupDefault: options must be an object',
+      );
+      expect(window.cordova.exec).not.toHaveBeenCalled();
+    });
+
+    test.each([null, 'true', 1, {}])('does not call native for setupDefault flag %s', (value) => {
+      liveActivities.setupDefault({
+        enablePushToStart: value,
+      } as unknown as LiveActivitySetupOptions);
+      liveActivities.setupDefault({
+        enablePushToUpdate: value,
+      } as unknown as LiveActivitySetupOptions);
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[OneSignal] setupDefault: enablePushToStart must be a boolean',
+      );
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[OneSignal] setupDefault: enablePushToUpdate must be a boolean',
+      );
+      expect(window.cordova.exec).not.toHaveBeenCalled();
+    });
+
+    test('allows setupDefault with omitted flags', () => {
+      liveActivities.setupDefault({ enablePushToStart: true } as LiveActivitySetupOptions);
+
+      expect(window.cordova.exec).toHaveBeenCalledWith(
+        expect.any(Function),
+        expect.any(Function),
+        'OneSignalPush',
+        'setupDefaultLiveActivity',
+        [{ enablePushToStart: true }],
       );
     });
   });

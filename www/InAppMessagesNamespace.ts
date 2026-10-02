@@ -1,4 +1,4 @@
-import { noop, removeListener } from './helpers';
+import { hasMissingEntries, hasMissingItems, isBoolean, noop, removeListener } from './helpers';
 import type {
   InAppMessageClickEvent,
   InAppMessageDidDismissEvent,
@@ -152,8 +152,7 @@ export default class InAppMessages {
    * @returns void
    */
   addTrigger(key: string, value: string): void {
-    const obj = { [key]: value };
-    this.addTriggers(obj);
+    this.addTriggers({ [key]: value });
   }
 
   /**
@@ -163,6 +162,7 @@ export default class InAppMessages {
    */
 
   addTriggers(triggers: { [key: string]: string }): void {
+    if (hasMissingEntries(triggers, 'addTriggers', true)) return;
     Object.keys(triggers).forEach(function (key) {
       // forces values to be string types
       if (typeof triggers[key] !== 'string') {
@@ -188,10 +188,7 @@ export default class InAppMessages {
    * @returns void
    */
   removeTriggers(keys: string[]): void {
-    if (!Array.isArray(keys)) {
-      console.error('OneSignal: removeTriggers: argument must be of type Array');
-    }
-
+    if (hasMissingItems(keys, 'removeTriggers', 'key')) return;
     window.cordova.exec(noop, noop, 'OneSignalPush', 'removeTriggers', [keys]);
   }
 
@@ -211,6 +208,7 @@ export default class InAppMessages {
    * @returns void
    */
   setPaused(pause: boolean): void {
+    if (!isBoolean(pause, 'setPaused: pause')) return;
     window.cordova.exec(noop, noop, 'OneSignalPush', 'setPaused', [pause]);
   }
 

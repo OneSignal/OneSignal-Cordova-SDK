@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from 'vite-plus/test';
+import { beforeEach, describe, expect, test, vi } from 'vite-plus/test';
 
 import { APP_ID } from '../mocks/constants';
 import { mockCordova, mockExec } from '../mocks/cordova';
@@ -48,6 +48,12 @@ describe('OneSignalPlugin', () => {
     );
   });
 
+  test('should not initialize with an empty appId', () => {
+    plugin.initialize('');
+
+    expect(window.cordova.exec).not.toHaveBeenCalled();
+  });
+
   test('should call cordova.exec for login', () => {
     const externalId = 'test-user-123';
     plugin.login(externalId);
@@ -59,6 +65,18 @@ describe('OneSignalPlugin', () => {
       'login',
       [externalId],
     );
+  });
+
+  test('should not login with an empty externalId', () => {
+    plugin.login('');
+
+    expect(window.cordova.exec).not.toHaveBeenCalled();
+  });
+
+  test('should not login with a null externalId', () => {
+    plugin.login(null as unknown as string);
+
+    expect(window.cordova.exec).not.toHaveBeenCalled();
   });
 
   test('should call cordova.exec for logout', () => {
@@ -95,4 +113,24 @@ describe('OneSignalPlugin', () => {
       [true],
     );
   });
+
+  test.each([null, undefined, 'true', 1, {}])(
+    'should not call cordova.exec for consent setters with %s',
+    (value) => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      plugin.setConsentRequired(value as unknown as boolean);
+      plugin.setConsentGiven(value as unknown as boolean);
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[OneSignal] setConsentRequired: required must be a boolean',
+      );
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[OneSignal] setConsentGiven: granted must be a boolean',
+      );
+      expect(window.cordova.exec).not.toHaveBeenCalled();
+
+      consoleSpy.mockRestore();
+    },
+  );
 });

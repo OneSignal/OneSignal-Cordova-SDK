@@ -189,6 +189,40 @@ describe('InAppMessages', () => {
         [{ key: 'value' }],
       );
     });
+
+    test('should not add a trigger with an empty key', () => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      inAppMessages.addTrigger('', 'value');
+
+      expect(consoleSpy).toHaveBeenCalledWith('[OneSignal] addTriggers: key is required');
+      expect(window.cordova.exec).not.toHaveBeenCalled();
+
+      consoleSpy.mockRestore();
+    });
+
+    test.each([null, undefined])('should not add a trigger with a %s value', (value) => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      inAppMessages.addTrigger('key', value as unknown as string);
+
+      expect(consoleSpy).toHaveBeenCalledWith('[OneSignal] addTriggers: value is required');
+      expect(window.cordova.exec).not.toHaveBeenCalled();
+
+      consoleSpy.mockRestore();
+    });
+
+    test('should allow an empty value', () => {
+      inAppMessages.addTrigger('key', '');
+
+      expect(window.cordova.exec).toHaveBeenCalledWith(
+        expect.any(Function),
+        expect.any(Function),
+        'OneSignalPush',
+        'addTriggers',
+        [{ key: '' }],
+      );
+    });
   });
 
   describe('addTriggers', () => {
@@ -219,6 +253,12 @@ describe('InAppMessages', () => {
         [{ key1: 'value1', key2: '123', key3: 'true' }],
       );
     });
+
+    test('should not add triggers with an empty key', () => {
+      inAppMessages.addTriggers({ '': 'value' });
+
+      expect(window.cordova.exec).not.toHaveBeenCalled();
+    });
   });
 
   describe('removeTrigger', () => {
@@ -232,6 +272,12 @@ describe('InAppMessages', () => {
         'removeTriggers',
         [['key']],
       );
+    });
+
+    test('should not remove a trigger with an empty key', () => {
+      inAppMessages.removeTrigger('');
+
+      expect(window.cordova.exec).not.toHaveBeenCalled();
     });
   });
 
@@ -249,14 +295,21 @@ describe('InAppMessages', () => {
       );
     });
 
+    test('should not remove triggers with an empty key', () => {
+      inAppMessages.removeTriggers(['']);
+
+      expect(window.cordova.exec).not.toHaveBeenCalled();
+    });
+
     test('should handle non-array input gracefully', () => {
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       inAppMessages.removeTriggers('not-an-array' as any);
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        'OneSignal: removeTriggers: argument must be of type Array',
+        '[OneSignal] removeTriggers: keys must be an array of strings',
       );
+      expect(window.cordova.exec).not.toHaveBeenCalled();
 
       consoleSpy.mockRestore();
     });
@@ -287,6 +340,20 @@ describe('InAppMessages', () => {
         [pauseValue],
       );
     });
+
+    test.each([null, undefined, 'true', 1, {}, []])(
+      'should not call cordova.exec for setPaused with %s',
+      (pauseValue) => {
+        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+        inAppMessages.setPaused(pauseValue as unknown as boolean);
+
+        expect(consoleSpy).toHaveBeenCalledWith('[OneSignal] setPaused: pause must be a boolean');
+        expect(window.cordova.exec).not.toHaveBeenCalled();
+
+        consoleSpy.mockRestore();
+      },
+    );
   });
 
   describe('getPaused', () => {

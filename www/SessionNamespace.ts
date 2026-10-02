@@ -1,4 +1,4 @@
-import { noop } from './helpers';
+import { isMissing, noop } from './helpers';
 
 export default class Session {
   /**
@@ -11,6 +11,7 @@ export default class Session {
    * @returns void
    */
   addOutcome(name: string): void {
+    if (isMissing(name, 'addOutcome: name')) return;
     window.cordova.exec(noop, noop, 'OneSignalPush', 'addOutcome', [name]);
   }
 
@@ -20,6 +21,7 @@ export default class Session {
    * @returns void
    */
   addUniqueOutcome(name: string): void {
+    if (isMissing(name, 'addUniqueOutcome: name')) return;
     window.cordova.exec(noop, noop, 'OneSignalPush', 'addUniqueOutcome', [name]);
   }
 
@@ -30,6 +32,12 @@ export default class Session {
    * @returns void
    */
   addOutcomeWithValue(name: string, value: number): void {
+    if (isMissing(name, 'addOutcomeWithValue: name')) return;
+    // NaN and Infinity serialize to null across the bridge.
+    if (!Number.isFinite(value)) {
+      console.error('[OneSignal] addOutcomeWithValue: value must be a finite number');
+      return;
+    }
     window.cordova.exec(noop, noop, 'OneSignalPush', 'addOutcomeWithValue', [name, value]);
   }
 }

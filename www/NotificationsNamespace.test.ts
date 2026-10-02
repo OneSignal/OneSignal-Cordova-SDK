@@ -136,6 +136,24 @@ describe('Notifications', () => {
 
       return promise;
     });
+
+    test.each([null, 'true', 1, {}])(
+      'should reject and not call cordova.exec for fallbackToSettings %s',
+      async (fallback) => {
+        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+        await expect(
+          notifications.requestPermission(fallback as unknown as boolean),
+        ).rejects.toThrow('fallbackToSettings must be a boolean');
+
+        expect(consoleSpy).toHaveBeenCalledWith(
+          '[OneSignal] requestPermission: fallbackToSettings must be a boolean',
+        );
+        expect(window.cordova.exec).not.toHaveBeenCalled();
+
+        consoleSpy.mockRestore();
+      },
+    );
   });
 
   describe('canRequestPermission', () => {
@@ -284,6 +302,42 @@ describe('Notifications', () => {
         'OneSignalPush',
         'proceedWithWillDisplay',
         [notificationData.notificationId],
+      );
+    });
+
+    test('should still proceed when a foreground listener throws', () => {
+      notifications.addEventListener('foregroundWillDisplay', () => {
+        throw new Error('listener failed');
+      });
+
+      const foregroundCallback = mockExec.mock.calls[0][0];
+      const notificationData = mockNotification();
+
+      expect(() => foregroundCallback(notificationData)).toThrow('listener failed');
+      expect(window.cordova.exec).toHaveBeenCalledWith(
+        expect.any(Function),
+        expect.any(Function),
+        'OneSignalPush',
+        'proceedWithWillDisplay',
+        [notificationData.notificationId],
+      );
+    });
+
+    test('should not proceed when a foreground listener prevents display and then throws', () => {
+      notifications.addEventListener('foregroundWillDisplay', (event) => {
+        event.preventDefault();
+        throw new Error('listener failed');
+      });
+
+      const foregroundCallback = mockExec.mock.calls[0][0];
+
+      expect(() => foregroundCallback(mockNotification())).toThrow('listener failed');
+      expect(window.cordova.exec).not.toHaveBeenCalledWith(
+        expect.any(Function),
+        expect.any(Function),
+        'OneSignalPush',
+        'proceedWithWillDisplay',
+        expect.anything(),
       );
     });
 
@@ -479,6 +533,19 @@ describe('Notifications', () => {
         [notificationId],
       );
     });
+
+    test.each([null, undefined, '5', 5.5, NaN])('should not call cordova.exec for id %s', (id) => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      notifications.removeNotification(id as unknown as number);
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[OneSignal] removeNotification: id must be an integer',
+      );
+      expect(window.cordova.exec).not.toHaveBeenCalled();
+
+      consoleSpy.mockRestore();
+    });
   });
 
   describe('removeGroupedNotifications', () => {
@@ -493,6 +560,19 @@ describe('Notifications', () => {
         'removeGroupedNotifications',
         [groupId],
       );
+    });
+
+    test.each([null, undefined, '', 5])('should not call cordova.exec for id %s', (id) => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      notifications.removeGroupedNotifications(id as unknown as string);
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[OneSignal] removeGroupedNotifications: id is required',
+      );
+      expect(window.cordova.exec).not.toHaveBeenCalled();
+
+      consoleSpy.mockRestore();
     });
   });
 

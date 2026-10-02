@@ -73,7 +73,7 @@ export default class PushSubscription {
    */
   get id(): string | null | undefined {
     console.warn(
-      'OneSignal: This method has been deprecated. Use getIdAsync instead for getting push subscription id.',
+      '[OneSignal] This method has been deprecated. Use getIdAsync instead for getting push subscription id.',
     );
     return this._id;
   }
@@ -83,7 +83,7 @@ export default class PushSubscription {
    */
   get token(): string | null | undefined {
     console.warn(
-      'OneSignal: This method has been deprecated. Use getTokenAsync instead for getting push subscription token.',
+      '[OneSignal] This method has been deprecated. Use getTokenAsync instead for getting push subscription token.',
     );
     return this._token;
   }
@@ -93,7 +93,7 @@ export default class PushSubscription {
    */
   get optedIn(): boolean {
     console.warn(
-      'OneSignal: This method has been deprecated. Use getOptedInAsync instead for getting push subscription opted in status.',
+      '[OneSignal] This method has been deprecated. Use getOptedInAsync instead for getting push subscription opted in status.',
     );
     return this._optedIn || false;
   }

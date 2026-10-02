@@ -11,6 +11,12 @@ export enum LogLevel {
   Verbose,
 }
 
+function isValidLogLevel(level: unknown, api: string): boolean {
+  if (typeof level === 'number' && LogLevel[level] !== undefined) return true;
+  console.error(`[OneSignal] ${api}: level must be a LogLevel value`);
+  return false;
+}
+
 export default class Debug {
   /**
    * Enable logging to help debug if you run into an issue setting up OneSignal.
@@ -18,6 +24,7 @@ export default class Debug {
    * @returns void
    */
   setLogLevel(logLevel: LogLevel): void {
+    if (!isValidLogLevel(logLevel, 'setLogLevel')) return;
     window.cordova.exec(noop, noop, 'OneSignalPush', 'setLogLevel', [logLevel]);
   }
 
@@ -27,6 +34,7 @@ export default class Debug {
    * @returns void
    */
   setAlertLevel(visualLogLevel: LogLevel): void {
+    if (!isValidLogLevel(visualLogLevel, 'setAlertLevel')) return;
     window.cordova.exec(noop, noop, 'OneSignalPush', 'setAlertLevel', [visualLogLevel]);
   }
 }
