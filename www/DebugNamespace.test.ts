@@ -64,10 +64,10 @@ describe('Debug', () => {
       debug.setAlertLevel(level as unknown as LogLevel);
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        'OneSignal: setLogLevel: level must be a LogLevel value',
+        '[OneSignal] setLogLevel: level must be a LogLevel value',
       );
       expect(consoleSpy).toHaveBeenCalledWith(
-        'OneSignal: setAlertLevel: level must be a LogLevel value',
+        '[OneSignal] setAlertLevel: level must be a LogLevel value',
       );
       expect(window.cordova.exec).not.toHaveBeenCalled();
 

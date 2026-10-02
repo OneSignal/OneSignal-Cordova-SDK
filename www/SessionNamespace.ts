@@ -35,7 +35,7 @@ export default class Session {
     if (isMissing(name, 'addOutcomeWithValue: name')) return;
     // NaN and Infinity serialize to null across the bridge.
     if (!Number.isFinite(value)) {
-      console.error('OneSignal: addOutcomeWithValue: value must be a finite number');
+      console.error('[OneSignal] addOutcomeWithValue: value must be a finite number');
       return;
     }
     window.cordova.exec(noop, noop, 'OneSignalPush', 'addOutcomeWithValue', [name, value]);

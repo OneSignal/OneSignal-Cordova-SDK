@@ -147,7 +147,7 @@ describe('Notifications', () => {
         ).rejects.toThrow('fallbackToSettings must be a boolean');
 
         expect(consoleSpy).toHaveBeenCalledWith(
-          'OneSignal: requestPermission: fallbackToSettings must be a boolean',
+          '[OneSignal] requestPermission: fallbackToSettings must be a boolean',
         );
         expect(window.cordova.exec).not.toHaveBeenCalled();
 

@@ -123,10 +123,10 @@ describe('OneSignalPlugin', () => {
       plugin.setConsentGiven(value as unknown as boolean);
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        'OneSignal: setConsentRequired: required must be a boolean',
+        '[OneSignal] setConsentRequired: required must be a boolean',
       );
       expect(consoleSpy).toHaveBeenCalledWith(
-        'OneSignal: setConsentGiven: granted must be a boolean',
+        '[OneSignal] setConsentGiven: granted must be a boolean',
       );
       expect(window.cordova.exec).not.toHaveBeenCalled();
 

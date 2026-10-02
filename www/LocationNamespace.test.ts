@@ -52,7 +52,7 @@ describe('Location', () => {
 
         location.setShared(sharedValue as unknown as boolean);
 
-        expect(consoleSpy).toHaveBeenCalledWith('OneSignal: setShared: shared must be a boolean');
+        expect(consoleSpy).toHaveBeenCalledWith('[OneSignal] setShared: shared must be a boolean');
         expect(window.cordova.exec).not.toHaveBeenCalled();
 
         consoleSpy.mockRestore();

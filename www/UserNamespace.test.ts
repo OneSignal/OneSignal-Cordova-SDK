@@ -520,7 +520,7 @@ describe('User', () => {
       user.trackEvent(eventName, circularObj);
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        'OneSignal: trackEvent: properties must be a JSON-serializable object',
+        '[OneSignal] trackEvent: properties must be a JSON-serializable object',
       );
       expect(window.cordova.exec).not.toHaveBeenCalled();
       consoleSpy.mockRestore();
@@ -533,7 +533,7 @@ describe('User', () => {
       user.trackEvent(eventName, ['item1', 'item2'] as unknown as object);
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        'OneSignal: trackEvent: properties must be a JSON-serializable object',
+        '[OneSignal] trackEvent: properties must be a JSON-serializable object',
       );
       expect(window.cordova.exec).not.toHaveBeenCalled();
       consoleSpy.mockRestore();
@@ -570,8 +570,8 @@ describe('User', () => {
       user.addTags(['a'] as unknown as object);
       user.addAliases(['x'] as unknown as object);
 
-      expect(consoleSpy).toHaveBeenCalledWith('OneSignal: addTags: argument must be an object');
-      expect(consoleSpy).toHaveBeenCalledWith('OneSignal: addAliases: argument must be an object');
+      expect(consoleSpy).toHaveBeenCalledWith('[OneSignal] addTags: argument must be an object');
+      expect(consoleSpy).toHaveBeenCalledWith('[OneSignal] addAliases: argument must be an object');
       expect(window.cordova.exec).not.toHaveBeenCalled();
 
       consoleSpy.mockRestore();
@@ -584,10 +584,10 @@ describe('User', () => {
       user.removeTags('key' as unknown as string[]);
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        'OneSignal: removeAliases: labels must be an array of strings',
+        '[OneSignal] removeAliases: labels must be an array of strings',
       );
       expect(consoleSpy).toHaveBeenCalledWith(
-        'OneSignal: removeTags: keys must be an array of strings',
+        '[OneSignal] removeTags: keys must be an array of strings',
       );
       expect(window.cordova.exec).not.toHaveBeenCalled();
 

@@ -195,7 +195,7 @@ describe('InAppMessages', () => {
 
       inAppMessages.addTrigger('', 'value');
 
-      expect(consoleSpy).toHaveBeenCalledWith('OneSignal: addTriggers: key is required');
+      expect(consoleSpy).toHaveBeenCalledWith('[OneSignal] addTriggers: key is required');
       expect(window.cordova.exec).not.toHaveBeenCalled();
 
       consoleSpy.mockRestore();
@@ -206,7 +206,7 @@ describe('InAppMessages', () => {
 
       inAppMessages.addTrigger('key', value as unknown as string);
 
-      expect(consoleSpy).toHaveBeenCalledWith('OneSignal: addTriggers: value is required');
+      expect(consoleSpy).toHaveBeenCalledWith('[OneSignal] addTriggers: value is required');
       expect(window.cordova.exec).not.toHaveBeenCalled();
 
       consoleSpy.mockRestore();
@@ -307,7 +307,7 @@ describe('InAppMessages', () => {
       inAppMessages.removeTriggers('not-an-array' as any);
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        'OneSignal: removeTriggers: keys must be an array of strings',
+        '[OneSignal] removeTriggers: keys must be an array of strings',
       );
       expect(window.cordova.exec).not.toHaveBeenCalled();
 
@@ -348,7 +348,7 @@ describe('InAppMessages', () => {
 
         inAppMessages.setPaused(pauseValue as unknown as boolean);
 
-        expect(consoleSpy).toHaveBeenCalledWith('OneSignal: setPaused: pause must be a boolean');
+        expect(consoleSpy).toHaveBeenCalledWith('[OneSignal] setPaused: pause must be a boolean');
         expect(window.cordova.exec).not.toHaveBeenCalled();
 
         consoleSpy.mockRestore();

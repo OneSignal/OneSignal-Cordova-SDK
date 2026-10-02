@@ -42,7 +42,7 @@ export default class User {
   setLanguage(language: string): void {
     // Empty string is the reset to the device language. Null is not.
     if (typeof language !== 'string') {
-      console.error('OneSignal: setLanguage: language is required');
+      console.error('[OneSignal] setLanguage: language is required');
       return;
     }
     window.cordova.exec(noop, noop, 'OneSignalPush', 'setLanguage', [language]);
@@ -252,7 +252,7 @@ export default class User {
   trackEvent(name: string, properties?: object): void {
     if (isMissing(name, 'trackEvent: name')) return;
     if (properties !== undefined && !isObjectSerializable(properties)) {
-      console.error('OneSignal: trackEvent: properties must be a JSON-serializable object');
+      console.error('[OneSignal] trackEvent: properties must be a JSON-serializable object');
       return;
     }
     const args = properties ? [name, properties] : [name];

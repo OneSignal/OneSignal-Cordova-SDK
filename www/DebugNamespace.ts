@@ -13,7 +13,7 @@ export enum LogLevel {
 
 function isValidLogLevel(level: unknown, api: string): boolean {
   if (typeof level === 'number' && LogLevel[level] !== undefined) return true;
-  console.error(`OneSignal: ${api}: level must be a LogLevel value`);
+  console.error(`[OneSignal] ${api}: level must be a LogLevel value`);
   return false;
 }
 

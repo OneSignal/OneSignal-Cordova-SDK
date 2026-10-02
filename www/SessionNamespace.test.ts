@@ -85,7 +85,7 @@ describe('Session', () => {
         session.addOutcomeWithValue('purchase', value as unknown as number);
 
         expect(consoleSpy).toHaveBeenCalledWith(
-          'OneSignal: addOutcomeWithValue: value must be a finite number',
+          '[OneSignal] addOutcomeWithValue: value must be a finite number',
         );
         expect(window.cordova.exec).not.toHaveBeenCalled();
 
@@ -103,9 +103,9 @@ describe('Session', () => {
       session.addUniqueOutcome(missing);
       session.addOutcomeWithValue(missing, 1);
 
-      expect(consoleSpy).toHaveBeenCalledWith('OneSignal: addOutcome: name is required');
-      expect(consoleSpy).toHaveBeenCalledWith('OneSignal: addUniqueOutcome: name is required');
-      expect(consoleSpy).toHaveBeenCalledWith('OneSignal: addOutcomeWithValue: name is required');
+      expect(consoleSpy).toHaveBeenCalledWith('[OneSignal] addOutcome: name is required');
+      expect(consoleSpy).toHaveBeenCalledWith('[OneSignal] addUniqueOutcome: name is required');
+      expect(consoleSpy).toHaveBeenCalledWith('[OneSignal] addOutcomeWithValue: name is required');
       expect(window.cordova.exec).not.toHaveBeenCalled();
 
       consoleSpy.mockRestore();

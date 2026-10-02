@@ -43,11 +43,11 @@ describe('hasMissingItems', () => {
 
     expect(hasMissingItems(null, 'removeTags', 'key')).toBe(true);
     expect(hasMissingItems('key', 'removeTags', 'key')).toBe(true);
-    expect(error).toHaveBeenCalledWith('OneSignal: removeTags: keys must be an array of strings');
+    expect(error).toHaveBeenCalledWith('[OneSignal] removeTags: keys must be an array of strings');
 
     expect(hasMissingItems(['a', ''], 'removeTags', 'key')).toBe(true);
     expect(hasMissingItems(['a', 1], 'removeTags', 'key')).toBe(true);
-    expect(error).toHaveBeenCalledWith('OneSignal: removeTags: key is required');
+    expect(error).toHaveBeenCalledWith('[OneSignal] removeTags: key is required');
 
     expect(hasMissingItems(['a', 'b'], 'removeTags', 'key')).toBe(false);
     expect(hasMissingItems([], 'removeTags', 'key')).toBe(false);
