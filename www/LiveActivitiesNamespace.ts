@@ -1,5 +1,12 @@
-import { noop } from './helpers';
+import { isBoolean, isMissing, isObject, noop } from './helpers';
 import type { LiveActivitySetupOptions } from './types/LiveActivities';
+
+function isValidSetupOptions(options: unknown): boolean {
+  if (!isObject(options, 'setupDefault: options')) return false;
+  return (['enablePushToStart', 'enablePushToUpdate'] as const).every(
+    (flag) => options[flag] === undefined || isBoolean(options[flag], `setupDefault: ${flag}`),
+  );
+}
 
 export default class LiveActivities {
   /**
@@ -16,6 +23,8 @@ export default class LiveActivities {
     onSuccess?: (data: unknown) => void,
     onFailure?: (data: unknown) => void,
   ): void {
+    if (isMissing(activityId, 'enter: activityId') || isMissing(token, 'enter: token')) return;
+
     if (onSuccess == null) {
       onSuccess = noop;
     }
@@ -43,6 +52,8 @@ export default class LiveActivities {
     onSuccess?: (data: unknown) => void,
     onFailure?: (data: unknown) => void,
   ): void {
+    if (isMissing(activityId, 'exit: activityId')) return;
+
     if (onSuccess == null) {
       onSuccess = noop;
     }
@@ -66,6 +77,12 @@ export default class LiveActivities {
    * @param {string} token: The activity type's pushToStart token.
    */
   setPushToStartToken(activityType: string, token: string) {
+    if (
+      isMissing(activityType, 'setPushToStartToken: activityType') ||
+      isMissing(token, 'setPushToStartToken: token')
+    ) {
+      return;
+    }
     window.cordova.exec(noop, noop, 'OneSignalPush', 'setPushToStartToken', [activityType, token]);
   }
 
@@ -80,6 +97,7 @@ export default class LiveActivities {
    * to the live activity.
    */
   removePushToStartToken(activityType: string) {
+    if (isMissing(activityType, 'removePushToStartToken: activityType')) return;
     window.cordova.exec(noop, noop, 'OneSignalPush', 'removePushToStartToken', [activityType]);
   }
 
@@ -98,6 +116,7 @@ export default class LiveActivities {
    * @param {LiveActivitySetupOptions} options: An optional structure to provide for more granular setup options.
    */
   setupDefault(options?: LiveActivitySetupOptions) {
+    if (options !== undefined && !isValidSetupOptions(options)) return;
     window.cordova.exec(noop, noop, 'OneSignalPush', 'setupDefaultLiveActivity', [options]);
   }
 
@@ -114,6 +133,13 @@ export default class LiveActivities {
    * @param {object} content: A dynamic type containing the content attributes passed into `DefaultLiveActivityAttributes`.
    */
   startDefault(activityId: string, attributes: object, content: object) {
+    if (
+      isMissing(activityId, 'startDefault: activityId') ||
+      !isObject(attributes, 'startDefault: attributes') ||
+      !isObject(content, 'startDefault: content')
+    ) {
+      return;
+    }
     window.cordova.exec(noop, noop, 'OneSignalPush', 'startDefaultLiveActivity', [
       activityId,
       attributes,

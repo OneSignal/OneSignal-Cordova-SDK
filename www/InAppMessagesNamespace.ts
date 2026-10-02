@@ -1,4 +1,4 @@
-import { noop, hasMissingEntries, hasMissingItems, isBoolean, removeListener } from './helpers';
+import { hasMissingEntries, hasMissingItems, isBoolean, noop, removeListener } from './helpers';
 import type {
   InAppMessageClickEvent,
   InAppMessageDidDismissEvent,
@@ -189,7 +189,6 @@ export default class InAppMessages {
    */
   removeTriggers(keys: string[]): void {
     if (hasMissingItems(keys, 'removeTriggers', 'key')) return;
-
     window.cordova.exec(noop, noop, 'OneSignalPush', 'removeTriggers', [keys]);
   }
 
