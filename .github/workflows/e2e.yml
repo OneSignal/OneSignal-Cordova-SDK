@@ -46,21 +46,6 @@ jobs:
           onesignal-app-id: ${{ vars.APPIUM_ONESIGNAL_APP_ID }}
           onesignal-api-key: ${{ secrets.APPIUM_ONESIGNAL_API_KEY }}
 
-      - name: Resolve OneSignal Android SDK version
-        id: android-sdk-version
-        run: |
-          VERSION=$(sed -n "s/.*def oneSignalVersion = '\([^']*\)'.*/\1/p" build-extras-onesignal.gradle | head -n1)
-          if [ -z "$VERSION" ]; then
-            echo "::error::Unable to resolve OneSignal Android SDK version from build-extras-onesignal.gradle"
-            exit 1
-          fi
-          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
-
-      - name: Wait for OneSignal Android SDK on Maven Central
-        uses: OneSignal/sdk-shared/.github/actions/wait-for-maven-artifact@main
-        with:
-          version: ${{ steps.android-sdk-version.outputs.version }}
-
       - name: Build debug APK
         working-directory: examples/demo/android
         # Debug build is faster (no R8/proguard, no release signing) and ships
