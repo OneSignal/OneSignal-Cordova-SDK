@@ -1,4 +1,4 @@
-import { noop, removeListener } from './helpers';
+import { isBoolean, noop, removeListener } from './helpers';
 import { isDefaultPrevented, NotificationWillDisplayEvent } from './NotificationReceivedEvent';
 import { OSNotification } from './OSNotification';
 import type {
@@ -88,11 +88,15 @@ export default class Notifications {
    * @param  {boolean} fallbackToSettings
    * @returns {Promise<boolean>}
    */
-  requestPermission(fallbackToSettings?: boolean): Promise<boolean> {
-    let fallback = fallbackToSettings ?? false;
+  requestPermission(fallbackToSettings = false): Promise<boolean> {
+    if (!isBoolean(fallbackToSettings, 'requestPermission: fallbackToSettings')) {
+      return Promise.reject(new Error('fallbackToSettings must be a boolean'));
+    }
 
     return new Promise<boolean>((resolve, reject) => {
-      window.cordova.exec(resolve, reject, 'OneSignalPush', 'requestPermission', [fallback]);
+      window.cordova.exec(resolve, reject, 'OneSignalPush', 'requestPermission', [
+        fallbackToSettings,
+      ]);
     });
   }
 

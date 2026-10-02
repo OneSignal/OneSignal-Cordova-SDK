@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from 'vite-plus/test';
+import { beforeEach, describe, expect, test, vi } from 'vite-plus/test';
 
 import { mockCordova, mockExec } from '../mocks/cordova';
 import Location from './LocationNamespace';
@@ -42,6 +42,20 @@ describe('Location', () => {
           'setLocationShared',
           [sharedValue],
         );
+      },
+    );
+
+    test.each([null, undefined, 'true', 1, {}])(
+      'should not call cordova.exec for setShared with %s',
+      (sharedValue) => {
+        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+        location.setShared(sharedValue as unknown as boolean);
+
+        expect(consoleSpy).toHaveBeenCalledWith('OneSignal: setShared: shared must be a boolean');
+        expect(window.cordova.exec).not.toHaveBeenCalled();
+
+        consoleSpy.mockRestore();
       },
     );
   });

@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from 'vite-plus/test';
+import { beforeEach, describe, expect, test, vi } from 'vite-plus/test';
 
 import { APP_ID } from '../mocks/constants';
 import { mockCordova, mockExec } from '../mocks/cordova';
@@ -113,4 +113,24 @@ describe('OneSignalPlugin', () => {
       [true],
     );
   });
+
+  test.each([null, undefined, 'true', 1, {}])(
+    'should not call cordova.exec for consent setters with %s',
+    (value) => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      plugin.setConsentRequired(value as unknown as boolean);
+      plugin.setConsentGiven(value as unknown as boolean);
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'OneSignal: setConsentRequired: required must be a boolean',
+      );
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'OneSignal: setConsentGiven: granted must be a boolean',
+      );
+      expect(window.cordova.exec).not.toHaveBeenCalled();
+
+      consoleSpy.mockRestore();
+    },
+  );
 });

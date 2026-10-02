@@ -1,4 +1,4 @@
-import { noop } from './helpers';
+import { isBoolean, noop } from './helpers';
 
 export default class Location {
   /**
@@ -19,6 +19,7 @@ export default class Location {
    * @returns void
    */
   setShared(shared: boolean): void {
+    if (!isBoolean(shared, 'setShared: shared')) return;
     window.cordova.exec(noop, noop, 'OneSignalPush', 'setLocationShared', [shared]);
   }
 

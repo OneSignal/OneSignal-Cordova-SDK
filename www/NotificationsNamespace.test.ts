@@ -136,6 +136,24 @@ describe('Notifications', () => {
 
       return promise;
     });
+
+    test.each([null, 'true', 1, {}])(
+      'should reject and not call cordova.exec for fallbackToSettings %s',
+      async (fallback) => {
+        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+        await expect(
+          notifications.requestPermission(fallback as unknown as boolean),
+        ).rejects.toThrow('fallbackToSettings must be a boolean');
+
+        expect(consoleSpy).toHaveBeenCalledWith(
+          'OneSignal: requestPermission: fallbackToSettings must be a boolean',
+        );
+        expect(window.cordova.exec).not.toHaveBeenCalled();
+
+        consoleSpy.mockRestore();
+      },
+    );
   });
 
   describe('canRequestPermission', () => {

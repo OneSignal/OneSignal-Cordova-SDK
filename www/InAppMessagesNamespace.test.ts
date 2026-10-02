@@ -340,6 +340,20 @@ describe('InAppMessages', () => {
         [pauseValue],
       );
     });
+
+    test.each([null, undefined, 'true', 1, {}, []])(
+      'should not call cordova.exec for setPaused with %s',
+      (pauseValue) => {
+        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+        inAppMessages.setPaused(pauseValue as unknown as boolean);
+
+        expect(consoleSpy).toHaveBeenCalledWith('OneSignal: setPaused: pause must be a boolean');
+        expect(window.cordova.exec).not.toHaveBeenCalled();
+
+        consoleSpy.mockRestore();
+      },
+    );
   });
 
   describe('getPaused', () => {

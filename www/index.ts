@@ -25,7 +25,7 @@
  * THE SOFTWARE.
  */
 import Debug from './DebugNamespace';
-import { noop, isMissing } from './helpers';
+import { noop, isMissing, isBoolean } from './helpers';
 import InAppMessages from './InAppMessagesNamespace';
 import LiveActivities from './LiveActivitiesNamespace';
 import Location from './LocationNamespace';
@@ -94,6 +94,7 @@ export class OneSignalPlugin {
    * @returns void
    */
   setConsentRequired(required: boolean): void {
+    if (!isBoolean(required, 'setConsentRequired: required')) return;
     window.cordova.exec(noop, noop, 'OneSignalPush', 'setPrivacyConsentRequired', [required]);
   }
 
@@ -103,6 +104,7 @@ export class OneSignalPlugin {
    * @returns void
    */
   setConsentGiven(granted: boolean): void {
+    if (!isBoolean(granted, 'setConsentGiven: granted')) return;
     window.cordova.exec(noop, noop, 'OneSignalPush', 'setPrivacyConsentGiven', [granted]);
   }
 }

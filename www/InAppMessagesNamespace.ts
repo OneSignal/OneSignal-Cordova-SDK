@@ -1,4 +1,4 @@
-import { noop, hasMissingEntries, hasMissingItems, removeListener } from './helpers';
+import { noop, hasMissingEntries, hasMissingItems, isBoolean, removeListener } from './helpers';
 import type {
   InAppMessageClickEvent,
   InAppMessageDidDismissEvent,
@@ -209,6 +209,7 @@ export default class InAppMessages {
    * @returns void
    */
   setPaused(pause: boolean): void {
+    if (!isBoolean(pause, 'setPaused: pause')) return;
     window.cordova.exec(noop, noop, 'OneSignalPush', 'setPaused', [pause]);
   }
 
