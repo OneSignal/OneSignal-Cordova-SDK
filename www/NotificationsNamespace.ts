@@ -1,4 +1,4 @@
-import { isBoolean, noop, removeListener } from './helpers';
+import { isBoolean, isMissing, noop, removeListener } from './helpers';
 import { isDefaultPrevented, NotificationWillDisplayEvent } from './NotificationReceivedEvent';
 import { OSNotification } from './OSNotification';
 import type {
@@ -163,11 +163,15 @@ export default class Notifications {
         this._hasRegisteredForegroundWillDisplayListener = true;
         const foregroundParsingHandler = (notification: OSNotification) => {
           const displayEvent = new NotificationWillDisplayEvent(notification);
-          this._processFunctionList(this._notificationWillDisplayListeners, displayEvent);
-          if (!isDefaultPrevented(displayEvent)) {
-            window.cordova.exec(noop, noop, 'OneSignalPush', 'proceedWithWillDisplay', [
-              notification.notificationId,
-            ]);
+          // Native holds the notification until proceedWithWillDisplay, so a throwing listener must not skip it.
+          try {
+            this._processFunctionList(this._notificationWillDisplayListeners, displayEvent);
+          } finally {
+            if (!isDefaultPrevented(displayEvent)) {
+              window.cordova.exec(noop, noop, 'OneSignalPush', 'proceedWithWillDisplay', [
+                notification.notificationId,
+              ]);
+            }
           }
         };
         window.cordova.exec(
@@ -240,6 +244,10 @@ export default class Notifications {
    * @returns void
    */
   removeNotification(id: number): void {
+    if (!Number.isInteger(id)) {
+      console.error('[OneSignal] removeNotification: id must be an integer');
+      return;
+    }
     window.cordova.exec(noop, noop, 'OneSignalPush', 'removeNotification', [id]);
   }
 
@@ -250,6 +258,7 @@ export default class Notifications {
    * @returns void
    */
   removeGroupedNotifications(id: string): void {
+    if (isMissing(id, 'removeGroupedNotifications: id')) return;
     window.cordova.exec(noop, noop, 'OneSignalPush', 'removeGroupedNotifications', [id]);
   }
 }

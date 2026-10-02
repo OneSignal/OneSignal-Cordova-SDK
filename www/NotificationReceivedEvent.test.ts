@@ -1,8 +1,8 @@
-import { beforeEach, describe, expect, test } from 'vite-plus/test';
+import { beforeEach, describe, expect, test, vi } from 'vite-plus/test';
 
 import { mockCordova } from '../mocks/cordova';
 import { mockNotification } from '../mocks/data';
-import { NotificationWillDisplayEvent } from './NotificationReceivedEvent';
+import { isDefaultPrevented, NotificationWillDisplayEvent } from './NotificationReceivedEvent';
 import { OSNotification } from './OSNotification';
 
 describe('NotificationWillDisplayEvent', () => {
@@ -52,6 +52,20 @@ describe('NotificationWillDisplayEvent', () => {
         'preventDefault',
         [notificationData.notificationId, true],
       );
+    });
+
+    test.each([null, 'yes', 1, {}])('should not prevent default for discard %s', (discard) => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      notificationEvent.preventDefault(discard as unknown as boolean);
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[OneSignal] preventDefault: discard must be a boolean',
+      );
+      expect(window.cordova.exec).not.toHaveBeenCalled();
+      expect(isDefaultPrevented(notificationEvent)).toBe(false);
+
+      consoleSpy.mockRestore();
     });
   });
 
