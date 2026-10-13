@@ -103,7 +103,13 @@ export class OneSignalPlugin {
     if (isMissing(externalId, 'loginWithProfile: externalId')) {
       return Promise.resolve(failureResult('INVALID_ARGUMENT', 'externalId is required'));
     }
-    const nativeProfile = toNativeProfile(profile);
+    let nativeProfile: OneSignalUserProfile | null;
+    try {
+      nativeProfile = toNativeProfile(profile);
+    } catch (error) {
+      console.error('[OneSignal] loginWithProfile: profile could not be read', error);
+      nativeProfile = null;
+    }
     if (!nativeProfile) {
       return Promise.resolve(failureResult('INVALID_ARGUMENT', 'profile is invalid'));
     }
@@ -111,17 +117,23 @@ export class OneSignalPlugin {
       return Promise.resolve(failureResult('INVALID_ARGUMENT', 'jwtBearerToken is invalid'));
     }
 
+    const args = [externalId, nativeProfile, jwtBearerToken ?? null];
     return new Promise((resolve) => {
-      window.cordova.exec(
-        (raw: unknown) => resolve(parseLoginResult(raw)),
-        (error: unknown) =>
-          resolve(
-            failureResult('UNKNOWN', typeof error === 'string' ? error : 'Native call failed'),
-          ),
-        'OneSignalPush',
-        'loginWithProfile',
-        [externalId, nativeProfile, jwtBearerToken ?? null],
-      );
+      try {
+        window.cordova.exec(
+          (raw: unknown) => resolve(parseLoginResult(raw)),
+          (error: unknown) =>
+            resolve(
+              failureResult('UNKNOWN', typeof error === 'string' ? error : 'Native call failed'),
+            ),
+          'OneSignalPush',
+          'loginWithProfile',
+          args,
+        );
+      } catch (error) {
+        console.error('[OneSignal] loginWithProfile: native call threw', error);
+        resolve(failureResult('UNKNOWN', error instanceof Error ? error.message : String(error)));
+      }
     });
   }
 

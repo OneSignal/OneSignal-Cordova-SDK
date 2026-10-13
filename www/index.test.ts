@@ -113,6 +113,20 @@ describe('OneSignalPlugin', () => {
       expect(mockExec.mock.calls[0][4]).toEqual(['user-1', {}, null]);
     });
 
+    test('should resolve UNKNOWN when cordova.exec throws synchronously', async () => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      mockExec.mockImplementation(() => {
+        throw new Error('bridge gone');
+      });
+
+      const result = await plugin.loginWithProfile('user-1', {});
+
+      expect(result.success).toBe(false);
+      expect(result.error?.[0].code).toBe('UNKNOWN');
+      expect(result.error?.[0].message).toBe('bridge gone');
+      consoleSpy.mockRestore();
+    });
+
     test('should resolve a malformed native result as an UNKNOWN failure', async () => {
       mockExec.mockImplementation((resolve: (raw: unknown) => void) => resolve('garbage'));
 
@@ -177,6 +191,7 @@ describe('OneSignalPlugin', () => {
       ['a non-string email', 'user-1', { email: 1 }, undefined],
       ['an empty jwt', 'user-1', {}, ''],
       ['a non-string jwt', 'user-1', {}, 5],
+      ['an unserializable tag value', 'user-1', { tags: { big: BigInt(1) } }, undefined],
     ])(
       'should resolve INVALID_ARGUMENT without calling native for %s',
       async (_, externalId, profile, jwt) => {

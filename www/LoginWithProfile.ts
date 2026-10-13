@@ -151,6 +151,9 @@ export function parseLoginResult(raw: unknown): OneSignalResult<LoginData> {
   }
 
   if (raw.success) {
+    if (Array.isArray(raw.error) && raw.error.length > 0) {
+      return failureResult('UNKNOWN', MALFORMED_RESULT);
+    }
     const data = parseLoginData(raw.data);
     return data ? { success: true, data, error: null } : failureResult('UNKNOWN', MALFORMED_RESULT);
   }

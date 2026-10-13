@@ -103,6 +103,14 @@ describe('parseLoginResult', () => {
     ],
     ['failure without errors', { success: false, error: null }],
     ['failure with an empty error list', { success: false, error: [] }],
+    [
+      'success that carries errors',
+      {
+        success: true,
+        data: { onesignalId: 'a', externalId: 'ext' },
+        error: [{ code: 'BACKEND_ERROR', source: 'BACKEND', message: 'x' }],
+      },
+    ],
   ])('treats %s as an UNKNOWN failure', (_, raw) => {
     expect(parseLoginResult(raw)).toEqual(MALFORMED);
   });
