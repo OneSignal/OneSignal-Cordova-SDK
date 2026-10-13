@@ -8,6 +8,7 @@ import OneSignal, {
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { NotificationType } from '../models/NotificationType';
+import { log } from '../services/LogService';
 import OneSignalApiService from '../services/OneSignalApiService';
 import PreferencesService from '../services/PreferencesService';
 
@@ -229,7 +230,7 @@ export function useOneSignal(): UseOneSignalReturn {
     let userChanged = false;
 
     const logIam = (kind: string) => (e: { message: { messageId: string } }) =>
-      console.log(`[OneSignal] IAM ${kind}: ${e.message.messageId}`);
+      log(`IAM ${kind}: ${e.message.messageId}`);
 
     const handleIamWillDisplay = logIam('willDisplay');
     const handleIamDidDisplay = logIam('didDisplay');
@@ -238,15 +239,16 @@ export function useOneSignal(): UseOneSignalReturn {
     const handleIamClick = logIam('click');
 
     const handleNotificationClick = (e: NotificationClickEvent) => {
-      console.log(`[OneSignal] Notification click: ${e.notification.title ?? ''}`);
+      log(`Notification click: ${e.notification.notificationId} ${e.notification.title ?? ''}`);
 
       // uncomment to see the full event object
       // console.log('[OneSignal] click event: ', e);
     };
 
     const handleForegroundWillDisplay = (e: NotificationWillDisplayEvent) => {
-      console.log(
-        `[OneSignal] Notification foregroundWillDisplay: ${e.getNotification().title ?? ''}`,
+      const notification = e.getNotification();
+      log(
+        `Notification foregroundWillDisplay: ${notification.notificationId} ${notification.title ?? ''}`,
       );
 
       // uncomment to see the full event object
@@ -276,8 +278,8 @@ export function useOneSignal(): UseOneSignalReturn {
       pushChanged = true;
       const { previous, current } = event;
       const fmtToken = (t: string | undefined) => (t ? `${t.slice(0, 8)}…` : 'null');
-      console.log(
-        `[OneSignal] Push subscription changed: id=${previous.id ?? 'null'} → ${current.id ?? 'null'}, optedIn=${previous.optedIn} → ${current.optedIn}, token=${fmtToken(previous.token)} → ${fmtToken(current.token)}`,
+      log(
+        `Push subscription changed: id=${previous.id ?? 'null'} → ${current.id ?? 'null'}, optedIn=${previous.optedIn} → ${current.optedIn}, token=${fmtToken(previous.token)} → ${fmtToken(current.token)}`,
       );
       setPushSubscriptionId(current.id ?? undefined);
       setIsPushEnabled(current.optedIn);
@@ -285,7 +287,7 @@ export function useOneSignal(): UseOneSignalReturn {
 
     const permissionHandler = (granted: boolean) => {
       permissionChanged = true;
-      console.log(`[OneSignal] Permission changed: ${granted}`);
+      log(`Permission changed: ${granted}`);
       setHasNotificationPermission(granted);
     };
 
@@ -293,8 +295,8 @@ export function useOneSignal(): UseOneSignalReturn {
       userChanged = true;
       requestSequenceRef.current++;
       const nextOnesignalId = event.current.onesignalId ?? null;
-      console.log(
-        `[OneSignal] User changed: onesignalId=${nextOnesignalId ?? 'null'}, externalId=${event.current.externalId ?? 'null'}`,
+      log(
+        `User changed: onesignalId=${nextOnesignalId ?? 'null'}, externalId=${event.current.externalId ?? 'null'}`,
       );
 
       setOneSignalId(nextOnesignalId ?? undefined);
