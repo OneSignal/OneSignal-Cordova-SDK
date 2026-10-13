@@ -36,6 +36,7 @@
 
     <source-file src="src/android/com/onesignal/cordova/OneSignalPush.java" target-dir="src/com/onesignal/cordova/" />
     <source-file src="src/android/com/onesignal/cordova/OneSignalController.java" target-dir="src/com/onesignal/cordova/" />
+    <source-file src="src/android/com/onesignal/cordova/OneSignalLoginController.java" target-dir="src/com/onesignal/cordova/" />
     <source-file src="src/android/com/onesignal/cordova/OneSignalEmailController.java" target-dir="src/com/onesignal/cordova/" />
     <source-file src="src/android/com/onesignal/cordova/OneSignalSMSController.java" target-dir="src/com/onesignal/cordova/" />
     <source-file src="src/android/com/onesignal/cordova/OneSignalObserverController.java" target-dir="src/com/onesignal/cordova/" />

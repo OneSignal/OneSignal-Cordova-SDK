@@ -77,6 +77,7 @@ public class OneSignalPush extends CordovaPlugin
 
     private static final String LOGIN = "login";
     private static final String LOGOUT = "logout";
+    private static final String LOGIN_WITH_PROFILE = "loginWithProfile";
 
     private static final String ADD_PERMISSION_OBSERVER = "addPermissionObserver";
     private static final String ADD_PUSH_SUBSCRIPTION_OBSERVER = "addPushSubscriptionObserver";
@@ -448,6 +449,10 @@ public class OneSignalPush extends CordovaPlugin
 
             case LOGOUT:
                 result = OneSignalController.logout();
+                break;
+
+            case LOGIN_WITH_PROFILE:
+                result = OneSignalLoginController.loginWithProfile(callbackContext, data);
                 break;
 
             case ADD_PERMISSION_OBSERVER:

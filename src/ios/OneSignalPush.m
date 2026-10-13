@@ -429,6 +429,23 @@ static Class delegateClass = nil;
   [OneSignal logout];
 }
 
+- (void)loginWithProfile:(CDVInvokedUrlCommand *)command {
+  NSDictionary *error = @{
+    @"code" : @"UNKNOWN",
+    @"source" : @"CLIENT",
+    @"backendCode" : [NSNull null],
+    @"httpStatus" : [NSNull null],
+    @"message" : @"loginWithProfile is only supported on Android",
+    @"meta" : [NSNull null]
+  };
+  NSDictionary *envelope =
+      @{@"success" : @NO, @"data" : [NSNull null], @"error" : @[ error ]};
+  CDVPluginResult *result =
+      [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                    messageAsDictionary:envelope];
+  [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
 - (void)addTags:(CDVInvokedUrlCommand *)command {
   [OneSignal.User addTags:command.arguments[0]];
 }

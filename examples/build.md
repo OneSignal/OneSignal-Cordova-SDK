@@ -148,41 +148,42 @@ The committed demo iOS project uses Swift Package Manager. If package resolution
 
 Use the `OneSignal` object from `onesignal-cordova-plugin`:
 
-| Operation                         | SDK Call                                                  |
-| --------------------------------- | --------------------------------------------------------- |
-| LoginUser(externalUserId)         | `OneSignal.login(externalUserId)`                         |
-| LogoutUser()                      | `OneSignal.logout()`                                      |
-| AddAlias(label, id)               | `OneSignal.User.addAlias(label, id)`                      |
-| AddAliases(aliases)               | `OneSignal.User.addAliases(aliases)`                      |
-| AddEmail(email)                   | `OneSignal.User.addEmail(email)`                          |
-| RemoveEmail(email)                | `OneSignal.User.removeEmail(email)`                       |
-| AddSms(number)                    | `OneSignal.User.addSms(number)`                           |
-| RemoveSms(number)                 | `OneSignal.User.removeSms(number)`                        |
-| AddTag(key, value)                | `OneSignal.User.addTag(key, value)`                       |
-| AddTags(tags)                     | `OneSignal.User.addTags(tags)`                            |
-| RemoveTags(keys)                  | `OneSignal.User.removeTags(keys)`                         |
-| AddTrigger(key, value)            | `OneSignal.InAppMessages.addTrigger(key, value)`          |
-| AddTriggers(triggers)             | `OneSignal.InAppMessages.addTriggers(triggers)`           |
-| RemoveTriggers(keys)              | `OneSignal.InAppMessages.removeTriggers(keys)`            |
-| ClearTriggers()                   | `OneSignal.InAppMessages.clearTriggers()`                 |
-| SendOutcome(name)                 | `OneSignal.Session.addOutcome(name)`                      |
-| SendUniqueOutcome(name)           | `OneSignal.Session.addUniqueOutcome(name)`                |
-| SendOutcomeWithValue(name, value) | `OneSignal.Session.addOutcomeWithValue(name, value)`      |
-| TrackEvent(name, properties)      | `OneSignal.User.trackEvent(name, properties)`             |
-| GetPushSubscriptionId()           | `await OneSignal.User.pushSubscription.getIdAsync()`      |
-| IsPushOptedIn()                   | `await OneSignal.User.pushSubscription.getOptedInAsync()` |
-| OptInPush()                       | `OneSignal.User.pushSubscription.optIn()`                 |
-| OptOutPush()                      | `OneSignal.User.pushSubscription.optOut()`                |
-| ClearAllNotifications()           | `OneSignal.Notifications.clearAll()`                      |
-| HasPermission()                   | `await OneSignal.Notifications.getPermissionAsync()`      |
-| RequestPermission(fallback)       | `OneSignal.Notifications.requestPermission(fallback)`     |
-| SetPaused(paused)                 | `OneSignal.InAppMessages.setPaused(paused)`               |
-| SetLocationShared(shared)         | `OneSignal.Location.setShared(shared)`                    |
-| RequestLocationPermission()       | `OneSignal.Location.requestPermission()`                  |
-| SetConsentRequired(required)      | `OneSignal.setConsentRequired(required)`                  |
-| SetConsentGiven(granted)          | `OneSignal.setConsentGiven(granted)`                      |
-| GetExternalId()                   | `await OneSignal.User.getExternalId()`                    |
-| GetOnesignalId()                  | `await OneSignal.User.getOnesignalId()`                   |
+| Operation                          | SDK Call                                                      |
+| ---------------------------------- | ------------------------------------------------------------- |
+| LoginUser(externalUserId)          | `OneSignal.login(externalUserId)`                             |
+| LoginWithProfile(id, profile, jwt) | `OneSignal.loginWithProfile(id, profile, jwt)` (Android only) |
+| LogoutUser()                       | `OneSignal.logout()`                                          |
+| AddAlias(label, id)                | `OneSignal.User.addAlias(label, id)`                          |
+| AddAliases(aliases)                | `OneSignal.User.addAliases(aliases)`                          |
+| AddEmail(email)                    | `OneSignal.User.addEmail(email)`                              |
+| RemoveEmail(email)                 | `OneSignal.User.removeEmail(email)`                           |
+| AddSms(number)                     | `OneSignal.User.addSms(number)`                               |
+| RemoveSms(number)                  | `OneSignal.User.removeSms(number)`                            |
+| AddTag(key, value)                 | `OneSignal.User.addTag(key, value)`                           |
+| AddTags(tags)                      | `OneSignal.User.addTags(tags)`                                |
+| RemoveTags(keys)                   | `OneSignal.User.removeTags(keys)`                             |
+| AddTrigger(key, value)             | `OneSignal.InAppMessages.addTrigger(key, value)`              |
+| AddTriggers(triggers)              | `OneSignal.InAppMessages.addTriggers(triggers)`               |
+| RemoveTriggers(keys)               | `OneSignal.InAppMessages.removeTriggers(keys)`                |
+| ClearTriggers()                    | `OneSignal.InAppMessages.clearTriggers()`                     |
+| SendOutcome(name)                  | `OneSignal.Session.addOutcome(name)`                          |
+| SendUniqueOutcome(name)            | `OneSignal.Session.addUniqueOutcome(name)`                    |
+| SendOutcomeWithValue(name, value)  | `OneSignal.Session.addOutcomeWithValue(name, value)`          |
+| TrackEvent(name, properties)       | `OneSignal.User.trackEvent(name, properties)`                 |
+| GetPushSubscriptionId()            | `await OneSignal.User.pushSubscription.getIdAsync()`          |
+| IsPushOptedIn()                    | `await OneSignal.User.pushSubscription.getOptedInAsync()`     |
+| OptInPush()                        | `OneSignal.User.pushSubscription.optIn()`                     |
+| OptOutPush()                       | `OneSignal.User.pushSubscription.optOut()`                    |
+| ClearAllNotifications()            | `OneSignal.Notifications.clearAll()`                          |
+| HasPermission()                    | `await OneSignal.Notifications.getPermissionAsync()`          |
+| RequestPermission(fallback)        | `OneSignal.Notifications.requestPermission(fallback)`         |
+| SetPaused(paused)                  | `OneSignal.InAppMessages.setPaused(paused)`                   |
+| SetLocationShared(shared)          | `OneSignal.Location.setShared(shared)`                        |
+| RequestLocationPermission()        | `OneSignal.Location.requestPermission()`                      |
+| SetConsentRequired(required)       | `OneSignal.setConsentRequired(required)`                      |
+| SetConsentGiven(granted)           | `OneSignal.setConsentGiven(granted)`                          |
+| GetExternalId()                    | `await OneSignal.User.getExternalId()`                        |
+| GetOnesignalId()                   | `await OneSignal.User.getOnesignalId()`                       |
 
 The demo uses the async getter variants (`getIdAsync`, `getOptedInAsync`, `getPermissionAsync`) instead of the synchronous property/getter forms.
 
@@ -280,7 +281,7 @@ All listeners are removed in the `useEffect` cleanup.
 
 - `HomeScreen` owns layout + `TooltipModal` only. Tooltip visibility is a single local `tooltipOpen` boolean; action dialog state never lives here or in the SDK hook.
 - Sections render modals as children inside `SectionCard` (siblings of the section's buttons), with one local `useState` boolean per dialog (`open`, `addOpen`, `removeOpen`, ...). Section button click sets the flag; modal `onSubmit` calls the SDK callback from props, then closes the modal and (where applicable) calls `showSnackbar`.
-- Custom `ModalShell` (`src/components/modals/ModalShell.tsx`) using a CSS backdrop + card pattern; the demo does NOT use `<IonModal>`. Shared modals in `src/components/modals/` (`SingleInputModal`, `PairInputModal`, `MultiPairInputModal`, `MultiSelectRemoveModal`, `OutcomeModal`, `TrackEventModal`, `CustomNotificationModal`, `TooltipModal`).
+- Custom `ModalShell` (`src/components/modals/ModalShell.tsx`) using a CSS backdrop + card pattern; the demo does NOT use `<IonModal>`. Shared modals in `src/components/modals/` (`SingleInputModal`, `PairInputModal`, `MultiPairInputModal`, `MultiSelectRemoveModal`, `OutcomeModal`, `TrackEventModal`, `CustomNotificationModal`, `LoginWithProfileModal`, `TooltipModal`).
 - Login uses `SingleInputModal` inline in `UserSection.tsx` -- there is no dedicated `LoginModal`.
 - JSON parsing via `JSON.parse` returns `Record<string, unknown>` for Custom Events.
 - Do not centralize action dialogs in a `DialogState` union on `HomeScreen` and do not lift dialog visibility into the SDK hook.

@@ -77,6 +77,8 @@ const HomeScreen: FC = () => {
             <UserSection
               externalUserId={os.externalUserId}
               onLogin={os.loginUser}
+              onLoginWithProfile={os.loginUserWithProfile}
+              showLoginWithProfile={Capacitor.getPlatform() === 'android'}
               onLogout={os.logoutUser}
             />
 
