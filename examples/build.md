@@ -291,7 +291,7 @@ All listeners are removed in the `useEffect` cleanup.
 
 ### Logging
 
-- Logging uses `console.log` / `console.error` in `useOneSignal.ts`; the demo does not ship an in-app log viewer.
+- SDK listener events go through `log()` in `services/LogService.ts`, which feeds the Log View (shared guide Prompt 2.0). Other logs use `console.log` / `console.error`.
 
 ### Android back-button handler
 
