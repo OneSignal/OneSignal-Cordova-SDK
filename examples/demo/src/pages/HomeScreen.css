@@ -610,6 +610,10 @@
   font-size: 18px;
 }
 
+.log-head .log-clear svg {
+  font-size: 16px;
+}
+
 .log-list[hidden] {
   display: none;
 }

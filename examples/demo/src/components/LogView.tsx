@@ -20,6 +20,7 @@ const LogView: FC = () => {
         <div className="log-actions">
           <button
             type="button"
+            className="log-clear"
             onClick={clearLogs}
             aria-label="Clear logs"
             data-testid="log_clear_button"
