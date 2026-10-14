@@ -59,13 +59,14 @@ public class OneSignalLoginController {
 
     private static OneSignalUserProfile toProfile(JSONObject json) throws JSONException {
         if (json == null) {
-            return new OneSignalUserProfile();
+            return OneSignalUserProfile.builder().build();
         }
-        return new OneSignalUserProfile(
-                optString(json, "email"),
-                optString(json, "sms"),
-                toStringMap(json.optJSONObject("tags")),
-                toStringMap(json.optJSONObject("aliases")));
+        return OneSignalUserProfile.builder()
+                .setEmail(optString(json, "email"))
+                .setSms(optString(json, "sms"))
+                .setTags(toStringMap(json.optJSONObject("tags")))
+                .setAliases(toStringMap(json.optJSONObject("aliases")))
+                .build();
     }
 
     private static Map<String, String> toStringMap(JSONObject json) throws JSONException {
