@@ -29,6 +29,15 @@ import { noop, isMissing, isBoolean } from './helpers';
 import InAppMessages from './InAppMessagesNamespace';
 import LiveActivities from './LiveActivitiesNamespace';
 import Location from './LocationNamespace';
+import {
+  failureResult,
+  IOS_UNSUPPORTED_MESSAGE,
+  parseLoginResult,
+  toNativeProfile,
+  type LoginData,
+  type OneSignalResult,
+  type OneSignalUserProfile,
+} from './LoginWithProfile';
 import Notifications from './NotificationsNamespace';
 import Session from './SessionNamespace';
 import User from './UserNamespace';
@@ -77,6 +86,55 @@ export class OneSignalPlugin {
   login(externalId: string): void {
     if (isMissing(externalId, 'login: externalId')) return;
     window.cordova.exec(noop, noop, 'OneSignalPush', 'login', [externalId]);
+  }
+
+  /**
+   * Login as [externalId] and apply [profile] in one request, resolving with the result instead of throwing.
+   * Android only for now: on iOS this resolves with an UNKNOWN failure without calling native.
+   */
+  loginWithProfile(
+    externalId: string,
+    profile: OneSignalUserProfile,
+    jwtBearerToken?: string,
+  ): Promise<OneSignalResult<LoginData>> {
+    if (window.cordova.platformId === 'ios') {
+      return Promise.resolve(failureResult('UNKNOWN', IOS_UNSUPPORTED_MESSAGE));
+    }
+    if (isMissing(externalId, 'loginWithProfile: externalId')) {
+      return Promise.resolve(failureResult('INVALID_ARGUMENT', 'externalId is required'));
+    }
+    let nativeProfile: OneSignalUserProfile | null;
+    try {
+      nativeProfile = toNativeProfile(profile);
+    } catch (error) {
+      console.error('[OneSignal] loginWithProfile: profile could not be read', error);
+      nativeProfile = null;
+    }
+    if (!nativeProfile) {
+      return Promise.resolve(failureResult('INVALID_ARGUMENT', 'profile is invalid'));
+    }
+    if (jwtBearerToken != null && isMissing(jwtBearerToken, 'loginWithProfile: jwtBearerToken')) {
+      return Promise.resolve(failureResult('INVALID_ARGUMENT', 'jwtBearerToken is invalid'));
+    }
+
+    const args = [externalId, nativeProfile, jwtBearerToken ?? null];
+    return new Promise((resolve) => {
+      try {
+        window.cordova.exec(
+          (raw: unknown) => resolve(parseLoginResult(raw)),
+          (error: unknown) =>
+            resolve(
+              failureResult('UNKNOWN', typeof error === 'string' ? error : 'Native call failed'),
+            ),
+          'OneSignalPush',
+          'loginWithProfile',
+          args,
+        );
+      } catch (error) {
+        console.error('[OneSignal] loginWithProfile: native call threw', error);
+        resolve(failureResult('UNKNOWN', error instanceof Error ? error.message : String(error)));
+      }
+    });
   }
 
   /**
@@ -145,5 +203,14 @@ export type {
 } from './types/InAppMessage';
 
 export type { UserChangedState, UserState } from './UserNamespace';
+
+export type {
+  LoginData,
+  OneSignalErrorCode,
+  OneSignalErrorDetail,
+  OneSignalErrorSource,
+  OneSignalResult,
+  OneSignalUserProfile,
+} from './LoginWithProfile';
 
 export default OneSignal;

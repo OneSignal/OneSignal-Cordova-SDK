@@ -1,18 +1,33 @@
+import type { OneSignalUserProfile } from 'onesignal-cordova-plugin';
 import type { FC } from 'react';
 import { useState } from 'react';
 
 import ActionButton from '../ActionButton';
+import LoginWithProfileModal from '../modals/LoginWithProfileModal';
 import SingleInputModal from '../modals/SingleInputModal';
 import SectionCard from '../SectionCard';
 
 interface UserSectionProps {
   externalUserId: string | undefined;
   onLogin: (externalUserId: string) => Promise<void>;
+  onLoginWithProfile: (
+    externalUserId: string,
+    profile: OneSignalUserProfile,
+    jwt?: string,
+  ) => Promise<void>;
+  showLoginWithProfile: boolean;
   onLogout: () => Promise<void>;
 }
 
-const UserSection: FC<UserSectionProps> = ({ externalUserId, onLogin, onLogout }) => {
+const UserSection: FC<UserSectionProps> = ({
+  externalUserId,
+  onLogin,
+  onLoginWithProfile,
+  showLoginWithProfile,
+  onLogout,
+}) => {
   const [loginOpen, setLoginOpen] = useState(false);
+  const [loginWithProfileOpen, setLoginWithProfileOpen] = useState(false);
   const isLoggedIn = Boolean(externalUserId);
 
   const handleLogin = async (value: string) => {
@@ -20,6 +35,18 @@ const UserSection: FC<UserSectionProps> = ({ externalUserId, onLogin, onLogout }
       await onLogin(value);
     } finally {
       setLoginOpen(false);
+    }
+  };
+
+  const handleLoginWithProfile = async (
+    value: string,
+    profile: OneSignalUserProfile,
+    jwt?: string,
+  ) => {
+    try {
+      await onLoginWithProfile(value, profile, jwt);
+    } finally {
+      setLoginWithProfileOpen(false);
     }
   };
 
@@ -51,6 +78,16 @@ const UserSection: FC<UserSectionProps> = ({ externalUserId, onLogin, onLogout }
       >
         {isLoggedIn ? 'SWITCH USER' : 'LOGIN USER'}
       </ActionButton>
+      {showLoginWithProfile ? (
+        <ActionButton
+          variant="outline"
+          type="button"
+          onClick={() => setLoginWithProfileOpen(true)}
+          data-testid="composite_login_button"
+        >
+          LOGIN WITH PROFILE
+        </ActionButton>
+      ) : null}
       {isLoggedIn ? (
         <ActionButton
           variant="outline"
@@ -69,6 +106,11 @@ const UserSection: FC<UserSectionProps> = ({ externalUserId, onLogin, onLogout }
         onClose={() => setLoginOpen(false)}
         onSubmit={handleLogin}
         inputTestId="login_user_id_input"
+      />
+      <LoginWithProfileModal
+        open={loginWithProfileOpen}
+        onClose={() => setLoginWithProfileOpen(false)}
+        onSubmit={handleLoginWithProfile}
       />
     </SectionCard>
   );
