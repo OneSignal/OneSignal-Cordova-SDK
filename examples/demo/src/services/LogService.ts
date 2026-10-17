@@ -12,13 +12,28 @@ function emit(): void {
   for (const listener of listeners) listener();
 }
 
-/** Write to the on-screen log view and the console. Kept in memory only, so each launch starts empty. */
-export function log(message: string): void {
-  console.log(`[OneSignal] ${message}`);
+function write(message: string, method: 'log' | 'error'): void {
+  console[method](`[OneSignal] ${message}`);
+}
+
+/** Log view entries are kept in memory only, so each launch starts empty. */
+function addToView(message: string): void {
   const time = new Date().toLocaleTimeString([], { hour12: false });
   entries = [...entries, { id: nextId++, time, message }].slice(-MAX_ENTRIES);
   emit();
 }
+
+export const log = {
+  info: (message: string) => write(message, 'log'),
+  show: (message: string) => {
+    write(message, 'log');
+    addToView(message);
+  },
+  error: (message: string) => {
+    write(message, 'error');
+    addToView(message);
+  },
+};
 
 export function clearLogs(): void {
   entries = [];
