@@ -177,7 +177,7 @@
 /* Popovers mount outside the card, so this can't be scoped under .kv-card. */
 .language-popover {
   --width: 280px;
-  --max-height: 50vh;
+  --max-height: 320px;
 }
 
 .divider {
