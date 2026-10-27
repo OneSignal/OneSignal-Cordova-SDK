@@ -6,6 +6,7 @@ import SectionCard from '../SectionCard';
 
 interface PushSectionProps {
   pushSubscriptionId: string | null | undefined;
+  pushSubscriptionToken: string | null | undefined;
   isPushEnabled: boolean;
   hasNotificationPermission: boolean;
   onTogglePush: (checked: boolean) => void;
@@ -15,6 +16,7 @@ interface PushSectionProps {
 
 const PushSection: FC<PushSectionProps> = ({
   pushSubscriptionId,
+  pushSubscriptionToken,
   isPushEnabled,
   hasNotificationPermission,
   onTogglePush,
@@ -30,12 +32,21 @@ const PushSection: FC<PushSectionProps> = ({
         </span>
       </div>
       <div className="divider" />
+      <div className="kv-row">
+        <span>Status</span>
+        <span data-testid="push_subscription_status">
+          {isPushEnabled && hasNotificationPermission && pushSubscriptionToken
+            ? 'Subscribed'
+            : 'Unsubscribed'}
+        </span>
+      </div>
+      <div className="divider" />
       <div className="kv-row kv-row-toggle">
-        <span>Push Enabled</span>
+        <span>Opted In</span>
         <IonToggle
           checked={isPushEnabled}
           onIonChange={(event) => onTogglePush(event.detail.checked)}
-          aria-label="Push enabled"
+          aria-label="Push opted in"
           disabled={!hasNotificationPermission}
           data-testid="push_enabled_toggle"
         />

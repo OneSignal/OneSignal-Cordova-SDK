@@ -3,6 +3,7 @@ const CONSENT_GIVEN_KEY = 'onesignal.demo.consentGiven';
 const EXTERNAL_ID_KEY = 'onesignal.demo.externalUserId';
 const LOCATION_SHARED_KEY = 'onesignal.demo.locationShared';
 const IAM_PAUSED_KEY = 'onesignal.demo.iamPaused';
+const LANGUAGE_KEY = 'onesignal.demo.language';
 
 function readBoolean(key: string, fallback: boolean): boolean {
   const value = localStorage.getItem(key);
@@ -62,6 +63,14 @@ class PreferencesService {
 
   setIamPaused(value: boolean): void {
     localStorage.setItem(IAM_PAUSED_KEY, String(value));
+  }
+
+  getLanguage(): string {
+    return localStorage.getItem(LANGUAGE_KEY) ?? '';
+  }
+
+  setLanguage(value: string): void {
+    localStorage.setItem(LANGUAGE_KEY, value);
   }
 }
 

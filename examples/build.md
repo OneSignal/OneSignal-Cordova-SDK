@@ -169,7 +169,9 @@ Use the `OneSignal` object from `onesignal-cordova-plugin`:
 | SendUniqueOutcome(name)           | `OneSignal.Session.addUniqueOutcome(name)`                |
 | SendOutcomeWithValue(name, value) | `OneSignal.Session.addOutcomeWithValue(name, value)`      |
 | TrackEvent(name, properties)      | `OneSignal.User.trackEvent(name, properties)`             |
+| SetLanguage(code)                 | `OneSignal.User.setLanguage(code)`                        |
 | GetPushSubscriptionId()           | `await OneSignal.User.pushSubscription.getIdAsync()`      |
+| GetPushSubscriptionToken()        | `await OneSignal.User.pushSubscription.getTokenAsync()`   |
 | IsPushOptedIn()                   | `await OneSignal.User.pushSubscription.getOptedInAsync()` |
 | OptInPush()                       | `OneSignal.User.pushSubscription.optIn()`                 |
 | OptOutPush()                      | `OneSignal.User.pushSubscription.optOut()`                |
@@ -184,7 +186,7 @@ Use the `OneSignal` object from `onesignal-cordova-plugin`:
 | GetExternalId()                   | `await OneSignal.User.getExternalId()`                    |
 | GetOnesignalId()                  | `await OneSignal.User.getOnesignalId()`                   |
 
-The demo uses the async getter variants (`getIdAsync`, `getOptedInAsync`, `getPermissionAsync`) instead of the synchronous property/getter forms.
+The demo uses the async getter variants (`getIdAsync`, `getTokenAsync`, `getOptedInAsync`, `getPermissionAsync`) instead of the synchronous property/getter forms.
 
 ---
 
@@ -250,6 +252,7 @@ All listeners are removed in the `useEffect` cleanup.
 ### Persistence
 
 - `PreferencesService` wraps `localStorage`
+- Selected language code is persisted for display only; the SDK keeps its own language across launches
 - Triggers list (`triggersList`) is NOT persisted
 
 ---
@@ -259,6 +262,18 @@ All listeners are removed in the `useEffect` cleanup.
 ### Notification Permission
 
 - Call `promptPush()` once in a startup `useEffect` (gated on `isReady`)
+
+### User Section
+
+- Rows: Status (Logged In / Anonymous), External ID, Language.
+- Language is an `IonSelect` (`interface="popover"`, test id `user_language_dropdown`) with "Device Default" (code `''`) first, then the same language list as the Android/iOS demos. Selecting calls `OneSignal.User.setLanguage(code)`; the empty code resets the SDK to the device locale language.
+- Login and logout reset the picker to Device Default by clearing the cached value only. They don't call `setLanguage`, since `''` sends the device language and would overwrite the user's backend value.
+
+### Push Section
+
+- Rows: Push ID, Status, Opted In toggle.
+- Status (test id `push_subscription_status`) is read-only: "Subscribed" when opted in AND notification permission is granted AND a push token is present, otherwise "Unsubscribed". It is derived from hook state updated by the push subscription `change` and `permissionChange` listeners.
+- Opted In toggle keeps test id `push_enabled_toggle` and is disabled until permission is granted.
 
 ### Loading state
 
