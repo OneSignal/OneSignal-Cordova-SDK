@@ -267,7 +267,7 @@ All listeners are removed in the `useEffect` cleanup.
 
 - Rows: Status (Logged In / Anonymous), External ID, Language.
 - Language is an `IonSelect` (`interface="popover"`, test id `user_language_dropdown`) with "Device Default" (code `''`) first, then the same language list as the Android/iOS demos. Selecting calls `OneSignal.User.setLanguage(code)`; the empty code resets the SDK to the device locale language.
-- Logout resets the language to Device Default.
+- Login and logout reset the picker to Device Default by clearing the cached value only. They don't call `setLanguage`, since `''` sends the device language and would overwrite the user's backend value.
 
 ### Push Section
 
