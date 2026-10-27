@@ -1,4 +1,5 @@
 import { IonSelect, IonSelectOption } from '@ionic/react';
+import { chevronDown } from 'ionicons/icons';
 import type { FC } from 'react';
 import { useState } from 'react';
 
@@ -105,6 +106,7 @@ const UserSection: FC<UserSectionProps> = ({
           <IonSelect
             className="language-select"
             interface="popover"
+            toggleIcon={chevronDown}
             value={language}
             onIonChange={(event) => onLanguageChange(String(event.detail.value ?? ''))}
             aria-label="Language"
