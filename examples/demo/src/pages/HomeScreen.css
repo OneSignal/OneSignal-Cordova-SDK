@@ -163,6 +163,15 @@
   -webkit-user-select: all;
 }
 
+.kv-card .language-select {
+  min-height: 0;
+  font-size: var(--font-size-body-small);
+  --padding-top: 0;
+  --padding-bottom: 0;
+  --padding-start: 0;
+  --padding-end: 0;
+}
+
 .divider {
   height: 1px;
   margin: 8px 0;
