@@ -107,6 +107,8 @@ const UserSection: FC<UserSectionProps> = ({
             className="language-select"
             interface="popover"
             toggleIcon={chevronDown}
+            justify="end"
+            interfaceOptions={{ cssClass: 'language-popover' }}
             value={language}
             onIonChange={(event) => onLanguageChange(String(event.detail.value ?? ''))}
             aria-label="Language"
