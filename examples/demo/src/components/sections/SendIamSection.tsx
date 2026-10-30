@@ -8,50 +8,31 @@ interface SendIamSectionProps {
   onInfoTap: () => void;
 }
 
-const iamButtons: {
-  label: string;
-  key: string;
-  iamType: string;
-  testID: string;
-}[] = [
-  {
-    label: 'TOP BANNER',
-    key: 'top',
-    iamType: 'top_banner',
-    testID: 'send_iam_top_banner_button',
-  },
-  {
-    label: 'BOTTOM BANNER',
-    key: 'bottom',
-    iamType: 'bottom_banner',
-    testID: 'send_iam_bottom_banner_button',
-  },
-  {
-    label: 'CENTER MODAL',
-    key: 'center',
-    iamType: 'center_modal',
-    testID: 'send_iam_center_modal_button',
-  },
-  {
-    label: 'FULL SCREEN',
-    key: 'full',
-    iamType: 'full_screen',
-    testID: 'send_iam_full_screen_button',
-  },
+const iamButtons: { label: string; iamType: string }[] = [
+  { label: 'TOP', iamType: 'top_banner' },
+  { label: 'BOTTOM', iamType: 'bottom_banner' },
+  { label: 'CENTER', iamType: 'center_modal' },
+  { label: 'HTML', iamType: 'html' },
+  { label: 'FULL', iamType: 'full_screen' },
+  { label: 'FULL BLEED', iamType: 'full_bleed' },
+  { label: 'CAROUSEL', iamType: 'carousel' },
+  { label: 'CAROUSEL BLEED', iamType: 'carousel_bleed' },
 ];
 
 const SendIamSection: FC<SendIamSectionProps> = ({ onSendIam, onInfoTap }) => (
   <SectionCard title="SEND IN-APP MESSAGE" onInfoTap={onInfoTap} sectionKey="send_iam">
-    {iamButtons.map((btn) => (
-      <ActionButton
-        key={btn.key}
-        type="button"
-        onClick={() => onSendIam(btn.iamType)}
-        data-testid={btn.testID}
-      >
-        {btn.label}
-      </ActionButton>
-    ))}
+    <div className="iam-grid">
+      {iamButtons.map((btn) => (
+        <ActionButton
+          key={btn.iamType}
+          type="button"
+          onClick={() => onSendIam(btn.iamType)}
+          data-testid={`send_iam_${btn.iamType}_button`}
+        >
+          {btn.label}
+        </ActionButton>
+      ))}
+    </div>
   </SectionCard>
 );
 

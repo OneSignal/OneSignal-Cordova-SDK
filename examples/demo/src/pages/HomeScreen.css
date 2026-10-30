@@ -272,6 +272,20 @@
   opacity: 0.6;
 }
 
+.iam-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-card-gap);
+  margin-bottom: var(--space-card-gap);
+}
+
+.iam-grid .action-btn {
+  margin-bottom: 0;
+  padding: 0 8px;
+  white-space: nowrap;
+  font-size: min(13px, 3.6vw);
+}
+
 .toggle-card ion-toggle {
   --track-background: #cfd4dc;
   --track-background-checked: var(--os-primary);
