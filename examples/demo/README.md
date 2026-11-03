@@ -23,7 +23,6 @@ Then, in this directory:
 
 ```sh
 cp .env.example .env
-vp install
 ```
 
 Set your OneSignal credentials in `.env`:
@@ -35,8 +34,10 @@ VITE_ONESIGNAL_ANDROID_CHANNEL_ID=
 ```
 
 - `VITE_ONESIGNAL_APP_ID`: falls back to a built-in default App ID when empty.
-- `VITE_ONESIGNAL_API_KEY`: REST API key, used by the in-app buttons that send notifications and update or end live activities.
+- `VITE_ONESIGNAL_API_KEY`: REST API key, used to update and end live activities. Sending notifications from the demo doesn't need it.
 - `VITE_ONESIGNAL_ANDROID_CHANNEL_ID`: optional Android notification channel for the sound test notification. Falls back to a built-in default channel.
+
+The `VITE_*` values are built into the web bundle, so rerun setup (`vp run android` / `vp run ios`) after changing `.env`. The demo's own dependencies are installed by setup.
 
 The OneSignal app needs FCM credentials for Android and APNs credentials for the `com.onesignal.example` bundle ID on iOS.
 
