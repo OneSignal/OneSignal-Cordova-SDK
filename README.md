@@ -197,7 +197,7 @@ For account issues and support please contact OneSignal support from the [OneSig
 
 #### Demo Projects
 
-To make things easier, we have published an Ionic Capacitor React demo app in the `/example` folder of this repository.
+To make things easier, we have published an Ionic Capacitor React demo app in the [`examples/demo`](examples/demo) folder of this repository.
 
 Legacy (Player Model) demo projects:
 
