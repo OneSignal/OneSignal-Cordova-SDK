@@ -45,6 +45,7 @@ jobs:
         with:
           onesignal-app-id: ${{ vars.APPIUM_ONESIGNAL_APP_ID }}
           onesignal-api-key: ${{ secrets.APPIUM_ONESIGNAL_API_KEY }}
+          google-services-json: ${{ secrets.APPIUM_GOOGLE_SERVICES_JSON }}
 
       - name: Build debug APK
         working-directory: examples/demo/android
@@ -52,7 +53,9 @@ jobs:
         # `android:debuggable=true`, which enables WebView remote debugging
         # automatically as a belt-and-suspenders alongside the explicit
         # WebView.setWebContentsDebuggingEnabled(true) in MainActivity.
-        run: ./gradlew assembleDebug --quiet --console=plain --warning-mode=summary
+        # FIREBASE_INSTALLATION_ID_ENABLED turns on Firebase Installation ID registration,
+        # which needs the google-services.json written by setup-demo.
+        run: ./gradlew assembleDebug -PFIREBASE_INSTALLATION_ID_ENABLED=true --quiet --console=plain --warning-mode=summary
 
       - name: Upload APK
         uses: actions/upload-artifact@v7
@@ -145,6 +148,7 @@ jobs:
       app-artifact: demo-apk
       app-filename: app-debug.apk
       sdk-type: cordova
+      bundle-id: com.onesignal.sdkdemo
       build-name: cordova-android-${{ github.ref_name }}-${{ github.run_number }}
 
   e2e-ios:

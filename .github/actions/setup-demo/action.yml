@@ -8,6 +8,10 @@ inputs:
   onesignal-api-key:
     description: 'OneSignal API Key for the demo .env'
     required: true
+  google-services-json:
+    description: 'google-services.json contents for the Android demo (secrets.APPIUM_GOOGLE_SERVICES_JSON). Skipped when empty.'
+    required: false
+    default: ''
   resolve-ios-packages:
     description: 'Whether to resolve Swift Package Manager dependencies for iOS'
     required: false
@@ -47,6 +51,13 @@ runs:
         echo "VITE_ONESIGNAL_APP_ID=${{ inputs.onesignal-app-id }}" > .env
         echo "VITE_ONESIGNAL_API_KEY=${{ inputs.onesignal-api-key }}" >> .env
         echo "VITE_ONESIGNAL_ANDROID_CHANNEL_ID=7ec2ece9-c538-4656-9516-1316f48a005c" >> .env
+
+    - name: Write demo google-services.json
+      if: inputs.google-services-json != ''
+      uses: OneSignal/sdk-shared/.github/actions/setup-google-services@main
+      with:
+        google-services-json: ${{ inputs.google-services-json }}
+        path: examples/demo/android/app/google-services.json
 
     - name: Set up demo
       shell: bash

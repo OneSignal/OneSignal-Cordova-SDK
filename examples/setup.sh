@@ -134,17 +134,33 @@ finish_pods_sync() {
   info "Using OneSignalCordovaDependencies from the generated git tag."
 }
 
+# `cap add` takes the package from capacitor.config.ts, which is the iOS bundle id. Android uses
+# com.onesignal.sdkdemo to match the shared google-services.json.
+use_sdkdemo_android_package() {
+  local app="$ORIGINAL_DIR/android/app"
+  local java="$app/src/main/java/com/onesignal"
+
+  sed -i.bak -E 's/(namespace *=? *"|applicationId *=? *")com\.onesignal\.example"/\1com.onesignal.sdkdemo"/' "$app/build.gradle"
+  sed -i.bak 's/com\.onesignal\.example/com.onesignal.sdkdemo/g' "$app/src/main/res/values/strings.xml"
+  if [[ -d "$java/example" ]]; then
+    mv "$java/example" "$java/sdkdemo"
+    sed -i.bak 's/^package com\.onesignal\.example;/package com.onesignal.sdkdemo;/' "$java/sdkdemo/MainActivity.java"
+  fi
+  rm -f "$app/build.gradle.bak" "$app/src/main/res/values/strings.xml.bak" "$java/sdkdemo/MainActivity.java.bak"
+}
+
 ensure_capacitor_platforms() {
   if [[ "$SYNC_PLATFORM" == "all" || "$SYNC_PLATFORM" == "android" ]]; then
     if [[ -f "$ORIGINAL_DIR/android/app/build.gradle" ]] &&
-       ! grep -q 'applicationId "com.onesignal.example"' "$ORIGINAL_DIR/android/app/build.gradle"; then
-      info "Recreating Android platform with package com.onesignal.example..."
+       ! grep -q 'applicationId "com.onesignal.sdkdemo"' "$ORIGINAL_DIR/android/app/build.gradle"; then
+      info "Recreating Android platform with package com.onesignal.sdkdemo..."
       rm -rf "$ORIGINAL_DIR/android"
     fi
 
     if [[ ! -d "$ORIGINAL_DIR/android" ]]; then
       info "Adding Android platform..."
       vpx cap add android
+      use_sdkdemo_android_package
     fi
   fi
 

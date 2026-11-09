@@ -2,7 +2,7 @@
 
 This lightweight runnable example shows how to integrate OneSignal push with Swift Package Manager without linking the `OneSignalLocation` native module.
 
-The demo uses package/bundle id `com.onesignal.example`.
+The demo uses Android package `com.onesignal.sdkdemo` and iOS bundle id `com.onesignal.example`.
 
 Run it with:
 
