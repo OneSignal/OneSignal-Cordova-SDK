@@ -199,6 +199,9 @@ jobs:
 
       - name: Refresh demo Swift package resolution
         if: inputs.ios_version != ''
+        # setup:ios builds the web bundle, and vite.config.ts fails the build without an app id.
+        env:
+          VITE_ONESIGNAL_APP_ID: ${{ vars.APPIUM_ONESIGNAL_APP_ID }}
         run: |
           (
             cd examples/demo
