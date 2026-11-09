@@ -2,7 +2,7 @@
 
 This lightweight runnable example shows the native build flag for apps that use OneSignal push, but do not use `OneSignal.Location`.
 
-The demo uses package/bundle id `com.onesignal.example`.
+The demo uses Android package `com.onesignal.sdkdemo` and iOS bundle id `com.onesignal.example`.
 
 ## Shared App Source
 
