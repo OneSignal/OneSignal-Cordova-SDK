@@ -12,9 +12,8 @@ import { log } from '../services/LogService';
 import OneSignalApiService from '../services/OneSignalApiService';
 import PreferencesService from '../services/PreferencesService';
 
-const APP_ID = import.meta.env.VITE_ONESIGNAL_APP_ID as string | undefined;
-const DEFAULT_APP_ID = '77e32082-ea27-42e3-a898-c72e141824ef';
-const RESOLVED_APP_ID = APP_ID?.trim() || DEFAULT_APP_ID;
+// vite.config.ts fails the build when this is unset.
+const RESOLVED_APP_ID = (import.meta.env.VITE_ONESIGNAL_APP_ID as string).trim();
 
 const apiService = OneSignalApiService.getInstance();
 const preferences = PreferencesService.getInstance();

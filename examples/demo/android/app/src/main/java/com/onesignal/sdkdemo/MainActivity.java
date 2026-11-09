@@ -1,4 +1,4 @@
-package com.onesignal.example;
+package com.onesignal.sdkdemo;
 
 import com.getcapacitor.BridgeActivity;
 
