@@ -12,6 +12,10 @@ inputs:
     description: 'google-services.json contents for the Android demo (secrets.APPIUM_GOOGLE_SERVICES_JSON). Skipped when empty.'
     required: false
     default: ''
+  google-services-enabled:
+    description: "Set to 'false' to build without google-services.json (Firebase Installation IDs off)"
+    required: false
+    default: 'true'
   resolve-ios-packages:
     description: 'Whether to resolve Swift Package Manager dependencies for iOS'
     required: false
@@ -58,6 +62,7 @@ runs:
       with:
         google-services-json: ${{ inputs.google-services-json }}
         path: examples/demo/android/app/google-services.json
+        enabled: ${{ inputs.google-services-enabled }}
 
     - name: Set up demo
       shell: bash
