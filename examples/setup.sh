@@ -242,8 +242,8 @@ project_file = Path(os.environ["PROJECT_FILE"])
 text = project_file.read_text()
 
 text = text.replace(
-    "PRODUCT_BUNDLE_IDENTIFIER = com.onesignal.example.OneSignalWidgetExtension;",
-    "PRODUCT_BUNDLE_IDENTIFIER = com.onesignal.example.LA;",
+    "PRODUCT_BUNDLE_IDENTIFIER = com.onesignal.sdkdemo.OneSignalWidgetExtension;",
+    "PRODUCT_BUNDLE_IDENTIFIER = com.onesignal.sdkdemo.LA;",
 )
 
 text = text.replace(

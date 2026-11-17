@@ -2,6 +2,7 @@ import type { FC } from 'react';
 import { useMemo, useState } from 'react';
 
 import ActionButton from '../ActionButton';
+import ButtonGrid from '../ButtonGrid';
 import { PairList } from '../ListWidgets';
 import MultiPairInputModal from '../modals/MultiPairInputModal';
 import MultiSelectRemoveModal from '../modals/MultiSelectRemoveModal';
@@ -40,26 +41,28 @@ const TagsSection: FC<TagsSectionProps> = ({
         onRemove={(key) => onRemoveSelected([key])}
         sectionKey="tags"
       />
-      <ActionButton type="button" onClick={() => setAddOpen(true)} data-testid="add_tag_button">
-        ADD TAG
-      </ActionButton>
-      <ActionButton
-        type="button"
-        onClick={() => setAddMultipleOpen(true)}
-        data-testid="add_multiple_tags_button"
-      >
-        ADD MULTIPLE TAGS
-      </ActionButton>
-      {tags.length > 0 ? (
-        <ActionButton
-          variant="outline"
-          type="button"
-          onClick={() => setRemoveOpen(true)}
-          data-testid="remove_tags_button"
-        >
-          REMOVE TAGS
+      <ButtonGrid>
+        <ActionButton type="button" onClick={() => setAddOpen(true)} data-testid="add_tag_button">
+          ADD TAG
         </ActionButton>
-      ) : null}
+        <ActionButton
+          type="button"
+          onClick={() => setAddMultipleOpen(true)}
+          data-testid="add_multiple_tags_button"
+        >
+          ADD TAGS
+        </ActionButton>
+        {tags.length > 0 ? (
+          <ActionButton
+            variant="outline"
+            type="button"
+            onClick={() => setRemoveOpen(true)}
+            data-testid="remove_tags_button"
+          >
+            REMOVE TAGS
+          </ActionButton>
+        ) : null}
+      </ButtonGrid>
       <PairInputModal
         open={addOpen}
         title="Add Tag"

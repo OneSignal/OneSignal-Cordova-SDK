@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { FC } from 'react';
 
 import ActionButton from '../ActionButton';
+import ButtonGrid from '../ButtonGrid';
 import SectionCard from '../SectionCard';
 
 const ORDER_STATUSES = [
@@ -133,33 +134,35 @@ const LiveActivitySection: FC<LiveActivitySectionProps> = ({
         </div>
       </div>
 
-      <ActionButton
-        type="button"
-        onClick={handleStart}
-        disabled={isEmpty}
-        data-testid="start_live_activity_button"
-      >
-        START LIVE ACTIVITY
-      </ActionButton>
+      <ButtonGrid>
+        <ActionButton
+          type="button"
+          onClick={handleStart}
+          disabled={isEmpty}
+          data-testid="start_live_activity_button"
+        >
+          START ACTIVITY
+        </ActionButton>
 
-      <ActionButton
-        type="button"
-        onClick={handleUpdate}
-        disabled={isEmpty || updating || !hasApiKey}
-        data-testid="update_live_activity_button"
-      >
-        {`UPDATE → ${nextStatus.status.replace(/_/g, ' ').toUpperCase()}`}
-      </ActionButton>
+        <ActionButton
+          type="button"
+          onClick={handleUpdate}
+          disabled={isEmpty || updating || !hasApiKey}
+          data-testid="update_live_activity_button"
+        >
+          {`UPDATE → ${nextStatus.status.replace(/_/g, ' ').toUpperCase()}`}
+        </ActionButton>
 
-      <ActionButton
-        variant="outline"
-        type="button"
-        onClick={handleEnd}
-        disabled={isEmpty || updating || !hasApiKey}
-        data-testid="end_live_activity_button"
-      >
-        END LIVE ACTIVITY
-      </ActionButton>
+        <ActionButton
+          variant="outline"
+          type="button"
+          onClick={handleEnd}
+          disabled={isEmpty || updating || !hasApiKey}
+          data-testid="end_live_activity_button"
+        >
+          END ACTIVITY
+        </ActionButton>
+      </ButtonGrid>
     </SectionCard>
   );
 };

@@ -2,7 +2,7 @@
 
 An Ionic Capacitor React app showcasing OneSignal Cordova SDK features including push notifications, in-app messaging, user management, tags, triggers, outcomes, live activities, and more. It installs the plugin packed from this repository and uses Swift Package Manager for iOS.
 
-The demo uses Android package `com.onesignal.sdkdemo` and iOS bundle id `com.onesignal.example`.
+The demo uses Android package `com.onesignal.sdkdemo` and iOS bundle id `com.onesignal.sdkdemo`.
 
 ## Prerequisites
 
@@ -39,7 +39,7 @@ VITE_ONESIGNAL_ANDROID_CHANNEL_ID=
 
 The `VITE_*` values are built into the web bundle, so rerun setup (`vp run android` / `vp run ios`) after changing `.env`. The demo's own dependencies are installed by setup.
 
-The OneSignal app needs FCM credentials for the `com.onesignal.sdkdemo` Android package and APNs credentials for the `com.onesignal.example` bundle ID on iOS.
+The OneSignal app needs FCM credentials for the `com.onesignal.sdkdemo` Android package and APNs credentials for the `com.onesignal.sdkdemo` bundle ID on iOS.
 
 Firebase Installation ID registration is off by default. To turn it on, add a `google-services.json` with a client for `com.onesignal.sdkdemo` to `android/app/` (gitignored) and build with `-PFIREBASE_INSTALLATION_ID_ENABLED=true`. The E2E workflow does both, writing the file from the `APPIUM_GOOGLE_SERVICES_JSON` secret.
 
