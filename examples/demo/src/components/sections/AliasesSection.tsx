@@ -2,6 +2,7 @@ import type { FC } from 'react';
 import { useMemo, useState } from 'react';
 
 import ActionButton from '../ActionButton';
+import ButtonGrid from '../ButtonGrid';
 import { PairList } from '../ListWidgets';
 import MultiPairInputModal from '../modals/MultiPairInputModal';
 import PairInputModal from '../modals/PairInputModal';
@@ -38,16 +39,18 @@ const AliasesSection: FC<AliasesSectionProps> = ({
   return (
     <SectionCard title="ALIASES" onInfoTap={onInfoTap} sectionKey="aliases">
       <PairList items={items} emptyText="No aliases added" loading={loading} sectionKey="aliases" />
-      <ActionButton type="button" onClick={() => setAddOpen(true)} data-testid="add_alias_button">
-        ADD ALIAS
-      </ActionButton>
-      <ActionButton
-        type="button"
-        onClick={() => setAddMultipleOpen(true)}
-        data-testid="add_multiple_aliases_button"
-      >
-        ADD MULTIPLE ALIASES
-      </ActionButton>
+      <ButtonGrid>
+        <ActionButton type="button" onClick={() => setAddOpen(true)} data-testid="add_alias_button">
+          ADD ALIAS
+        </ActionButton>
+        <ActionButton
+          type="button"
+          onClick={() => setAddMultipleOpen(true)}
+          data-testid="add_multiple_aliases_button"
+        >
+          ADD ALIASES
+        </ActionButton>
+      </ButtonGrid>
       <PairInputModal
         open={addOpen}
         title="Add Alias"

@@ -4,6 +4,7 @@ import type { FC } from 'react';
 import { useState } from 'react';
 
 import ActionButton from '../ActionButton';
+import ButtonGrid from '../ButtonGrid';
 import SingleInputModal from '../modals/SingleInputModal';
 import SectionCard from '../SectionCard';
 
@@ -122,23 +123,25 @@ const UserSection: FC<UserSectionProps> = ({
           </IonSelect>
         </div>
       </div>
-      <ActionButton
-        type="button"
-        onClick={() => setLoginOpen(true)}
-        data-testid="login_user_button"
-      >
-        {isLoggedIn ? 'SWITCH USER' : 'LOGIN USER'}
-      </ActionButton>
-      {isLoggedIn ? (
+      <ButtonGrid>
         <ActionButton
-          variant="outline"
           type="button"
-          onClick={handleLogout}
-          data-testid="logout_user_button"
+          onClick={() => setLoginOpen(true)}
+          data-testid="login_user_button"
         >
-          LOGOUT USER
+          {isLoggedIn ? 'SWITCH USER' : 'LOGIN USER'}
         </ActionButton>
-      ) : null}
+        {isLoggedIn ? (
+          <ActionButton
+            variant="outline"
+            type="button"
+            onClick={handleLogout}
+            data-testid="logout_user_button"
+          >
+            LOGOUT USER
+          </ActionButton>
+        ) : null}
+      </ButtonGrid>
       <SingleInputModal
         open={loginOpen}
         title="Login User"

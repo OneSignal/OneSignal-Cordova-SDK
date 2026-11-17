@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 
 import ActionButton from '../ActionButton';
+import ButtonGrid from '../ButtonGrid';
 import SectionCard from '../SectionCard';
 
 interface SendIamSectionProps {
@@ -21,7 +22,7 @@ const iamButtons: { label: string; iamType: string }[] = [
 
 const SendIamSection: FC<SendIamSectionProps> = ({ onSendIam, onInfoTap }) => (
   <SectionCard title="SEND IN-APP MESSAGE" onInfoTap={onInfoTap} sectionKey="send_iam">
-    <div className="iam-grid">
+    <ButtonGrid>
       {iamButtons.map((btn) => (
         <ActionButton
           key={btn.iamType}
@@ -32,7 +33,7 @@ const SendIamSection: FC<SendIamSectionProps> = ({ onSendIam, onInfoTap }) => (
           {btn.label}
         </ActionButton>
       ))}
-    </div>
+    </ButtonGrid>
   </SectionCard>
 );
 

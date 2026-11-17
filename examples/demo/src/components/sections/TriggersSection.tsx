@@ -2,6 +2,7 @@ import type { FC } from 'react';
 import { useMemo, useState } from 'react';
 
 import ActionButton from '../ActionButton';
+import ButtonGrid from '../ButtonGrid';
 import { PairList } from '../ListWidgets';
 import MultiPairInputModal from '../modals/MultiPairInputModal';
 import MultiSelectRemoveModal from '../modals/MultiSelectRemoveModal';
@@ -39,36 +40,42 @@ const TriggersSection: FC<TriggersSectionProps> = ({
         onRemove={(key) => onRemoveSelected([key])}
         sectionKey="triggers"
       />
-      <ActionButton type="button" onClick={() => setAddOpen(true)} data-testid="add_trigger_button">
-        ADD TRIGGER
-      </ActionButton>
-      <ActionButton
-        type="button"
-        onClick={() => setAddMultipleOpen(true)}
-        data-testid="add_multiple_triggers_button"
-      >
-        ADD MULTIPLE TRIGGERS
-      </ActionButton>
-      {triggers.length > 0 ? (
-        <>
-          <ActionButton
-            variant="outline"
-            type="button"
-            onClick={() => setRemoveOpen(true)}
-            data-testid="remove_triggers_button"
-          >
-            REMOVE TRIGGERS
-          </ActionButton>
-          <ActionButton
-            variant="outline"
-            type="button"
-            onClick={onClearAll}
-            data-testid="clear_triggers_button"
-          >
-            CLEAR ALL TRIGGERS
-          </ActionButton>
-        </>
-      ) : null}
+      <ButtonGrid>
+        <ActionButton
+          type="button"
+          onClick={() => setAddOpen(true)}
+          data-testid="add_trigger_button"
+        >
+          ADD TRIGGER
+        </ActionButton>
+        <ActionButton
+          type="button"
+          onClick={() => setAddMultipleOpen(true)}
+          data-testid="add_multiple_triggers_button"
+        >
+          ADD TRIGGERS
+        </ActionButton>
+        {triggers.length > 0 ? (
+          <>
+            <ActionButton
+              variant="outline"
+              type="button"
+              onClick={() => setRemoveOpen(true)}
+              data-testid="remove_triggers_button"
+            >
+              REMOVE TRIGGERS
+            </ActionButton>
+            <ActionButton
+              variant="outline"
+              type="button"
+              onClick={onClearAll}
+              data-testid="clear_triggers_button"
+            >
+              CLEAR ALL
+            </ActionButton>
+          </>
+        ) : null}
+      </ButtonGrid>
       <PairInputModal
         open={addOpen}
         title="Add Trigger"

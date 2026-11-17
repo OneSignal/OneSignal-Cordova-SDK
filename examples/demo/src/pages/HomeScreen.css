@@ -272,14 +272,18 @@
   opacity: 0.6;
 }
 
-.iam-grid {
+.button-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-card-gap);
   margin-bottom: var(--space-card-gap);
 }
 
-.iam-grid .action-btn {
+.button-grid > :last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+.button-grid .action-btn {
   margin-bottom: 0;
   padding: 0 8px;
   white-space: nowrap;
@@ -387,14 +391,19 @@
   inset: 0;
   background: var(--os-backdrop);
   display: flex;
-  align-items: center;
+  /* Top-anchored so the card doesn't move when the keyboard resizes the
+     viewport; a moving dialog leaves Appium with stale element frames. */
+  align-items: flex-start;
   justify-content: center;
-  padding: 24px 16px;
+  padding: calc(24px + var(--ion-safe-area-top, 0px)) 16px
+    calc(24px + var(--ion-safe-area-bottom, 0px));
   z-index: 50;
 }
 
 .modal-card {
   width: min(640px, 100%);
+  max-height: 100%;
+  overflow-y: auto;
   background: var(--os-card-background);
   border-radius: var(--radius-modal);
   padding: 24px;
@@ -431,6 +440,7 @@
 
 .modal-card textarea {
   min-height: 90px;
+  max-height: 200px;
   resize: vertical;
 }
 
