@@ -370,8 +370,9 @@ export function useOneSignal(): UseOneSignalReturn {
 
     void load().catch((err) => {
       if (cancelled) return;
-      console.error(`Initial load error: ${String(err)}`);
+      log.error(`Initial load error: ${String(err)}`);
       setIsLoading(false);
+      setIsReady(true);
     });
 
     return () => {
