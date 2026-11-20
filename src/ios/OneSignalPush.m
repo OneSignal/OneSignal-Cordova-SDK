@@ -54,6 +54,7 @@ OSNotification *notification;
 id<CDVCommandDelegate> pluginCommandDelegate;
 
 bool initDone = false;
+bool lifecycleListenerAdded = false;
 
 void successCallback(NSString *callbackId, NSDictionary *data) {
   CDVPluginResult *commandResult =
@@ -348,23 +349,36 @@ static Class delegateClass = nil;
     successCallbackBoolean(command.callbackId, true);
     return;
   }
-  initDone = true;
+  NSString *appId = stringArgumentOrNil(command.arguments[0]);
+  // Collapse empty to nil. Native rejects @"" outright, while nil means "no app id supplied" and
+  // lets it fall back to the one cached by an earlier launch, which is what Android does.
+  if (appId.length == 0) {
+    appId = nil;
+  }
+
+  // Latch only once an app id is present. Without one native waits for setAppId and never starts,
+  // so latching would turn a later init with a real app id into the no-op branch above.
+  if (appId != nil) {
+    initDone = true;
+  }
+
   _notificationWillDisplayCache = [NSMutableDictionary new];
   _preventDefaultCache = [NSMutableDictionary new];
 
   pluginCommandDelegate = self.commandDelegate;
 
-  NSString *appId = stringArgumentOrNil(command.arguments[0]);
   NSString *appIdStr =
       (appId ? [NSString stringWithUTF8String:[appId UTF8String]] : nil);
 
-  // nil is intentional: native reads it as "no app id supplied" and falls back
-  // to the one cached by an earlier launch.
   [OneSignal initialize:appIdStr withLaunchOptions:nil];
 
   // Automatically add this listener as each lifecycle is registered by the
-  // developer separately
-  [OneSignal.InAppMessages addLifecycleListener:self];
+  // developer separately. Guarded because init can now run more than once when
+  // the first call had no app id, and the listener array does not dedupe.
+  if (!lifecycleListenerAdded) {
+    lifecycleListenerAdded = true;
+    [OneSignal.InAppMessages addLifecycleListener:self];
+  }
 
   if (actionNotification)
     processNotificationClicked(actionNotification);

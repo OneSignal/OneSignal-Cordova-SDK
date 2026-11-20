@@ -60,6 +60,18 @@ describe('OneSignalPlugin', () => {
     );
   });
 
+  test('should forward a null appId to native', () => {
+    plugin.initialize(null as unknown as string);
+
+    expect(window.cordova.exec).toHaveBeenCalledWith(
+      expect.any(Function),
+      expect.any(Function),
+      'OneSignalPush',
+      'init',
+      [null],
+    );
+  });
+
   test('should call cordova.exec for login', () => {
     const externalId = 'test-user-123';
     plugin.login(externalId);
