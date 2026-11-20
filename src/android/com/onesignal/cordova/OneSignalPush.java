@@ -373,7 +373,9 @@ public class OneSignalPush extends CordovaPlugin
         OneSignalWrapper.setSdkType("cordova");
         OneSignalWrapper.setSdkVersion("050603");
         try {
-            String appId = data.getString(0);
+            // getString coerces a JSON null to the literal "null", which native would treat as a
+            // real app id and never fall back to the cached one.
+            String appId = data.isNull(0) ? null : data.getString(0);
             OneSignal.initWithContext(this.cordova.getActivity(), appId);
 
             // add listeners
