@@ -59,6 +59,12 @@ public class OneSignalController {
 
     public static boolean login(JSONArray data) {
         try {
+            // getString coerces a JSON null to the literal "null", which would be stored as a real
+            // external ID and merge unrelated users. Reject it before native sees it.
+            if (data.isNull(0)) {
+                Logging.error("login: externalId is required", null);
+                return false;
+            }
             String externalId = data.getString(0);
             OneSignal.login(externalId);
             return true;

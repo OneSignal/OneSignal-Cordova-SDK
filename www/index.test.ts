@@ -48,10 +48,28 @@ describe('OneSignalPlugin', () => {
     );
   });
 
-  test('should not initialize with an empty appId', () => {
+  test('should forward an empty appId to native', () => {
     plugin.initialize('');
 
-    expect(window.cordova.exec).not.toHaveBeenCalled();
+    expect(window.cordova.exec).toHaveBeenCalledWith(
+      expect.any(Function),
+      expect.any(Function),
+      'OneSignalPush',
+      'init',
+      [''],
+    );
+  });
+
+  test('should forward a null appId to native', () => {
+    plugin.initialize(null as unknown as string);
+
+    expect(window.cordova.exec).toHaveBeenCalledWith(
+      expect.any(Function),
+      expect.any(Function),
+      'OneSignalPush',
+      'init',
+      [null],
+    );
   });
 
   test('should call cordova.exec for login', () => {
@@ -67,16 +85,28 @@ describe('OneSignalPlugin', () => {
     );
   });
 
-  test('should not login with an empty externalId', () => {
+  test('should forward an empty externalId to native', () => {
     plugin.login('');
 
-    expect(window.cordova.exec).not.toHaveBeenCalled();
+    expect(window.cordova.exec).toHaveBeenCalledWith(
+      expect.any(Function),
+      expect.any(Function),
+      'OneSignalPush',
+      'login',
+      [''],
+    );
   });
 
-  test('should not login with a null externalId', () => {
+  test('should forward a null externalId to native', () => {
     plugin.login(null as unknown as string);
 
-    expect(window.cordova.exec).not.toHaveBeenCalled();
+    expect(window.cordova.exec).toHaveBeenCalledWith(
+      expect.any(Function),
+      expect.any(Function),
+      'OneSignalPush',
+      'login',
+      [null],
+    );
   });
 
   test('should call cordova.exec for logout', () => {
