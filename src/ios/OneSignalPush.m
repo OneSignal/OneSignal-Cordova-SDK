@@ -133,6 +133,12 @@ NSString *getStringOrNSNull(NSString *string) {
   }
 }
 
+/** A JS null arrives as NSNull, which is not nil and answers no NSString
+ *  selector. Collapse it to nil so arguments can be nil-checked. **/
+NSString *_Nullable stringArgumentOrNil(id argument) {
+  return [argument isKindOfClass:[NSString class]] ? (NSString *)argument : nil;
+}
+
 @implementation UIApplication (OneSignalCordovaPush)
 
 static void injectSelectorCordova(Class newClass, SEL newSel, Class addToClass,
@@ -348,10 +354,12 @@ static Class delegateClass = nil;
 
   pluginCommandDelegate = self.commandDelegate;
 
-  NSString *appId = (NSString *)command.arguments[0];
+  NSString *appId = stringArgumentOrNil(command.arguments[0]);
   NSString *appIdStr =
       (appId ? [NSString stringWithUTF8String:[appId UTF8String]] : nil);
 
+  // nil is intentional: native reads it as "no app id supplied" and falls back
+  // to the one cached by an earlier launch.
   [OneSignal initialize:appIdStr withLaunchOptions:nil];
 
   // Automatically add this listener as each lifecycle is registered by the
@@ -422,7 +430,15 @@ static Class delegateClass = nil;
 }
 
 - (void)login:(CDVInvokedUrlCommand *)command {
-  [OneSignal login:command.arguments[0]];
+  // Native login forwards externalId into a non-optional Swift parameter with
+  // no nil handling, so it has to stop here.
+  NSString *externalId = stringArgumentOrNil(command.arguments[0]);
+  if (externalId.length == 0) {
+    [OneSignalLog onesignalLog:ONE_S_LL_ERROR
+                       message:@"login: externalId is required"];
+    return;
+  }
+  [OneSignal login:externalId];
 }
 
 - (void)logout:(CDVInvokedUrlCommand *)command {
