@@ -6,4 +6,4 @@ export ONESIGNAL_DISABLE_LOCATION=true
 
 cd "$DEMO_DIR"
 
-exec ../setup.sh "$@" --spm
+exec ../setup.sh "$@"

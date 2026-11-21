@@ -45,29 +45,15 @@ The Cordova SDK accesses the OneSignal native iOS and Android SDKs. For this upd
 
 ### Native Dependency Manager Support
 
-The Cordova SDK continues to support CocoaPods through `OneSignalCordovaDependencies`. Apps using `cordova-ios` 8 or newer can also resolve the iOS native dependencies with Swift Package Manager.
+As of 6.0.0, the iOS native dependencies are resolved only through Swift Package Manager; CocoaPods is no longer supported. Cordova apps need `cordova-ios` 8 or newer. See the README's iOS Native Dependencies section for migration steps.
 
-For Ionic Capacitor apps that use Swift Package Manager, use Capacitor 8.4.0 or newer. Earlier Capacitor versions generate a Cordova-only Swift package for Cordova plugins and do not preserve this SDK's `OneSignal-XCFramework` dependency.
+For Ionic Capacitor apps, use Capacitor 8.4.0 or newer with Swift Package Manager. Earlier Capacitor versions generate a Cordova-only Swift package for Cordova plugins and do not preserve this SDK's `OneSignal-XCFramework` dependency.
 
 If your app does not use `OneSignal.Location`, set `ONESIGNAL_DISABLE_LOCATION=true` before resolving native dependencies. For Swift Package Manager builds, the variable must also be present during the actual Xcode build so `Package.swift` is evaluated with the location module disabled.
 
 ### Notification Service Extension Changes
 
-In your Project Root > ios > Podfile, update the notification service extension:
-
-```
-    // 3.x.x
-    target 'OneSignalNotificationServiceExtension' do
-      pod 'OneSignalXCFramework', '>= 3.0', '< 4.0'
-    end
-
-    // 5.x.x
-    target 'OneSignalNotificationServiceExtension' do
-      pod 'OneSignalXCFramework', '>= 5.0', '< 6.0'
-    end
-```
-
-Close Xcode. While still in the ios directory, run `pod install --repo-update`.
+In Xcode, add the `https://github.com/OneSignal/OneSignal-XCFramework` Swift package to the notification service extension target and link the `OneSignalExtension` product. If the extension still has an `OneSignalXCFramework` pod in your `Podfile`, remove it.
 
 # API Changes
 

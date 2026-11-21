@@ -1,1 +1,0 @@
-../../../../demo/ios/App/App/AppDelegate.swift
