@@ -1,1 +1,0 @@
-../demo-no-location/capacitor.config.ts

@@ -42,15 +42,17 @@ See OneSignal's [Client SDK Reference](https://documentation.onesignal.com/docs/
 
 #### iOS Native Dependencies
 
-Cordova iOS apps using `cordova-ios` 8 or newer can resolve this plugin with Swift Package Manager. Older Cordova iOS apps continue to use CocoaPods through `OneSignalCordovaDependencies`.
+On iOS the plugin is distributed only through Swift Package Manager. CocoaPods is not supported, because CocoaPods trunk became read-only on December 2, 2026 and new OneSignal iOS SDK versions are no longer published there.
 
-Capacitor apps using Swift Package Manager must use Capacitor 8.4.0 or newer so Capacitor can read this plugin's root `Package.swift`. The demo app in `examples/demo` validates that path.
+- Cordova apps need `cordova-ios` 8 or newer, which resolves this plugin through SPM automatically.
+- Capacitor apps need Capacitor 8.4.0 or newer using SPM, so Capacitor can read this plugin's root `Package.swift`. To migrate an existing CocoaPods app, run `npx cap spm-migration-assistant` and follow the [Capacitor SPM guide](https://capacitorjs.com/docs/ios/spm).
+- If you added a Notification Service Extension or Live Activity widget, remove its `OneSignalXCFramework` pod from the `Podfile`. In Xcode, add the `https://github.com/OneSignal/OneSignal-XCFramework` package to that target instead: `OneSignalExtension` for the extension and `OneSignalFramework` for the widget.
+
+The demo app in `examples/demo` validates the Capacitor SPM path.
 
 #### Manual iOS Dependency Tests
 
-Use these checks from a clean checkout when changing iOS dependency resolution.
-
-Swift Package Manager:
+Use this check from a clean checkout when changing iOS dependency resolution:
 
 ```bash
 vp install
@@ -81,33 +83,9 @@ xcodebuild -workspace "platforms/ios/${APP_NAME}.xcworkspace" \
 
 Replace `/path/to/OneSignal-Cordova-SDK` with the path to this repository. A passing test resolves `OneSignal-XCFramework` through SPM and builds without adding `OneSignalCordovaDependencies` to the Podfile.
 
-CocoaPods:
-
-```bash
-vp install
-vp run build
-
-cd examples/demo-pods
-vp run clean:ios
-vp run setup:ios
-
-grep "OneSignalCordovaDependencies" ios/App/Podfile
-xcodebuild -workspace ios/App/App.xcworkspace \
-  -scheme App \
-  -configuration Debug \
-  -sdk iphonesimulator \
-  -destination 'generic/platform=iOS Simulator' \
-  -derivedDataPath ios/App/build \
-  -quiet build \
-  CODE_SIGNING_ALLOWED=NO \
-  COMPILER_INDEX_STORE_ENABLE=NO
-```
-
-Use `vp run setup:ios:local` in `examples/demo-pods` when manually validating local podspec changes before release.
-
 #### Disabling OneSignal Location
 
-If your app does not use `OneSignal.Location`, you can exclude the native OneSignal location module from Android, iOS CocoaPods, and iOS Swift Package Manager builds.
+If your app does not use `OneSignal.Location`, you can exclude the native OneSignal location module from Android and iOS builds.
 
 Set `ONESIGNAL_DISABLE_LOCATION=true` in the environment before installing the plugin or syncing native platforms, because this flag is read when native dependencies are resolved. The value is case-insensitive, and `1` is also accepted. For iOS Swift Package Manager, also set the flag for the actual Xcode build process so `Package.swift` is evaluated with location disabled.
 
@@ -117,7 +95,7 @@ ONESIGNAL_DISABLE_LOCATION=true cordova platform add ios
 ONESIGNAL_DISABLE_LOCATION=true cordova platform add android
 ```
 
-Capacitor apps do not need to edit `ios/App/Podfile` or `CapApp-SPM/Package.swift`; run Capacitor sync in an environment where the flag is set:
+Capacitor apps do not need to edit `CapApp-SPM/Package.swift`; run Capacitor sync in an environment where the flag is set:
 
 ```bash
 ONESIGNAL_DISABLE_LOCATION=true npx cap sync ios
@@ -125,7 +103,7 @@ ONESIGNAL_DISABLE_LOCATION=true npx cap sync android
 ONESIGNAL_DISABLE_LOCATION=true npx cap run ios --no-sync
 ```
 
-In CI, set the flag once at the job or step level so CocoaPods and Gradle inherit it:
+In CI, set the flag once at the job or step level so Xcode and Gradle inherit it:
 
 ```yaml
 env:
@@ -134,43 +112,9 @@ env:
 
 With the location module disabled, calls to `OneSignal.Location` are ignored and `OneSignal.Location.isShared()` resolves `false`.
 
-If your iOS Podfile explicitly adds `OneSignalXCFramework` to a Notification Service Extension target, use the modular subspec instead. The aggregate pod resolves `OneSignalComplete`, which includes the location module:
-
-```ruby
-target 'OneSignalNotificationServiceExtension' do
-  pod 'OneSignalXCFramework/OneSignal', '>= 5.0.0', '< 6.0'
-end
-```
-
-If your app also has a Live Activity widget extension, add only its required subspec:
-
-```ruby
-target 'OneSignalWidgetExtension' do
-  pod 'OneSignalXCFramework/OneSignalLiveActivities', '>= 5.0.0', '< 6.0'
-end
-```
-
 If you change this setting in an existing project, clear the relevant native dependency state and re-resolve in a shell where the variable is exported.
 
-For Cordova:
-
-```bash
-cd platforms/ios
-pod deintegrate
-rm -rf Pods Podfile.lock
-ONESIGNAL_DISABLE_LOCATION=true pod install
-```
-
 For Capacitor:
-
-```bash
-cd ios/App
-pod deintegrate
-rm -rf Pods Podfile.lock
-ONESIGNAL_DISABLE_LOCATION=true pod install
-```
-
-For SPM:
 
 ```bash
 rm -rf ios/App/App.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved

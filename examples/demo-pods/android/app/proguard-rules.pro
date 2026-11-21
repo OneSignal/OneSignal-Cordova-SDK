@@ -1,1 +1,0 @@
-../../../demo/android/app/proguard-rules.pro

@@ -111,7 +111,7 @@ jobs:
           # Get versions from target branch (not the release branch)
           CURRENT_VERSION=$(git show origin/${{ inputs.target_branch }}:package.json | jq -r .version)
           ANDROID_VERSION=$(git show origin/${{ inputs.target_branch }}:build-extras-onesignal.gradle | sed -n "s/.*def oneSignalVersion = '\([0-9.]*\)'.*/\1/p" | head -1)
-          IOS_VERSION=$(git show origin/${{ inputs.target_branch }}:OneSignalCordovaDependencies.podspec | sed -n "s/.*onesignal_xcframework_version = '\([0-9.]*\)'.*/\1/p" | head -1)
+          IOS_VERSION=$(git show origin/${{ inputs.target_branch }}:Package.swift | sed -n 's|.*OneSignal-XCFramework.git", exact: "\([^"]*\)".*|\1|p' | head -1)
 
           echo "cordova_from=$CURRENT_VERSION" >> $GITHUB_OUTPUT
           echo "android_from=$ANDROID_VERSION" >> $GITHUB_OUTPUT
@@ -157,10 +157,12 @@ jobs:
 
           # Update iOS native SDK version
           # mac os sed syntax
-          sed -i '' "s|onesignal_xcframework_version = '[^']*'|onesignal_xcframework_version = '${VERSION}'|" OneSignalCordovaDependencies.podspec
           sed -i '' "s|OneSignal-XCFramework.git\", exact: \"[^\"]*\"|OneSignal-XCFramework.git\", exact: \"${VERSION}\"|" Package.swift
           sed -i '' '/XCRemoteSwiftPackageReference "OneSignal-XCFramework"/,/};/ { s|version = [^;]*;|version = '"${VERSION}"';|; }' examples/demo/ios/App/App.xcodeproj/project.pbxproj
-          echo "✓ Updated OneSignalCordovaDependencies.podspec with iOS SDK ${VERSION}"
+          if ! grep -q "OneSignal-XCFramework.git\", exact: \"${VERSION}\"" Package.swift; then
+            echo "::error::Failed to update iOS SDK version in Package.swift to ${VERSION}"
+            exit 1
+          fi
           echo "✓ Updated Package.swift and demo SPM requirement with iOS SDK ${VERSION}"
 
           # Only commit if there are changes
