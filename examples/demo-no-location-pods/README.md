@@ -2,7 +2,7 @@
 
 This lightweight runnable example shows the native build flag for apps that use OneSignal push, but do not use `OneSignal.Location`.
 
-The demo uses Android package `com.onesignal.sdkdemo` and iOS bundle id `com.onesignal.sdkdemo`.
+The demo uses Android package `com.onesignal.example` and iOS bundle id `com.onesignal.example`.
 
 ## Shared App Source
 
@@ -27,16 +27,10 @@ vp run ios:local
 
 ## Setup
 
-Copy `.env.example` to `.env` and set your OneSignal app ID:
+The demo uses the shared OneSignal demo app (`1154c350-e715-4b71-a58b-1b84b6745baa`) by default. To use your own app, copy `.env.example` to `.env` and set `VITE_ONESIGNAL_APP_ID`:
 
 ```sh
 cp .env.example .env
-```
-
-Then edit `.env`:
-
-```sh
-VITE_ONESIGNAL_APP_ID=your-onesignal-app-id
 ```
 
 The `setup` script exports `ONESIGNAL_DISABLE_LOCATION=true` before packing the local Cordova plugin and running Capacitor sync, so Android Gradle and iOS CocoaPods resolve OneSignal without the location module.

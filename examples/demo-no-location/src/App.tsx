@@ -2,7 +2,7 @@ import { CapacitorHttp } from '@capacitor/core';
 import { LogLevel, type OneSignalPlugin } from 'onesignal-cordova-plugin';
 import { useCallback, useEffect, useState } from 'react';
 
-const DEFAULT_APP_ID = '77e32082-ea27-42e3-a898-c72e141824ef';
+const DEFAULT_APP_ID = '1154c350-e715-4b71-a58b-1b84b6745baa';
 const ONESIGNAL_APP_ID = import.meta.env.VITE_ONESIGNAL_APP_ID?.trim() || DEFAULT_APP_ID;
 
 const isPlaceholder = (value: string): boolean => value.toLowerCase().startsWith('your-');

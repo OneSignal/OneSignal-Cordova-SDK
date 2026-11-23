@@ -81,7 +81,7 @@ Create `App/App.entitlements`:
 	<string>development</string>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.com.onesignal.sdkdemo.onesignal</string>
+		<string>group.$(DEMO_BUNDLE_ID).onesignal</string>
 	</array>
 </dict>
 </plist>
@@ -177,7 +177,7 @@ The app group must match `App/App.entitlements`.
 <dict>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.com.onesignal.sdkdemo.onesignal</string>
+		<string>group.$(DEMO_BUNDLE_ID).onesignal</string>
 	</array>
 </dict>
 </plist>
@@ -293,13 +293,13 @@ The `project.pbxproj` already includes both extension targets with all required 
 
 After syncing, open `ios/App/App.xcodeproj` in Xcode and verify:
 
-- **App** target: bundle ID `com.onesignal.sdkdemo`, team `DL8TF3X4K3`, entitlements `App/App.entitlements`, depends on both extensions
-- **OneSignalNotificationServiceExtension**: bundle ID `com.onesignal.sdkdemo.NSE`, team `DL8TF3X4K3`, deployment target iOS 14.0
-- **OneSignalWidgetExtension**: bundle ID `com.onesignal.sdkdemo.LA`, team `DL8TF3X4K3`, deployment target iOS 16.2, `SUPPORTS_LIVE_ACTIVITIES = YES`
+- **App** target: bundle ID `$(DEMO_BUNDLE_ID)`, team `$(DEMO_TEAM_ID)`, entitlements `App/App.entitlements`, depends on both extensions
+- **OneSignalNotificationServiceExtension**: bundle ID `$(DEMO_BUNDLE_ID).NSE`, team `$(DEMO_TEAM_ID)`, deployment target iOS 14.0
+- **OneSignalWidgetExtension**: bundle ID `$(DEMO_BUNDLE_ID).LA`, team `$(DEMO_TEAM_ID)`, deployment target iOS 16.2, `SUPPORTS_LIVE_ACTIVITIES = YES`
 
-`DL8TF3X4K3` is the OneSignal, Inc. Enterprise team. Debug builds sign automatically. Release device builds sign manually with the in-house `iPhone Distribution` certificate and the "Appium Demo - Main", "Appium Demo - NSE" and "Appium Demo - Live Activity" In House profiles, and `ios/App/ExportOptions.plist` exports with method `enterprise`. In House builds install on any device without registering it, which lets BrowserStack run the push specs.
+`ios/demo.xcconfig` sets `DEMO_BUNDLE_ID = com.onesignal.example` and `DEMO_TEAM_ID = 99SW8E36CT`; an optional gitignored `ios/local.xcconfig` overrides them. E2E builds pass `DEMO_BUNDLE_ID=com.onesignal.sdkdemo DEMO_TEAM_ID=DL8TF3X4K3` (the OneSignal, Inc. Enterprise team) to xcodebuild. Debug builds sign automatically. E2E release device builds sign manually with the in-house `iPhone Distribution` certificate and the "Appium Demo - Main", "Appium Demo - NSE" and "Appium Demo - Live Activity" In House profiles, and `ios/App/ExportOptions.plist` exports with method `enterprise`. In House builds install on any device without registering it, which lets BrowserStack run the push specs.
 
-To add App Groups capability (shows up in Signing & Capabilities), select each target in Xcode and use **+ Capability > App Groups**, then add `group.com.onesignal.sdkdemo.onesignal`. Do this for:
+To add App Groups capability (shows up in Signing & Capabilities), select each target in Xcode and use **+ Capability > App Groups**, then add `group.$(DEMO_BUNDLE_ID).onesignal`. Do this for:
 
 - `App`
 - `OneSignalNotificationServiceExtension`
