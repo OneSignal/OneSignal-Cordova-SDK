@@ -2,6 +2,4 @@
 <resources>
     <string name="app_name">OneSignal Demo</string>
     <string name="title_activity_main">OneSignal Demo</string>
-    <string name="package_name">com.onesignal.sdkdemo</string>
-    <string name="custom_url_scheme">com.onesignal.sdkdemo</string>
 </resources>
