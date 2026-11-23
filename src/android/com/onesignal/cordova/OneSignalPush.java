@@ -154,6 +154,7 @@ public class OneSignalPush extends CordovaPlugin
     private static CallbackContext jsNotificationClickedCallback;
 
     private static boolean initDone;
+    private static boolean listenersAdded;
 
     /**
      * N O T I F I C A T I O N    L I F E C Y C L E
@@ -369,17 +370,29 @@ public class OneSignalPush extends CordovaPlugin
             return true;
         }
 
-        initDone = true;
         OneSignalWrapper.setSdkType("cordova");
         OneSignalWrapper.setSdkVersion("050603");
         try {
-            String appId = data.getString(0);
+            // getString coerces a JSON null to the literal "null", which native would treat as a
+            // real app id and never fall back to the cached one.
+            String appId = data.isNull(0) ? null : data.getString(0);
+
+            // Latch only once an app id is present, so an init without one does not turn a later
+            // init with a real app id into the no-op branch above.
+            if (appId != null && !appId.isEmpty()) {
+                initDone = true;
+            }
+
             OneSignal.initWithContext(this.cordova.getActivity(), appId);
 
-            // add listeners
-            OneSignal.getInAppMessages().addLifecycleListener(this);
-            OneSignal.getInAppMessages().addClickListener(this);
-            OneSignal.getNotifications().addForegroundLifecycleListener(this);
+            // add listeners. Guarded because init can now run more than once when the first call
+            // had no app id, and the listener lists do not dedupe.
+            if (!listenersAdded) {
+                listenersAdded = true;
+                OneSignal.getInAppMessages().addLifecycleListener(this);
+                OneSignal.getInAppMessages().addClickListener(this);
+                OneSignal.getNotifications().addForegroundLifecycleListener(this);
+            }
 
             CallbackHelper.callbackSuccessBoolean(callbackContext, true);
             return true;

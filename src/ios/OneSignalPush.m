@@ -54,6 +54,7 @@ OSNotification *notification;
 id<CDVCommandDelegate> pluginCommandDelegate;
 
 bool initDone = false;
+bool lifecycleListenerAdded = false;
 
 void successCallback(NSString *callbackId, NSDictionary *data) {
   CDVPluginResult *commandResult =
@@ -131,6 +132,12 @@ NSString *getStringOrNSNull(NSString *string) {
   } else {
     return [NSNull null];
   }
+}
+
+/** A JS null arrives as NSNull, which is not nil and answers no NSString
+ *  selector. Collapse it to nil so arguments can be nil-checked. **/
+NSString *_Nullable stringArgumentOrNil(id argument) {
+  return [argument isKindOfClass:[NSString class]] ? (NSString *)argument : nil;
 }
 
 @implementation UIApplication (OneSignalCordovaPush)
@@ -342,21 +349,38 @@ static Class delegateClass = nil;
     successCallbackBoolean(command.callbackId, true);
     return;
   }
-  initDone = true;
+  NSString *appId = stringArgumentOrNil(command.arguments[0]);
+  // Collapse empty to nil. Native rejects @"" outright, while nil means "no app
+  // id supplied" and lets it fall back to the one cached by an earlier launch,
+  // which is what Android does.
+  if (appId.length == 0) {
+    appId = nil;
+  }
+
+  // Latch only once an app id is present. Without one native waits for setAppId
+  // and never starts, so latching would turn a later init with a real app id
+  // into the no-op branch above.
+  if (appId != nil) {
+    initDone = true;
+  }
+
   _notificationWillDisplayCache = [NSMutableDictionary new];
   _preventDefaultCache = [NSMutableDictionary new];
 
   pluginCommandDelegate = self.commandDelegate;
 
-  NSString *appId = (NSString *)command.arguments[0];
   NSString *appIdStr =
       (appId ? [NSString stringWithUTF8String:[appId UTF8String]] : nil);
 
   [OneSignal initialize:appIdStr withLaunchOptions:nil];
 
   // Automatically add this listener as each lifecycle is registered by the
-  // developer separately
-  [OneSignal.InAppMessages addLifecycleListener:self];
+  // developer separately. Guarded because init can now run more than once when
+  // the first call had no app id, and the listener array does not dedupe.
+  if (!lifecycleListenerAdded) {
+    lifecycleListenerAdded = true;
+    [OneSignal.InAppMessages addLifecycleListener:self];
+  }
 
   if (actionNotification)
     processNotificationClicked(actionNotification);
@@ -422,7 +446,15 @@ static Class delegateClass = nil;
 }
 
 - (void)login:(CDVInvokedUrlCommand *)command {
-  [OneSignal login:command.arguments[0]];
+  // Native login forwards externalId into a non-optional Swift parameter with
+  // no nil handling, so it has to stop here.
+  NSString *externalId = stringArgumentOrNil(command.arguments[0]);
+  if (externalId.length == 0) {
+    [OneSignalLog onesignalLog:ONE_S_LL_ERROR
+                       message:@"login: externalId is required"];
+    return;
+  }
+  [OneSignal login:externalId];
 }
 
 - (void)logout:(CDVInvokedUrlCommand *)command {
